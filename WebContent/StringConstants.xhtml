@@ -1,0 +1,59 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:s="http://jboss.com/products/seam/taglib"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:rich="http://richfaces.org/rich"
+	template="layout/cleantemplate.xhtml">
+
+	<ui:define name="body">
+	
+		<script
+			src="#{facesContext.externalContext.requestContextPath}/codemirror.js"></script>
+		<script
+			src="#{facesContext.externalContext.requestContextPath}/xml.js"></script>
+		<script
+			src="#{facesContext.externalContext.requestContextPath}/skynet-codemirror.js"></script>
+		<script type="text/javascript">
+			window.onload = function() {
+				initializeCodeMirror("#{rich:clientId('constantValue')}", true);
+			};
+		</script>
+
+		<rich:panel>
+			<f:facet name="header">String constants Details</f:facet>
+
+			<s:decorate id="constantNameField" template="layout/display.xhtml">
+				<ui:define name="label">Constant name</ui:define>
+				<h:outputText value="#{stringConstantsHome.instance.constantName}" />
+			</s:decorate>
+
+			<s:decorate id="constantValueField" template="layout/display.xhtml">
+				<ui:define name="label">Constant value</ui:define>
+				<h:inputTextarea 
+					id="constantValue" 
+					cols="80" 
+					rows="10"
+					readonly="true"
+					value="#{stringConstantsHome.instance.constantValue}" />
+			</s:decorate>
+
+			<div style="clear: both" />
+
+		</rich:panel>
+
+		<div class="actionButtons">
+
+			<s:button view="/StringConstantsEdit.xhtml" id="edit" value="Edit" />
+
+			<s:button
+				view="/#{empty stringConstantsFrom ? 'StringConstantsList' : stringConstantsFrom}.xhtml"
+				id="done" value="Done" />
+
+		</div>
+
+	</ui:define>
+
+</ui:composition>

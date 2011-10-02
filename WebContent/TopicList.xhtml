@@ -1,0 +1,295 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:rich="http://richfaces.org/rich"
+    template="layout/cleantemplate.xhtml">
+
+<ui:define name="body">
+
+	<rich:simpleTogglePanel label="Topic Search Filter" switchType="ajax" opened="true">
+     
+		<h:form id="topicSearch" styleClass="edit">
+			<h:panelGrid id="grid" columns="1">
+				<h:panelGroup>
+					<s:decorate template="layout/display.xhtml" rendered="#{s:hasPermission('FilterTopicID', 'Rendered', null)}">
+			        	<ui:define name="label">Topic ID</ui:define>
+			            <h:inputText id="topicID" value="#{topicList.topic.topicId}"/>
+			        </s:decorate>
+				
+					<s:decorate template="layout/display.xhtml" rendered="#{s:hasPermission('FilterTopicAddedBy', 'Rendered', null)}">
+			        	<ui:define name="label">Topic Added By</ui:define>
+			            <h:inputText id="topicAddedBy" value="#{topicList.topic.topicAddedBy}"/>
+			        </s:decorate>
+					
+					<s:decorate template="layout/display.xhtml" rendered="#{s:hasPermission('FilterTopicTitle', 'Rendered', null)}">
+			        	<ui:define name="label">Topic Title</ui:define>
+			            <h:inputText id="topicTitle" value="#{topicList.topic.topicTitle}"/>
+			        </s:decorate>
+			
+					<s:decorate template="layout/display.xhtml" rendered="#{s:hasPermission('FilterTopicText', 'Rendered', null)}">
+					    <ui:define name="label">Topic Text</ui:define>
+					    <h:inputText id="topicText" value="#{topicList.topic.topicText}"/>
+					</s:decorate>			
+					
+					<s:decorate template="layout/display.xhtml">
+					    <ui:define name="label">Match</ui:define>
+					    <h:selectOneRadio id="logic" value="#{topicList.restrictionLogicOperator}" styleClass="radio">
+					        <f:selectItem itemLabel="All" itemValue="and"/>
+					        <f:selectItem itemLabel="Any" itemValue="or"/>
+					    </h:selectOneRadio>
+					</s:decorate>
+				</h:panelGroup>				
+			
+	          	<h:panelGroup>
+		          	<div class="actionButtons">
+			           <h:commandButton id="search" value="Search" action="/TopicList.xhtml?firstResult=0"/>
+			           <s:button id="reset" value="Reset" includePageParams="false"/>
+		      		</div>
+		      	</h:panelGroup>
+      		
+      		</h:panelGrid>
+     	
+	 	</h:form>
+     	
+	
+	</rich:simpleTogglePanel>
+
+	<br/><br/>
+   
+    <rich:panel>
+        <f:facet name="header">Topic Search Results (#{empty topicList.resultList ? 0 : (topicList.paginated ? topicList.resultCount : topicList.resultList.size)})</f:facet>
+        
+         <div class="tableControl">
+
+        <s:link view="/TopicList.xhtml"
+            rendered="#{topicList.previousExists}"
+               value="#{messages.left}#{messages.left} First Page"
+                  id="firstPageTop">
+          <f:param name="firstResult" value="0"/>
+        </s:link>
+
+        <s:link view="/TopicList.xhtml"
+            rendered="#{topicList.previousExists}"
+               value="#{messages.left} Previous Page"
+                  id="previousPageTop">
+            <f:param name="firstResult"
+                    value="#{topicList.previousFirstResult}"/>
+        </s:link>
+
+        <s:link view="/TopicList.xhtml"
+            rendered="#{topicList.nextExists}"
+               value="Next Page #{messages.right}"
+                  id="nextPageTop">
+            <f:param name="firstResult"
+                    value="#{topicList.nextFirstResult}"/>
+        </s:link>
+	
+        <s:link view="/TopicList.xhtml"
+            rendered="#{topicList.nextExists}"
+               value="Last Page #{messages.right}#{messages.right}"
+                  id="lastPageTop">
+            <f:param name="firstResult"
+                    value="#{topicList.lastFirstResult}"/>
+        </s:link>
+
+    </div>
+    
+    <br/><br/>
+        
+    <div class="results" id="topicList">
+
+    <h:outputText value="The topic search returned no results."
+               rendered="#{empty topicList.resultList}"/>
+
+    <rich:dataTable id="topicList"
+                var="_topic"
+              value="#{topicList.resultList}"
+           rendered="#{not empty topicList.resultList}">
+        
+        <rich:column styleClass="action" rendered="#{s:hasPermission('TopicListActionColumn', 'Rendered', null)}">
+            <f:facet name="header">Action</f:facet>
+            <s:link view="/#{empty from ? 'Topic' : from}.xhtml"
+                   value="#{empty from ? 'View' : 'Select'}"
+             propagation="#{empty from ? 'none' : 'default'}"
+                      id="topicViewId">
+                <f:param name="topicTopicId" value="#{_topic.topicId}"/>
+            </s:link>
+            <br/>
+            <s:link view="/TopicEdit.xhtml"
+                   value="Edit"
+             propagation="none"
+                      id="topicEdit"
+                rendered="#{empty from}">
+                <f:param name="topicTopicId" value="#{_topic.topicId}"/>
+            </s:link>
+            <br/>
+            <s:link view="/CustomTopicTags.xhtml"
+                   value="Tags"
+             propagation="none"
+                      id="topicTagsEdit"
+                rendered="#{empty from}">
+                <f:param name="topicTopicId" value="#{_topic.topicId}"/>
+            </s:link>
+            <br/>
+            <s:link view="/CustomRelatedTopicList.xhtml"
+                   value="Related"
+             propagation="none"
+                      id="topicRelatedTopicSelect"
+                rendered="#{empty from}">
+                <f:param name="topicTopicId" value="#{_topic.topicId}"/>
+            </s:link>  
+            <br/>
+            <s:link view="/CustomTopicRelatedEdit.xhtml"
+                   value="Remove Related"
+             propagation="none"
+                      id="topicRelatedTopicEdit"
+                rendered="#{empty from}">
+                <f:param name="topicTopicId" value="#{_topic.topicId}"/>
+            </s:link>           
+        </rich:column>
+        
+        
+        <h:column rendered="#{s:hasPermission('TopicListIDColumn', 'Rendered', null)}">
+            <f:facet name="header">
+                <ui:include src="layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{topicList}"/>
+                    <ui:param name="propertyLabel" value="ID"/>
+                    <ui:param name="propertyPath" value="topic.topicId"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_topic.topicId}"/>
+        </h:column>
+        
+        <h:column rendered="#{s:hasPermission('TopicListTitleColumn', 'Rendered', null)}">
+            <f:facet name="header">
+                <ui:include src="layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{topicList}"/>
+                    <ui:param name="propertyLabel" value="Topic Title"/>
+                    <ui:param name="propertyPath" value="topic.topicTitle"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_topic.topicTitle}" style="white-space: nowrap;"/>
+        </h:column>
+        
+        <h:column rendered="#{s:hasPermission('TopicListTextColumn', 'Rendered', null)}">
+            <f:facet name="header">
+                <ui:include src="layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{topicList}"/>
+                    <ui:param name="propertyLabel" value="Topic Text"/>
+                    <ui:param name="propertyPath" value="topic.topicText"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_topic.topicText}"/>
+        </h:column>
+        
+        <h:column rendered="#{s:hasPermission('TopicListAddedByColumn', 'Rendered', null)}">
+            <f:facet name="header">
+                <ui:include src="layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{topicList}"/>
+                    <ui:param name="propertyLabel" value="Added By"/>
+                    <ui:param name="propertyPath" value="topic.topicAddedBy"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_topic.topicAddedBy}"/>
+        </h:column>
+        
+        <h:column rendered="#{s:hasPermission('TopicListURLColumn', 'Rendered', null)}">
+            <f:facet name="header">
+				<h:outputText value="Source Material URL"/>
+	        </f:facet>
+		    <rich:dataList var="url" value="#{_topic.topicToTopicSourceUrls.toArray()}">
+				 <h:outputLink value="#{url.topicSourceUrl.sourceUrl}">
+				 	<h:outputText value="Source URL" rendered="#{empty url.topicSourceUrl.title}"/>
+				 	<h:outputText value="#{url.topicSourceUrl.title}" rendered="#{not empty url.topicSourceUrl.title}"/>
+				 </h:outputLink>
+			</rich:dataList>
+        </h:column>
+        
+        <!-- <h:column rendered="#{s:hasPermission('TopicListSVNURLColumn', 'Rendered', null)}">
+            <f:facet name="header">
+                <ui:include src="layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{topicList}"/>
+                    <ui:param name="propertyLabel" value="Topic SVN URL"/>
+                    <ui:param name="propertyPath" value="topic.topicSvnUrl"/>
+                </ui:include>
+            </f:facet>
+            <h:outputLink value="#{_topic.topicSvnUrl}" rendered="#{not empty _topic.topicSvnUrl}">
+				<h:outputText value="Topic SVN URL" />
+			</h:outputLink>
+        </h:column>  -->
+               
+        <h:column rendered="#{s:hasPermission('TopicListRelatedTopicsColumn', 'Rendered', null)}">
+            <f:facet name="header">
+                Related Topics
+            </f:facet>
+            <h:outputText value="#{_topic.relatedTopicsList}"/>
+        </h:column>
+        
+        <h:column rendered="#{s:hasPermission('TopicListTagsColumn', 'Rendered', null)}">
+            <f:facet name="header">
+                Topic Tags
+            </f:facet>
+            <h:outputText value="#{_topic.tagsList}" escape="false"  styleClass="taglist"/>
+        </h:column>
+        
+        
+    </rich:dataTable>
+
+    </div>
+    
+    <br/><br/>
+    
+    <div class="tableControl">
+
+        <s:link view="/TopicList.xhtml"
+            rendered="#{topicList.previousExists}"
+               value="#{messages.left}#{messages.left} First Page"
+                  id="firstPage">
+          <f:param name="firstResult" value="0"/>
+        </s:link>
+
+        <s:link view="/TopicList.xhtml"
+            rendered="#{topicList.previousExists}"
+               value="#{messages.left} Previous Page"
+                  id="previousPage">
+            <f:param name="firstResult"
+                    value="#{topicList.previousFirstResult}"/>
+        </s:link>
+
+        <s:link view="/TopicList.xhtml"
+            rendered="#{topicList.nextExists}"
+               value="Next Page #{messages.right}"
+                  id="nextPage">
+            <f:param name="firstResult"
+                    value="#{topicList.nextFirstResult}"/>
+        </s:link>
+
+        <s:link view="/TopicList.xhtml"
+            rendered="#{topicList.nextExists}"
+               value="Last Page #{messages.right}#{messages.right}"
+                  id="lastPage">
+            <f:param name="firstResult"
+                    value="#{topicList.lastFirstResult}"/>
+        </s:link>
+
+    </div>
+    </rich:panel>
+
+    
+
+    <s:div styleClass="actionButtons" rendered="#{empty from}">
+        <s:button view="/TopicEdit.xhtml"
+                    id="create"
+           propagation="none"
+                 value="Add Task">
+            <f:param name="topicTopicId"/>
+        </s:button>
+    </s:div>
+
+</ui:define>
+
+</ui:composition>

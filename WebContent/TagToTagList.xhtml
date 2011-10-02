@@ -1,0 +1,155 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:rich="http://richfaces.org/rich"
+    template="layout/cleantemplate.xhtml">
+
+<ui:define name="body">
+
+    <h:form id="tagToTagSearch" styleClass="edit">
+
+        <rich:simpleTogglePanel label="TagToTag Search Filter" switchType="ajax">
+
+            <s:decorate template="layout/display.xhtml">
+                <ui:define name="label">Match</ui:define>
+                <h:selectOneRadio id="logic" value="#{tagToTagList.restrictionLogicOperator}" styleClass="radio">
+                    <f:selectItem itemLabel="All" itemValue="and"/>
+                    <f:selectItem itemLabel="Any" itemValue="or"/>
+                </h:selectOneRadio>
+            </s:decorate>
+
+        </rich:simpleTogglePanel>
+
+        <div class="actionButtons">
+            <h:commandButton id="search" value="Search" action="/TagToTagList.xhtml"/>
+            <s:button id="reset" value="Reset" includePageParams="false"/>
+        </div>
+
+    </h:form>
+
+    <rich:panel>
+        <f:facet name="header">TagToTag Search Results (#{empty tagToTagList.resultList ? 0 : (tagToTagList.paginated ? tagToTagList.resultCount : tagToTagList.resultList.size)})</f:facet>
+    <div class="results" id="tagToTagList">
+
+    <h:outputText value="The tagToTag search returned no results."
+               rendered="#{empty tagToTagList.resultList}"/>
+
+    <rich:dataTable id="tagToTagList"
+                var="_tagToTag"
+              value="#{tagToTagList.resultList}"
+           rendered="#{not empty tagToTagList.resultList}">
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{tagToTagList}"/>
+                    <ui:param name="propertyLabel" value="Tag to tag id"/>
+                    <ui:param name="propertyPath" value="tagToTag.tagToTagId"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_tagToTag.tagToTagId}"/>
+        </h:column>
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{tagToTagList}"/>
+                    <ui:param name="propertyLabel" value="Tag to tag relationship tag to tag relationship type"/>
+                    <ui:param name="propertyPath" value="tagToTag.tagToTagRelationship.tagToTagRelationshipType"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_tagToTag.tagToTagRelationship.tagToTagRelationshipType}"/>
+        </h:column>
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{tagToTagList}"/>
+                    <ui:param name="propertyLabel" value="Primary tag id"/>
+                    <ui:param name="propertyPath" value="tagToTag.primaryTagId"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_tagToTag.primaryTagId}"/>
+        </h:column>
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{tagToTagList}"/>
+                    <ui:param name="propertyLabel" value="Secondary tag id"/>
+                    <ui:param name="propertyPath" value="tagToTag.secondaryTagId"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_tagToTag.secondaryTagId}"/>
+        </h:column>
+        <rich:column styleClass="action">
+            <f:facet name="header">Action</f:facet>
+            <s:link view="/#{empty from ? 'TagToTag' : from}.xhtml"
+                   value="#{empty from ? 'View' : 'Select'}"
+             propagation="#{empty from ? 'none' : 'default'}"
+                      id="tagToTagViewId">
+                <f:param name="tagToTagTagToTagId"
+                        value="#{_tagToTag.tagToTagId}"/>
+            </s:link>
+            #{' '}
+            <s:link view="/TagToTagEdit.xhtml"
+                   value="Edit"
+             propagation="none"
+                      id="tagToTagEdit"
+                rendered="#{empty from}">
+                <f:param name="tagToTagTagToTagId"
+                        value="#{_tagToTag.tagToTagId}"/>
+            </s:link>
+        </rich:column>
+    </rich:dataTable>
+
+    </div>
+    </rich:panel>
+
+    <div class="tableControl">
+
+        <s:link view="/TagToTagList.xhtml"
+            rendered="#{tagToTagList.previousExists}"
+               value="#{messages.left}#{messages.left} First Page"
+                  id="firstPage">
+          <f:param name="firstResult" value="0"/>
+        </s:link>
+
+        <s:link view="/TagToTagList.xhtml"
+            rendered="#{tagToTagList.previousExists}"
+               value="#{messages.left} Previous Page"
+                  id="previousPage">
+            <f:param name="firstResult"
+                    value="#{tagToTagList.previousFirstResult}"/>
+        </s:link>
+
+        <s:link view="/TagToTagList.xhtml"
+            rendered="#{tagToTagList.nextExists}"
+               value="Next Page #{messages.right}"
+                  id="nextPage">
+            <f:param name="firstResult"
+                    value="#{tagToTagList.nextFirstResult}"/>
+        </s:link>
+
+        <s:link view="/TagToTagList.xhtml"
+            rendered="#{tagToTagList.nextExists}"
+               value="Last Page #{messages.right}#{messages.right}"
+                  id="lastPage">
+            <f:param name="firstResult"
+                    value="#{tagToTagList.lastFirstResult}"/>
+        </s:link>
+
+    </div>
+
+    <s:div styleClass="actionButtons" rendered="#{empty from}">
+        <s:button view="/TagToTagEdit.xhtml"
+                    id="create"
+           propagation="none"
+                 value="Create tagToTag">
+            <f:param name="tagToTagTagToTagId"/>
+        </s:button>
+    </s:div>
+
+</ui:define>
+
+</ui:composition>

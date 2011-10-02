@@ -1,0 +1,82 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:rich="http://richfaces.org/rich"
+    template="layout/template.xhtml">
+
+<ui:define name="body">
+
+    <rich:panel>
+        <f:facet name="header">Tag to project Details</f:facet>
+
+
+        <s:decorate id="tagId" template="layout/display.xhtml">
+            <ui:define name="label">Tag id</ui:define>
+            <h:outputText value="#{tagToProjectHome.instance.tagId}"/>
+        </s:decorate>
+
+        <div style="clear:both"/>
+
+    </rich:panel>
+
+    <div class="actionButtons">
+
+        <s:button view="/TagToProjectEdit.xhtml"
+                    id="edit"
+                 value="Edit"/>
+
+        <s:button view="/#{empty tagToProjectFrom ? 'TagToProjectList' : tagToProjectFrom}.xhtml"
+                    id="done"
+                 value="Done"/>
+
+    </div>
+
+    <rich:tabPanel switchType="ajax">
+
+    <rich:tab>
+        <f:facet name="label">
+            <h:panelGroup><h:graphicImage value="/img/manytoone.gif" style="vertical-align: middle; padding-right: 4px;"/>Project</h:panelGroup>
+        </f:facet>
+    <div class="association" id="projectParent">
+
+        <h:outputText value="There is no project associated with this tagToProject."
+                   rendered="#{tagToProjectHome.instance.project == null}"/>
+
+        <rich:dataTable var="_project"
+                   value="#{tagToProjectHome.instance.project}"
+                rendered="#{tagToProjectHome.instance.project != null}"
+              rowClasses="rvgRowOne,rvgRowTwo"
+                      id="projectTable">
+            <h:column>
+                <f:facet name="header">Project id</f:facet>
+                <h:outputText value="#{_project.projectId}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Project name</f:facet>
+                <h:outputText value="#{_project.projectName}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Project description</f:facet>
+                <h:outputText value="#{_project.projectDescription}"/>
+            </h:column>
+            <h:column styleClass="action">
+                <f:facet name="header">Action</f:facet>
+                <s:link id="viewproject"
+                     value="View"
+                      view="/Project.xhtml">
+                    <f:param name="projectProjectId"
+                           value="#{_project.projectId}"/>
+                </s:link>
+            </h:column>
+        </rich:dataTable>
+
+    </div>
+    </rich:tab>
+</rich:tabPanel>
+</ui:define>
+
+</ui:composition>

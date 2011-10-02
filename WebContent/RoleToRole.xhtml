@@ -1,0 +1,83 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:rich="http://richfaces.org/rich"
+    template="layout/template.xhtml">
+
+<ui:define name="body">
+
+    <rich:panel>
+        <f:facet name="header">Role to role Details</f:facet>
+
+
+        <s:decorate id="primaryRole" template="layout/display.xhtml">
+            <ui:define name="label">Primary role</ui:define>
+            <h:outputText value="#{roleToRoleHome.instance.primaryRole}"/>
+        </s:decorate>
+
+        <s:decorate id="secondaryRole" template="layout/display.xhtml">
+            <ui:define name="label">Secondary role</ui:define>
+            <h:outputText value="#{roleToRoleHome.instance.secondaryRole}"/>
+        </s:decorate>
+
+        <div style="clear:both"/>
+
+    </rich:panel>
+
+    <div class="actionButtons">
+
+        <s:button view="/RoleToRoleEdit.xhtml"
+                    id="edit"
+                 value="Edit"/>
+
+        <s:button view="/#{empty roleToRoleFrom ? 'RoleToRoleList' : roleToRoleFrom}.xhtml"
+                    id="done"
+                 value="Done"/>
+
+    </div>
+
+    <rich:tabPanel switchType="ajax">
+
+    <rich:tab>
+        <f:facet name="label">
+            <h:panelGroup><h:graphicImage value="/img/manytoone.gif" style="vertical-align: middle; padding-right: 4px;"/>Role to role relationship</h:panelGroup>
+        </f:facet>
+    <div class="association" id="roleToRoleRelationshipParent">
+
+        <h:outputText value="There is no roleToRoleRelationship associated with this roleToRole."
+                   rendered="#{roleToRoleHome.instance.roleToRoleRelationship == null}"/>
+
+        <rich:dataTable var="_roleToRoleRelationship"
+                   value="#{roleToRoleHome.instance.roleToRoleRelationship}"
+                rendered="#{roleToRoleHome.instance.roleToRoleRelationship != null}"
+              rowClasses="rvgRowOne,rvgRowTwo"
+                      id="roleToRoleRelationshipTable">
+            <h:column>
+                <f:facet name="header">Role to role relationship id</f:facet>
+                <h:outputText value="#{_roleToRoleRelationship.roleToRoleRelationshipId}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Description</f:facet>
+                <h:outputText value="#{_roleToRoleRelationship.description}"/>
+            </h:column>
+            <h:column styleClass="action">
+                <f:facet name="header">Action</f:facet>
+                <s:link id="viewroleToRoleRelationship"
+                     value="View"
+                      view="/RoleToRoleRelationship.xhtml">
+                    <f:param name="roleToRoleRelationshipRoleToRoleRelationshipId"
+                           value="#{_roleToRoleRelationship.roleToRoleRelationshipId}"/>
+                </s:link>
+            </h:column>
+        </rich:dataTable>
+
+    </div>
+    </rich:tab>
+</rich:tabPanel>
+</ui:define>
+
+</ui:composition>

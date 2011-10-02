@@ -1,0 +1,87 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:rich="http://richfaces.org/rich"
+    template="layout/cleantemplate.xhtml">
+
+<ui:define name="body">
+
+    <rich:panel>
+        <f:facet name="header">Filter category Details</f:facet>
+
+
+        <s:decorate id="categoryId" template="layout/display.xhtml">
+            <ui:define name="label">Category id</ui:define>
+            <h:outputText value="#{filterCategoryHome.instance.category.categoryId}"/>
+        </s:decorate>
+
+        <s:decorate id="categoryState" template="layout/display.xhtml">
+            <ui:define name="label">Category state</ui:define>
+            <h:outputText value="#{filterCategoryHome.instance.categoryState}"/>
+        </s:decorate>
+
+        <div style="clear:both"/>
+
+    </rich:panel>
+
+    <div class="actionButtons">
+
+        <s:button view="/FilterCategoryEdit.xhtml"
+                    id="edit"
+                 value="Edit"/>
+
+        <s:button view="/#{empty filterCategoryFrom ? 'FilterCategoryList' : filterCategoryFrom}.xhtml"
+                    id="done"
+                 value="Done"/>
+
+    </div>
+
+    <rich:tabPanel switchType="ajax">
+
+    <rich:tab>
+        <f:facet name="label">
+            <h:panelGroup><h:graphicImage value="/img/manytoone.gif" style="vertical-align: middle; padding-right: 4px;"/>Filter</h:panelGroup>
+        </f:facet>
+    <div class="association" id="filterParent">
+
+        <h:outputText value="There is no filter associated with this filterCategory."
+                   rendered="#{filterCategoryHome.instance.filter == null}"/>
+
+        <rich:dataTable var="_filter"
+                   value="#{filterCategoryHome.instance.filter}"
+                rendered="#{filterCategoryHome.instance.filter != null}"
+              rowClasses="rvgRowOne,rvgRowTwo"
+                      id="filterTable">
+            <h:column>
+                <f:facet name="header">Filter id</f:facet>
+                <h:outputText value="#{_filter.filterId}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Filter name</f:facet>
+                <h:outputText value="#{_filter.filterName}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Filter description</f:facet>
+                <h:outputText value="#{_filter.filterDescription}"/>
+            </h:column>
+            <h:column styleClass="action">
+                <f:facet name="header">Action</f:facet>
+                <s:link id="viewfilter"
+                     value="View"
+                      view="/Filter.xhtml">
+                    <f:param name="filterFilterId"
+                           value="#{_filter.filterId}"/>
+                </s:link>
+            </h:column>
+        </rich:dataTable>
+
+    </div>
+    </rich:tab>
+</rich:tabPanel>
+</ui:define>
+
+</ui:composition>

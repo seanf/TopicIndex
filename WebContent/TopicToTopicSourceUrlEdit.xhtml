@@ -1,0 +1,115 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:a="http://richfaces.org/a4j"
+    xmlns:rich="http://richfaces.org/rich"
+    template="layout/template.xhtml">
+
+<ui:define name="body">
+
+    <h:form id="topicToTopicSourceUrl" styleClass="edit">
+
+        <rich:panel>
+            <f:facet name="header">#{topicToTopicSourceUrlHome.managed ? 'Edit' : 'Add'} Topic to topic source url</f:facet>
+
+
+
+
+            <s:decorate id="topicIdField" template="layout/edit.xhtml">
+                <ui:define name="label">Topic id</ui:define>
+                <h:inputText id="topicId"
+                       required="true"
+                          value="#{topicToTopicSourceUrlHome.instance.topicId}">
+                    <a:support event="onblur" reRender="topicIdField" bypassUpdates="true" ajaxSingle="true"/>
+                </h:inputText>
+            </s:decorate>
+
+            <div style="clear:both">
+                <span class="required">*</span>
+                required fields
+            </div>
+
+        </rich:panel>
+
+        <div class="actionButtons">
+
+            <h:commandButton id="save"
+                          value="Save"
+                         action="#{topicToTopicSourceUrlHome.persist}"
+                       disabled="#{!topicToTopicSourceUrlHome.wired}"
+                       rendered="#{!topicToTopicSourceUrlHome.managed}"/>
+
+            <h:commandButton id="update"
+                          value="Save"
+                         action="#{topicToTopicSourceUrlHome.update}"
+                       rendered="#{topicToTopicSourceUrlHome.managed}"/>
+
+            <h:commandButton id="delete"
+                          value="Delete"
+                         action="#{topicToTopicSourceUrlHome.remove}"
+                      immediate="true"
+                       rendered="#{topicToTopicSourceUrlHome.managed}"/>
+
+            <s:button id="cancelEdit"
+                   value="Cancel"
+             propagation="end"
+                    view="/TopicToTopicSourceUrl.xhtml"
+                rendered="#{topicToTopicSourceUrlHome.managed}"/>
+
+            <s:button id="cancelAdd"
+                   value="Cancel"
+             propagation="end"
+                    view="/#{empty topicToTopicSourceUrlFrom ? 'TopicToTopicSourceUrlList' : topicToTopicSourceUrlFrom}.xhtml"
+                rendered="#{!topicToTopicSourceUrlHome.managed}"/>
+
+        </div>
+    </h:form>
+
+<rich:tabPanel switchType="ajax">
+
+    <rich:tab label="Topic source url *" labelClass="required">
+    <div class="association" id="topicSourceUrlParent">
+
+        <h:outputText value="There is no topicSourceUrl associated with this topicToTopicSourceUrl."
+                   rendered="#{topicToTopicSourceUrlHome.instance.topicSourceUrl == null}"/>
+
+        <rich:dataTable var="_topicSourceUrl"
+                   value="#{topicToTopicSourceUrlHome.instance.topicSourceUrl}"
+                rendered="#{topicToTopicSourceUrlHome.instance.topicSourceUrl != null}"
+              rowClasses="rvgRowOne,rvgRowTwo"
+                      id="topicSourceUrlTable">
+            <h:column>
+                <f:facet name="header">Topic source urlid</f:facet>
+                <h:outputText value="#{_topicSourceUrl.topicSourceUrlid}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Source url</f:facet>
+                <h:outputText value="#{_topicSourceUrl.sourceUrl}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Description</f:facet>
+                <h:outputText value="#{_topicSourceUrl.description}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Original topic id</f:facet>
+                <h:outputText value="#{_topicSourceUrl.originalTopicId}"/>
+            </h:column>
+        </rich:dataTable>
+
+        <div class="actionButtons">
+            <s:button id="#{topicToTopicSourceUrlHome.instance.topicSourceUrl != null ? 'changeParent' : 'selectParent'}" value="#{topicToTopicSourceUrlHome.instance.topicSourceUrl != null ? 'Change' : 'Select'} topicSourceUrl"
+                       view="/TopicSourceUrlList.xhtml">
+                <f:param name="from" value="TopicToTopicSourceUrlEdit"/>
+            </s:button>
+        </div>
+
+    </div>
+    </rich:tab>
+</rich:tabPanel>
+</ui:define>
+
+</ui:composition>

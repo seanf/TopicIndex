@@ -1,0 +1,277 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:s="http://jboss.com/products/seam/taglib"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:c="http://java.sun.com/jstl/core"
+	template="layout/cleantemplate.xhtml">
+
+	<ui:define name="body">
+
+		<script
+			src="#{facesContext.externalContext.requestContextPath}/filterscripts.js"></script>
+
+		<!-- Disable the not fields once the page has loaded. Disabling them here in this file would also disable data binding,
+		 making the fields useless. So we have to do it at runtime.	 -->
+		<rich:jQuery selector="input[id*='tag-']" timing="onload"
+			query="each(function(index, element){if (element.checked){jQuery('input[id*=' + element.id.replace('tag', 'tagnot') + ']').removeAttr('disabled');} else {jQuery('input[id*=' + element.id.replace('tag', 'tagnot') + ']').attr('disabled', true);}})" />
+
+		<h:graphicImage value="/img/skynet.png" alt="Redhat Logo"
+			style="vertical-align:middle; padding: 10px" />
+		<h:outputText value="Skynet"
+			style="font-weight:bold; font-size: large; padding: 10px" />
+		<br />
+		<h:outputText value="All your topics are belong to us!"
+			style="padding: 10px" />
+
+		<br />
+		<br />
+		<br />
+		<br />
+
+		<h:form id="topicIndexSearch" styleClass="edit">
+			<rich:tabPanel switchType="client">
+				<rich:tab label="Tag And Field Search">
+					<div class="actionButtons">
+						<h:commandButton id="searchTop" value="Search"
+							action="#{customTagSearch.doSearch()}" />
+						<s:button id="resetTop" value="Reset" includePageParams="false" />
+						<h:commandButton id="newTopicTop" value="Create New Topic"
+							action="#{customTagSearch.getCreateNewTopicUrl()}" />
+						<h:commandButton id="xmlDownloadTop" value="Download XML"
+							action="#{customTagSearch.downloadXML()}" />
+					</div>
+
+					<br />
+					<br />
+					<br />
+					<br />
+
+					<rich:panel>
+						<f:facet name="header">Build DocBook</f:facet>
+						<h:panelGrid columns="2">
+							<h:selectBooleanCheckbox
+								value="#{customTagSearch.docbookBuildingOptions.publicanShowRemarks}" />
+							<h:outputText value="Show remarks" />
+
+							<h:selectBooleanCheckbox
+								value="#{customTagSearch.docbookBuildingOptions.processRelatedTopics}" />
+							<h:outputText value="Include all related topics" />
+
+							<h:selectBooleanCheckbox
+								value="#{customTagSearch.docbookBuildingOptions.enableDynamicTreeToc}" />
+							<h:outputText
+								value="Create dynamic TOC tree view. When disabled, the links can be styled against the topic lifecycle." />
+
+							<h:selectBooleanCheckbox
+								value="#{customTagSearch.docbookBuildingOptions.buildNarrative}" />
+							<h:outputText
+								value="Build a narrative documentation style. The sequence of topic IDs in the 'Topic ID' filter field defines the order of the narrative. With this option set the 'Create dynamic TOC tree view' and 'Include all related topics' options will be ignored." />
+
+							<h:selectBooleanCheckbox
+								value="#{customTagSearch.docbookBuildingOptions.ignoreMissingCustomInjections}" />
+							<h:outputText
+								value="Ignore topics that have been referenced in a custom injection point, but are not included by the filter. WARNING: This may lead to some strange results e.g. if a 'Inject' has been used inline, but the topic it references is not available." />
+
+							<h:selectBooleanCheckbox
+								value="#{customTagSearch.docbookBuildingOptions.suppressErrorsPage}" />
+							<h:outputText value="Suppress errors page" />
+						</h:panelGrid>
+
+						<br />
+						<h:commandButton id="docbookTop" value="Docbook"
+							action="#{customTagSearch.buildDocbook()}" />
+					</rich:panel>
+
+					<br />
+
+					<rich:panel style="width: 100%; overflow: auto;">
+						<f:facet name="header">Manage Filters</f:facet>
+						<h:selectOneMenu style="width:300px; margin:10px"
+							value="#{customTagSearch.selectedFilter}">
+							<f:selectItem itemLabel="[Unload Filter]" itemValue="" />
+							<c:forEach items="#{customTagSearch.filters}" var="filter">
+								<f:selectItem itemLabel="#{filter.filterName}"
+									itemValue="#{filter.filterId}" />
+							</c:forEach>
+						</h:selectOneMenu>
+						<h:commandButton style="margin:10px" value="Load"
+							action="#{customTagSearch.loadFilter}" />
+						<h:outputText style="margin:10px" value="Filter Name: " />
+						<h:inputText style="margin:10px"
+							value="#{customTagSearch.selectedFilterName}"></h:inputText>
+						<c:choose>
+							<c:when test="#{customTagSearch.selectedFilter == null}">
+								<h:commandButton value="Save"
+									action="#{customTagSearch.saveFilter()}"
+									title="Save this filter set as a new Filter." />
+							</c:when>
+							<c:otherwise>
+								<h:commandButton value="Update"
+									action="#{customTagSearch.saveFilter()}"
+									title="Update the loaded Filter with the selected filter set." />
+							</c:otherwise>
+						</c:choose>
+					</rich:panel>
+
+					<br />
+					<br />
+
+					<rich:panel style="width: 100%; overflow: auto;">
+						<f:facet name="header">Tag Filter</f:facet>
+
+						<ui:include src="/WEB-INF/templates/TagSelectAndNotSelect.xhtml">
+							<ui:param name="selectedTags"
+								value="#{customTagSearch.selectedTags.projectCategories}" />
+							<ui:param name="header" value="Topic Tag Filters" />
+							<ui:param name="logicEnabled" value="#{true}"/>					
+						</ui:include>
+					
+					</rich:panel>
+
+					<br />
+					<br />
+
+					<rich:panel style="width: 100%; overflow: auto;">
+						<f:facet name="header">Topic Field Filters</f:facet>
+						<h:panelGrid id="grid" columns="1">
+							<h:panelGroup>
+
+								<s:decorate template="layout/display.xhtml"
+									rendered="#{s:hasPermission('FilterTopicDates', 'Rendered', null)}">
+									<ui:define name="label">Topic Created After</ui:define>
+									<rich:calendar
+										value="#{customTagSearch.topic.startCreateDatePlain}"
+										locale="AU" popup="true" datePattern="dd MMM yyyy HH:mm"
+										showApplyButton="true" cellWidth="24px" cellHeight="22px"
+										style="width:200px" />
+								</s:decorate>
+
+								<s:decorate template="layout/display.xhtml"
+									rendered="#{s:hasPermission('FilterTopicDates', 'Rendered', null)}">
+									<ui:define name="label">Topic Created Before</ui:define>
+									<rich:calendar
+										value="#{customTagSearch.topic.endCreateDatePlain}"
+										locale="AU" popup="true" datePattern="dd MMM yyyy HH:mm"
+										showApplyButton="true" cellWidth="24px" cellHeight="22px"
+										style="width:200px" />
+
+								</s:decorate>
+
+								<s:decorate template="layout/display.xhtml"
+									rendered="#{s:hasPermission('FilterTopicID', 'Rendered', null)}">
+									<ui:define name="label">Topic ID</ui:define>
+									<h:inputText size="125" id="topicID"
+										value="#{customTagSearch.topic.topicIdsString}" />
+								</s:decorate>
+
+								<s:decorate template="layout/display.xhtml"
+									rendered="#{s:hasPermission('FilterTopicAddedBy', 'Rendered', null)}">
+									<ui:define name="label">Topic Added By</ui:define>
+									<h:inputText size="125" id="topicAddedBy"
+										value="#{customTagSearch.topic.topicAddedBy}" />
+								</s:decorate>
+
+								<s:decorate template="layout/display.xhtml"
+									rendered="#{s:hasPermission('FilterTopicTitle', 'Rendered', null)}">
+									<ui:define name="label">Topic Title</ui:define>
+									<h:inputText size="125" id="topicTitle"
+										value="#{customTagSearch.topic.topicTitle}" />
+								</s:decorate>
+
+								<s:decorate template="layout/display.xhtml"
+									rendered="#{s:hasPermission('FilterTopicXML', 'Rendered', null)}">
+									<ui:define name="label">Topic XML</ui:define>
+									<h:inputText size="125" id="topicXML"
+										value="#{customTagSearch.topic.topicXML}" />
+								</s:decorate>
+
+								<s:decorate template="layout/display.xhtml"
+									rendered="#{s:hasPermission('FilterTopicText', 'Rendered', null)}">
+									<ui:define name="label">Topic Description</ui:define>
+									<h:inputText size="125" id="topicText"
+										value="#{customTagSearch.topic.topicText}" />
+								</s:decorate>
+
+								<s:decorate template="layout/display.xhtml"
+									rendered="#{s:hasPermission('FilterTopicIsRelatedTo', 'Rendered', null)}">
+									<ui:define name="label">Is Related To</ui:define>
+									<h:inputText size="125" id="topicIsRelatedTo"
+										value="#{customTagSearch.topic.topicRelatedTo}" />
+								</s:decorate>
+
+
+								<s:decorate template="layout/display.xhtml"
+									rendered="#{s:hasPermission('FilterTopicIsRelatedFrom', 'Rendered', null)}">
+									<ui:define name="label">Is Related From</ui:define>
+									<h:inputText size="125" id="topicIsRelatedFrom"
+										value="#{customTagSearch.topic.topicRelatedFrom}" />
+								</s:decorate>
+
+								<s:decorate template="layout/display.xhtml"
+									rendered="#{s:hasPermission('FilterTopicHasRelationships', 'Rendered', null)}">
+									<ui:define name="label">Has Related Topics</ui:define>
+									<h:selectBooleanCheckbox id="hasRelationships"
+										value="#{customTagSearch.topic.hasRelationships}" />
+								</s:decorate>
+
+								<s:decorate template="layout/display.xhtml"
+									rendered="#{s:hasPermission('FilterTopicHasIncomingRelationships', 'Rendered', null)}">
+									<ui:define name="label">Has Incoming Related topics</ui:define>
+									<h:selectBooleanCheckbox id="hasIncomingRelationships"
+										value="#{customTagSearch.topic.hasIncomingRelationships}" />
+								</s:decorate>
+
+								<s:decorate template="layout/display.xhtml">
+									<ui:define name="label">Match</ui:define>
+									<h:selectOneRadio id="logic"
+										value="#{customTagSearch.topic.logic}" styleClass="radio">
+										<f:selectItem itemLabel="All" itemValue="and" />
+										<f:selectItem itemLabel="Any" itemValue="or" />
+									</h:selectOneRadio>
+								</s:decorate>
+							</h:panelGroup>
+						</h:panelGrid>
+					</rich:panel>
+
+					<br />
+					<br />
+
+					<div class="actionButtons">
+						<h:commandButton id="search" value="Search"
+							action="#{customTagSearch.doSearch()}" />
+						<s:button id="reset" value="Reset" includePageParams="false" />
+						<h:commandButton id="docbook" value="Docbook"
+							action="#{customTagSearch.buildDocbook()}" />
+						<h:commandButton id="xmlDownload" value="Download XML"
+							action="#{customTagSearch.downloadXML()}" />
+					</div>
+				</rich:tab>
+				<rich:tab label="Text Search">
+					<h:outputText
+						value="Enter a query in the textbox below, and click Search to perform a free text search on the contents of a Topic's XML." />
+					<br />
+					<h:outputText
+						value="You can find details on the Lucene search syntax " />
+					<h:outputLink
+						value="http://lucene.apache.org/java/2_4_0/queryparsersyntax.html">
+						<h:outputText value="here" />
+					</h:outputLink>
+					<h:outputText value="." />
+					<br />
+					<br />
+					<h:inputText size="125" id="topicIsRelatedFrom"
+						value="#{customTagSearch.topic.topicTextSearch}" />
+	        	 #{' '}
+	        	 <h:commandButton id="textSearch" value="Search"
+						action="#{customTagSearch.doTextSearch()}" />
+				</rich:tab>
+			</rich:tabPanel>
+		</h:form>
+
+	</ui:define>
+
+</ui:composition>

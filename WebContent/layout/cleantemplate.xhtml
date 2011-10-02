@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<f:view xmlns="http://www.w3.org/1999/xhtml"
+   xmlns:ui="http://java.sun.com/jsf/facelets"
+   xmlns:f="http://java.sun.com/jsf/core"
+   xmlns:h="http://java.sun.com/jsf/html"
+   xmlns:a="http://richfaces.org/a4j"
+   xmlns:s="http://jboss.com/products/seam/taglib"
+   xmlns:rich="http://richfaces.org/rich"
+   contentType="text/html">
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+      <title>TopicIndex</title>
+      <link rel="shortcut icon" href="#{request.contextPath}/favicon.png"/>
+      <a:loadStyle src="/stylesheet/theme.xcss"/>
+      <a:loadStyle src="/stylesheet/theme.css"/>
+      <a:loadStyle src="/stylesheet/codemirror.css"/>
+      <a:loadStyle src="/stylesheet/xml.css"/>
+      <ui:insert name="head"/>
+   </head>
+   <body>
+   		<h:form>		
+			<rich:toolBar>
+			 	<rich:toolBarGroup>
+			    	<h:outputText value="BUILD: #{webConstants.build}" />
+			    </rich:toolBarGroup>		    
+			    <rich:toolBarGroup>
+			        <s:link id="homeId" view="/CustomSearchTopicList.seam?filterId=#{userPrefs.userPrefsData.homeFilter}" value="Home" propagation="none" rendered="#{not empty userPrefs.userPrefsData.homeFilter}"/>
+			        <s:link id="menuSearchId" view="/CustomSearchTopics.xhtml" value="Topic Search" propagation="none"/>
+			        <s:link id="menuTopicListId" view="/CustomSearchTopicList.xhtml" value="Topic List" propagation="none"/>
+			        <s:link id="menuTagListId" view="/TagList.xhtml" value="Tag List" propagation="none" rendered="#{s:hasPermission('TagListLink', 'Rendered', null)}"/>
+			        <s:link id="menuCategoryListId" view="/CategoryList.xhtml" value="Category List" propagation="none" rendered="#{s:hasPermission('CategoryListLink', 'Rendered', null)}"/>
+			        <s:link id="menuImageListId" view="/ImageFileList.xhtml" value="Images" propagation="none" rendered="#{s:hasPermission('ImageListLink', 'Rendered', null)}"/>
+			        <s:link id="menuProjectListId" view="/ProjectList.xhtml" value="Projects" propagation="none" rendered="#{s:hasPermission('ProjectListLink', 'Rendered', null)}"/>
+			        <s:link id="menuDownloadRockbook" action="#{dtdProvider.downloadRocBookDTD()}" value="Download DTD" title="Use with xmllint: xmllint --noout --dtdvalid rocbook.dtd yourtopic.xml"/>
+			        <h:outputLink id="menuBugzilla" value="https://bugzilla.redhat.com/buglist.cgi" target="_blank">
+			        	<f:param name="component" value="web-Topic_Index"/>
+			        	<f:param name="product" value="Topic Tool"/>
+			        	<h:outputText>BUGZILLA</h:outputText>
+			        </h:outputLink>		
+			        <h:outputLink id="menuBugzillaBug" value="https://bugzilla.redhat.com/enter_bug.cgi" target="_blank">
+			        	<f:param name="product" value="Topic Tool"/>
+			        	<f:param name="component" value="web-Topic_Index"/>
+			        	<!-- <f:param name="short_desc" value="TopicID + Build.Date"/>  -->
+			        	<f:param name="comment" value="#{webConstants.build} #{facesContext.viewRoot.viewId}"/>
+			        	<h:outputText>New Bug</h:outputText>
+			        </h:outputLink>
+			        <s:link id="menuReportsListId" view="/Reports.xhtml" value="Reports" propagation="none" rendered="#{s:hasPermission('ReportsListLink', 'Rendered', null)}"/>
+			        
+			        <rich:dropDownMenu rendered="#{s:hasPermission('MoreLink', 'Rendered', null)}">
+	
+		                <f:facet name="label">
+		                	<h:outputText value="More..." />
+		                </f:facet>
+		                
+		                <rich:menuItem rendered="#{s:hasPermission('IndexEntireDatabaseLink', 'Rendered', null)}">
+		                    <s:link action="#{hibernateSearchUtilities.indexEntireDatabase()}" value="Index Database"/>
+		                </rich:menuItem>
+		
+		                <rich:menuItem rendered="#{s:hasPermission('IntegerConstantsLink', 'Rendered', null)}">
+		                    <s:link view="/IntegerConstantsList.xhtml" value="Integer Constants"/>
+		                </rich:menuItem>
+		
+						<rich:menuItem rendered="#{s:hasPermission('StringConstantsLink', 'Rendered', null)}">
+		                    <s:link view="/StringConstantsList.xhtml" value="String Constants"/>
+		                </rich:menuItem>
+		                
+		                <rich:menuItem rendered="#{s:hasPermission('BlobConstantsLink', 'Rendered', null)}">
+		                    <s:link view="/BlobConstantsList.xhtml" value="Blob Constants"/>
+		                </rich:menuItem>
+		                
+		                <rich:menuItem rendered="#{s:hasPermission('HelpListLink', 'Rendered', null)}">
+		                    <s:link view="/HelpList.xhtml" value="Help"/>
+		                </rich:menuItem>
+		                
+		                <rich:menuItem rendered="#{s:hasPermission('UserListLink', 'Rendered', null)}">
+		                    <s:link view="/UserList.xhtml" value="User List"/>
+		                </rich:menuItem>
+		                
+		                <rich:menuItem rendered="#{s:hasPermission('RoleListLink', 'Rendered', null)}">
+		                    <s:link view="/RoleList.xhtml" value="Role List"/>
+		                </rich:menuItem>
+		                
+		                <rich:menuItem rendered="#{s:hasPermission('UserRoleListLink', 'Rendered', null)}">
+		                    <s:link view="/UserRoleList.xhtml" value="User Role List"/>
+		                </rich:menuItem>
+		
+		            </rich:dropDownMenu>
+			         
+			    </rich:toolBarGroup>
+			    <rich:toolBarGroup location="right">
+			    	<h:outputText value="CONNECTED TO PRODUCTION DATABASE" rendered="#{systemInfo.liveDatabase}"/>
+			    </rich:toolBarGroup>
+			    <rich:toolBarGroup location="right">		    
+			        <h:outputText id="menuWelcomeId" value="signed in as: #{credentials.username}" title="#{identityDetails.rolesString}" rendered="#{identity.loggedIn}"/>			        
+			        <s:link id="menuLoginId" view="/login.xhtml" value="Login" rendered="#{not identity.loggedIn}" propagation="none"/>
+			        <s:link id="menuLogoutId" view="/CustomSearchTopics.xhtml" action="#{identity.logout}" value="Logout" rendered="#{identity.loggedIn}" propagation="end"/>
+			    </rich:toolBarGroup>
+	    	</rich:toolBar>
+	    </h:form>
+		
+      <div class="body">         
+         <ui:insert name="body"/>
+      </div>
+      <br/><br/>
+      <div>
+      <h:messages id="messages" globalOnly="true" styleClass="message"
+            errorClass="errormsg" infoClass="infomsg" warnClass="warnmsg"
+            rendered="#{showGlobalMessages != 'false'}"/>
+      </div>
+      
+
+   </body>
+</html>
+</f:view>

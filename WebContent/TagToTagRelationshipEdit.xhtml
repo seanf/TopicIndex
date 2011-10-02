@@ -1,0 +1,126 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:a="http://richfaces.org/a4j"
+    xmlns:rich="http://richfaces.org/rich"
+    template="layout/template.xhtml">
+
+<ui:define name="body">
+
+    <h:form id="tagToTagRelationship" styleClass="edit">
+
+        <rich:panel>
+            <f:facet name="header">#{tagToTagRelationshipHome.managed ? 'Edit' : 'Add'} Tag to tag relationship</f:facet>
+
+
+            <s:decorate id="tagToTagRelationshipTypeField" template="layout/edit.xhtml">
+                <ui:define name="label">Tag to tag relationship type</ui:define>
+                <h:inputText id="tagToTagRelationshipType"
+                       required="true"
+                       disabled="#{tagToTagRelationshipHome.managed}"
+                          value="#{tagToTagRelationshipHome.instance.tagToTagRelationshipType}">
+                    <a:support event="onblur" reRender="tagToTagRelationshipTypeField" bypassUpdates="true" ajaxSingle="true"/>
+                </h:inputText>
+            </s:decorate>
+
+
+            <s:decorate id="tagToTagRelationshipDescriptionField" template="layout/edit.xhtml">
+                <ui:define name="label">Tag to tag relationship description</ui:define>
+                <h:inputTextarea id="tagToTagRelationshipDescription"
+                               cols="80"
+                               rows="10"
+                              value="#{tagToTagRelationshipHome.instance.tagToTagRelationshipDescription}"/>
+            </s:decorate>
+
+
+            <div style="clear:both">
+                <span class="required">*</span>
+                required fields
+            </div>
+
+        </rich:panel>
+
+        <div class="actionButtons">
+
+            <h:commandButton id="save"
+                          value="Save"
+                         action="#{tagToTagRelationshipHome.persist}"
+                       disabled="#{!tagToTagRelationshipHome.wired}"
+                       rendered="#{!tagToTagRelationshipHome.managed}"/>
+
+            <h:commandButton id="update"
+                          value="Save"
+                         action="#{tagToTagRelationshipHome.update}"
+                       rendered="#{tagToTagRelationshipHome.managed}"/>
+
+            <h:commandButton id="delete"
+                          value="Delete"
+                         action="#{tagToTagRelationshipHome.remove}"
+                      immediate="true"
+                       rendered="#{tagToTagRelationshipHome.managed}"/>
+
+            <s:button id="cancelEdit"
+                   value="Cancel"
+             propagation="end"
+                    view="/TagToTagRelationship.xhtml"
+                rendered="#{tagToTagRelationshipHome.managed}"/>
+
+            <s:button id="cancelAdd"
+                   value="Cancel"
+             propagation="end"
+                    view="/#{empty tagToTagRelationshipFrom ? 'TagToTagRelationshipList' : tagToTagRelationshipFrom}.xhtml"
+                rendered="#{!tagToTagRelationshipHome.managed}"/>
+
+        </div>
+    </h:form>
+
+<rich:tabPanel switchType="ajax">
+
+    <rich:tab label="Tag to tags">
+        <h:form styleClass="association" id="tagToTagsChildren">
+
+            <h:outputText value="There are no tagToTags associated with this tagToTagRelationship."
+                       rendered="#{empty tagToTagRelationshipHome.tagToTags}"/>
+
+            <rich:dataTable value="#{tagToTagRelationshipHome.tagToTags}"
+                           var="_tagToTag"
+                      rendered="#{not empty tagToTagRelationshipHome.tagToTags}"
+                    rowClasses="rvgRowOne,rvgRowTwo"
+                            id="tagToTagsTable">
+                <rich:column sortBy="#{_tagToTag.tagToTagId}">
+                    <f:facet name="header">Tag to tag id</f:facet>
+                    <h:outputText value="#{_tagToTag.tagToTagId}"/>
+                </rich:column>
+                <rich:column sortBy="#{_tagToTag.primaryTagId}">
+                    <f:facet name="header">Primary tag id</f:facet>
+                    <h:outputText value="#{_tagToTag.primaryTagId}"/>
+                </rich:column>
+                <rich:column sortBy="#{_tagToTag.secondaryTagId}">
+                    <f:facet name="header">Secondary tag id</f:facet>
+                    <h:outputText value="#{_tagToTag.secondaryTagId}"/>
+                </rich:column>
+            </rich:dataTable>
+
+        </h:form>
+
+        <f:subview rendered="#{tagToTagRelationshipHome.managed}" id="tagToTags">
+        <div class="actionButtons">
+            <s:button id="addtagToTag"
+                   value="Add tagToTag"
+                    view="/TagToTagEdit.xhtml"
+             propagation="none">
+                 <f:param name="tagToTagRelationshipTagToTagRelationshipType"
+                         value="#{tagToTagRelationshipHome.instance.tagToTagRelationshipType}"/>
+                 <f:param name="tagToTagFrom" value="TagToTagRelationship"/>
+            </s:button>
+        </div>
+        </f:subview>
+    </rich:tab>
+</rich:tabPanel>
+</ui:define>
+
+</ui:composition>

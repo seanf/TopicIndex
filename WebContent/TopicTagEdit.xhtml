@@ -1,0 +1,59 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:a="http://richfaces.org/a4j"
+    xmlns:rich="http://richfaces.org/rich"
+    template="layout/cleantemplate.xhtml">
+
+<ui:define name="body">
+
+    <h:form id="topic" styleClass="edit">
+
+        <rich:panel>
+            <f:facet name="header">#{topicHome.managed ? 'Edit' : 'Add'} Topic</f:facet>
+
+            <s:decorate id="topicTagIdField" template="layout/edit.xhtml">
+                <ui:define name="label">Topic tag id</ui:define>
+                <h:inputText id="topicTagId"
+                		  required="true"
+                          value="#{topicTagEdit.tagId}">
+                    <a:support event="onblur" reRender="topicTagIdField" bypassUpdates="true" ajaxSingle="true"/>
+                </h:inputText>
+            </s:decorate>
+
+            <div style="clear:both">
+                <span class="required">*</span>
+                required fields
+            </div>
+
+        </rich:panel>
+
+        <div class="actionButtons">
+
+            <h:commandButton id="save"
+                          value="Persist"
+                         action="#{topicTagEdit.persist}"
+                       disabled="#{!topicTagEdit.wired}"
+                       rendered="#{!topicTagEdit.managed}"/>
+
+            <h:commandButton id="update"
+                          value="Update"
+                         action="#{topicTagEdit.update}"
+                       rendered="#{topicTagEdit.managed}"/>
+
+            <s:button id="cancelEdit"
+                   value="Cancel"
+             propagation="end"
+                    view="/Topic.xhtml"
+                rendered="#{topicHome.managed}"/>
+
+        </div>
+    </h:form>
+
+</ui:define>
+
+</ui:composition>

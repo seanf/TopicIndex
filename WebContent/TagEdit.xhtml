@@ -1,0 +1,156 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:s="http://jboss.com/products/seam/taglib"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:c="http://java.sun.com/jstl/core"
+	template="layout/cleantemplate.xhtml">
+
+	<ui:define name="body">
+	
+	<!-- Add jQuery to the page -->
+	<rich:jQuery query="console.log('Loaded jQuery')"/>
+		
+	<script
+			src="#{facesContext.externalContext.requestContextPath}/filterscripts.js"></script>
+
+		<h:form
+			id="tag"
+			styleClass="edit">
+			<rich:tabPanel switchType="client">
+				<rich:tab label="#{tagHome.managed ? 'Edit' : 'Add'} Tag Details">
+
+					<s:decorate
+						id="tagNameField"
+						template="layout/edit.xhtml">
+						<ui:define name="label">Tag name</ui:define>
+						<h:inputTextarea
+							id="tagName"
+							cols="80"
+							rows="6"
+							required="true"
+							value="#{tagHome.instance.tagName}" />
+					</s:decorate>
+
+					<s:decorate
+						id="tagDescriptionField"
+						template="layout/edit.xhtml">
+						<ui:define name="label">Tag description</ui:define>
+						<h:inputTextarea
+							id="tagDescription"
+							cols="80"
+							rows="10"
+							value="#{tagHome.instance.tagDescription}" />
+					</s:decorate>
+
+					<div style="clear: both">
+						<span class="required">*</span> required fields
+					</div>
+
+				</rich:tab>
+				<rich:tab label="Tag Categories">
+
+					<h:panelGrid columns="3">
+						<s:label>Category Name</s:label>
+						<s:label>Include in Category</s:label>
+						<s:label>Sort Position in Category</s:label>
+
+						<s:label>#{' '}</s:label>
+						<s:label>#{' '}</s:label>
+						<s:label>#{' '}</s:label>
+
+						<c:forEach
+							items="#{tagHome.categories}"
+							var="category">
+							<s:label>#{category.name}</s:label>
+							<h:selectBooleanCheckbox
+								value="#{category.selected}"
+								title="Check this box to include this tag in the category." />
+							<h:inputText
+								cols="20"
+								required="false"
+								value="#{category.sort}" />
+						</c:forEach>
+					</h:panelGrid>
+
+				</rich:tab>
+				<rich:tab label="Encompassed Tags">
+					<ui:include src="/WEB-INF/templates/TagSelect.xhtml">
+						<ui:param
+							name="selectedTags"
+							value="#{tagHome.selectedTags.projectCategories}" />
+						<ui:param
+							name="logicEnabled"
+							value="#{false}" />
+						<ui:param
+							name="homeObject"
+							value="#{tagHome}" />
+					</ui:include>
+				</rich:tab>
+				<rich:tab label="Tag Projects">
+					<h:panelGrid columns="2">
+						<s:label>Project Name</s:label>
+						<s:label>Include in Project</s:label>
+
+						<s:label>#{' '}</s:label>
+						<s:label>#{' '}</s:label>
+
+						<c:forEach
+							items="#{tagHome.projects}"
+							var="project">
+							<s:label>#{project.project.projectName}</s:label>
+							<h:selectBooleanCheckbox
+								value="#{project.selected}"
+								title="Check this box to include this tag in the project." />
+						</c:forEach>
+					</h:panelGrid>
+				</rich:tab>
+			</rich:tabPanel>
+
+
+			<div class="actionButtons">
+
+				<h:commandButton
+					id="save"
+					value="Save"
+					action="#{tagHome.persist}"
+					disabled="#{!tagHome.wired}"
+					rendered="#{!tagHome.managed}" />
+
+				<h:commandButton
+					id="update"
+					value="Update"
+					action="#{tagHome.update}"
+					rendered="#{tagHome.managed}" />
+
+				<!--  <h:commandButton id="delete"
+                          value="Delete"
+                         action="#{tagHome.remove}"
+                      immediate="true"
+                       rendered="#{tagHome.managed}"/> -->
+
+				<s:button
+					id="cancelEdit"
+					value="Cancel"
+					propagation="end"
+					view="/Tag.xhtml"
+					rendered="#{tagHome.managed}" />
+
+				<s:button
+					id="cancelAdd"
+					value="Cancel"
+					propagation="end"
+					view="/#{empty tagFrom ? 'TagList' : tagFrom}.xhtml"
+					rendered="#{!tagHome.managed}" />
+
+			</div>
+		</h:form>
+
+	</ui:define>
+
+</ui:composition>

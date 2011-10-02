@@ -1,0 +1,90 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:rich="http://richfaces.org/rich"
+    template="layout/cleantemplate.xhtml">
+
+<ui:define name="body">
+
+    <rich:panel>
+        <f:facet name="header">User Details</f:facet>
+
+
+        <s:decorate id="userName" template="layout/display.xhtml">
+            <ui:define name="label">User name</ui:define>
+            <h:outputText value="#{userHome.instance.userName}"/>
+        </s:decorate>
+
+        <s:decorate id="description" template="layout/display.xhtml">
+            <ui:define name="label">Description</ui:define>
+            <h:outputText value="#{userHome.instance.description}"/>
+        </s:decorate>
+
+        <div style="clear:both"/>
+
+    </rich:panel>
+
+    <div class="actionButtons">
+
+        <s:button view="/UserEdit.xhtml"
+                    id="edit"
+                 value="Edit"/>
+
+        <s:button view="/#{empty userFrom ? 'UserList' : userFrom}.xhtml"
+                    id="done"
+                 value="Done"/>
+
+    </div>
+
+    <rich:tabPanel switchType="ajax">
+
+    <rich:tab>
+        <f:facet name="label">
+            <h:panelGroup><h:graphicImage value="/img/onetomany.gif" style="vertical-align: middle; padding-right: 4px;"/>User roles</h:panelGroup>
+        </f:facet>
+    <h:form styleClass="association" id="userRolesChildren">
+
+        <h:outputText value="There are no userRoles associated with this user."
+                   rendered="#{empty userHome.userRoles}"/>
+
+        <rich:dataTable value="#{userHome.userRoles}"
+                       var="_userRole"
+                  rendered="#{not empty userHome.userRoles}"
+                rowClasses="rvgRowOne,rvgRowTwo"
+                        id="userRolesTable">
+            <rich:column sortBy="#{_userRole.userRoleId}">
+                <f:facet name="header">User role id</f:facet>
+                <h:outputText value="#{_userRole.userRoleId}"/>
+            </rich:column>
+            <h:column>
+                <f:facet name="header">Action</f:facet>
+                <s:link id="selectuserRole"
+                     value="Select"
+                      view="/UserRole.xhtml">
+                    <f:param name="userRoleUserRoleId"
+                            value="#{_userRole.userRoleId}"/>
+                    <f:param name="userRoleFrom" value="User"/>
+                </s:link>
+            </h:column>
+        </rich:dataTable>
+
+    </h:form>
+
+    <div class="actionButtons">
+        <s:button
+               value="Add userRole"
+                view="/UserRoleEdit.xhtml">
+            <f:param name="userUserId"
+                    value="#{userHome.instance.userId}"/>
+            <f:param name="userRoleFrom" value="User"/>
+        </s:button>
+    </div>
+    </rich:tab>
+</rich:tabPanel>
+</ui:define>
+
+</ui:composition>

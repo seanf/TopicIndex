@@ -1,0 +1,157 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:rich="http://richfaces.org/rich"
+    template="layout/cleantemplate.xhtml">
+
+<ui:define name="body">
+
+    <h:form id="helpSearch" styleClass="edit">
+
+        <rich:simpleTogglePanel label="Help Search Filter" switchType="ajax">
+
+            <s:decorate template="layout/display.xhtml">
+                <ui:define name="label">Table col id</ui:define>
+                <h:inputText id="tableColId" value="#{helpList.help.tableColId}"/>
+            </s:decorate>
+
+            <s:decorate template="layout/display.xhtml">
+                <ui:define name="label">Help text</ui:define>
+                <h:inputText id="helpText" value="#{helpList.help.helpText}"/>
+            </s:decorate>
+
+            <s:decorate template="layout/display.xhtml">
+                <ui:define name="label">Match</ui:define>
+                <h:selectOneRadio id="logic" value="#{helpList.restrictionLogicOperator}" styleClass="radio">
+                    <f:selectItem itemLabel="All" itemValue="and"/>
+                    <f:selectItem itemLabel="Any" itemValue="or"/>
+                </h:selectOneRadio>
+            </s:decorate>
+
+        </rich:simpleTogglePanel>
+
+        <div class="actionButtons">
+            <h:commandButton id="search" value="Search" action="/HelpList.xhtml"/>
+            <s:button id="reset" value="Reset" includePageParams="false"/>
+        </div>
+
+    </h:form>
+    
+    <br/><br/><br/>
+
+    <rich:panel>
+        <f:facet name="header">Help Search Results (#{empty helpList.resultList ? 0 : (helpList.paginated ? helpList.resultCount : helpList.resultList.size)})</f:facet>
+    <div class="results" id="helpList">
+
+    <h:outputText value="The help search returned no results."
+               rendered="#{empty helpList.resultList}"/>
+
+    <rich:dataTable id="helpList"
+                var="_help"
+              value="#{helpList.resultList}"
+           rendered="#{not empty helpList.resultList}">
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{helpList}"/>
+                    <ui:param name="propertyLabel" value="Help id"/>
+                    <ui:param name="propertyPath" value="help.helpId"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_help.helpId}"/>
+        </h:column>
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{helpList}"/>
+                    <ui:param name="propertyLabel" value="Table col id"/>
+                    <ui:param name="propertyPath" value="help.tableColId"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_help.tableColId}"/>
+        </h:column>
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{helpList}"/>
+                    <ui:param name="propertyLabel" value="Help text"/>
+                    <ui:param name="propertyPath" value="help.helpText"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_help.helpText}"/>
+        </h:column>
+        <rich:column styleClass="action">
+            <f:facet name="header">Action</f:facet>
+            <s:link view="/#{empty from ? 'Help' : from}.xhtml"
+                   value="#{empty from ? 'View' : 'Select'}"
+             propagation="#{empty from ? 'none' : 'default'}"
+                      id="helpViewId">
+                <f:param name="helpHelpId"
+                        value="#{_help.helpId}"/>
+            </s:link>
+            #{' '}
+            <s:link view="/HelpEdit.xhtml"
+                   value="Edit"
+             propagation="none"
+                      id="helpEdit"
+                rendered="#{empty from}">
+                <f:param name="helpHelpId"
+                        value="#{_help.helpId}"/>
+            </s:link>
+        </rich:column>
+    </rich:dataTable>
+
+    </div>
+    </rich:panel>
+
+    <div class="tableControl">
+
+        <s:link view="/HelpList.xhtml"
+            rendered="#{helpList.previousExists}"
+               value="#{messages.left}#{messages.left} First Page"
+                  id="firstPage">
+          <f:param name="firstResult" value="0"/>
+        </s:link>
+
+        <s:link view="/HelpList.xhtml"
+            rendered="#{helpList.previousExists}"
+               value="#{messages.left} Previous Page"
+                  id="previousPage">
+            <f:param name="firstResult"
+                    value="#{helpList.previousFirstResult}"/>
+        </s:link>
+
+        <s:link view="/HelpList.xhtml"
+            rendered="#{helpList.nextExists}"
+               value="Next Page #{messages.right}"
+                  id="nextPage">
+            <f:param name="firstResult"
+                    value="#{helpList.nextFirstResult}"/>
+        </s:link>
+
+        <s:link view="/HelpList.xhtml"
+            rendered="#{helpList.nextExists}"
+               value="Last Page #{messages.right}#{messages.right}"
+                  id="lastPage">
+            <f:param name="firstResult"
+                    value="#{helpList.lastFirstResult}"/>
+        </s:link>
+
+    </div>
+
+    <s:div styleClass="actionButtons" rendered="#{empty from}">
+        <s:button view="/HelpEdit.xhtml"
+                    id="create"
+           propagation="none"
+                 value="Create help">
+            <f:param name="helpHelpId"/>
+        </s:button>
+    </s:div>
+
+</ui:define>
+
+</ui:composition>

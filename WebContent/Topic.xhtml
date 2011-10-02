@@ -1,0 +1,121 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:s="http://jboss.com/products/seam/taglib"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:c="http://java.sun.com/jstl/core"
+	template="layout/cleantemplate.xhtml">
+
+	<ui:define name="body">
+
+		<script
+			src="#{facesContext.externalContext.requestContextPath}/codemirror.js"></script>
+		<script
+			src="#{facesContext.externalContext.requestContextPath}/xml.js"></script>
+		<script
+			src="#{facesContext.externalContext.requestContextPath}/skynet-codemirror.js"></script>
+		<script type="text/javascript">
+			window.onload = function() {
+				initializeCodeMirror("#{rich:clientId('topicXML')}", true);
+			};
+		</script>
+
+		<s:decorate id="topicRevisionField" template="layout/display.xhtml">
+			<ui:define name="label">Topic Revision</ui:define>
+			<h:outputText
+				value="#{empty topicHome.revision ? 'Latest' : topicHome.revision}" />
+		</s:decorate>
+
+		<s:decorate id="topicIdField" template="layout/display.xhtml">
+			<ui:define name="label">Topic Title</ui:define>
+			<h:outputText
+				value="#{empty topicHome.revision ? topicHome.instance.topicTitle : topicHome.revisionInstance.topicTitle}" />
+		</s:decorate>
+
+		<s:decorate id="topicTitleField" template="layout/display.xhtml">
+			<ui:define name="label">Topic ID</ui:define>
+			<h:outputText
+				value="#{empty topicHome.revision ? topicHome.instance.topicId : topicHome.revisionInstance.topicId}" />
+		</s:decorate>
+
+		<s:decorate id="topicXMLField" template="layout/display.xhtml">
+			<ui:define name="label">Topic XML</ui:define>
+			<h:inputTextarea id="topicXML" cols="80" rows="10" readonly="true"
+				value="#{empty topicHome.revision ? topicHome.instance.topicXML : topicHome.revisionInstance.topicXML}" />
+		</s:decorate>
+
+		<s:decorate id="topicTextField" template="layout/display.xhtml">
+			<ui:define name="label">Description</ui:define>
+			<h:inputTextarea id="topicText" cols="80" rows="10" readonly="true"
+				value="#{empty topicHome.revision ? topicHome.instance.topicText : topicHome.revisionInstance.topicText}" />
+		</s:decorate>
+
+		<s:decorate id="topicAddedByField" template="layout/display.xhtml">
+			<ui:define name="label">Topic Added By</ui:define>
+			<h:outputText
+				value="#{empty topicHome.revision ? topicHome.instance.topicAddedBy : topicHome.revisionInstance.topicAddedBy}" />
+		</s:decorate>
+
+		<s:decorate id="topicSourceMaterialUrls"
+			template="layout/display.xhtml">
+			<ui:define name="label">Topic Source URLs</ui:define>
+			<rich:dataList var="url"
+				value="#{topicHome.instance.topicToTopicSourceUrls.toArray()}">
+				<h:outputLink value="#{url.topicSourceUrl.sourceUrl}"
+					title="#{url.topicSourceUrl.description}">
+					<h:outputText value="Source URL"
+						rendered="#{empty url.topicSourceUrl.title}" />
+					<h:outputText value="#{url.topicSourceUrl.title}"
+						rendered="#{not empty url.topicSourceUrl.title}" />
+				</h:outputLink>
+			</rich:dataList>
+		</s:decorate>
+
+		<s:decorate id="topicTimeStamp" template="layout/display.xhtml">
+			<ui:define name="label">Topic TimeStamp</ui:define>
+			<h:outputText
+				value="#{empty topicHome.revision ? topicHome.instance.topicTimeStamp : topicHome.revisionInstance.topicTimeStamp}">
+				<s:convertDateTime type="both" dateStyle="short" />
+			</h:outputText>
+		</s:decorate>
+
+		<s:decorate id="topicTags" template="layout/display.xhtml">
+			<ui:define name="label">Topic Tags</ui:define>
+			<h:outputText
+				value="#{empty topicHome.revision ? topicHome.instance.tagsList : topicHome.revisionInstance.tagsList}"
+				escape="false" />
+		</s:decorate>
+
+		<div style="clear: both" />
+
+		<div class="actionButtons">
+
+			<s:button view="/TopicEdit.xhtml" id="edit"
+				value="Edit Latest Version">
+				<f:param name="topicRevision" value="" />
+			</s:button>
+
+			<s:button view="/CustomSearchTopicList.xhtml" id="done" value="Done" />
+
+			<h:form>
+	        #{" "}
+	        <h:outputText value="View Revision: " />
+	        #{" "}
+	       	<h:selectOneMenu value="#{topicHome.revision}">
+					<c:forEach items="#{topicHome.instance.revisions}" var="revision">
+						<f:selectItem itemLabel="#{revision}" itemValue="#{revision}" />
+					</c:forEach>
+				</h:selectOneMenu>
+			#{" "}
+			<h:commandButton value="View" />
+			</h:form>
+		</div>
+
+
+
+	</ui:define>
+
+</ui:composition>

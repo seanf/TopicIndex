@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page xmlns="http://jboss.com/products/seam/pages"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd">
+ <param name="firstResult" value="#{topicTagsList.firstResult}"/>
+ <param name="sort" value="#{topicTagsList.orderColumn}"/>
+ <param name="dir" value="#{topicTagsList.orderDirection}"/>
+ <param name="logic" value="#{topicTagsList.restrictionLogicOperator}"/>
+ <param name="from"/>
+ <param name="startDate" value="#{topicTagsList.topic.startCreateDateString}"/>
+ <param name="endDate" value="#{topicTagsList.topic.endCreateDateString}"/>
+ <param name="topicIds" value="#{topicTagsList.topic.topicIdsString}"/>
+ <param name="topicTitle" value="#{topicTagsList.topic.topicTitle}"/>
+ <param name="topicText" value="#{topicTagsList.topic.topicText}"/>
+ <param name="topicAddedBy" value="#{topicTagsList.topic.topicAddedBy}"/>
+ <param name="topicProduct" value="#{topicTagsList.topic.topicProduct}"/>
+ <param name="topicHasRelationships" value="#{topicTagsList.topic.hasRelationships}"/>
+ <param name="topicRelatedTo" value="#{topicTagsList.topic.topicRelatedTo}"/>
+ <param name="topicRelatedFrom" value="#{topicTagsList.topic.topicRelatedFrom}"/>
+ <param name="topicXml" value="#{topicTagsList.topic.topicXML}"/>
+ <param name="topicTextSearch" value="#{topicTagsList.topic.topicTextSearch}"/>
+</page>

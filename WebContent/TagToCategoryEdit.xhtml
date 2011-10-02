@@ -1,0 +1,94 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:a="http://richfaces.org/a4j"
+    xmlns:rich="http://richfaces.org/rich"
+    template="layout/cleantemplate.xhtml">
+
+<ui:define name="body">
+
+    <h:form id="tagToCategory" styleClass="edit">
+
+        <rich:panel>
+            <f:facet name="header">#{tagToCategoryHome.managed ? 'Edit' : 'Add'} Tag to category</f:facet>
+
+
+            <s:decorate id="tagIdField" template="layout/edit.xhtml">
+                <ui:define name="label">Tag id</ui:define>
+                <h:inputText id="tagId"
+                       required="true"
+                       disabled="#{tagToCategoryHome.managed}"
+                          value="#{tagToCategoryHome.instance.id.tag.tagId}">
+                    <a:support event="onblur" reRender="tagIdField" bypassUpdates="true" ajaxSingle="true"/>
+                </h:inputText>
+            </s:decorate>
+
+            <s:decorate id="categoryIdField" template="layout/edit.xhtml">
+                <ui:define name="label">Category id</ui:define>
+                <h:inputText id="categoryId"
+                       required="true"
+                       disabled="#{tagToCategoryHome.managed}"
+                          value="#{tagToCategoryHome.instance.id.category.categoryId}">
+                    <a:support event="onblur" reRender="categoryIdField" bypassUpdates="true" ajaxSingle="true"/>
+                </h:inputText>
+            </s:decorate>
+
+
+            <s:decorate id="sortingField" template="layout/edit.xhtml">
+                <ui:define name="label">Sorting</ui:define>
+                <h:inputText id="sorting"
+                           size="45"
+                      maxlength="45"
+                          value="#{tagToCategoryHome.instance.sorting}">
+                    <a:support event="onblur" reRender="sortingField" bypassUpdates="true" ajaxSingle="true"/>
+                </h:inputText>
+            </s:decorate>
+
+            <div style="clear:both">
+                <span class="required">*</span>
+                required fields
+            </div>
+
+        </rich:panel>
+
+        <div class="actionButtons">
+
+            <h:commandButton id="save"
+                          value="Save"
+                         action="#{tagToCategoryHome.persist}"
+                       disabled="#{!tagToCategoryHome.wired}"
+                       rendered="#{!tagToCategoryHome.managed}"/>
+
+            <h:commandButton id="update"
+                          value="Save"
+                         action="#{tagToCategoryHome.update}"
+                       rendered="#{tagToCategoryHome.managed}"/>
+
+            <h:commandButton id="delete"
+                          value="Delete"
+                         action="#{tagToCategoryHome.remove}"
+                      immediate="true"
+                       rendered="#{tagToCategoryHome.managed}"/>
+
+            <s:button id="cancelEdit"
+                   value="Cancel"
+             propagation="end"
+                    view="/TagToCategory.xhtml"
+                rendered="#{tagToCategoryHome.managed}"/>
+
+            <s:button id="cancelAdd"
+                   value="Cancel"
+             propagation="end"
+                    view="/#{empty tagToCategoryFrom ? 'TagToCategoryList' : tagToCategoryFrom}.xhtml"
+                rendered="#{!tagToCategoryHome.managed}"/>
+
+        </div>
+    </h:form>
+
+</ui:define>
+
+</ui:composition>

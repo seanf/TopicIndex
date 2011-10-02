@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page xmlns="http://jboss.com/products/seam/pages" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd"
+	no-conversation-view-id="/TopicList.xhtml" login-required="false">
+
+	<begin-conversation join="true" flush-mode="MANUAL" />
+
+	<action execute="#{topicHome.wire}" />
+	<param name="topicTopicId" value="#{topicHome.topicTopicId}" />
+
+	<action execute="#{topicHome.triggerCreateEvent}" />
+	<action execute="#{topicHome.populate}" />
+
+	<navigation from-action="#{topicHome.persist}">
+		<rule if-outcome="persisted">
+			<redirect view-id="/CustomSearchTopicList.xhtml">
+				<param name="topicTopicId" value="#{topicHome.topicTopicId}" />
+			</redirect>
+		</rule>
+	</navigation>
+
+	<navigation from-action="#{topicHome.update}">
+		<rule if-outcome="updated">
+			<redirect view-id="/CustomSearchTopicList.xhtml">
+				<param name="topicTopicId" value="#{topicHome.topicTopicId}" />
+			</redirect>
+		</rule>
+	</navigation>
+
+	<navigation from-action="#{topicHome.remove}">
+		<rule if-outcome="removed">
+			<redirect view-id="/CustomSearchTopicList.xhtml" />
+		</rule>
+	</navigation>
+
+	<navigation from-action="#{topicHome.updateEx(false)}">
+		<rule if-outcome="backToList">
+			<end-conversation before-redirect="true" />
+			<redirect view-id="#{topicHome.multipleUpdateUrl}" />
+		</rule>
+	</navigation>
+
+	<navigation from-action="#{topicHome.persistEx(false)}">
+		<rule if-outcome="backToList">
+			<end-conversation before-redirect="true" />
+			<redirect view-id="#{topicHome.multipleUpdateUrl}" />
+		</rule>
+	</navigation>
+
+</page>

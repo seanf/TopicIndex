@@ -1,0 +1,127 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:a="http://richfaces.org/a4j"
+    xmlns:rich="http://richfaces.org/rich"
+    template="layout/cleantemplate.xhtml">
+
+<ui:define name="body">
+
+    <h:form id="topic" styleClass="edit">
+
+        <rich:panel>
+            <f:facet name="header">#{topicHome.managed ? 'Edit' : 'Add'} Topic</f:facet>
+
+
+
+            <s:decorate id="topicTitleField" template="layout/edit.xhtml">
+                <ui:define name="label">Topic title</ui:define>
+                <h:inputTextarea id="topicTitle"
+                               cols="80"
+                               rows="6"
+                              value="#{topicHome.instance.topicTitle}"/>
+            </s:decorate>
+
+
+            <s:decorate id="topicTextField" template="layout/edit.xhtml">
+                <ui:define name="label">Topic Text</ui:define>
+                <h:inputTextarea id="topicText"
+                               cols="80"
+                               rows="10"
+                              value="#{topicHome.instance.topicText}"/>
+            </s:decorate>
+
+
+            <s:decorate id="topicAddedByField" template="layout/edit.xhtml">
+                <ui:define name="label">Topic Added By</ui:define>
+                <h:inputTextarea id="topicAddedBy"
+                               cols="80"
+                               rows="6"
+                              value="#{topicHome.instance.topicAddedBy}"/>
+            </s:decorate>
+
+
+            <s:decorate id="topicUrlField" template="layout/edit.xhtml">
+                <ui:define name="label">Topic URL</ui:define>
+                <h:inputTextarea id="topicUrl"
+                               cols="80"
+                               rows="6"
+                              value="#{topicHome.instance.topicUrl}"/>
+            </s:decorate>
+            
+            <!-- <s:decorate id="topicSvnUrlField" template="layout/edit.xhtml">
+                <ui:define name="label">Topic SVN URL</ui:define>
+                <h:inputTextarea id="topicUrl"
+                               cols="80"
+                               rows="6"
+                              value="#{topicHome.instance.topicSvnUrl}"/>
+            </s:decorate>  -->
+
+
+            <!--  <s:decorate id="topicTimeStampField" template="layout/edit.xhtml">
+                <ui:define name="label">Topic time stamp</ui:define>
+                <rich:calendar id="topicTimeStamp"
+                       required="true"
+                          value="#{topicHome.instance.topicTimeStamp}" datePattern="MM/dd/yyyy hh:mm a"/>
+            </s:decorate> -->
+
+
+            <s:decorate id="topicProductField" template="layout/edit.xhtml">
+                <ui:define name="label">Topic product</ui:define>
+                <h:inputText id="topicProduct"
+                       required="true"
+                           size="45"
+                      maxlength="45"
+                          value="#{topicHome.instance.topicProduct}">
+                    <a:support event="onblur" reRender="topicProductField" bypassUpdates="true" ajaxSingle="true"/>
+                </h:inputText>
+            </s:decorate>
+
+            <div style="clear:both">
+                <span class="required">*</span>
+                required fields
+            </div>
+
+        </rich:panel>
+
+        <div class="actionButtons">
+
+            <h:commandButton id="save"
+                          value="Save"
+                         action="#{topicHome.persist}"
+                       disabled="#{!topicHome.wired}"
+                       rendered="#{!topicHome.managed}"/>
+
+            <h:commandButton id="update"
+                          value="Save"
+                         action="#{topicHome.update}"
+                       rendered="#{topicHome.managed}"/>
+
+            <!-- <h:commandButton id="delete"
+                          value="Delete"
+                         action="#{topicHome.remove}"
+                      immediate="true"
+                       rendered="#{topicHome.managed}"/>  -->                       
+
+            <s:button id="cancelEdit"
+                   value="Cancel"
+             propagation="end"
+                    view="/Topic.xhtml"
+                rendered="#{topicHome.managed}"/>
+
+            <s:button id="cancelAdd"
+                   value="Cancel"
+             propagation="end"
+                    view="/#{empty topicFrom ? 'TopicList' : topicFrom}.xhtml"
+                rendered="#{!topicHome.managed}"/>
+
+        </div>
+    </h:form>
+
+</ui:define>
+
+</ui:composition>
