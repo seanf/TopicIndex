@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/hot"/>
+	<classpathentry kind="src" path="src/main"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="owner.project.facets" value="java"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Hibernate 3.6.7"/>
+	<classpathentry kind="lib" path="/home/mcaspers/jboss-as-7.0.1.Final/modules/javax/faces/api/1.2/jsf-api-1.2_13.jar"/>
+	<classpathentry kind="lib" path="/home/mcaspers/jboss-as-7.0.1.Final/modules/org/apache/commons/codec/main/commons-codec-1.4.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
