@@ -8,68 +8,61 @@ import com.redhat.topicindex.utils.docbookbuilding.DocbookBuildingOptions;
 import com.redhat.topicindex.utils.docbookbuilding.DocbookUtils;
 
 /**
-	This class represents the top level toc container
-*/
-public class TocTopLevel extends TocFolderElement 
-{	
+ * This class represents the top level toc container
+ */
+public class TocTopLevel extends TocFolderElement
+{
 	public TocTopLevel(final DocbookBuildingOptions docbookBuildingOptions, final String label, final List<TocElement> children)
 	{
 		super(docbookBuildingOptions, label, children);
 	}
-	
+
 	public TocTopLevel(final DocbookBuildingOptions docbookBuildingOptions, final String label)
 	{
 		super(docbookBuildingOptions, label);
 	}
-	
+
 	public TocTopLevel(final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		super(docbookBuildingOptions);
 	}
-	
+
 	public TocTopLevel()
 	{
 		super();
 	}
-	
+
 	@Override
 	protected void generateDocbookXML()
 	{
-		// generate the docbook that represents this folder
+		/* generate the docbook that represents this folder */
 		final List<String> childrenDocbook = new ArrayList<String>();
-				
+
 		for (final TocElement child : children)
 			childrenDocbook.add(child.getDocbook());
-		
+
 		this.docbook = DocbookUtils.wrapListItems(childrenDocbook, label);
-		
-		// wrap the whole thing up in a para/div    			
-		this.docbook = DocbookUtils.wrapInPara(
-			this.docbook, 
-			AttributeBuilder.NAV_TOC_PARENT_ROLE, 
-			docbookBuildingOptions != null && docbookBuildingOptions.isEnableDynamicTreeToc() ? 
-				AttributeBuilder.NAV_TOC_PARENT_ID : 
-				AttributeBuilder.NAV_DISABLED_TOC_PARENT_ID
-		);
-		
-		// wrap it up again in another div. this allows us to add elements above
-		// and below the tree (like the search box)
-		this.docbook = DocbookUtils.wrapInSimpleSect(
-			this.docbook,
-			null,
-			AttributeBuilder.NAV_TOC_CONTAINER_ID
-		);
-		
-		// and place that para into a section
+
+		/* wrap the whole thing up in a para/div */
+		this.docbook = DocbookUtils.wrapInPara(this.docbook, AttributeBuilder.NAV_TOC_PARENT_ROLE, docbookBuildingOptions != null
+				&& docbookBuildingOptions.isEnableDynamicTreeToc() ? AttributeBuilder.NAV_TOC_PARENT_ID : AttributeBuilder.NAV_DISABLED_TOC_PARENT_ID);
+
+		/*
+		 * wrap it up again in another div. this allows us to add elements above
+		 * and below the tree (like the search box)
+		 */
+		this.docbook = DocbookUtils.wrapInSimpleSect(this.docbook, null, AttributeBuilder.NAV_TOC_CONTAINER_ID);
+
+		/* and place that para into a section */
 		this.docbook = DocbookUtils.buildChapter(this.docbook, "", AttributeBuilder.NAV_TOC_CHAPTER_ID);
-    	
+
 		this.docbook = DocbookUtils.addXMLBoilerplate(this.docbook);
 	}
-	
+
 	@Override
 	protected void generateEclipseXML()
 	{
-		// generate the eclipse xml that represents this folder
+		/* generate the eclipse xml that represents this folder */
 		this.eclipseXml = "<toc label=\"" + this.label + "\">";
 		for (final TocElement child : children)
 			this.eclipseXml += child.eclipseXml;

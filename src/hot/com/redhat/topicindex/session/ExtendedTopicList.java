@@ -24,13 +24,21 @@ public class ExtendedTopicList extends TopicList
 	protected static final String BEAN_NAME_MARKER = "#BEANNAME#";
 	protected static final String[] EXTENDED_RESTRICTIONS =
 	{
-			// "topic.topicId like concat('%', #{" + BEAN_NAME_MARKER +
-			// ".topic.topicId}, '%')",
-			"lower(topic.topicTitle) like lower(concat('%', #{" + BEAN_NAME_MARKER + ".topic.topicTitle}, '%'))", "lower(topic.topicXML) like lower(concat('%', #{" + BEAN_NAME_MARKER + ".topic.topicXML}, '%'))", "lower(topic.topicText) like lower(concat('%', #{" + BEAN_NAME_MARKER + ".topic.topicText}, '%'))",
-			"lower(topic.topicAddedBy) like lower(concat('%', #{" + BEAN_NAME_MARKER + ".topic.topicAddedBy}, '%'))", "lower(topic.topicSvnUrl) like lower(concat('%', #{" + BEAN_NAME_MARKER + ".topic.topicSvnUrl}, '%'))",
-			"lower(topic.topicProduct) like lower(concat('%', #{" + BEAN_NAME_MARKER + ".topic.topicProduct}, '%'))", "topic.topicTimeStamp >= #{" + BEAN_NAME_MARKER + ".topic.startCreateDatePlain}", "topic.topicTimeStamp <= #{" + BEAN_NAME_MARKER + ".topic.endCreateDatePlain}",
-			"topic.topicId in (#{" + BEAN_NAME_MARKER + ".topic.topicIds})", "topic.parentTopicToTopics.size >= #{" + BEAN_NAME_MARKER + ".topic.minimumRelationshipCount}", "topic.childTopicToTopics.size >= #{" + BEAN_NAME_MARKER + ".topic.minimumIncomingRelationshipCount}",
-			"topic.topicId in (#{" + BEAN_NAME_MARKER + ".topic.relatedTopicIDs})", "topic.topicId in (#{" + BEAN_NAME_MARKER + ".topic.incomingRelatedTopicIDs})", "topic.topicId in (#{" + BEAN_NAME_MARKER + ".topic.topicTextSearchIDs})"
+			/*
+			 * "topic.topicId like concat('%', #{" + BEAN_NAME_MARKER +
+			 * ".topic.topicId}, '%')",
+			 */
+			"lower(topic.topicTitle) like lower(concat('%', #{" + BEAN_NAME_MARKER + ".topic.topicTitle}, '%'))",
+			"lower(topic.topicXML) like lower(concat('%', #{" + BEAN_NAME_MARKER + ".topic.topicXML}, '%'))",
+			"lower(topic.topicText) like lower(concat('%', #{" + BEAN_NAME_MARKER + ".topic.topicText}, '%'))",
+			"lower(topic.topicAddedBy) like lower(concat('%', #{" + BEAN_NAME_MARKER + ".topic.topicAddedBy}, '%'))",
+			"lower(topic.topicProduct) like lower(concat('%', #{" + BEAN_NAME_MARKER + ".topic.topicProduct}, '%'))",
+			"topic.topicTimeStamp >= #{" + BEAN_NAME_MARKER + ".topic.startCreateDatePlain}",
+			"topic.topicTimeStamp <= #{" + BEAN_NAME_MARKER + ".topic.endCreateDatePlain}", "topic.topicId in (#{" + BEAN_NAME_MARKER + ".topic.topicIds})",
+			"topic.parentTopicToTopics.size >= #{" + BEAN_NAME_MARKER + ".topic.minimumRelationshipCount}",
+			"topic.childTopicToTopics.size >= #{" + BEAN_NAME_MARKER + ".topic.minimumIncomingRelationshipCount}",
+			"topic.topicId in (#{" + BEAN_NAME_MARKER + ".topic.relatedTopicIDs})", "topic.topicId in (#{" + BEAN_NAME_MARKER + ".topic.incomingRelatedTopicIDs})",
+			"topic.topicId in (#{" + BEAN_NAME_MARKER + ".topic.topicTextSearchIDs})"
 
 	};
 
@@ -140,7 +148,8 @@ public class ExtendedTopicList extends TopicList
 		if (constructedEJBQL == null)
 		{
 			// initialize filter home
-			final Filter filter = EntityUtilities.populateFilter(FacesContext.getCurrentInstance(), Constants.FILTER_ID, Constants.MATCH_TAG, Constants.CATEORY_INTERNAL_LOGIC, Constants.CATEORY_EXTERNAL_LOGIC);
+			final Filter filter = EntityUtilities.populateFilter(FacesContext.getCurrentInstance(), Constants.FILTER_ID, Constants.MATCH_TAG,
+					Constants.CATEORY_INTERNAL_LOGIC, Constants.CATEORY_EXTERNAL_LOGIC);
 
 			// get the heading to display over the list of topics
 			searchTagHeading = filter.getFilterTitle();

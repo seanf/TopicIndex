@@ -145,7 +145,9 @@ public class TopicTagsList extends ExtendedTopicList
 		 * category
 		 */
 		for (final Boolean remove : new Boolean[]
-		{ true, false })
+		{
+				true, false
+		})
 		{
 			// loop through each topic
 			for (final Topic topic : bulkTagList)
@@ -509,20 +511,13 @@ public class TopicTagsList extends ExtendedTopicList
 						topicUrls += url.getTopicSourceUrl() + "\n";
 				}
 
-				// merge the source material urls
-				String topicSvnUrls = "";
-				for (final TopicToTopic topicToTopic : topic.getParentTopicToTopics())
-				{
-					final Topic relatedTopic = topicToTopic.getRelatedTopic();
-					topicSvnUrls += "\n\n[TopicSVNURL From TopicID " + relatedTopic.getTopicId() + "]\n";
-					topicSvnUrls += relatedTopic.getTopicSvnUrl() == null ? "" : relatedTopic.getTopicSvnUrl();
-				}
-
 				// the topic text will contain the details of the other topics
-				topic.setTopicText(topicTags + topicText + topicTitle + topicAddedBy + topicUrls + topicSvnUrls);
+				topic.setTopicText(topicTags + topicText + topicTitle + topicAddedBy + topicUrls);
 
-				// we will combine the tags, and let the topic resolve any
-				// conflicts when it is saved
+				/*
+				 * we will combine the tags, and let the topic resolve any
+				 * conflicts when it is saved
+				 */
 
 				for (final TopicToTopic topicToTopic : topic.getParentTopicToTopics())
 				{
@@ -534,7 +529,7 @@ public class TopicTagsList extends ExtendedTopicList
 					}
 				}
 
-				entityManager.persist(topicSvnUrls);
+				entityManager.persist(topic);
 				entityManager.flush();
 			}
 		}

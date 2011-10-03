@@ -1206,8 +1206,6 @@ public class EntityUtilities
 
 						if (!found)
 						{
-							System.out.println("Adding new FilterTag");
-
 							final Tag dbTag = entityManager.getReference(Tag.class, tag.getId());
 
 							final FilterTag filterTag = new FilterTag();

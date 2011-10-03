@@ -775,8 +775,8 @@
 					value="#{topicTagsList.resultList}"
 					rendered="#{not empty topicTagsList.resultList}"
 					styleClass="listTable"
-					columnsWidth="50px, 150px, 1*, 75px, 150px, 150px, 50px, 50px, 50px, 200px"
-					columnClasses=" , , longText, , , , , , , ">
+					columnsWidth="50px, 150px, 75px, 150px, 150px, 50px, 50px, 50px, 200px"
+					columnClasses=" , , , , , , , , ">
 
 					<rich:column
 						rendered="#{s:hasPermission('TopicListIDColumn', 'Rendered', null)}">
@@ -826,10 +826,10 @@
 									value="topic.topicTitle" />
 							</ui:include>
 						</f:facet>
-						<h:outputText value="#{_topic.topicTitle}" />
+						<h:outputText value="#{_topic.topicTitle}" title="#{_topic.topicText}" />
 					</rich:column>
 
-					<rich:column
+					<!-- <rich:column
 						rendered="#{s:hasPermission('TopicListTextColumn', 'Rendered', null)}">
 						<f:facet name="header">
 							<ui:include src="layout/sort.xhtml">
@@ -845,7 +845,7 @@
 							</ui:include>
 						</f:facet>
 						<h:outputText value="#{_topic.topicText}" />
-					</rich:column>
+					</rich:column> -->
 
 					<rich:column
 						rendered="#{s:hasPermission('TopicListAddedByColumn', 'Rendered', null)}">

@@ -208,19 +208,6 @@
 				 </h:outputLink>
 			</rich:dataList>
         </h:column>
-        
-        <!-- <h:column rendered="#{s:hasPermission('TopicListSVNURLColumn', 'Rendered', null)}">
-            <f:facet name="header">
-                <ui:include src="layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{topicList}"/>
-                    <ui:param name="propertyLabel" value="Topic SVN URL"/>
-                    <ui:param name="propertyPath" value="topic.topicSvnUrl"/>
-                </ui:include>
-            </f:facet>
-            <h:outputLink value="#{_topic.topicSvnUrl}" rendered="#{not empty _topic.topicSvnUrl}">
-				<h:outputText value="Topic SVN URL" />
-			</h:outputLink>
-        </h:column>  -->
                
         <h:column rendered="#{s:hasPermission('TopicListRelatedTopicsColumn', 'Rendered', null)}">
             <f:facet name="header">
