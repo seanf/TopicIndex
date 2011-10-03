@@ -26,7 +26,6 @@ public class XMLValidator implements DOMErrorHandler, LSResourceResolver
 	protected boolean errorsDetected;
 	private String errorText;
 	
-	
 	public Document validateTopicXML(final String xml, final boolean validateAgainstDTD)
 	{
 		try

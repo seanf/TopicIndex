@@ -23,8 +23,6 @@ import com.redhat.ecs.commonutils.XMLUtilities;
  */
 public class XMLFormatter implements LSResourceResolver, DOMErrorHandler
 {
-	
-	
 	public String formatXML(final String xml)
 	{
 		if (xml == null || xml.length() == 0)

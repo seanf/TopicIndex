@@ -78,6 +78,8 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	private static final Integer TASK_TOPIC_STRINGCONSTANTID = 13;
 	/** The string constant that is used as a concept template */
 	private static final Integer CONCEPT_TOPIC_STRINGCONSTANTID = 14;
+	/** The encoding of the XML, used when converting a DOM object to a string */
+	private static final String XML_ENCODING = "UTF-8";
 	private static final long serialVersionUID = 5580473587657911655L;
 
 	@Transient
@@ -773,7 +775,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	{
 		if (tempTopicXMLDoc != null)
 		{
-			String retValue = XMLUtilities.convertDocumentToString(this.tempTopicXMLDoc);
+			String retValue = XMLUtilities.convertDocumentToString(this.tempTopicXMLDoc, XML_ENCODING);
 
 			retValue = "<!-- Topic ID: " + this.topicId + " -->\n" + retValue.replaceAll("<\\?xml.*?\\?>", "").trim();
 
@@ -886,7 +888,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 				doc.getDocumentElement().appendChild(detailsComment);
 			}
 
-			this.topicXML = XMLUtilities.convertDocumentToString(doc);
+			this.topicXML = XMLUtilities.convertDocumentToString(doc, XML_ENCODING);
 			formatXML();
 		}
 	}
@@ -933,6 +935,8 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 
 	private void syncTopicTitleWithXML()
 	{
+		
+		
 		final Document doc = XMLUtilities.convertStringToDocument(this.topicXML);
 		if (doc != null)
 		{
@@ -957,7 +961,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 						docElement.appendChild(newTitle);
 				}
 
-				this.topicXML = XMLUtilities.convertDocumentToString(doc);
+				this.topicXML = XMLUtilities.convertDocumentToString(doc, XML_ENCODING);
 			}
 		}
 	}
