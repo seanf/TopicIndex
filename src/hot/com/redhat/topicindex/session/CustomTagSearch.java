@@ -3,8 +3,6 @@ package com.redhat.topicindex.session;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
 
@@ -25,7 +23,6 @@ import com.redhat.topicindex.entity.Filter;
 import com.redhat.topicindex.entity.FilterCategory;
 import com.redhat.topicindex.entity.FilterField;
 import com.redhat.topicindex.entity.FilterTag;
-import com.redhat.topicindex.entity.Project;
 import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.filter.TopicFilter;
 import com.redhat.topicindex.utils.Constants;

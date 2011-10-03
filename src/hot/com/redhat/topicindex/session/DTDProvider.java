@@ -4,7 +4,6 @@ import org.jboss.seam.annotations.Name;
 
 import com.redhat.ecs.commonutils.HTTPUtilities;
 import com.redhat.ecs.commonutils.MIMEUtilities;
-import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.DTDConstants;
 
 /**

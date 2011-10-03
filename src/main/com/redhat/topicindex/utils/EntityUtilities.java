@@ -23,7 +23,6 @@ import org.drools.WorkingMemory;
 import org.hibernate.Session;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.query.dsl.QueryBuilder;
 import org.jboss.seam.Component;
 import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.Role;

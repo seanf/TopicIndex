@@ -6,15 +6,12 @@ import static ch.lambdaj.Lambda.on;
 import static ch.lambdaj.collection.LambdaCollections.with;
 import static org.hamcrest.Matchers.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.ecs.commonutils.HTTPUtilities;
-import com.redhat.topicindex.entity.Filter;
 import com.redhat.topicindex.entity.Tag;
 import com.redhat.topicindex.entity.TagToCategory;
 import com.redhat.topicindex.entity.Topic;
@@ -22,7 +19,6 @@ import com.redhat.topicindex.entity.TopicToTag;
 import com.redhat.topicindex.entity.TopicToTopic;
 import com.redhat.topicindex.entity.TopicToTopicSourceUrl;
 import com.redhat.topicindex.filter.TopicFilter;
-import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.EntityUtilities;
 import com.redhat.topicindex.utils.structures.DroolsEvent;
 import com.redhat.topicindex.utils.structures.tags.UICategoryData;
@@ -31,12 +27,8 @@ import com.redhat.topicindex.utils.structures.tags.UITagData;
 
 import org.drools.WorkingMemory;
 import org.jboss.seam.Component;
-import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.Begin;
-import org.jboss.seam.annotations.End;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.security.Identity;
 
 @Name("topicTagsList")
@@ -124,6 +116,7 @@ public class TopicTagsList extends ExtendedTopicList
 	 * used in bulk tagging where you view a paged list of results, but apply
 	 * tags to all elements.
 	 */
+	@Override
 	protected void construct(final int limit, final String constructedEJBQL, final TopicFilter topic)
 	{
 		super.construct(limit, constructedEJBQL, topic, "topicTagsList");
@@ -269,6 +262,7 @@ public class TopicTagsList extends ExtendedTopicList
 	/**
 	 * Override the validate method to get the @Create function
 	 */
+	@Override
 	public void validate()
 	{
 		super.validate();
