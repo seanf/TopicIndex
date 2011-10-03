@@ -12,5 +12,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Hibernate 3.6.7"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Apache Commons Codec"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JSF API 1.2"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Hibernate Search 3.4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
