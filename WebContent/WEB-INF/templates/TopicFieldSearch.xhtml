@@ -1,0 +1,109 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:s="http://jboss.com/products/seam/taglib"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:c="http://java.sun.com/jstl/core">
+
+	<rich:panel style="width: 100%; overflow: auto;">
+		<f:facet name="header">Topic Field Filters</f:facet>
+		<h:panelGrid id="grid" columns="1">
+			<h:panelGroup>
+
+				<s:decorate template="layout/display.xhtml"
+					rendered="#{s:hasPermission('FilterTopicDates', 'Rendered', null)}">
+					<ui:define name="label">Topic Created After</ui:define>
+					<rich:calendar
+						value="#{topic.startCreateDatePlain}" locale="AU"
+						popup="true" datePattern="dd MMM yyyy HH:mm"
+						showApplyButton="true" cellWidth="24px" cellHeight="22px"
+						style="width:200px" />
+				</s:decorate>
+
+				<s:decorate template="layout/display.xhtml"
+					rendered="#{s:hasPermission('FilterTopicDates', 'Rendered', null)}">
+					<ui:define name="label">Topic Created Before</ui:define>
+					<rich:calendar value="#{topic.endCreateDatePlain}"
+						locale="AU" popup="true" datePattern="dd MMM yyyy HH:mm"
+						showApplyButton="true" cellWidth="24px" cellHeight="22px"
+						style="width:200px" />
+
+				</s:decorate>
+
+				<s:decorate template="layout/display.xhtml"
+					rendered="#{s:hasPermission('FilterTopicID', 'Rendered', null)}">
+					<ui:define name="label">Topic ID</ui:define>
+					<h:inputText size="125" id="topicID"
+						value="#{topic.topicIdsString}" />
+				</s:decorate>
+
+				<s:decorate template="layout/display.xhtml"
+					rendered="#{s:hasPermission('FilterTopicAddedBy', 'Rendered', null)}">
+					<ui:define name="label">Topic Added By</ui:define>
+					<h:inputText size="125" id="topicAddedBy"
+						value="#{topic.topicAddedBy}" />
+				</s:decorate>
+
+				<s:decorate template="layout/display.xhtml"
+					rendered="#{s:hasPermission('FilterTopicTitle', 'Rendered', null)}">
+					<ui:define name="label">Topic Title</ui:define>
+					<h:inputText size="125" id="topicTitle"
+						value="#{topic.topicTitle}" />
+				</s:decorate>
+
+				<s:decorate template="layout/display.xhtml"
+					rendered="#{s:hasPermission('FilterTopicXML', 'Rendered', null)}">
+					<ui:define name="label">Topic XML</ui:define>
+					<h:inputText size="125" id="topicXML"
+						value="#{topic.topicXML}" />
+				</s:decorate>
+
+				<s:decorate template="layout/display.xhtml"
+					rendered="#{s:hasPermission('FilterTopicText', 'Rendered', null)}">
+					<ui:define name="label">Topic Description</ui:define>
+					<h:inputText size="125" id="topicText"
+						value="#{topic.topicText}" />
+				</s:decorate>
+
+				<s:decorate template="layout/display.xhtml"
+					rendered="#{s:hasPermission('FilterTopicIsRelatedTo', 'Rendered', null)}">
+					<ui:define name="label">Is Related To</ui:define>
+					<h:inputText size="125" id="topicIsRelatedTo"
+						value="#{topic.topicRelatedTo}" />
+				</s:decorate>
+
+
+				<s:decorate template="layout/display.xhtml"
+					rendered="#{s:hasPermission('FilterTopicIsRelatedFrom', 'Rendered', null)}">
+					<ui:define name="label">Is Related From</ui:define>
+					<h:inputText size="125" id="topicIsRelatedFrom"
+						value="#{topic.topicRelatedFrom}" />
+				</s:decorate>
+
+				<s:decorate template="layout/display.xhtml"
+					rendered="#{s:hasPermission('FilterTopicHasRelationships', 'Rendered', null)}">
+					<ui:define name="label">Has Related Topics</ui:define>
+					<h:selectBooleanCheckbox id="hasRelationships"
+						value="#{topic.hasRelationships}" />
+				</s:decorate>
+
+				<s:decorate template="layout/display.xhtml"
+					rendered="#{s:hasPermission('FilterTopicHasIncomingRelationships', 'Rendered', null)}">
+					<ui:define name="label">Has Incoming Related topics</ui:define>
+					<h:selectBooleanCheckbox id="hasIncomingRelationships"
+						value="#{topic.hasIncomingRelationships}" />
+				</s:decorate>
+
+				<s:decorate template="layout/display.xhtml">
+					<ui:define name="label">Match</ui:define>
+					<h:selectOneRadio id="logic" value="#{topic.logic}"
+						styleClass="radio">
+						<f:selectItem itemLabel="All" itemValue="and" />
+						<f:selectItem itemLabel="Any" itemValue="or" />
+					</h:selectOneRadio>
+				</s:decorate>
+			</h:panelGroup>
+		</h:panelGrid>
+	</rich:panel>
+</ui:composition>

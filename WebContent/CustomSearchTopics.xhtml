@@ -127,115 +127,17 @@
 							<ui:param name="selectedTags"
 								value="#{customTagSearch.selectedTags.projectCategories}" />
 							<ui:param name="header" value="Topic Tag Filters" />
-							<ui:param name="logicEnabled" value="#{true}"/>					
+							<ui:param name="logicEnabled" value="#{true}" />
 						</ui:include>
-					
+
 					</rich:panel>
 
 					<br />
 					<br />
 
-					<rich:panel style="width: 100%; overflow: auto;">
-						<f:facet name="header">Topic Field Filters</f:facet>
-						<h:panelGrid id="grid" columns="1">
-							<h:panelGroup>
-
-								<s:decorate template="layout/display.xhtml"
-									rendered="#{s:hasPermission('FilterTopicDates', 'Rendered', null)}">
-									<ui:define name="label">Topic Created After</ui:define>
-									<rich:calendar
-										value="#{customTagSearch.topic.startCreateDatePlain}"
-										locale="AU" popup="true" datePattern="dd MMM yyyy HH:mm"
-										showApplyButton="true" cellWidth="24px" cellHeight="22px"
-										style="width:200px" />
-								</s:decorate>
-
-								<s:decorate template="layout/display.xhtml"
-									rendered="#{s:hasPermission('FilterTopicDates', 'Rendered', null)}">
-									<ui:define name="label">Topic Created Before</ui:define>
-									<rich:calendar
-										value="#{customTagSearch.topic.endCreateDatePlain}"
-										locale="AU" popup="true" datePattern="dd MMM yyyy HH:mm"
-										showApplyButton="true" cellWidth="24px" cellHeight="22px"
-										style="width:200px" />
-
-								</s:decorate>
-
-								<s:decorate template="layout/display.xhtml"
-									rendered="#{s:hasPermission('FilterTopicID', 'Rendered', null)}">
-									<ui:define name="label">Topic ID</ui:define>
-									<h:inputText size="125" id="topicID"
-										value="#{customTagSearch.topic.topicIdsString}" />
-								</s:decorate>
-
-								<s:decorate template="layout/display.xhtml"
-									rendered="#{s:hasPermission('FilterTopicAddedBy', 'Rendered', null)}">
-									<ui:define name="label">Topic Added By</ui:define>
-									<h:inputText size="125" id="topicAddedBy"
-										value="#{customTagSearch.topic.topicAddedBy}" />
-								</s:decorate>
-
-								<s:decorate template="layout/display.xhtml"
-									rendered="#{s:hasPermission('FilterTopicTitle', 'Rendered', null)}">
-									<ui:define name="label">Topic Title</ui:define>
-									<h:inputText size="125" id="topicTitle"
-										value="#{customTagSearch.topic.topicTitle}" />
-								</s:decorate>
-
-								<s:decorate template="layout/display.xhtml"
-									rendered="#{s:hasPermission('FilterTopicXML', 'Rendered', null)}">
-									<ui:define name="label">Topic XML</ui:define>
-									<h:inputText size="125" id="topicXML"
-										value="#{customTagSearch.topic.topicXML}" />
-								</s:decorate>
-
-								<s:decorate template="layout/display.xhtml"
-									rendered="#{s:hasPermission('FilterTopicText', 'Rendered', null)}">
-									<ui:define name="label">Topic Description</ui:define>
-									<h:inputText size="125" id="topicText"
-										value="#{customTagSearch.topic.topicText}" />
-								</s:decorate>
-
-								<s:decorate template="layout/display.xhtml"
-									rendered="#{s:hasPermission('FilterTopicIsRelatedTo', 'Rendered', null)}">
-									<ui:define name="label">Is Related To</ui:define>
-									<h:inputText size="125" id="topicIsRelatedTo"
-										value="#{customTagSearch.topic.topicRelatedTo}" />
-								</s:decorate>
-
-
-								<s:decorate template="layout/display.xhtml"
-									rendered="#{s:hasPermission('FilterTopicIsRelatedFrom', 'Rendered', null)}">
-									<ui:define name="label">Is Related From</ui:define>
-									<h:inputText size="125" id="topicIsRelatedFrom"
-										value="#{customTagSearch.topic.topicRelatedFrom}" />
-								</s:decorate>
-
-								<s:decorate template="layout/display.xhtml"
-									rendered="#{s:hasPermission('FilterTopicHasRelationships', 'Rendered', null)}">
-									<ui:define name="label">Has Related Topics</ui:define>
-									<h:selectBooleanCheckbox id="hasRelationships"
-										value="#{customTagSearch.topic.hasRelationships}" />
-								</s:decorate>
-
-								<s:decorate template="layout/display.xhtml"
-									rendered="#{s:hasPermission('FilterTopicHasIncomingRelationships', 'Rendered', null)}">
-									<ui:define name="label">Has Incoming Related topics</ui:define>
-									<h:selectBooleanCheckbox id="hasIncomingRelationships"
-										value="#{customTagSearch.topic.hasIncomingRelationships}" />
-								</s:decorate>
-
-								<s:decorate template="layout/display.xhtml">
-									<ui:define name="label">Match</ui:define>
-									<h:selectOneRadio id="logic"
-										value="#{customTagSearch.topic.logic}" styleClass="radio">
-										<f:selectItem itemLabel="All" itemValue="and" />
-										<f:selectItem itemLabel="Any" itemValue="or" />
-									</h:selectOneRadio>
-								</s:decorate>
-							</h:panelGroup>
-						</h:panelGrid>
-					</rich:panel>
+					<ui:include src="/WEB-INF/templates/TagSelectAndNotSelect.xhtml">					
+						<ui:param name="topic" value="#{customTagSearch.topic}" />
+					</ui:include>
 
 					<br />
 					<br />
