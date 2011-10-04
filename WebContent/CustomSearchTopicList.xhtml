@@ -829,24 +829,6 @@
 						<h:outputText value="#{_topic.topicTitle}" title="#{_topic.topicText}" />
 					</rich:column>
 
-					<!-- <rich:column
-						rendered="#{s:hasPermission('TopicListTextColumn', 'Rendered', null)}">
-						<f:facet name="header">
-							<ui:include src="layout/sort.xhtml">
-								<ui:param
-									name="entityList"
-									value="#{topicList}" />
-								<ui:param
-									name="propertyLabel"
-									value="Topic Text" />
-								<ui:param
-									name="propertyPath"
-									value="topic.topicText" />
-							</ui:include>
-						</f:facet>
-						<h:outputText value="#{_topic.topicText}" />
-					</rich:column> -->
-
 					<rich:column
 						rendered="#{s:hasPermission('TopicListAddedByColumn', 'Rendered', null)}">
 						<f:facet name="header">
@@ -895,14 +877,14 @@
 							value="#{_topic.topicToTopicSourceUrls.toArray()}">
 							<h:outputLink
 								value="#{url.topicSourceUrl.sourceUrl}"
-								title="#{url.topicSourceUrl.description}"
+								title="#{url.topicSourceUrl.sourceUrl} &#13;#{url.topicSourceUrl.description}"
 								target="_blank">
 								<h:outputText
 									value="Source URL"
-									rendered="#{empty url.topicSourceUrl.title}" />
+									rendered="#{empty url.topicSourceUrl.title}"/>
 								<h:outputText
 									value="#{url.topicSourceUrl.title}"
-									rendered="#{not empty url.topicSourceUrl.title}" />
+									rendered="#{not empty url.topicSourceUrl.title}"/>
 							</h:outputLink>
 						</rich:dataList>
 					</rich:column>

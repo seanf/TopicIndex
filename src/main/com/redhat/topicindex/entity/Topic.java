@@ -329,7 +329,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	public String getTagsList(final boolean brLineBreak)
 	{
 		// define the line breaks for html and for tooltips
-		final String lineBreak = brLineBreak ? "<br/>" : "\n";
+		final String lineBreak = brLineBreak ? "<br/>" : " \n";
 		final String boldStart = brLineBreak ? "<b>" : "";
 		final String boldEnd = brLineBreak ? "</b>" : "";
 
