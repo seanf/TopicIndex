@@ -46,6 +46,13 @@ public class UITagDataBase
 	{
 		this.name = name;
 	}
+	
+	public String getNameWithoutSpaces()
+	{
+		if (name == null)
+			return null;
+		return name.replaceAll(" ", "");
+	}
 
 	public Integer getId() 
 	{
