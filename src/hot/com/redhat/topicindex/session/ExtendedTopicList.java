@@ -64,7 +64,8 @@ public class ExtendedTopicList extends TopicList
 	 */
 	private HashMap<String, String> filterVars;
 
-	protected List<Topic> tempList = new ArrayList<Topic>();
+	/** A temporary list of topics that can be used for special processing tasks */ 
+	protected List<Topic> tempList;
 
 	public List<Topic> getTempList()
 	{
@@ -139,6 +140,8 @@ public class ExtendedTopicList extends TopicList
 	protected void construct(final int limit, final String constructedEJBQL, final TopicFilter topic, final String beanName)
 	{
 		super.construct(limit, constructedEJBQL, topic);
+		
+		tempList = new ArrayList<Topic>();
 
 		// populate the bulk tag database
 		selectedTags = new UIProjectData();
