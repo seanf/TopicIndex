@@ -226,7 +226,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	}
 
 	@Transient
-	public ArrayList<Topic> getOneWayRelatedTopicsArray()
+	public List<Topic> getOneWayRelatedTopicsArray()
 	{
 		final ArrayList<Topic> retValue = new ArrayList<Topic>();
 		for (final TopicToTopic topicToTopic : this.getParentTopicToTopics())
@@ -238,7 +238,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	}
 
 	@Transient
-	public ArrayList<Topic> getTwoWayRelatedTopicsArray()
+	public List<Topic> getTwoWayRelatedTopicsArray()
 	{
 		final ArrayList<Topic> retValue = new ArrayList<Topic>();
 		for (final TopicToTopic topicToTopic : this.getParentTopicToTopics())
@@ -248,12 +248,22 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	}
 
 	@Transient
-	public ArrayList<Topic> getIncomingRelatedTopicsArray()
+	public List<Topic> getIncomingRelatedTopicsArray()
 	{
 		final ArrayList<Topic> retValue = new ArrayList<Topic>();
 		for (final TopicToTopic topicToTopic : this.getChildTopicToTopics())
 			if (!this.isRelatedTo(topicToTopic.getMainTopic()))
 				retValue.add(topicToTopic.getMainTopic());
+		return retValue;
+	}
+	
+	@Transient
+	public List<Topic> getAllRelatedTopicsArray()
+	{
+		final List<Topic> retValue = new ArrayList<Topic>();
+		retValue.addAll(getOneWayRelatedTopicsArray());
+		retValue.addAll(getTwoWayRelatedTopicsArray());
+		retValue.addAll(getIncomingRelatedTopicsArray());
 		return retValue;
 	}
 

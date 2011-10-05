@@ -272,6 +272,18 @@ public class CustomTagSearch
 		loadCategoryLogic(filter);
 		loadFilterFields(filter);
 	}
+	
+	public String loadFilterAndSearch()
+	{
+		loadFilter();
+		return doSearch();
+	}
+	
+	public void loadFilterAndDocbook()
+	{
+		this.loadFilter();
+		this.buildDocbook();
+	}
 
 	protected void loadTagCheckboxes(final Filter filter)
 	{

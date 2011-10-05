@@ -100,6 +100,10 @@
 						</h:selectOneMenu>
 						<h:commandButton style="margin:10px" value="Load"
 							action="#{customTagSearch.loadFilter}" />
+						<h:commandButton style="margin:10px" value="Load And Search"
+							action="#{customTagSearch.loadFilterAndSearch}" />
+						<h:commandButton style="margin:10px" value="Load And Docbook"
+							action="#{customTagSearch.loadFilterAndDocbook}" />
 						<h:outputText style="margin:10px" value="Filter Name: " />
 						<h:inputText style="margin:10px"
 							value="#{customTagSearch.selectedFilterName}"></h:inputText>
@@ -135,7 +139,7 @@
 					<br />
 					<br />
 
-					<ui:include src="/WEB-INF/templates/TopicFieldSearch.xhtml">					
+					<ui:include src="/WEB-INF/templates/TopicFieldSearch.xhtml">
 						<ui:param name="topic" value="#{customTagSearch.topic}" />
 					</ui:include>
 
