@@ -305,7 +305,7 @@ public class TopicFilter
 			return this.getTopicTextSearch();
 		else if (fieldName.equals(Constants.TOPIC_ADDED_BY_FILTER_VAR))
 			return this.getTopicAddedBy();
-		else if (fieldName.equals(Constants.TOPIC_XML_FILTER_VAR_DESC))
+		else if (fieldName.equals(Constants.TOPIC_XML_FILTER_VAR))
 			return this.getTopicXML();
 		else if (fieldName.equals(Constants.TOPIC_TITLE_FILTER_VAR))
 			return this.getTopicTitle();
