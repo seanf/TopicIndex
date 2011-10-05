@@ -132,9 +132,9 @@
 		<rich:panel>
 			<f:facet name="header">Topic Search Results (#{empty relatedTopicTagsList.resultList ? 0 : (relatedTopicTagsList.paginated ? relatedTopicTagsList.resultCount : relatedTopicTagsList.resultList.size)}) #{relatedTopicTagsList.searchTagHeading}</f:facet>
 
-		<ui:include src="/WEB-INF/templates/BulkRelationshipActions.xhtml">
-			<ui:param name="topicList" value="#{relatedTopicTagsList}" />
-		</ui:include>
+			<ui:include src="/WEB-INF/templates/BulkRelationshipActions.xhtml">
+				<ui:param name="topicList" value="#{relatedTopicTagsList}" />
+			</ui:include>
 
 			<div class="tableControl">
 
@@ -494,11 +494,13 @@
 				</rich:dataTable>
 
 			</div>
+
+			<ui:include src="/WEB-INF/templates/BulkRelationshipActions.xhtml">
+				<ui:param name="topicList" value="#{relatedTopicTagsList}" />
+			</ui:include>
 		</rich:panel>
 
-		<ui:include src="/WEB-INF/templates/BulkRelationshipActions.xhtml">
-			<ui:param name="topicList" value="#{relatedTopicTagsList}" />
-		</ui:include>
+
 
 		<div class="tableControl">
 
