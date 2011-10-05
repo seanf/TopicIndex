@@ -226,19 +226,39 @@ public class Filter implements java.io.Serializable
 	public String getFilterTitle()
 	{
 		String desc = "";
-
+		
+		/* Loop over all the categories that the filter tags belong to */
 		for (final Category category : this.getFilterTagCategories())
 		{
 			String categoryDesc = category.getCategoryName() + ": ";
 			String tagDesc = "";
+			
+			/* This will be shown in the topic list results title */
+			String internalLogic = Constants.DEFAULT_INTERNAL_LOGIC;
+			
+			/* Find out if the category does not have the default internal logic */
+			final Set<FilterCategory> filterCategories = this.getFilterCategories();
+			for (final FilterCategory filterCategory : filterCategories)
+			{
+				/* if a filter category has been saved that matches the category we are looking at now.. */ 
+				if (filterCategory.getCategory().equals(category))
+				{
+					/* ...and it defines an internal logic state, update the internalLogic variable */
+					if (filterCategory.getCategoryState() == Constants.CATEGORY_INTERNAL_AND_STATE)
+						internalLogic = Constants.AND_LOGIC;
+					else if (filterCategory.getCategoryState() == Constants.CATEGORY_INTERNAL_OR_STATE)
+						internalLogic = Constants.OR_LOGIC;
+					break;
+				}
+			}
 
 			for (final FilterTag tag : this.filterTags)
 			{
 				if (tag.getTag().isInCategory(category.getCategoryId()))
 				{
 					if (tagDesc.length() != 0)
-						tagDesc += ", ";
-
+						tagDesc += " " + internalLogic + " ";
+					
 					if (tag.getTagState() == Constants.NOT_MATCH_TAG_STATE)
 						tagDesc += "Not ";
 
