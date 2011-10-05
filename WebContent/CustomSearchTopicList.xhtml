@@ -1,7 +1,6 @@
 <!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<ui:composition
-	xmlns="http://www.w3.org/1999/xhtml"
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:s="http://jboss.com/products/seam/taglib"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:f="http://java.sun.com/jsf/core"
@@ -13,184 +12,104 @@
 
 	<ui:define name="body">
 
-		<rich:jQuery
-			selector="input[id*='tag-']"
-			timing="onload"
+		<rich:jQuery selector="input[id*='tag-']" timing="onload"
 			query="each(function(index, element){if (element.checked){jQuery('input[id*=' + element.id.replace('tag', 'nottag') + ']').removeAttr('disabled');} else {jQuery('input[id*=' + element.id.replace('tag', 'nottag') + ']').attr('disabled', true);}})" />
 
 		<h:form>
-			<rich:contextMenu
-				id="oneWayRelatedContentMenu"
-				submitMode="server"
+			<rich:contextMenu id="oneWayRelatedContentMenu" submitMode="server"
 				attached="false">
-				<rich:menuItem
-					value="View"
+				<rich:menuItem value="View"
 					action="#{topicTagsList.viewRelatedTopic}"
 					rendered="#{s:hasPermission('ViewRelatedContextMenuItem', 'Rendered', null)}">
-					<a4j:actionparam
-						name="actionTopicID"
-						assignTo="#{topicTagsList.actionTopicID}"
-						value="{actionTopicID}" />
-					<a4j:actionparam
-						name="otherTopicId"
-						assignTo="#{topicTagsList.otherTopicId}"
-						value="{otherTopicId}" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<a4j:actionparam name="actionTopicID"
+						assignTo="#{topicTagsList.actionTopicID}" value="{actionTopicID}" />
+					<a4j:actionparam name="otherTopicId"
+						assignTo="#{topicTagsList.otherTopicId}" value="{otherTopicId}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</rich:menuItem>
-				<rich:menuItem
-					value="View New Window"
-					target="_blank"
+				<rich:menuItem value="View New Window" target="_blank"
 					action="#{topicTagsList.viewRelatedTopic}"
 					rendered="#{s:hasPermission('ViewRelatedContextMenuItem', 'Rendered', null)}">
-					<a4j:actionparam
-						name="actionTopicID"
-						assignTo="#{topicTagsList.actionTopicID}"
-						value="{actionTopicID}" />
-					<a4j:actionparam
-						name="otherTopicId"
-						assignTo="#{topicTagsList.otherTopicId}"
-						value="{otherTopicId}" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<a4j:actionparam name="actionTopicID"
+						assignTo="#{topicTagsList.actionTopicID}" value="{actionTopicID}" />
+					<a4j:actionparam name="otherTopicId"
+						assignTo="#{topicTagsList.otherTopicId}" value="{otherTopicId}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</rich:menuItem>
-				<rich:menuItem
-					value="Remove Relationship"
+				<rich:menuItem value="Remove Relationship"
 					action="#{topicTagsList.removeRelatedById}"
 					rendered="#{s:hasPermission('DeleteRelatedContextMenuItem', 'Rendered', null)}">
-					<a4j:actionparam
-						name="actionTopicID"
-						assignTo="#{topicTagsList.actionTopicID}"
-						value="{actionTopicID}" />
-					<a4j:actionparam
-						name="otherTopicId"
-						assignTo="#{topicTagsList.otherTopicId}"
-						value="{otherTopicId}" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<a4j:actionparam name="actionTopicID"
+						assignTo="#{topicTagsList.actionTopicID}" value="{actionTopicID}" />
+					<a4j:actionparam name="otherTopicId"
+						assignTo="#{topicTagsList.otherTopicId}" value="{otherTopicId}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</rich:menuItem>
-				<rich:menuItem
-					value="Convert Into 2 Way Relationship"
+				<rich:menuItem value="Convert Into 2 Way Relationship"
 					action="#{topicTagsList.makeTwoWayRelatedById}"
 					rendered="#{s:hasPermission('DeleteRelatedContextMenuItem', 'Rendered', null)}">
-					<a4j:actionparam
-						name="actionTopicID"
-						assignTo="#{topicTagsList.actionTopicID}"
-						value="{actionTopicID}" />
-					<a4j:actionparam
-						name="otherTopicId"
-						assignTo="#{topicTagsList.otherTopicId}"
-						value="{otherTopicId}" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<a4j:actionparam name="actionTopicID"
+						assignTo="#{topicTagsList.actionTopicID}" value="{actionTopicID}" />
+					<a4j:actionparam name="otherTopicId"
+						assignTo="#{topicTagsList.otherTopicId}" value="{otherTopicId}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</rich:menuItem>
 			</rich:contextMenu>
 		</h:form>
 
 		<h:form>
-			<rich:contextMenu
-				id="incomingWayRelatedContentMenu"
-				submitMode="server"
-				attached="false">
-				<rich:menuItem
-					value="View"
+			<rich:contextMenu id="incomingWayRelatedContentMenu"
+				submitMode="server" attached="false">
+				<rich:menuItem value="View"
 					action="#{topicTagsList.viewRelatedTopic}"
 					rendered="#{s:hasPermission('ViewRelatedContextMenuItem', 'Rendered', null)}">
-					<a4j:actionparam
-						name="actionTopicID"
-						assignTo="#{topicTagsList.actionTopicID}"
-						value="{actionTopicID}" />
-					<a4j:actionparam
-						name="otherTopicId"
-						assignTo="#{topicTagsList.otherTopicId}"
-						value="{otherTopicId}" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<a4j:actionparam name="actionTopicID"
+						assignTo="#{topicTagsList.actionTopicID}" value="{actionTopicID}" />
+					<a4j:actionparam name="otherTopicId"
+						assignTo="#{topicTagsList.otherTopicId}" value="{otherTopicId}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</rich:menuItem>
-				<rich:menuItem
-					value="View New Window"
-					target="_blank"
+				<rich:menuItem value="View New Window" target="_blank"
 					action="#{topicTagsList.viewRelatedTopic}"
 					rendered="#{s:hasPermission('ViewRelatedContextMenuItem', 'Rendered', null)}">
-					<a4j:actionparam
-						name="actionTopicID"
-						assignTo="#{topicTagsList.actionTopicID}"
-						value="{actionTopicID}" />
-					<a4j:actionparam
-						name="otherTopicId"
-						assignTo="#{topicTagsList.otherTopicId}"
-						value="{otherTopicId}" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<a4j:actionparam name="actionTopicID"
+						assignTo="#{topicTagsList.actionTopicID}" value="{actionTopicID}" />
+					<a4j:actionparam name="otherTopicId"
+						assignTo="#{topicTagsList.otherTopicId}" value="{otherTopicId}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</rich:menuItem>
-				<rich:menuItem
-					value="Remove Relationship"
+				<rich:menuItem value="Remove Relationship"
 					action="#{topicTagsList.removeIncomingRelatedById}"
 					rendered="#{s:hasPermission('DeleteRelatedContextMenuItem', 'Rendered', null)}">
-					<a4j:actionparam
-						name="actionTopicID"
-						assignTo="#{topicTagsList.actionTopicID}"
-						value="{actionTopicID}" />
-					<a4j:actionparam
-						name="otherTopicId"
-						assignTo="#{topicTagsList.otherTopicId}"
-						value="{otherTopicId}" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<a4j:actionparam name="actionTopicID"
+						assignTo="#{topicTagsList.actionTopicID}" value="{actionTopicID}" />
+					<a4j:actionparam name="otherTopicId"
+						assignTo="#{topicTagsList.otherTopicId}" value="{otherTopicId}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</rich:menuItem>
-				<rich:menuItem
-					value="Convert Into 2 Way Relationship"
+				<rich:menuItem value="Convert Into 2 Way Relationship"
 					action="#{topicTagsList.makeTwoWayRelatedById}"
 					rendered="#{s:hasPermission('DeleteRelatedContextMenuItem', 'Rendered', null)}">
-					<a4j:actionparam
-						name="actionTopicID"
-						assignTo="#{topicTagsList.actionTopicID}"
-						value="{actionTopicID}" />
-					<a4j:actionparam
-						name="otherTopicId"
-						assignTo="#{topicTagsList.otherTopicId}"
-						value="{otherTopicId}" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<a4j:actionparam name="actionTopicID"
+						assignTo="#{topicTagsList.actionTopicID}" value="{actionTopicID}" />
+					<a4j:actionparam name="otherTopicId"
+						assignTo="#{topicTagsList.otherTopicId}" value="{otherTopicId}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</rich:menuItem>
 			</rich:contextMenu>
@@ -199,326 +118,187 @@
 
 
 		<h:form>
-			<rich:contextMenu
-				id="twoWayRelatedContentMenu"
-				submitMode="server"
+			<rich:contextMenu id="twoWayRelatedContentMenu" submitMode="server"
 				attached="false">
-				<rich:menuItem
-					value="View"
+				<rich:menuItem value="View"
 					action="#{topicTagsList.viewRelatedTopic}"
 					rendered="#{s:hasPermission('ViewRelatedContextMenuItem', 'Rendered', null)}">
-					<a4j:actionparam
-						name="actionTopicID"
-						assignTo="#{topicTagsList.actionTopicID}"
-						value="{actionTopicID}" />
-					<a4j:actionparam
-						name="otherTopicId"
-						assignTo="#{topicTagsList.otherTopicId}"
-						value="{otherTopicId}" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<a4j:actionparam name="actionTopicID"
+						assignTo="#{topicTagsList.actionTopicID}" value="{actionTopicID}" />
+					<a4j:actionparam name="otherTopicId"
+						assignTo="#{topicTagsList.otherTopicId}" value="{otherTopicId}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</rich:menuItem>
-				<rich:menuItem
-					value="View New Window"
-					target="_blank"
+				<rich:menuItem value="View New Window" target="_blank"
 					action="#{topicTagsList.viewRelatedTopic}"
 					rendered="#{s:hasPermission('ViewRelatedContextMenuItem', 'Rendered', null)}">
-					<a4j:actionparam
-						name="actionTopicID"
-						assignTo="#{topicTagsList.actionTopicID}"
-						value="{actionTopicID}" />
-					<a4j:actionparam
-						name="otherTopicId"
-						assignTo="#{topicTagsList.otherTopicId}"
-						value="{otherTopicId}" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<a4j:actionparam name="actionTopicID"
+						assignTo="#{topicTagsList.actionTopicID}" value="{actionTopicID}" />
+					<a4j:actionparam name="otherTopicId"
+						assignTo="#{topicTagsList.otherTopicId}" value="{otherTopicId}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</rich:menuItem>
-				<rich:menuItem
-					value="Convert Into 1 Way Relationship (from here)"
+				<rich:menuItem value="Convert Into 1 Way Relationship (from here)"
 					action="#{topicTagsList.removeOtherRelationship}"
 					rendered="#{s:hasPermission('DeleteRelatedContextMenuItem', 'Rendered', null)}">
-					<a4j:actionparam
-						name="actionTopicID"
-						assignTo="#{topicTagsList.actionTopicID}"
-						value="{actionTopicID}" />
-					<a4j:actionparam
-						name="otherTopicId"
-						assignTo="#{topicTagsList.otherTopicId}"
-						value="{otherTopicId}" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<a4j:actionparam name="actionTopicID"
+						assignTo="#{topicTagsList.actionTopicID}" value="{actionTopicID}" />
+					<a4j:actionparam name="otherTopicId"
+						assignTo="#{topicTagsList.otherTopicId}" value="{otherTopicId}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</rich:menuItem>
-				<rich:menuItem
-					value="Convert Into 1 Way Relationship (from there)"
+				<rich:menuItem value="Convert Into 1 Way Relationship (from there)"
 					action="#{topicTagsList.removeThisRelationship}"
 					rendered="#{s:hasPermission('DeleteRelatedContextMenuItem', 'Rendered', null)}">
-					<a4j:actionparam
-						name="actionTopicID"
-						assignTo="#{topicTagsList.actionTopicID}"
-						value="{actionTopicID}" />
-					<a4j:actionparam
-						name="otherTopicId"
-						assignTo="#{topicTagsList.otherTopicId}"
-						value="{otherTopicId}" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<a4j:actionparam name="actionTopicID"
+						assignTo="#{topicTagsList.actionTopicID}" value="{actionTopicID}" />
+					<a4j:actionparam name="otherTopicId"
+						assignTo="#{topicTagsList.otherTopicId}" value="{otherTopicId}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</rich:menuItem>
-				<rich:menuItem
-					value="Remove Relationship (from both)"
+				<rich:menuItem value="Remove Relationship (from both)"
 					action="#{topicTagsList.removeBothRelationships}"
 					rendered="#{s:hasPermission('DeleteRelatedContextMenuItem', 'Rendered', null)}">
-					<a4j:actionparam
-						name="actionTopicID"
-						assignTo="#{topicTagsList.actionTopicID}"
-						value="{actionTopicID}" />
-					<a4j:actionparam
-						name="otherTopicId"
-						assignTo="#{topicTagsList.otherTopicId}"
-						value="{otherTopicId}" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<a4j:actionparam name="actionTopicID"
+						assignTo="#{topicTagsList.actionTopicID}" value="{actionTopicID}" />
+					<a4j:actionparam name="otherTopicId"
+						assignTo="#{topicTagsList.otherTopicId}" value="{otherTopicId}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</rich:menuItem>
 			</rich:contextMenu>
 		</h:form>
 
 		<h:form>
-			<rich:contextMenu
-				id="topicContextMenu"
-				submitMode="server"
+			<rich:contextMenu id="topicContextMenu" submitMode="server"
 				attached="false">
 
-				<rich:menuItem
-					value="Add To Temporary List"
+				<rich:menuItem value="Add To Temporary List"
 					action="#{topicTagsList.addToTempList}"
 					rendered="#{s:hasPermission('ViewAddToTemporaryListContextMenuItem', 'Rendered', null)}">
-					<a4j:actionparam
-						name="actionTopicID"
-						assignTo="#{topicTagsList.actionTopicID}"
-						value="{actionTopicID}" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<a4j:actionparam name="actionTopicID"
+						assignTo="#{topicTagsList.actionTopicID}" value="{actionTopicID}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</rich:menuItem>
 
-				<rich:menuItem
-					value="View"
-					action="#{ajaxHelper.getTopicUrl}"
+				<rich:menuItem value="View" action="#{ajaxHelper.getTopicUrl}"
 					rendered="#{s:hasPermission('ViewContextMenuItem', 'Rendered', null)}">
-					<a4j:actionparam
-						name="actionTopicID"
-						assignTo="#{ajaxHelper.topicId}"
-						value="{actionTopicID}" />
-					<a4j:actionparam
-						name="actionBaseUrl"
-						assignTo="#{ajaxHelper.baseUrl}"
-						value="/Topic.xhtml" />
-					<a4j:actionparam
-						name="revisionNumber"
-						assignTo="#{ajaxHelper.otherVars}"
-						value="#{null}" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<a4j:actionparam name="actionTopicID"
+						assignTo="#{ajaxHelper.topicId}" value="{actionTopicID}" />
+					<a4j:actionparam name="actionBaseUrl"
+						assignTo="#{ajaxHelper.baseUrl}" value="/Topic.xhtml" />
+					<a4j:actionparam name="revisionNumber"
+						assignTo="#{ajaxHelper.otherVars}" value="#{null}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</rich:menuItem>
-				<rich:menuItem
-					value="Edit and Tag"
+				<rich:menuItem value="Edit and Tag"
 					action="#{ajaxHelper.getTopicUrl}"
 					rendered="#{s:hasPermission('EditContextMenuItem', 'Rendered', null)}">
-					<a4j:actionparam
-						name="actionTopicID"
-						assignTo="#{ajaxHelper.topicId}"
-						value="{actionTopicID}" />
-					<a4j:actionparam
-						name="actionBaseUrl"
-						assignTo="#{ajaxHelper.baseUrl}"
-						value="/TopicEdit.xhtml" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<a4j:actionparam name="actionTopicID"
+						assignTo="#{ajaxHelper.topicId}" value="{actionTopicID}" />
+					<a4j:actionparam name="actionBaseUrl"
+						assignTo="#{ajaxHelper.baseUrl}" value="/TopicEdit.xhtml" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</rich:menuItem>
-				<rich:menuItem
-					value="Manage Relationships"
+				<rich:menuItem value="Manage Relationships"
 					action="#{ajaxHelper.getTopicUrl}"
 					rendered="#{s:hasPermission('RelatedContextMenuItem', 'Rendered', null)}">
-					<a4j:actionparam
-						name="actionTopicID"
-						assignTo="#{ajaxHelper.topicId}"
-						value="{actionTopicID}" />
-					<a4j:actionparam
-						name="actionOtherVars"
-						assignTo="#{ajaxHelper.otherVars}"
-						value="{otherVars}" />
-					<a4j:actionparam
-						name="actionBaseUrl"
+					<a4j:actionparam name="actionTopicID"
+						assignTo="#{ajaxHelper.topicId}" value="{actionTopicID}" />
+					<a4j:actionparam name="actionOtherVars"
+						assignTo="#{ajaxHelper.otherVars}" value="{otherVars}" />
+					<a4j:actionparam name="actionBaseUrl"
 						assignTo="#{ajaxHelper.baseUrl}"
 						value="/CustomRelatedTopicList.xhtml" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</rich:menuItem>
 
-				<rich:menuItem
-					value="View New Window"
+				<rich:menuItem value="View New Window"
 					action="#{ajaxHelper.getTopicUrlAndEndConverstaion}"
 					target="_blank"
 					rendered="#{s:hasPermission('ViewContextMenuItem', 'Rendered', null)}">
-					<a4j:actionparam
-						name="actionTopicID"
-						assignTo="#{ajaxHelper.topicId}"
-						value="{actionTopicID}" />
-					<a4j:actionparam
-						name="actionBaseUrl"
-						assignTo="#{ajaxHelper.baseUrl}"
-						value="/Topic.xhtml" />
-					<a4j:actionparam
-						name="revisionNumber"
-						assignTo="#{ajaxHelper.otherVars}"
-						value="#{null}" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<a4j:actionparam name="actionTopicID"
+						assignTo="#{ajaxHelper.topicId}" value="{actionTopicID}" />
+					<a4j:actionparam name="actionBaseUrl"
+						assignTo="#{ajaxHelper.baseUrl}" value="/Topic.xhtml" />
+					<a4j:actionparam name="revisionNumber"
+						assignTo="#{ajaxHelper.otherVars}" value="#{null}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</rich:menuItem>
-				<rich:menuItem
-					value="Edit and Tag New Window"
+				<rich:menuItem value="Edit and Tag New Window"
 					action="#{ajaxHelper.getTopicUrlAndEndConverstaion}"
 					target="_blank"
 					rendered="#{s:hasPermission('EditContextMenuItem', 'Rendered', null)}">
-					<a4j:actionparam
-						name="actionTopicID"
-						assignTo="#{ajaxHelper.topicId}"
-						value="{actionTopicID}" />
-					<a4j:actionparam
-						name="actionBaseUrl"
-						assignTo="#{ajaxHelper.baseUrl}"
-						value="/TopicEdit.xhtml" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<a4j:actionparam name="actionTopicID"
+						assignTo="#{ajaxHelper.topicId}" value="{actionTopicID}" />
+					<a4j:actionparam name="actionBaseUrl"
+						assignTo="#{ajaxHelper.baseUrl}" value="/TopicEdit.xhtml" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</rich:menuItem>
-				<rich:menuItem
-					value="Manage Relationships New Window"
+				<rich:menuItem value="Manage Relationships New Window"
 					action="#{ajaxHelper.getTopicUrlAndEndConverstaion}"
 					target="_blank"
 					rendered="#{s:hasPermission('RelatedContextMenuItem', 'Rendered', null)}">
-					<a4j:actionparam
-						name="actionTopicID"
-						assignTo="#{ajaxHelper.topicId}"
-						value="{actionTopicID}" />
-					<a4j:actionparam
-						name="actionOtherVars"
-						assignTo="#{ajaxHelper.otherVars}"
-						value="{otherVars}" />
-					<a4j:actionparam
-						name="actionBaseUrl"
+					<a4j:actionparam name="actionTopicID"
+						assignTo="#{ajaxHelper.topicId}" value="{actionTopicID}" />
+					<a4j:actionparam name="actionOtherVars"
+						assignTo="#{ajaxHelper.otherVars}" value="{otherVars}" />
+					<a4j:actionparam name="actionBaseUrl"
 						assignTo="#{ajaxHelper.baseUrl}"
 						value="/CustomRelatedTopicList.xhtml" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</rich:menuItem>
 
-				<rich:menuItem
-					value="Merge with Related Topics"
+				<rich:menuItem value="Merge with Related Topics"
 					action="#{topicTagsList.mergeTopics}"
 					rendered="#{s:hasPermission('MergeContextMenuItem', 'Rendered', null)}">
-					<a4j:actionparam
-						name="actionTopicID"
-						assignTo="#{topicTagsList.actionTopicID}"
-						value="{actionTopicID}" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<a4j:actionparam name="actionTopicID"
+						assignTo="#{topicTagsList.actionTopicID}" value="{actionTopicID}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</rich:menuItem>
 
-				<rich:menuItem
-					value="List Related Topics"
+				<rich:menuItem value="List Related Topics"
 					action="#{topicTagsList.getRelatedTopicsUrl()}"
 					rendered="#{s:hasPermission('ListRelatedTopicsMenuItem', 'Rendered', null)}">
-					<a4j:actionparam
-						name="actionTopicID"
-						assignTo="#{topicTagsList.actionTopicID}"
-						value="{actionTopicID}" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<a4j:actionparam name="actionTopicID"
+						assignTo="#{topicTagsList.actionTopicID}" value="{actionTopicID}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</rich:menuItem>
 
-				<rich:menuItem
-					value="Remove All Relationships"
+				<rich:menuItem value="Remove All Relationships"
 					action="#{topicTagsList.removeRelationships()}"
 					rendered="#{s:hasPermission('RemoveAllRelationshipsMenuItem', 'Rendered', null)}">
-					<a4j:actionparam
-						name="actionTopicID"
-						assignTo="#{topicTagsList.actionTopicID}"
-						value="{actionTopicID}" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<a4j:actionparam name="actionTopicID"
+						assignTo="#{topicTagsList.actionTopicID}" value="{actionTopicID}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</rich:menuItem>
 
@@ -533,20 +313,15 @@
 			</f:facet>
 
 
-			<rich:simpleTogglePanel
-				style="width: 100%; overflow: auto;"
-				switchType="client"
-				opened="false">
+			<rich:simpleTogglePanel style="width: 100%; overflow: auto;"
+				switchType="client" opened="false">
 				<f:facet name="header">Bulk Tags</f:facet>
 				<h:form>
 
 					<ui:include src="/WEB-INF/templates/TagSelectAndNotSelect.xhtml">
-						<ui:param
-							name="selectedTags"
+						<ui:param name="selectedTags"
 							value="#{topicTagsList.selectedTags.projectCategories}" />
-						<ui:param
-							name="logicEnabled"
-							value="#{false}" />
+						<ui:param name="logicEnabled" value="#{false}" />
 					</ui:include>
 
 					<br />
@@ -557,17 +332,11 @@
 							We need to supply the urlVars as f:param. Use a h:commandLink instead 
 							of a h:CommandButton, because h:CommandButton has no support for f:param  
 						-->
-						<h:commandLink
-							id="topicTagsUpdateButton"
-							value="Apply Bulk Tags"
+						<h:commandLink id="topicTagsUpdateButton" value="Apply Bulk Tags"
 							action="#{topicTagsList.applyBulkTags()}"
 							disabled="#{!s:hasPermission('TopicListRelatedBulkTagButton', 'Enabled', null)}">
-							<c:forEach
-								items="#{topicTagsList.filterVars}"
-								var="filtervar">
-								<f:param
-									name="#{filtervar.key}"
-									value="#{filtervar.value}" />
+							<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+								<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 							</c:forEach>
 						</h:commandLink>
 					</div>
@@ -577,14 +346,10 @@
 
 			<br />
 
-			<rich:simpleTogglePanel
-				label="Temporary Topic List"
-				switchType="client"
-				opened="#{not empty topicTagsList.tempList}"
+			<rich:simpleTogglePanel label="Temporary Topic List"
+				switchType="client" opened="#{not empty topicTagsList.tempList}"
 				rendered="#{not empty topicTagsList.tempList}">
-				<rich:dataTable
-					value="#{topicTagsList.tempList}"
-					var="topic"
+				<rich:dataTable value="#{topicTagsList.tempList}" var="topic"
 					id="tempListTable">
 					<rich:column>
 						<f:facet name="header">
@@ -603,8 +368,7 @@
 							<h:outputText value="Actions" />
 						</f:facet>
 						<h:form>
-							<h:commandLink
-								value="Remove"
+							<h:commandLink value="Remove"
 								action="#{topicTagsList.removeFromTempList(topic.topicId)}" />
 						</h:form>
 					</rich:column>
@@ -613,146 +377,89 @@
 				<br />
 
 				<div>
-					<s:link
-						id="topicTagsViewTempList"
-						value="View Temporary List"
-						action="CustomSearchTopicList.xhtml"
-						propagation="none">
-						<f:param
-							name="topicIds"
+					<s:link id="topicTagsViewTempList" value="View Temporary List"
+						action="CustomSearchTopicList.xhtml" propagation="none">
+						<f:param name="topicIds"
 							value="#{topicTagsList.tempTopicListURLParam}" />
-						<f:param
-							name="firstResult"
-							value="0" />
+						<f:param name="firstResult" value="0" />
 					</s:link>
 					#{' '}
-					<s:link
-						id="topicTagsViewTempListNewWindow"
+					<s:link id="topicTagsViewTempListNewWindow"
 						value="View Temporary List New Window"
-						action="CustomSearchTopicList.xhtml"
-						target="_blank"
+						action="CustomSearchTopicList.xhtml" target="_blank"
 						propagation="none">
-						<f:param
-							name="topicIds"
+						<f:param name="topicIds"
 							value="#{topicTagsList.tempTopicListURLParam}" />
-						<f:param
-							name="firstResult"
-							value="0" />
+						<f:param name="firstResult" value="0" />
 					</s:link>
 				</div>
 			</rich:simpleTogglePanel>
 
 			<br />
 
-			<s:div
-				styleClass="actionButtons"
-				rendered="#{empty from}">
-				<s:button
-					view="#{topicTagsList.createPopulatedTopic()}"
-					id="createTop"
-					propagation="none"
-					value="Add Task">
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+			<s:div styleClass="actionButtons" rendered="#{empty from}">
+				<s:button view="#{topicTagsList.createPopulatedTopic()}"
+					id="createTop" propagation="none" value="Add Task">
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</s:button>
 
-				<s:button
-					action="#{topicTagsList.doBackToSearchLink()}"
+				<s:button action="#{topicTagsList.doBackToSearchLink()}"
 					value="Back To Search">
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</s:button>
 
-				<s:button
-					action="#{topicTagsList.downloadCSV()}"
+				<s:button action="#{topicTagsList.downloadCSV()}"
 					value="Download CSV">
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</s:button>
 			</s:div>
 
 			<div class="tableControl">
 
-				<s:link
-					view="/CustomSearchTopicList.xhtml"
+				<s:link view="/CustomSearchTopicList.xhtml"
 					rendered="#{topicTagsList.previousExists}"
 					value="#{messages.left}#{messages.left} First Page"
 					id="firstPageTop">
-					<f:param
-						name="firstResult"
-						value="0" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<f:param name="firstResult" value="0" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</s:link>
 
-				<s:link
-					view="/CustomSearchTopicList.xhtml"
+				<s:link view="/CustomSearchTopicList.xhtml"
 					rendered="#{topicTagsList.previousExists}"
-					value="#{messages.left} Previous Page"
-					id="previousPageTop">
-					<f:param
-						name="firstResult"
+					value="#{messages.left} Previous Page" id="previousPageTop">
+					<f:param name="firstResult"
 						value="#{topicTagsList.previousFirstResult}" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</s:link>
 
-				<s:link
-					view="/CustomSearchTopicList.xhtml"
+				<s:link view="/CustomSearchTopicList.xhtml"
 					rendered="#{topicTagsList.nextExists}"
-					value="Next Page #{messages.right}"
-					id="nextPageTop">
-					<f:param
-						name="firstResult"
+					value="Next Page #{messages.right}" id="nextPageTop">
+					<f:param name="firstResult"
 						value="#{topicTagsList.nextFirstResult}" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</s:link>
 
-				<s:link
-					view="/CustomSearchTopicList.xhtml"
+				<s:link view="/CustomSearchTopicList.xhtml"
 					rendered="#{topicTagsList.nextExists}"
 					value="Last Page #{messages.right}#{messages.right}"
 					id="lastPageTop">
-					<f:param
-						name="firstResult"
+					<f:param name="firstResult"
 						value="#{topicTagsList.lastFirstResult}" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</s:link>
 			</div>
@@ -761,17 +468,12 @@
 			<br />
 			<br />
 
-			<div
-				class="results"
-				id="topicTagsList">
+			<div class="results" id="topicTagsList">
 
-				<h:outputText
-					value="The topic search returned no results."
+				<h:outputText value="The topic search returned no results."
 					rendered="#{empty topicTagsList.resultList}" />
 
-				<rich:dataTable
-					id="topicTagsList"
-					var="_topic"
+				<rich:dataTable id="topicTagsList" var="_topic"
 					value="#{topicTagsList.resultList}"
 					rendered="#{not empty topicTagsList.resultList}"
 					styleClass="listTable"
@@ -782,31 +484,19 @@
 						rendered="#{s:hasPermission('TopicListIDColumn', 'Rendered', null)}">
 						<f:facet name="header">
 							<ui:include src="layout/sort.xhtml">
-								<ui:param
-									name="entityList"
-									value="#{topicList}" />
-								<ui:param
-									name="propertyLabel"
-									value="ID" />
-								<ui:param
-									name="propertyPath"
-									value="topic.topicId" />
+								<ui:param name="entityList" value="#{topicList}" />
+								<ui:param name="propertyLabel" value="ID" />
+								<ui:param name="propertyPath" value="topic.topicId" />
 							</ui:include>
 						</f:facet>
 
 						<h:commandButton
 							style="border: 0; background: transparent; color: green;"
 							value="#{_topic.topicId}">
-							<rich:componentControl
-								event="onclick"
-								for="topicContextMenu"
+							<rich:componentControl event="onclick" for="topicContextMenu"
 								operation="show">
-								<f:param
-									value="#{_topic.topicId}"
-									name="actionTopicID" />
-								<f:param
-									value="#{topicTagsList.urlVars}"
-									name="otherVars" />
+								<f:param value="#{_topic.topicId}" name="actionTopicID" />
+								<f:param value="#{topicTagsList.urlVars}" name="otherVars" />
 							</rich:componentControl>
 						</h:commandButton>
 					</rich:column>
@@ -815,53 +505,41 @@
 						rendered="#{s:hasPermission('TopicListTitleColumn', 'Rendered', null)}">
 						<f:facet name="header">
 							<ui:include src="layout/sort.xhtml">
-								<ui:param
-									name="entityList"
-									value="#{topicList}" />
-								<ui:param
-									name="propertyLabel"
-									value="Topic Title" />
-								<ui:param
-									name="propertyPath"
-									value="topic.topicTitle" />
+								<ui:param name="entityList" value="#{topicList}" />
+								<ui:param name="propertyLabel" value="Topic Title" />
+								<ui:param name="propertyPath" value="topic.topicTitle" />
 							</ui:include>
 						</f:facet>
-						<h:outputText value="#{_topic.topicTitle}" title="#{_topic.topicText}" />
+						<h:outputText value="#{_topic.topicTitle}"
+							title="#{_topic.topicText}" />
 					</rich:column>
 
 					<rich:column
 						rendered="#{s:hasPermission('TopicListAddedByColumn', 'Rendered', null)}">
 						<f:facet name="header">
 							<ui:include src="layout/sort.xhtml">
-								<ui:param
-									name="entityList"
-									value="#{topicList}" />
-								<ui:param
-									name="propertyLabel"
-									value="Added By" />
-								<ui:param
-									name="propertyPath"
-									value="topic.topicAddedBy" />
+								<ui:param name="entityList" value="#{topicList}" />
+								<ui:param name="propertyLabel" value="Added By" />
+								<ui:param name="propertyPath" value="topic.topicAddedBy" />
 							</ui:include>
 						</f:facet>
 						<h:outputText value="#{_topic.topicAddedBy}" />
 					</rich:column>
 
-					<rich:column
-						styleClass="action"
+					<rich:column styleClass="action"
 						rendered="#{s:hasPermission('TopicListQuickTagsColumn', 'Rendered', null)}">
 						<f:facet name="header">
-							<h:outputText
-								value="Quick Tags"
+							<h:outputText value="Quick Tags"
 								title="Use these links to toggle the tags applied to a topic" />
 						</f:facet>
 						<h:form>
-							<c:forEach
-								items="#{topicTagsList.quickTags}"
-								var="tagID">
-								<h:commandLink
-									value="#{tagID.name}"
-									action="#{topicTagsList.addTagById(_topic.topicId, tagID.id)}" />
+							<c:forEach items="#{topicTagsList.quickTags}" var="tagID">
+								<h:commandLink value="#{tagID.name}"
+									action="#{topicTagsList.addTagById(_topic.topicId, tagID.id)}">
+									<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+										<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
+									</c:forEach>
+								</h:commandLink>
 								<br />
 							</c:forEach>
 						</h:form>
@@ -872,19 +550,15 @@
 						<f:facet name="header">
 							<h:outputText value="Source Material URL" />
 						</f:facet>
-						<rich:dataList
-							var="url"
+						<rich:dataList var="url"
 							value="#{_topic.topicToTopicSourceUrls.toArray()}">
-							<h:outputLink
-								value="#{url.topicSourceUrl.sourceUrl}"
+							<h:outputLink value="#{url.topicSourceUrl.sourceUrl}"
 								title="#{url.topicSourceUrl.sourceUrl} &#13;#{url.topicSourceUrl.description}"
 								target="_blank">
-								<h:outputText
-									value="Source URL"
-									rendered="#{empty url.topicSourceUrl.title}"/>
-								<h:outputText
-									value="#{url.topicSourceUrl.title}"
-									rendered="#{not empty url.topicSourceUrl.title}"/>
+								<h:outputText value="Source URL"
+									rendered="#{empty url.topicSourceUrl.title}" />
+								<h:outputText value="#{url.topicSourceUrl.title}"
+									rendered="#{not empty url.topicSourceUrl.title}" />
 							</h:outputLink>
 						</rich:dataList>
 					</rich:column>
@@ -892,27 +566,19 @@
 					<rich:column
 						rendered="#{s:hasPermission('TopicListRelatedTopicsColumn', 'Rendered', null)}">
 						<f:facet name="header">
-							<h:outputText
-								value="Out"
+							<h:outputText value="Out"
 								title="One way relationships to other topics" />
 						</f:facet>
-						<a4j:repeat
-							value="#{_topic.oneWayRelatedTopicsArray}"
+						<a4j:repeat value="#{_topic.oneWayRelatedTopicsArray}"
 							var="relatedTopic">
 							<h:commandButton
 								style="border: 0; background: transparent; color: green;"
 								value="#{relatedTopic.topicId}"
 								title="#{relatedTopic.topicTitle} &#13;#{relatedTopic.getTagsList(false)}">
-								<rich:componentControl
-									event="onclick"
-									for="oneWayRelatedContentMenu"
-									operation="show">
-									<f:param
-										value="#{_topic.topicId}"
-										name="actionTopicID" />
-									<f:param
-										value="#{relatedTopic.topicId}"
-										name="otherTopicId" />
+								<rich:componentControl event="onclick"
+									for="oneWayRelatedContentMenu" operation="show">
+									<f:param value="#{_topic.topicId}" name="actionTopicID" />
+									<f:param value="#{relatedTopic.topicId}" name="otherTopicId" />
 								</rich:componentControl>
 							</h:commandButton>
 						</a4j:repeat>
@@ -921,27 +587,18 @@
 					<rich:column
 						rendered="#{s:hasPermission('TopicListRelatedTopicsColumn', 'Rendered', null)}">
 						<f:facet name="header">
-							<h:outputText
-								value="2 Way"
-								title="Two way related topics" />
+							<h:outputText value="2 Way" title="Two way related topics" />
 						</f:facet>
-						<a4j:repeat
-							value="#{_topic.twoWayRelatedTopicsArray}"
+						<a4j:repeat value="#{_topic.twoWayRelatedTopicsArray}"
 							var="relatedTopic">
 							<h:commandButton
 								style="border: 0; background: transparent; color: blue;"
 								value="#{relatedTopic.topicId}"
 								title="#{relatedTopic.topicTitle}&#13;#{relatedTopic.getTagsList(false)}">
-								<rich:componentControl
-									event="onclick"
-									for="twoWayRelatedContentMenu"
-									operation="show">
-									<f:param
-										value="#{_topic.topicId}"
-										name="actionTopicID" />
-									<f:param
-										value="#{relatedTopic.topicId}"
-										name="otherTopicId" />
+								<rich:componentControl event="onclick"
+									for="twoWayRelatedContentMenu" operation="show">
+									<f:param value="#{_topic.topicId}" name="actionTopicID" />
+									<f:param value="#{relatedTopic.topicId}" name="otherTopicId" />
 								</rich:componentControl>
 							</h:commandButton>
 						</a4j:repeat>
@@ -950,28 +607,20 @@
 					<rich:column
 						rendered="#{s:hasPermission('TopicListRelatedTopicsColumn', 'Rendered', null)}">
 						<f:facet name="header">
-							<h:outputText
-								value="In"
+							<h:outputText value="In"
 								title="One way relationships from other topics" />
 						</f:facet>
-						<a4j:repeat
-							value="#{_topic.incomingRelatedTopicsArray}"
+						<a4j:repeat value="#{_topic.incomingRelatedTopicsArray}"
 							var="relatedTopic">
 
 							<h:commandButton
 								style="border: 0; background: transparent; color: red;"
 								value="#{relatedTopic.topicId}"
 								title="#{relatedTopic.topicTitle}&#13;#{relatedTopic.getTagsList(false)}">
-								<rich:componentControl
-									event="onclick"
-									for="incomingWayRelatedContentMenu"
-									operation="show">
-									<f:param
-										value="#{_topic.topicId}"
-										name="actionTopicID" />
-									<f:param
-										value="#{relatedTopic.topicId}"
-										name="otherTopicId" />
+								<rich:componentControl event="onclick"
+									for="incomingWayRelatedContentMenu" operation="show">
+									<f:param value="#{_topic.topicId}" name="actionTopicID" />
+									<f:param value="#{relatedTopic.topicId}" name="otherTopicId" />
 								</rich:componentControl>
 							</h:commandButton>
 
@@ -984,16 +633,12 @@
 		                Topic Tags
 		            </f:facet>
 
-						<h:outputText
-							escape="false"
-							value="#{_topic.tagsList}" />
+						<h:outputText escape="false" value="#{_topic.tagsList}" />
 
 					</rich:column>
 
-					<a4j:support
-						reRender="selectiontable"
-						action="#{topicTagsList.takeSelection}"
-						event="onselectionchange" />
+					<a4j:support reRender="selectiontable"
+						action="#{topicTagsList.takeSelection}" event="onselectionchange" />
 
 				</rich:dataTable>
 			</div>
@@ -1002,112 +647,64 @@
 
 			<div class="tableControl">
 
-				<s:link
-					view="/CustomSearchTopicList.xhtml"
+				<s:link view="/CustomSearchTopicList.xhtml"
 					rendered="#{topicTagsList.previousExists}"
-					value="#{messages.left}#{messages.left} First Page"
-					id="firstPage">
-					<f:param
-						name="firstResult"
-						value="0" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					value="#{messages.left}#{messages.left} First Page" id="firstPage">
+					<f:param name="firstResult" value="0" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</s:link>
 
-				<s:link
-					view="/CustomSearchTopicList.xhtml"
+				<s:link view="/CustomSearchTopicList.xhtml"
 					rendered="#{topicTagsList.previousExists}"
-					value="#{messages.left} Previous Page"
-					id="previousPage">
-					<f:param
-						name="firstResult"
+					value="#{messages.left} Previous Page" id="previousPage">
+					<f:param name="firstResult"
 						value="#{topicTagsList.previousFirstResult}" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</s:link>
 
-				<s:link
-					view="/CustomSearchTopicList.xhtml"
+				<s:link view="/CustomSearchTopicList.xhtml"
 					rendered="#{topicTagsList.nextExists}"
-					value="Next Page #{messages.right}"
-					id="nextPage">
-					<f:param
-						name="firstResult"
+					value="Next Page #{messages.right}" id="nextPage">
+					<f:param name="firstResult"
 						value="#{topicTagsList.nextFirstResult}" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</s:link>
 
-				<s:link
-					view="/CustomSearchTopicList.xhtml"
+				<s:link view="/CustomSearchTopicList.xhtml"
 					rendered="#{topicTagsList.nextExists}"
-					value="Last Page #{messages.right}#{messages.right}"
-					id="lastPage">
-					<f:param
-						name="firstResult"
+					value="Last Page #{messages.right}#{messages.right}" id="lastPage">
+					<f:param name="firstResult"
 						value="#{topicTagsList.lastFirstResult}" />
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</s:link>
 			</div>
 
-			<s:div
-				styleClass="actionButtons"
-				rendered="#{empty from}">
-				<s:button
-					view="#{topicTagsList.createPopulatedTopic()}"
-					id="create"
-					propagation="none"
-					value="Add Task">
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+			<s:div styleClass="actionButtons" rendered="#{empty from}">
+				<s:button view="#{topicTagsList.createPopulatedTopic()}" id="create"
+					propagation="none" value="Add Task">
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</s:button>
-				<s:button
-					action="#{topicTagsList.doBackToSearchLink()}"
+				<s:button action="#{topicTagsList.doBackToSearchLink()}"
 					value="Back To Search">
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</s:button>
 
-				<s:button
-					action="#{topicTagsList.downloadCSV()}"
+				<s:button action="#{topicTagsList.downloadCSV()}"
 					value="Download CSV">
-					<c:forEach
-						items="#{topicTagsList.filterVars}"
-						var="filtervar">
-						<f:param
-							name="#{filtervar.key}"
-							value="#{filtervar.value}" />
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</s:button>
 			</s:div>
