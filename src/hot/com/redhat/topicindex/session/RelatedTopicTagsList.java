@@ -324,11 +324,6 @@ public class RelatedTopicTagsList extends ExtendedTopicList
 		
 		return retValue;
 	}
-	
-	public String finish()
-	{
-		return "/CustomSearchTopicList.xhtml";
-	}
 
 	public void setTopicTopicId(final Integer topicTopicId) 
 	{

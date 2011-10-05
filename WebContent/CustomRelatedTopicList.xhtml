@@ -132,62 +132,9 @@
 		<rich:panel>
 			<f:facet name="header">Topic Search Results (#{empty relatedTopicTagsList.resultList ? 0 : (relatedTopicTagsList.paginated ? relatedTopicTagsList.resultCount : relatedTopicTagsList.resultList.size)}) #{relatedTopicTagsList.searchTagHeading}</f:facet>
 
-			<h:panelGrid id="bulkActionButtons" columns="7" border="0">
-				<s:button action="#{relatedTopicTagsList.finish()}" value="Done">
-					<c:forEach items="#{relatedTopicTagsList.filterVars}"
-						var="filtervar">
-						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
-					</c:forEach>
-				</s:button>
-				<s:button action="#{relatedTopicTagsList.oneWayToAll()}"
-					value="Create One Way Link To All Topics"
-					title="This will create a link from the main topic to those listed below. This will not affect relationships between topics that don't match the current filter.">
-					<c:forEach items="#{relatedTopicTagsList.filterVars}"
-						var="filtervar">
-						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
-					</c:forEach>
-				</s:button>
-				<s:button action="#{relatedTopicTagsList.oneWayFromAll()}"
-					value="Create One Way Link From All Topics"
-					title="This will create a link from those topics listed below to the main topic. This will not affect relationships between topics that don't match the current filter.">
-					<c:forEach items="#{relatedTopicTagsList.filterVars}"
-						var="filtervar">
-						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
-					</c:forEach>
-				</s:button>
-				<s:button action="#{relatedTopicTagsList.twoWayWithAll()}"
-					value="Create Two Way Link With All Topics"
-					title="This will create two way links between the main topic and those listed below. This will not affect relationships between topics that don't match the current filter.">
-					<c:forEach items="#{relatedTopicTagsList.filterVars}"
-						var="filtervar">
-						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
-					</c:forEach>
-				</s:button>
-				<s:button action="#{relatedTopicTagsList.removeToAll()}"
-					value="Remove All Links To Topics"
-					title="This will remove all links from the main topic to those topics that are listed below. This will not affect relationships between topics that don't match the current filter.">
-					<c:forEach items="#{relatedTopicTagsList.filterVars}"
-						var="filtervar">
-						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
-					</c:forEach>
-				</s:button>
-				<s:button action="#{relatedTopicTagsList.removeFromAll()}"
-					value="Remove All Links From Topics"
-					title="This will remove all links from the topics that are listed below to the main topic. This will not affect relationships between topics that don't match the current filter.">
-					<c:forEach items="#{relatedTopicTagsList.filterVars}"
-						var="filtervar">
-						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
-					</c:forEach>
-				</s:button>
-				<s:button action="#{relatedTopicTagsList.removeBetweenAll()}"
-					value="Remove All Links To and From Topics"
-					title="This will remove all links between the main topic and those that are listed below. This will not affect relationships between topics that don't match the current filter.">
-					<c:forEach items="#{relatedTopicTagsList.filterVars}"
-						var="filtervar">
-						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
-					</c:forEach>
-				</s:button>
-			</h:panelGrid>
+		<ui:include src="/WEB-INF/templates/BulkRelationshipActions.xhtml">
+			<ui:param name="topicList" value="#{relatedTopicTagsList}" />
+		</ui:include>
 
 			<div class="tableControl">
 
@@ -249,7 +196,7 @@
 					value="#{relatedTopicTagsList.resultList}"
 					rendered="#{not empty relatedTopicTagsList.resultList}"
 					styleClass="listTable"
-					columnsWidth="200px, 50px, 150px, 1*, 75px, 150px, 150px"
+					columnsWidth="200px, 50px, 150px, 75px, 150px, 150px"
 					columnClasses=" , , , longText, , , ">
 
 
@@ -511,19 +458,8 @@
 								<ui:param name="propertyPath" value="topic.topicTitle" />
 							</ui:include>
 						</f:facet>
-						<h:outputText value="#{_topic.topicTitle}" />
-					</h:column>
-
-					<h:column styleClass="longText"
-						rendered="#{s:hasPermission('RelatedTopicTagsListTextColumn', 'Rendered', null)}">
-						<f:facet name="header">
-							<ui:include src="layout/sort.xhtml">
-								<ui:param name="entityList" value="#{relatedTopicTagsList}" />
-								<ui:param name="propertyLabel" value="Topic Text" />
-								<ui:param name="propertyPath" value="topic.topicText" />
-							</ui:include>
-						</f:facet>
-						<h:outputText value="#{_topic.topicText}" />
+						<h:outputText value="#{_topic.topicTitle}"
+							title="#{_topic.topicText}" />
 					</h:column>
 
 					<h:column
@@ -559,6 +495,10 @@
 
 			</div>
 		</rich:panel>
+
+		<ui:include src="/WEB-INF/templates/BulkRelationshipActions.xhtml">
+			<ui:param name="topicList" value="#{relatedTopicTagsList}" />
+		</ui:include>
 
 		<div class="tableControl">
 

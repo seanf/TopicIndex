@@ -98,7 +98,9 @@
 				<f:param name="topicRevision" value="" />
 			</s:button>
 
-			<s:button view="/CustomSearchTopicList.xhtml" id="done" value="Done" />
+			<s:button view="/CustomSearchTopicList.xhtml" id="done" value="Done">
+				<f:param name="topicIds" value="#{topicHome.instance.topicId}" />
+			</s:button>
 
 			<h:form>
 	        #{" "}
