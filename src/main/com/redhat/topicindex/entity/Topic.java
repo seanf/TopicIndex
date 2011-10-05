@@ -52,6 +52,8 @@ import org.w3c.dom.NodeList;
 import com.redhat.ecs.commonutils.DocBookUtilities;
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.ecs.commonutils.XMLUtilities;
+import com.redhat.topicindex.sort.TagNameComparator;
+import com.redhat.topicindex.sort.TopicTitleComparator;
 import com.redhat.topicindex.sort.TopicToTagTagIDSort;
 import com.redhat.topicindex.sort.TopicToTopicTopicIDSort;
 import com.redhat.topicindex.utils.Constants;
@@ -345,7 +347,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		final String boldStart = brLineBreak ? "<b>" : "";
 		final String boldEnd = brLineBreak ? "</b>" : "";
 
-		final TreeMap<NameIDSortMap, ArrayList<String>> tags = new TreeMap<NameIDSortMap, ArrayList<String>>();
+		final TreeMap<NameIDSortMap, ArrayList<Tag>> tags = new TreeMap<NameIDSortMap, ArrayList<Tag>>();
 
 		final Set<TopicToTag> topicToTags = this.topicToTags;
 		for (final TopicToTag topicToTag : topicToTags)
@@ -358,9 +360,9 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 				final NameIDSortMap categoryDetails = new NameIDSortMap("Uncatagorised", -1, 0);
 
 				if (!tags.containsKey(categoryDetails))
-					tags.put(categoryDetails, new ArrayList<String>());
+					tags.put(categoryDetails, new ArrayList<Tag>());
 
-				tags.get(categoryDetails).add(tag.getTagName());
+				tags.get(categoryDetails).add(tag);
 			}
 			else
 			{
@@ -370,9 +372,9 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 							.getCategory().getCategorySort() == null ? 0 : category.getCategory().getCategorySort());
 
 					if (!tags.containsKey(categoryDetails))
-						tags.put(categoryDetails, new ArrayList<String>());
+						tags.put(categoryDetails, new ArrayList<Tag>());
 
-					tags.get(categoryDetails).add(tag.getTagName());
+					tags.get(categoryDetails).add(tag);
 				}
 			}
 		}
@@ -381,7 +383,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		for (final NameIDSortMap key : tags.keySet())
 		{
 			// sort alphabetically
-			Collections.sort(tags.get(key));
+			Collections.sort(tags.get(key), new TagNameComparator());
 
 			if (tagsList.length() != 0)
 				tagsList += lineBreak;
@@ -390,12 +392,12 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 
 			String thisTagList = "";
 
-			for (final String tag : tags.get(key))
+			for (final Tag tag : tags.get(key))
 			{
 				if (thisTagList.length() != 0)
 					thisTagList += ", ";
 
-				thisTagList += tag;
+				thisTagList += "<span title=\"Tag ID: " + tag.getTagId() + " &#13;Tag Description: " + tag.getTagDescription() + "\">" + tag.getTagName() + "</span>";
 			}
 
 			tagsList += thisTagList + " ";
