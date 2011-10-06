@@ -154,19 +154,28 @@ public class ExtendedTopicList extends TopicList
 			final Filter filter = EntityUtilities.populateFilter(FacesContext.getCurrentInstance(), Constants.FILTER_ID, Constants.MATCH_TAG,
 					Constants.CATEORY_INTERNAL_LOGIC, Constants.CATEORY_EXTERNAL_LOGIC);
 
-			// get the heading to display over the list of topics
-			searchTagHeading = filter.getFilterTitle();
-
-			// get a string that can be appended to a url that contains the url
-			// variables
-			urlVars = filter.buildFilterUrlVars();
-
-			// get a map of variable names to variable values
-			filterVars = filter.getUrlVariables();
-
-			// add the and and or categories clause to the default statement
-			final String query = EntityUtilities.buildQuery(FacesContext.getCurrentInstance(), filter);
-			this.constructedEJBQL = Topic.SELECT_ALL_QUERY + " " + query;
+			/* the filter may be null if an invalid varibale was passed in the URL */
+			if (filter != null)
+			{
+				// get the heading to display over the list of topics
+				searchTagHeading = filter.getFilterTitle();
+	
+				// get a string that can be appended to a url that contains the url
+				// variables
+				urlVars = filter.buildFilterUrlVars();
+	
+				// get a map of variable names to variable values
+				filterVars = filter.getUrlVariables();
+	
+				// add the and and or categories clause to the default statement
+				final String query = EntityUtilities.buildQuery(FacesContext.getCurrentInstance(), filter);
+				this.constructedEJBQL = Topic.SELECT_ALL_QUERY + " " + query;
+			}
+			else
+			{
+				searchTagHeading = "Invalid URL variables. Showing all topics.";
+				this.constructedEJBQL = Topic.SELECT_ALL_QUERY;
+			}
 		}
 		else
 		{

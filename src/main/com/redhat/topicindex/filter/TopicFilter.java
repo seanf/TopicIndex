@@ -333,9 +333,9 @@ public class TopicFilter
 	{
 		if (fieldName.equals(Constants.TOPIC_IDS_FILTER_VAR))
 			this.setTopicIdsString(fieldValue);
-		else if (fieldName.equals(Constants.TOPIC_TEXT_SEARCH_FILTER_VAR))
-			this.setTopicXML(fieldValue);
 		else if (fieldName.equals(Constants.TOPIC_XML_FILTER_VAR))
+			this.setTopicXML(fieldValue);
+		else if (fieldName.equals(Constants.TOPIC_TEXT_SEARCH_FILTER_VAR))
 			this.setTopicText(fieldValue);
 		else if (fieldName.equals(Constants.TOPIC_ADDED_BY_FILTER_VAR))
 			this.setTopicAddedBy(fieldValue);
