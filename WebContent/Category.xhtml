@@ -28,6 +28,11 @@
             <ui:define name="label">Category Sort</ui:define>
             <h:outputText value="#{categoryHome.instance.categorySort}"/>
         </s:decorate>        
+        
+        <s:decorate id="categoryTags" template="layout/display.xhtml">
+            <ui:define name="label">Category Tags</ui:define>
+            <h:outputText value="#{categoryHome.instance.tagsList}"/>
+        </s:decorate>        
 
         <div style="clear:both"/>
 

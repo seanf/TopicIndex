@@ -148,5 +148,18 @@ public class Category implements java.io.Serializable, Comparable<Category>
 		
 		return retValue;
 	}
+	
+	@Transient
+	public String getTagsList()
+	{
+		String tagsList = "";
+		for (final TagToCategory tagToCatgeory : this.getTagToCategories())
+		{
+			if (tagsList.length() != 0)
+				tagsList += ", ";
+			tagsList += tagToCatgeory.getTag().getTagName();
+		}
+		return tagsList;
+	}
 
 }
