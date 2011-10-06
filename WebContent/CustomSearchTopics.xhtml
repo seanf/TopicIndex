@@ -11,6 +11,12 @@
 
 	<ui:define name="body">
 
+		<c:if test="#{not empty customTagSearch.displayMessage}">
+			<script type="text/javascript">
+				alert('#{customTagSearch.displayMessage}');
+			</script>
+		</c:if>
+		
 		<script
 			src="#{facesContext.externalContext.requestContextPath}/filterscripts.js"></script>
 

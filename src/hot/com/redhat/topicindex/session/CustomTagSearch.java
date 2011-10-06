@@ -5,8 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
 
 import org.drools.WorkingMemory;
+import org.hibernate.exception.ConstraintViolationException;
 import org.jboss.seam.Component;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
@@ -15,6 +17,7 @@ import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.ecs.commonutils.HTTPUtilities;
 import com.redhat.ecs.commonutils.MIMEUtilities;
@@ -41,7 +44,7 @@ import com.redhat.topicindex.utils.structures.tags.UIProjectData;
  */
 @Name("customTagSearch")
 @Scope(ScopeType.PAGE)
-public class CustomTagSearch
+public class CustomTagSearch implements DisplayMessageInterface
 {
 	/**
 	 * a mapping of project and category details to tag details with sorting and
@@ -60,6 +63,8 @@ public class CustomTagSearch
 	private List<Filter> filters = new ArrayList<Filter>();
 	/** The data structure that holds the docbook building options */
 	private DocbookBuildingOptions docbookBuildingOptions = new DocbookBuildingOptions();
+	/** The message to be displayed to the user */
+	private String displayMessage;
 
 	private TopicFilter topic = new TopicFilter();
 
@@ -390,27 +395,43 @@ public class CustomTagSearch
 	 */
 	public void saveFilter()
 	{
-		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
-		Filter filter;
-
-		// load the filter object if it exists
-		if (this.selectedFilter != null)
-			filter = entityManager.find(Filter.class, selectedFilter);
-		else
-			// get a reference to the Filter object
-			filter = new Filter();
-
-		// set the name
-		filter.setFilterName(this.selectedFilterName);
-
-		// populate the filter with the options that are selected in the ui
-		syncFilterWithUI(filter, true);
-
-		// save the changes
-		entityManager.persist(filter);
-		this.selectedFilter = filter.getFilterId();
-
-		getFilterList();
+		try
+		{
+			final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+			Filter filter;
+	
+			// load the filter object if it exists
+			if (this.selectedFilter != null)
+				filter = entityManager.find(Filter.class, selectedFilter);
+			else
+				// get a reference to the Filter object
+				filter = new Filter();
+	
+			// set the name
+			filter.setFilterName(this.selectedFilterName);
+	
+			// populate the filter with the options that are selected in the ui
+			syncFilterWithUI(filter, true);
+	
+			// save the changes
+			entityManager.persist(filter);
+			this.selectedFilter = filter.getFilterId();
+	
+			getFilterList();
+		}
+		catch (final PersistenceException ex)
+		{
+			ExceptionUtilities.handleException(ex);	
+			if (ex.getCause() instanceof ConstraintViolationException)
+				this.setDisplayMessage("The filter requires a unique name");
+			else
+				this.setDisplayMessage("The filter could not be saved");
+		}
+		catch (final Exception ex)
+		{
+			ExceptionUtilities.handleException(ex);
+			this.setDisplayMessage("The filter could not be saved");
+		}
 	}
 
 	public String getCreateNewTopicUrl()
@@ -421,5 +442,15 @@ public class CustomTagSearch
 	public String doTextSearch()
 	{
 		return "/CustomSearchTopicList.seam?" + Constants.TOPIC_TEXT_SEARCH_FILTER_VAR + "=" + this.topic.getTopicTextSearch();
+	}
+
+	public String getDisplayMessage()
+	{
+		return displayMessage;
+	}
+
+	public void setDisplayMessage(String displayMessage)
+	{
+		this.displayMessage = displayMessage;
 	}
 }

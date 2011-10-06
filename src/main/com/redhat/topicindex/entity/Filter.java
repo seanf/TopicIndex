@@ -13,6 +13,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 
 import static javax.persistence.GenerationType.IDENTITY;
 import javax.persistence.Id;
@@ -30,7 +31,7 @@ import com.redhat.topicindex.utils.Constants;
  */
 @Entity
 @Audited
-@Table(name = "Filter", catalog = "Skynet")
+@Table(name = "Filter", catalog = "Skynet", uniqueConstraints = @UniqueConstraint(columnNames = {"FilterName" })) 
 public class Filter implements java.io.Serializable
 {
 	public static final String SELECT_ALL_QUERY = "select filter from Filter filter";
