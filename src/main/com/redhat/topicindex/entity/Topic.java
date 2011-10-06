@@ -1051,7 +1051,8 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 			if (docElement != null && docElement.getNodeName().equals(DocBookUtilities.TOPIC_ROOT_NODE_NAME))
 			{
 				final NodeList titleNodes = docElement.getElementsByTagName(DocBookUtilities.TOPIC_ROOT_TITLE_NODE_NAME);
-				if (titleNodes.getLength() != 0)
+				/* see if we have a title node whose parent is the section */
+				if (titleNodes.getLength() != 0 && titleNodes.item(0).getParentNode().equals(docElement))
 				{
 					final Node title = titleNodes.item(0);
 					title.getParentNode().replaceChild(newTitle, title);
