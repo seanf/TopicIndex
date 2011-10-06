@@ -70,7 +70,10 @@ import com.redhat.topicindex.utils.structures.NameIDSortMap;
 public class Topic implements java.io.Serializable, Comparable<Topic>
 {
 	public static final String SELECT_ALL_QUERY = "select topic from com.redhat.topicindex.entity.Topic as Topic";
-	/** The string that identifies the automatically generated comment added to the end of the XML */
+	/**
+	 * The string that identifies the automatically generated comment added to
+	 * the end of the XML
+	 */
 	private static final String DETAILS_COMMENT_NODE_START = " Generated Topic Details";
 	/** The string constant that is used as a conceptual overview template */
 	private static final Integer CONCEPTUAL_OVERVIEW_TOPIC_STRINGCONSTANTID = 11;
@@ -88,9 +91,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	public static String getCSVHeaderRow()
 	{
 		String topicColumns = EntityUtilities.buildString(new String[]
-		{
-				"Topic ID", "Topic Title", "Topic Text", "Topic URL"
-		}, ",");
+		{ "Topic ID", "Topic Title", "Topic Text", "Topic URL" }, ",");
 
 		final List<String> categroies = EntityQueries.getAllPropertiesFromEntity("Category", "categoryName");
 
@@ -113,8 +114,9 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	private String topicXML;
 
 	/*
-	 * While processing a topic for inclusion in the final output we need some additional
-	 * temporary variables. These variables are all prefixed with 'temp'.
+	 * While processing a topic for inclusion in the final output we need some
+	 * additional temporary variables. These variables are all prefixed with
+	 * 'temp'.
 	 */
 
 	/** the role (typically the highest priority lifecycle tag) is saved here */
@@ -209,8 +211,9 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 
 		for (final Category category : categroies)
 		{
-			final List<TopicToTag> matchingTags = filter(having(on(TopicToTag.class).getTag().getTagToCategories().toArray(), array(hasProperty("category",
-					equalTo(category)))), this.getTopicToTags());
+			final List<TopicToTag> matchingTags = filter(
+					having(on(TopicToTag.class).getTag().getTagToCategories().toArray(), array(hasProperty("category", equalTo(category)))),
+					this.getTopicToTags());
 
 			String tags = "";
 			for (final TopicToTag topicToTag : matchingTags)
@@ -258,7 +261,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 				retValue.add(topicToTopic.getMainTopic());
 		return retValue;
 	}
-	
+
 	@Transient
 	public List<Topic> getAllRelatedTopicsArray()
 	{
@@ -294,17 +297,19 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		for (final TopicToTopic topicToTopic : this.getParentTopicToTopics())
 		{
 			final Topic relatedTopic = topicToTopic.getRelatedTopic();
-			
+
 			if (topicList.length() != 0)
 				topicList += ", ";
 
-			topicList += "<span title=\"" + relatedTopic.getTopicTitle() + " \n" + relatedTopic.getTagsList() + "\">" + topicToTopic.getRelatedTopic().getTopicId() + "</span>";
+			topicList += "<span title=\"" + relatedTopic.getTopicTitle() + " \n" + relatedTopic.getTagsList() + "\">"
+					+ topicToTopic.getRelatedTopic().getTopicId() + "</span>";
 		}
 		return topicList;
 	}
 
 	/**
-	 * @return Returns the list of revision numbers for this entity, as maintained by Envers
+	 * @return Returns the list of revision numbers for this entity, as
+	 *         maintained by Envers
 	 */
 	@Transient
 	public List<Number> getRevisions()
@@ -314,6 +319,30 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		final List<Number> retValue = reader.getRevisions(Topic.class, this.topicId);
 		Collections.sort(retValue, Collections.reverseOrder());
 		return retValue;
+	}
+
+	/**
+	 * @return Returns the latest Envers revision number
+	 */
+	@Transient
+	public Number getLatestRevision()
+	{
+		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+		final AuditReader reader = AuditReaderFactory.get(entityManager);
+		final List<Number> retValue = reader.getRevisions(Topic.class, this.topicId);
+		Collections.sort(retValue, Collections.reverseOrder());
+		return retValue.size() != 0 ? retValue.get(0) : -1;
+	}
+
+	/**
+	 * @return Returns the latest Envers revision number
+	 */
+	@Transient
+	public Date getLatestRevisionDate()
+	{
+		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+		final AuditReader reader = AuditReaderFactory.get(entityManager);
+		return reader.getRevisionDate(getLatestRevision());
 	}
 
 	/**
@@ -329,24 +358,8 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	}
 
 	@Transient
-	public String getTagsList()
+	private TreeMap<NameIDSortMap, ArrayList<Tag>> getCategoriesMappedToTags()
 	{
-		return getTagsList(true);
-	}
-
-	/**
-	 * Generates a HTML formatted and categorized list of the tags that are associated with this topic
-	 * 
-	 * @return A HTML String to display in a table
-	 */
-	@Transient
-	public String getTagsList(final boolean brLineBreak)
-	{
-		// define the line breaks for html and for tooltips
-		final String lineBreak = brLineBreak ? "<br/>" : " \n";
-		final String boldStart = brLineBreak ? "<b>" : "";
-		final String boldEnd = brLineBreak ? "</b>" : "";
-
 		final TreeMap<NameIDSortMap, ArrayList<Tag>> tags = new TreeMap<NameIDSortMap, ArrayList<Tag>>();
 
 		final Set<TopicToTag> topicToTags = this.topicToTags;
@@ -363,13 +376,12 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 					tags.put(categoryDetails, new ArrayList<Tag>());
 
 				tags.get(categoryDetails).add(tag);
-			}
-			else
+			} else
 			{
 				for (final TagToCategory category : tagToCategories)
 				{
-					final NameIDSortMap categoryDetails = new NameIDSortMap(category.getCategory().getCategoryName(), category.getCategory().getCategoryId(), category
-							.getCategory().getCategorySort() == null ? 0 : category.getCategory().getCategorySort());
+					final NameIDSortMap categoryDetails = new NameIDSortMap(category.getCategory().getCategoryName(), category.getCategory().getCategoryId(),
+							category.getCategory().getCategorySort() == null ? 0 : category.getCategory().getCategorySort());
 
 					if (!tags.containsKey(categoryDetails))
 						tags.put(categoryDetails, new ArrayList<Tag>());
@@ -378,6 +390,31 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 				}
 			}
 		}
+
+		return tags;
+	}
+
+	@Transient
+	public String getTagsList()
+	{
+		return getTagsList(true);
+	}
+
+	/**
+	 * Generates a HTML formatted and categorized list of the tags that are
+	 * associated with this topic
+	 * 
+	 * @return A HTML String to display in a table
+	 */
+	@Transient
+	public String getTagsList(final boolean brLineBreak)
+	{
+		// define the line breaks for html and for tooltips
+		final String lineBreak = brLineBreak ? "<br/>" : " \n";
+		final String boldStart = brLineBreak ? "<b>" : "";
+		final String boldEnd = brLineBreak ? "</b>" : "";
+
+		final TreeMap<NameIDSortMap, ArrayList<Tag>> tags = getCategoriesMappedToTags();
 
 		String tagsList = "";
 		for (final NameIDSortMap key : tags.keySet())
@@ -397,7 +434,40 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 				if (thisTagList.length() != 0)
 					thisTagList += ", ";
 
-				thisTagList += "<span title=\"Tag ID: " + tag.getTagId() + " &#13;Tag Description: " + tag.getTagDescription() + "\">" + tag.getTagName() + "</span>";
+				thisTagList += "<span title=\"Tag ID: " + tag.getTagId() + " &#13;Tag Description: " + tag.getTagDescription() + "\">" + tag.getTagName()
+						+ "</span>";
+			}
+
+			tagsList += thisTagList + " ";
+		}
+
+		return tagsList;
+	}
+
+	@Transient
+	public String getCommaSeparatedTagList()
+	{
+		final TreeMap<NameIDSortMap, ArrayList<Tag>> tags = getCategoriesMappedToTags();
+
+		String tagsList = "";
+		for (final NameIDSortMap key : tags.keySet())
+		{
+			// sort alphabetically
+			Collections.sort(tags.get(key), new TagNameComparator());
+
+			if (tagsList.length() != 0)
+				tagsList += " ";
+
+			tagsList += key.getName() + ": ";
+
+			String thisTagList = "";
+
+			for (final Tag tag : tags.get(key))
+			{
+				if (thisTagList.length() != 0)
+					thisTagList += ", ";
+
+				thisTagList += tag.getTagName();
 			}
 
 			tagsList += thisTagList + " ";
@@ -649,8 +719,10 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 
 	private void validateTags()
 	{
-		// validate the tags that are applied to this topic. generally the gui should
-		// enforce these rules, with the exception of the bulk tag apply function
+		// validate the tags that are applied to this topic. generally the gui
+		// should
+		// enforce these rules, with the exception of the bulk tag apply
+		// function
 
 		// create a collection of Categories mapped to TagToCategories, sorted
 		// by the Category sorting order
@@ -715,10 +787,31 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 				final Tag tag = tagToCategory.getTag();
 				for (final Tag exclusionTag : tag.getExcludedTags())
 				{
-					if (filter(having(on(TopicToTag.class).getTag(), equalTo(tagToCategory.getTag())), this.topicToTags).size() != 0 && // make sure that we have not
-																																																															// removed this tag already
-							filter(having(on(TopicToTag.class).getTag(), equalTo(exclusionTag)), this.topicToTags).size() != 0 && // make sure the exclusion tag exists
-							!exclusionTag.equals(tagToCategory.getTag())) // make sure we are not trying to remove ourselves
+					if (filter(having(on(TopicToTag.class).getTag(), equalTo(tagToCategory.getTag())), this.topicToTags).size() != 0 && // make
+																																		// sure
+																																		// that
+																																		// we
+																																		// have
+																																		// not
+																																		// removed
+																																		// this
+																																		// tag
+																																		// already
+							filter(having(on(TopicToTag.class).getTag(), equalTo(exclusionTag)), this.topicToTags).size() != 0 && // make
+																																	// sure
+																																	// the
+																																	// exclusion
+																																	// tag
+																																	// exists
+							!exclusionTag.equals(tagToCategory.getTag())) // make
+																			// sure
+																			// we
+																			// are
+																			// not
+																			// trying
+																			// to
+																			// remove
+																			// ourselves
 					{
 						with(this.topicToTags).remove(having(on(TopicToTag.class).getTag(), equalTo(exclusionTag)));
 					}
@@ -781,8 +874,9 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	}
 
 	/**
-	 * Convert an in memory XML document to a string. Also remove any XML preamble, meaning the
-	 * XML returned by this function can be easily appended to existing XML.
+	 * Convert an in memory XML document to a string. Also remove any XML
+	 * preamble, meaning the XML returned by this function can be easily
+	 * appended to existing XML.
 	 */
 	@Transient
 	public String getTempTopicXMLDocString()
@@ -834,8 +928,8 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 
 	/**
 	 * This function will take the XML in the topicXML String and use it to
-	 * generate a text only view that will be used by Hibernate Search. The
-	 * text extraction uses Jericho - http://jericho.htmlparser.net/
+	 * generate a text only view that will be used by Hibernate Search. The text
+	 * extraction uses Jericho - http://jericho.htmlparser.net/
 	 */
 	@Transient
 	@Field(name = "TopicSearchText", index = Index.TOKENIZED, store = Store.YES)
@@ -851,8 +945,9 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		final Document doc = XMLUtilities.convertStringToDocument(this.topicXML);
 		if (doc != null)
 		{
-			String detailsCommentContent = DETAILS_COMMENT_NODE_START + "\n\n" + "GENERAL DETAILS\n" + "\n" + "Topic ID: " + this.topicId + "\n" + "Topic Title: "
-					+ this.topicTitle + "\n" + "Topic Added By: " + this.topicAddedBy + "\n" + "Topic Description: " + this.topicText + "\n\n" + "TOPIC TAGS\n" + "\n";
+			String detailsCommentContent = DETAILS_COMMENT_NODE_START + "\n\n" + "GENERAL DETAILS\n" + "\n" + "Topic ID: " + this.topicId + "\n"
+					+ "Topic Title: " + this.topicTitle + "\n" + "Topic Added By: " + this.topicAddedBy + "\n" + "Topic Description: " + this.topicText
+					+ "\n\n" + "TOPIC TAGS\n" + "\n";
 
 			final ArrayList<TopicToTag> sortedTags = new ArrayList<TopicToTag>(this.getTopicToTags());
 			Collections.sort(sortedTags, new TopicToTagTagIDSort());
@@ -922,16 +1017,13 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 			if (filter(having(on(TopicToTag.class).getTag().getTagId(), equalTo(Constants.CONCEPT_TAG_ID)), this.topicToTags).size() != 0)
 			{
 				this.topicXML = entityManager.find(StringConstants.class, CONCEPT_TOPIC_STRINGCONSTANTID).getConstantValue();
-			}
-			else if (filter(having(on(TopicToTag.class).getTag().getTagId(), equalTo(Constants.TASK_TAG_ID)), this.topicToTags).size() != 0)
+			} else if (filter(having(on(TopicToTag.class).getTag().getTagId(), equalTo(Constants.TASK_TAG_ID)), this.topicToTags).size() != 0)
 			{
 				this.topicXML = entityManager.find(StringConstants.class, TASK_TOPIC_STRINGCONSTANTID).getConstantValue();
-			}
-			else if (filter(having(on(TopicToTag.class).getTag().getTagId(), equalTo(Constants.REFERENCE_TAG_ID)), this.topicToTags).size() != 0)
+			} else if (filter(having(on(TopicToTag.class).getTag().getTagId(), equalTo(Constants.REFERENCE_TAG_ID)), this.topicToTags).size() != 0)
 			{
 				this.topicXML = entityManager.find(StringConstants.class, REFERENCE_TOPIC_STRINGCONSTANTID).getConstantValue();
-			}
-			else if (filter(having(on(TopicToTag.class).getTag().getTagId(), equalTo(Constants.CONCEPTUALOVERVIEW_TAG_ID)), this.topicToTags).size() != 0)
+			} else if (filter(having(on(TopicToTag.class).getTag().getTagId(), equalTo(Constants.CONCEPTUALOVERVIEW_TAG_ID)), this.topicToTags).size() != 0)
 			{
 				this.topicXML = entityManager.find(StringConstants.class, CONCEPTUAL_OVERVIEW_TOPIC_STRINGCONSTANTID).getConstantValue();
 			}
@@ -939,8 +1031,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 			syncTopicTitleWithXML();
 
 			addDetailsCommentToXML();
-		}
-		catch (final Exception ex)
+		} catch (final Exception ex)
 		{
 			// probably countn't find one of the string constants
 			ExceptionUtilities.handleException(ex);
@@ -949,8 +1040,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 
 	private void syncTopicTitleWithXML()
 	{
-		
-		
+
 		final Document doc = XMLUtilities.convertStringToDocument(this.topicXML);
 		if (doc != null)
 		{
@@ -965,8 +1055,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 				{
 					final Node title = titleNodes.item(0);
 					title.getParentNode().replaceChild(newTitle, title);
-				}
-				else
+				} else
 				{
 					final Node firstNode = docElement.getFirstChild();
 					if (firstNode != null)
