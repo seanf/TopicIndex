@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
 
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.topicindex.entity.*;
@@ -20,15 +21,18 @@ import com.redhat.topicindex.utils.structures.tags.UICategoryData;
 import com.redhat.topicindex.utils.structures.tags.UITagData;
 import com.redhat.topicindex.utils.structures.tags.UIProjectCategoriesData;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.jboss.seam.Component;
 import org.jboss.seam.annotations.Name;
 
 @Name("tagHome")
-public class TagHome extends VersionedEntityHome<Tag>
+public class TagHome extends VersionedEntityHome<Tag> implements DisplayMessageInterface
 {
 	/** Serializable version identifier */
 	private static final long serialVersionUID = -7321335882716157007L;
 	private UIProjectData selectedTags;
+	/** The message to be displayed to the user */
+	private String displayMessage;
 
 	public void setTagTagId(final Integer id)
 	{
@@ -96,18 +100,54 @@ public class TagHome extends VersionedEntityHome<Tag>
 
 	public String update()
 	{
-		updateCategories();
-		updateTags();
-		updateProjects();
-		return super.update();
+		try
+		{
+			updateCategories();
+			updateTags();
+			updateProjects();
+			return super.update();
+		}
+		catch (final PersistenceException ex)
+		{
+			ExceptionUtilities.handleException(ex);	
+			if (ex.getCause() instanceof ConstraintViolationException)
+				this.setDisplayMessage("The tag requires a unique name");
+			else
+				this.setDisplayMessage("The tag could not be saved");
+		}
+		catch (final Exception ex)
+		{
+			ExceptionUtilities.handleException(ex);
+			this.setDisplayMessage("The tag could not be saved");
+		}
+		
+		return null;
 	}
 
 	public String persist()
 	{
-		updateCategories();
-		updateTags();
-		updateProjects();
-		return super.persist();
+		try
+		{
+			updateCategories();
+			updateTags();
+			updateProjects();
+			return super.persist();
+		}
+		catch (final PersistenceException ex)
+		{
+			ExceptionUtilities.handleException(ex);	
+			if (ex.getCause() instanceof ConstraintViolationException)
+				this.setDisplayMessage("The tag requires a unique name");
+			else
+				this.setDisplayMessage("The tag could not be saved");
+		}
+		catch (final Exception ex)
+		{
+			ExceptionUtilities.handleException(ex);
+			this.setDisplayMessage("The tag could not be saved");
+		}
+		
+		return null;
 	}
 
 	private Tag getTagFromId(final Integer tagId)
@@ -320,6 +360,17 @@ public class TagHome extends VersionedEntityHome<Tag>
     public String getExclusionArray(final Integer id)
 	{
 		return "[]";
+	}
+
+	@Override
+	public String getDisplayMessage()
+	{
+		return displayMessage;
+	}
+	
+	public void setDisplayMessage(final String displayMessage)
+	{
+		this.displayMessage = displayMessage;
 	}
 
 }

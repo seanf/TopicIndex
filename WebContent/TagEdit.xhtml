@@ -150,6 +150,12 @@
 
 			</div>
 		</h:form>
+		
+		<c:if test="#{not empty tagHome.displayMessage}">
+			<script type="text/javascript">
+				alert('#{tagHome.displayMessage}');
+			</script>
+		</c:if>
 
 	</ui:define>
 
