@@ -1683,10 +1683,10 @@ public class DocbookBuilder
 		{
 			final Element note = xmlData.getTempTopicXMLDoc().createElement("note");
 			final Element title = xmlData.getTempTopicXMLDoc().createElement("title");
-			title.setNodeValue("Topic is still in a draft state");
+			title.setTextContent("Topic is still in a draft state");
 			note.appendChild(title);
 			final Element para = xmlData.getTempTopicXMLDoc().createElement("para");
-			para.setNodeValue("This topic is still in a draft state. The contents below are subject to change");
+			para.setTextContent("This topic is still in a draft state. The contents below are subject to change");
 			note.appendChild(para);
 
 			final NodeList nodes = xmlData.getTempTopicXMLDoc().getDocumentElement().getChildNodes();
