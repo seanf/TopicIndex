@@ -12,7 +12,7 @@ import com.redhat.topicindex.utils.Constants;
 public class DocbookUtils 
 {
 	/** A prefix for error xref ids */
-	private static final String ERROR_XREF_ID_PREFIX = "TagErrorXRef";
+	public static final String ERROR_XREF_ID_PREFIX = "TagErrorXRef";
 	
 	public static String buildChapter(final String contents, final String title)
 	{
@@ -138,7 +138,7 @@ public class DocbookUtils
 		return revalue;	
 	}
 	
-	public static String buildErrorListItem(final String error)
+	public static String buildListItem(final String error)
 	{
 		return "<listitem><para>" + error + "</para></listitem>\n";
 	}
@@ -185,9 +185,15 @@ public class DocbookUtils
 	
 	public static String wrapListItems(final List<String> listItems, final String title)
 	{
+		return wrapListItems(listItems, title, null);
+	}
+	
+	public static String wrapListItems(final List<String> listItems, final String title, final String id)
+	{
+		final String idAttribute = id != null && id.length() != 0 ? " id=\"" + id + "\" " : "";
 		final String titleElement = title == null || title.length() == 0 ? "" : "<title>" + title + "</title>";
 		
-		String retValue = "<itemizedlist>" + titleElement;
+		String retValue = "<itemizedlist" + idAttribute + ">" + titleElement;
 		for (final String listItem : listItems)
 			retValue += listItem;
 		retValue += "</itemizedlist>";

@@ -63,6 +63,8 @@ import com.redhat.topicindex.utils.docbookbuilding.toc.TocFolderElement;
 import com.redhat.topicindex.utils.docbookbuilding.toc.TocLink;
 import com.redhat.topicindex.utils.docbookbuilding.toc.TocTopLevel;
 import com.redhat.topicindex.utils.structures.DroolsEvent;
+import com.redhat.topicindex.utils.structures.TopicErrorData;
+import com.redhat.topicindex.utils.structures.TopicImageData;
 
 /**
  * This class is used to convert a collection of topics in a Publican Docbook
@@ -388,18 +390,13 @@ public class DocbookBuilder
 	 * Holds the compiler errors that form the Errors.xml file in the compiled
 	 * docbook
 	 */
-	protected String errors = "";
-	/**
-	 * Holds the compiler warnings that form the Errors.xml file in the compiled
-	 * docbook
-	 */
-	protected String warnings = "";
+	protected Map<Topic, TopicErrorData> errors = new HashMap<Topic, TopicErrorData>();
 
 	/**
 	 * Holds information on file url locations, which will be downloaded and
 	 * included in the docbook zip file
 	 */
-	protected ArrayList<String> imageLocations = new ArrayList<String>();
+	protected ArrayList<TopicImageData> imageLocations = new ArrayList<TopicImageData>();
 
 	/**
 	 * Takes a comma separated list of ints, and returns an array of Integers.
@@ -422,7 +419,8 @@ public class DocbookBuilder
 			{
 				final InjectionTopicData topicData = new InjectionTopicData(Integer.parseInt(topicId), optional);
 				retValue.add(topicData);
-			} catch (final Exception ex)
+			}
+			catch (final Exception ex)
 			{
 				/*
 				 * these lists are discovered by a regular expression so we
@@ -447,7 +445,8 @@ public class DocbookBuilder
 			if (child.getNodeName().equals("imagedata"))
 			{
 				images.add(child);
-			} else
+			}
+			else
 			{
 				images.addAll(getImages(child));
 			}
@@ -463,8 +462,7 @@ public class DocbookBuilder
 	 * 
 	 * @return a list of topics that were injected but not related
 	 */
-	protected String processCustomInjectionPoints(final ArrayList<Integer> customInjectionIds, final HashMap<Node, InjectionListData> customInjections,
-			final int injectionPointType, final Integer topidID, final Topic topicData, final String regularExpression,
+	protected String processCustomInjectionPoints(final ArrayList<Integer> customInjectionIds, final HashMap<Node, InjectionListData> customInjections, final int injectionPointType, final Integer topidID, final Topic topicData, final String regularExpression,
 			final ExternalMapSort<Integer, Topic, InjectionTopicData> sortComparator, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		final Document xmlDocument = topicData.getTempTopicXMLDoc();
@@ -554,9 +552,9 @@ public class DocbookBuilder
 							/* wrap the xref up in a listitem */
 							if (sequenceID.optional)
 							{
-								list.add(DocbookUtils.buildEmphasisPrefixedXRef(xmlDocument, OPTIONAL_LIST_PREFIX, topicIdToTopicMap.get(sequenceID.topicId)
-										.getXRefID()));
-							} else
+								list.add(DocbookUtils.buildEmphasisPrefixedXRef(xmlDocument, OPTIONAL_LIST_PREFIX, topicIdToTopicMap.get(sequenceID.topicId).getXRefID()));
+							}
+							else
 							{
 								list.add(DocbookUtils.buildXRef(xmlDocument, topicIdToTopicMap.get(sequenceID.topicId).getXRefID()));
 							}
@@ -590,8 +588,7 @@ public class DocbookBuilder
 	 * This function takes the list of topics and their related topics and
 	 * injects xrefs
 	 */
-	protected void processInjections(final List<TagToCategory> topicTypeTagIDs, final String searchTagsUrl, final int roleCategoryID,
-			final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
+	protected void processInjections(final List<TagToCategory> topicTypeTagIDs, final String searchTagsUrl, final int roleCategoryID, final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		System.out.println("Processing injection points");
 
@@ -653,16 +650,11 @@ public class DocbookBuilder
 						 */
 						final HashMap<Node, InjectionListData> customInjections = new HashMap<Node, InjectionListData>();
 
-						String injectionErrors = processCustomInjectionPoints(customInjectionIds, customInjections, ORDEREDLIST_INJECTION_POINT, topicID,
-								topic, CUSTOM_INJECTION_SEQUENCE_RE, null, docbookBuildingOptions);
-						injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, XREF_INJECTION_POINT, topicID, topic,
-								CUSTOM_INJECTION_SINGLE_RE, null, docbookBuildingOptions);
-						injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, topicID, topic,
-								CUSTOM_INJECTION_LIST_RE, null, docbookBuildingOptions);
-						injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, topicID, topic,
-								CUSTOM_ALPHA_SORT_INJECTION_LIST_RE, new TopicTitleSorter(), docbookBuildingOptions);
-						injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, LIST_INJECTION_POINT, topicID, topic,
-								CUSTOM_INJECTION_LISTITEMS_RE, null, docbookBuildingOptions);
+						String injectionErrors = processCustomInjectionPoints(customInjectionIds, customInjections, ORDEREDLIST_INJECTION_POINT, topicID, topic, CUSTOM_INJECTION_SEQUENCE_RE, null, docbookBuildingOptions);
+						injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, XREF_INJECTION_POINT, topicID, topic, CUSTOM_INJECTION_SINGLE_RE, null, docbookBuildingOptions);
+						injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, topicID, topic, CUSTOM_INJECTION_LIST_RE, null, docbookBuildingOptions);
+						injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, topicID, topic, CUSTOM_ALPHA_SORT_INJECTION_LIST_RE, new TopicTitleSorter(), docbookBuildingOptions);
+						injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, LIST_INJECTION_POINT, topicID, topic, CUSTOM_INJECTION_LISTITEMS_RE, null, docbookBuildingOptions);
 
 						if (injectionErrors.length() != 0)
 						{
@@ -670,13 +662,15 @@ public class DocbookBuilder
 
 							/* remove the last ", " from the error string */
 							injectionErrors = injectionErrors.substring(0, injectionErrors.length() - 2);
-							errors += DocbookUtils
-									.buildErrorListItem(
+							addErrorToTopic(
+									topic,
+									DocbookUtils.buildErrorListItem(
 											topicID.toString(),
 											"references Topic(s) "
 													+ injectionErrors
-													+ " in a custom injection point, but this topic has either not been related in the database, or was not matched by the filter. The later might occur if you are building a narrative and the injected topic was not listed in the Topic ID field, or you have not selected the 'Include all related topics' option.");
-						} else
+													+ " in a custom injection point, but this topic has either not been related in the database, or was not matched by the filter. The later might occur if you are building a narrative and the injected topic was not listed in the Topic ID field, or you have not selected the 'Include all related topics' option."));
+						}
+						else
 						{
 							/* now make the custom injection point substitutions */
 							for (final Node customInjectionCommentNode : customInjections.keySet())
@@ -693,16 +687,22 @@ public class DocbookBuilder
 									if (injectionListData.listType == ORDEREDLIST_INJECTION_POINT)
 									{
 										list = DocbookUtils.wrapOrderedListItemsInPara(topic.getTempTopicXMLDoc(), injectionListData.listItems);
-									} else if (injectionListData.listType == XREF_INJECTION_POINT)
-									{
-										list = injectionListData.listItems.get(0);
-									} else if (injectionListData.listType == ITEMIZEDLIST_INJECTION_POINT)
-									{
-										list = DocbookUtils.wrapItemizedListItemsInPara(topic.getTempTopicXMLDoc(), injectionListData.listItems);
-									} else if (injectionListData.listType == LIST_INJECTION_POINT)
-									{
-										list = DocbookUtils.wrapItemsInListItems(topic.getTempTopicXMLDoc(), injectionListData.listItems);
 									}
+									else
+										if (injectionListData.listType == XREF_INJECTION_POINT)
+										{
+											list = injectionListData.listItems.get(0);
+										}
+										else
+											if (injectionListData.listType == ITEMIZEDLIST_INJECTION_POINT)
+											{
+												list = DocbookUtils.wrapItemizedListItemsInPara(topic.getTempTopicXMLDoc(), injectionListData.listItems);
+											}
+											else
+												if (injectionListData.listType == LIST_INJECTION_POINT)
+												{
+													list = DocbookUtils.wrapItemsInListItems(topic.getTempTopicXMLDoc(), injectionListData.listItems);
+												}
 								}
 
 								if (list != null)
@@ -751,8 +751,7 @@ public class DocbookBuilder
 											 * true if not processing all
 											 * related topics
 											 */
-											if (tagIdToTopicMap.containsKey(primaryTopicTypeTagId)
-													&& tagIdToTopicMap.get(primaryTopicTypeTagId).containsKey(relatedTopic))
+											if (tagIdToTopicMap.containsKey(primaryTopicTypeTagId) && tagIdToTopicMap.get(primaryTopicTypeTagId).containsKey(relatedTopic))
 											{
 												/*
 												 * at this point we have found a
@@ -864,7 +863,8 @@ public class DocbookBuilder
 						 * exists
 						 */
 						DocbookUtils.insertNodeAfter(titleNode, itemizedlist);
-					} else
+					}
+					else
 					{
 						/*
 						 * of the title does not exist, see if any children
@@ -876,7 +876,8 @@ public class DocbookBuilder
 						{
 							/* if so, insert the new node before the first child */
 							xmlDoc.getDocumentElement().insertBefore(itemizedlist, firstChild);
-						} else
+						}
+						else
 						{
 							/* if not, just add the new node */
 							xmlDoc.getDocumentElement().appendChild(itemizedlist);
@@ -930,47 +931,50 @@ public class DocbookBuilder
 		int imageProgress = 0;
 		final int imageTotal = this.imageLocations.size();
 
-		for (final String imageLocation : this.imageLocations)
+		for (final TopicImageData imageLocation : this.imageLocations)
 		{
-			final int extensionIndex = imageLocation.lastIndexOf(".");
-			final int pathIndex = imageLocation.lastIndexOf("/");
+			boolean success = false;
+
+			final int extensionIndex = imageLocation.getImageName().lastIndexOf(".");
+			final int pathIndex = imageLocation.getImageName().lastIndexOf("/");
 
 			if (/* characters were found */
 			extensionIndex != -1 && pathIndex != -1 &&
 			/* the path character was found before the extension */
 			extensionIndex > pathIndex)
 			{
-				boolean success = true;
-
 				try
 				{
 					/*
 					 * The file name minus the extension should be an integer
 					 * that references an ImageFile record ID.
 					 */
-					final String topicID = imageLocation.substring(pathIndex + 1, extensionIndex);
+					final String topicID = imageLocation.getImageName().substring(pathIndex + 1, extensionIndex);
 					final ImageFile imageFile = entityManager.find(ImageFile.class, Integer.parseInt(topicID));
 
 					if (imageFile != null)
 					{
+						success = true;
 						files.put("Book/en-US/" + imageLocation, imageFile.getImageData());
-					} else
+					}
+					else
 					{
-						success = false;
-						errors += DocbookUtils.buildErrorListItem("ImageFile ID " + topicID + " from image location " + imageLocation + " was not found!");
+						addErrorToTopic(imageLocation.getTopic(), "ImageFile ID " + topicID + " from image location " + imageLocation + " was not found!");
 						System.out.println("ImageFile ID " + topicID + " from image location " + imageLocation + " was not found!");
 					}
-				} catch (final Exception ex)
+				}
+				catch (final Exception ex)
 				{
 					success = false;
-					errors += DocbookUtils.buildErrorListItem(imageLocation
-							+ " is not a valid image. Must be in the format [ImageFileID].extension e.g. 123.png, or images/321.jpg");
+					addErrorToTopic(imageLocation.getTopic(), imageLocation + " is not a valid image. Must be in the format [ImageFileID].extension e.g. 123.png, or images/321.jpg");
 					ExceptionUtilities.handleException(ex);
 				}
+			}
 
-				/* put in a place holder */
-				if (!success)
-					files.put("Book/en-US/" + imageLocation, failpenguinPng);
+			/* put in a place holder */
+			if (!success)
+			{
+				files.put("Book/en-US/" + imageLocation, failpenguinPng);
 			}
 
 			final float progress = (float) imageProgress / (float) imageTotal * 100;
@@ -982,21 +986,24 @@ public class DocbookBuilder
 
 	private String buildErrorChapter()
 	{
-		/* wrap up the errors into a itemizedlist, and then a section */
-		if (errors.length() == 0)
-			errors += DocbookUtils.wrapListItemsInPara(DocbookUtils.buildErrorListItem("No Errors Found"));
-		else
-			errors = DocbookUtils.wrapListItemsInPara(errors);
-		errors = DocbookUtils.buildSection(errors, "Compiler Errors");
+		String errorItemizedLists = "";
+		
+		for (final Topic topic : errors.keySet())
+		{
+			final List<String> topicErrorItems = new ArrayList<String>();
+			
+			for (final String error : errors.get(topic).getErrors())
+				topicErrorItems.add(DocbookUtils.buildListItem("ERROR: " + error));
+			
+			for (final String warning : errors.get(topic).getWarnings())
+				topicErrorItems.add(DocbookUtils.buildListItem("WARNING: " + warning));
+			
+			/* this should never be false, because a topic will only be listed in the errors collection once a error or warning has been added */
+			if (topicErrorItems.size() != 0)
+				errorItemizedLists += DocbookUtils.wrapListItems(topicErrorItems, "Topic ID " + topic.getTopicId(), DocbookUtils.ERROR_XREF_ID_PREFIX + topic.getTopicId());
+		}
 
-		/* wrap up the warnings into a itemizedlist, and then a section */
-		if (warnings.length() == 0)
-			warnings += DocbookUtils.wrapListItemsInPara(DocbookUtils.buildErrorListItem("No Warnings Found"));
-		else
-			warnings = DocbookUtils.wrapListItemsInPara(warnings);
-		warnings = DocbookUtils.buildSection(warnings, "Compiler Warnings");
-
-		return DocbookUtils.buildChapter(errors + warnings, "Compiler Output");
+		return DocbookUtils.buildChapter(errorItemizedLists, "Compiler Output");
 	}
 
 	/**
@@ -1004,8 +1011,7 @@ public class DocbookBuilder
 	 * compilation process and packages them up with some static Docbook Strings
 	 * to produce a ZIP file that is sent to the user
 	 */
-	protected void buildZipFile(final List<TagToCategory> topicTypeTagIDs, final List<TagToCategory> tagToCategories,
-			final DocbookBuildingOptions docbookBuildingOptions)
+	protected void buildZipFile(final List<TagToCategory> topicTypeTagIDs, final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		/* build up the files that will make up the zip file */
 		final HashMap<String, byte[]> files = new HashMap<String, byte[]>();
@@ -1047,14 +1053,14 @@ public class DocbookBuilder
 			{
 				if (tagIdToDocbookMap.containsKey(topicTag.getTag().getTagId()) && tagIdToDocbookMap.get(topicTag.getTag().getTagId()).length() != 0)
 				{
-					files.put("Book/en-US/" + topicTag.getTag().getTagName().replaceAll(" ", "") + "s.xml",
-							getStringBytes(xmlFormatter.formatXML(tagIdToDocbookMap.get(topicTag.getTag().getTagId()))));
+					files.put("Book/en-US/" + topicTag.getTag().getTagName().replaceAll(" ", "") + "s.xml", getStringBytes(xmlFormatter.formatXML(tagIdToDocbookMap.get(topicTag.getTag().getTagId()))));
 				}
 			}
 
 			// now add the publican files
 			publicnCfgFixed = publicanCfg;
-		} else
+		}
+		else
 		{
 			if (tagIdToDocbookMap.containsKey(Constants.TAG_ID_NARRATIVE))
 			{
@@ -1076,9 +1082,7 @@ public class DocbookBuilder
 		files.put("Book/packager/en-US/spec.in", getStringBytes(spec_in));
 
 		// replace the date marker in the Book.XML file
-		files.put("Book/en-US/Book_Info.xml",
-				xmlFormatter.formatXML(bookInfoXml.replace(DATE_YYMMDD_TEXT_MARKER, new StringBuilder(new SimpleDateFormat("yyMMdd").format(new Date()))))
-						.getBytes());
+		files.put("Book/en-US/Book_Info.xml", xmlFormatter.formatXML(bookInfoXml.replace(DATE_YYMMDD_TEXT_MARKER, new StringBuilder(new SimpleDateFormat("yyMMdd").format(new Date())))).getBytes());
 
 		files.put("Book/en-US/Author_Group.xml", getStringBytes(xmlFormatter.formatXML(authorGroupXml)));
 		files.put("Book/en-US/Book.ent", getStringBytes(bookEnt));
@@ -1133,11 +1137,11 @@ public class DocbookBuilder
 			{
 				if (tagIdToDocbookMap.containsKey(topicTag.getTag().getTagId()) && tagIdToDocbookMap.get(topicTag.getTag().getTagId()).length() != 0)
 				{
-					bookXmlXiIncludes += "	<xi:include href=\"" + topicTag.getTag().getTagName().replaceAll(" ", "")
-							+ "s.xml\" xmlns:xi=\"http://www.w3.org/2001/XInclude\" />\n";
+					bookXmlXiIncludes += "	<xi:include href=\"" + topicTag.getTag().getTagName().replaceAll(" ", "") + "s.xml\" xmlns:xi=\"http://www.w3.org/2001/XInclude\" />\n";
 				}
 			}
-		} else
+		}
+		else
 		{
 			if (tagIdToDocbookMap.containsKey(Constants.TAG_ID_NARRATIVE))
 			{
@@ -1156,7 +1160,8 @@ public class DocbookBuilder
 		try
 		{
 			zipFile = ZipUtilities.createZip(files);
-		} catch (final Exception ex)
+		}
+		catch (final Exception ex)
 		{
 			zipFile = null;
 			ExceptionUtilities.handleException(ex);
@@ -1170,9 +1175,8 @@ public class DocbookBuilder
 	 * user and processes them to validate the xml in the topic SVN repo,
 	 * process the related topics and fix up image paths
 	 */
-	protected void processTopics(final WorkingMemory businessRulesWorkingMemory, final Filter filter,
-			final ArrayList<List<TagToCategory>> mandatoryExclusiveTagCollections, final ArrayList<List<TagToCategory>> mandatoryTagCollections,
-			final int roleCategoryID, final String searchTagsUrl, final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
+	protected void processTopics(final WorkingMemory businessRulesWorkingMemory, final Filter filter, final ArrayList<List<TagToCategory>> mandatoryExclusiveTagCollections, final ArrayList<List<TagToCategory>> mandatoryTagCollections, final int roleCategoryID, final String searchTagsUrl,
+			final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		final List<Topic> topicList = EntityUtilities.getTopicsFromFilter(filter);
 
@@ -1188,8 +1192,7 @@ public class DocbookBuilder
 		 * related topics etc
 		 */
 		for (final Topic topic : topicList)
-			processTopic(businessRulesWorkingMemory, topic, mandatoryExclusiveTagCollections, mandatoryTagCollections, roleCategoryID, searchTagsUrl,
-					tagToCategories, usedIds, docbookBuildingOptions);
+			processTopic(businessRulesWorkingMemory, topic, mandatoryExclusiveTagCollections, mandatoryTagCollections, roleCategoryID, searchTagsUrl, tagToCategories, usedIds, docbookBuildingOptions);
 
 	}
 
@@ -1394,8 +1397,7 @@ public class DocbookBuilder
 		 * build an initial list of "root" topics from the search page to be
 		 * processed
 		 */
-		processTopics(businessRulesWorkingMemory, filter, mandatoryExclusiveTags, mandatoryTags, Constants.LIFECYCLE_CATEGORY_ID, searchTagsUrl,
-				tagToCategories, docbookBuildingOptions);
+		processTopics(businessRulesWorkingMemory, filter, mandatoryExclusiveTags, mandatoryTags, Constants.LIFECYCLE_CATEGORY_ID, searchTagsUrl, tagToCategories, docbookBuildingOptions);
 
 		/*
 		 * take the information gathered by the processTopic() function, and use
@@ -1410,8 +1412,7 @@ public class DocbookBuilder
 		final List<Integer> buildOrder = new ArrayList<Integer>();
 		if (docbookBuildingOptions.isBuildNarrative())
 		{
-			final FilterField topicIdField = selectFirst(filter.getFilterFields(),
-					having(on(FilterField.class).getField(), equalTo(Constants.TOPIC_IDS_FILTER_VAR)));
+			final FilterField topicIdField = selectFirst(filter.getFilterFields(), having(on(FilterField.class).getField(), equalTo(Constants.TOPIC_IDS_FILTER_VAR)));
 
 			if (topicIdField != null)
 			{
@@ -1423,7 +1424,8 @@ public class DocbookBuilder
 					{
 						final Integer topicIdInt = Integer.parseInt(topicId.trim());
 						buildOrder.add(topicIdInt);
-					} catch (final Exception ex)
+					}
+					catch (final Exception ex)
 					{
 						/*
 						 * a non-integer was probably entered into the field, so
@@ -1442,8 +1444,7 @@ public class DocbookBuilder
 		buildZipFile(topicTypeTagIDs, tagToCategories, docbookBuildingOptions);
 	}
 
-	protected Document buildErrorTopic(final String template, final Topic xmlData, final String xref, final String filterUrl,
-			final DocbookBuildingOptions docbookBuildingOptions)
+	protected Document buildErrorTopic(final String template, final Topic xmlData, final String xref, final String filterUrl, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		String retValue = template;
 
@@ -1451,13 +1452,10 @@ public class DocbookBuilder
 		if (docbookBuildingOptions.isSuppressErrorsPage())
 			retValue = retValue.replace(TOPIC_ERROR_LINK_MARKER, "");
 		else
-			retValue = retValue.replace(TOPIC_ERROR_LINK_MARKER,
-					"<para>Please review the compiler error for <xref linkend=\"TagErrorXRef#TOPICID#\"/> for more detailed information.</para>");
+			retValue = retValue.replace(TOPIC_ERROR_LINK_MARKER, "<para>Please review the compiler error for <xref linkend=\"TagErrorXRef#TOPICID#\"/> for more detailed information.</para>");
 
 		// replace the various markers
-		retValue = retValue.replace(TOPIC_ID_MARKER, xmlData.getTopicId().toString())
-				.replace(TOPIC_TITLE_MARKER, EntityUtilities.cleanTextForXML(xmlData.getTopicTitle()))
-				.replace(TOPIC_TEXT_MARKER, EntityUtilities.cleanTextForXML(xmlData.getTopicText())).replace(XREF_ID_MARKER, xref)
+		retValue = retValue.replace(TOPIC_ID_MARKER, xmlData.getTopicId().toString()).replace(TOPIC_TITLE_MARKER, EntityUtilities.cleanTextForXML(xmlData.getTopicTitle())).replace(TOPIC_TEXT_MARKER, EntityUtilities.cleanTextForXML(xmlData.getTopicText())).replace(XREF_ID_MARKER, xref)
 				.replace(TAG_FILTER_URL_MARKER, filterUrl.replace("&", "&amp;")).replace(BUILD_MARKER, Constants.BUILD);
 
 		return XMLUtilities.convertStringToDocument(retValue);
@@ -1468,8 +1466,7 @@ public class DocbookBuilder
 	 * the ROLE_MARKER has been defined in the template, and then calls the 2nd
 	 * populateIdXMLDataFromDB function to populate the rest of the template.
 	 */
-	protected void populateIdXMLDataFromDB(final String errorTemplate, final Topic xmlData, final boolean assignToErrorTag, final String filterUrl,
-			final int roleCategoryID, final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
+	protected void populateIdXMLDataFromDB(final String errorTemplate, final Topic xmlData, final boolean assignToErrorTag, final String filterUrl, final int roleCategoryID, final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		final String fixedTemplate = errorTemplate.replaceAll(ROLE_MARKER, xmlData.getTempTopicRole());
 		populateIdXMLDataFromDB(fixedTemplate, xmlData, assignToErrorTag, filterUrl, docbookBuildingOptions);
@@ -1494,8 +1491,7 @@ public class DocbookBuilder
 	 * @param filterUrl
 	 *            The URL that is used to get back to the tag search screen
 	 */
-	protected void populateIdXMLDataFromDB(final String errorTemplate, final Topic xmlData, final boolean assignToErrorTag, final String filterUrl,
-			final DocbookBuildingOptions docbookBuildingOptions)
+	protected void populateIdXMLDataFromDB(final String errorTemplate, final Topic xmlData, final boolean assignToErrorTag, final String filterUrl, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		xmlData.setTempTopicXMLDoc(buildErrorTopic(errorTemplate, xmlData, xmlData.getXRefID(), filterUrl, docbookBuildingOptions));
 		xmlData.setTempInvalidTopic(true);
@@ -1528,8 +1524,7 @@ public class DocbookBuilder
 	 * 
 	 * This is done after the injections are generated.
 	 */
-	protected boolean postValidateTopicDocbook(final Topic topic, final String searchTagsUrl, final int roleCategoryID,
-			final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
+	protected boolean postValidateTopicDocbook(final Topic topic, final String searchTagsUrl, final int roleCategoryID, final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		final XMLValidator validator = new XMLValidator();
 
@@ -1545,9 +1540,7 @@ public class DocbookBuilder
 			populateIdXMLDataFromDB(errorTopic, topic, false, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
 			System.out.println(topic.getTopicId().toString() + " failed docbook validation after the injection points were processed.");
 
-			errors += DocbookUtils.buildErrorListItem(topic.getTopicId().toString(),
-					"failed docbook validation after the injection points were processed. The error was <emphasis>" + validator.getErrorText()
-							+ "</emphasis> The XML after the injections points were processed is:", true, originalXML);
+			addErrorToTopic(topic, topic.getTopicId().toString() + "failed docbook validation after the injection points were processed. The error was <emphasis>" + validator.getErrorText() + "</emphasis> The XML after the injections points were processed is: <programlisting><![CDATA[" + originalXML + "]]></programlisting>");
 			return false;
 		}
 
@@ -1561,14 +1554,13 @@ public class DocbookBuilder
 	 * the repo is valid. But until the topic tool implements some kind of
 	 * validation, this step is required.
 	 */
-	protected boolean validateTopicXML(final Topic xmlData, final String searchTagsUrl, final int roleCategoryID, final List<TagToCategory> tagToCategories,
-			final DocbookBuildingOptions docbookBuildingOptions)
+	protected boolean validateTopicXML(final Topic topic, final String searchTagsUrl, final int roleCategoryID, final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		// see if we have some xml to work with
-		if (xmlData.getTopicXML() == null || xmlData.getTopicXML().trim().length() == 0)
+		if (topic.getTopicXML() == null || topic.getTopicXML().trim().length() == 0)
 		{
-			populateIdXMLDataFromDB(errorTopic, xmlData, false, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
-			errors += DocbookUtils.buildErrorListItem(xmlData.getTopicId().toString(), "has a blank Topic XML field");
+			populateIdXMLDataFromDB(errorTopic, topic, false, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
+			addErrorToTopic(topic, topic.getTopicId().toString() + "has a blank Topic XML field");
 			return false;
 		}
 
@@ -1576,29 +1568,27 @@ public class DocbookBuilder
 		 * if the xml is not blank, but the tempTopicXMLDoc variable is null, we
 		 * must have had some invalid xml
 		 */
-		if (xmlData.getTempTopicXMLDoc() == null)
+		if (topic.getTempTopicXMLDoc() == null)
 		{
-			populateIdXMLDataFromDB(errorTopic, xmlData, false, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
+			populateIdXMLDataFromDB(errorTopic, topic, false, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
 
-			errors += DocbookUtils.buildErrorListItem(xmlData.getTopicId().toString(), "failed xml validation.");
+			addErrorToTopic(topic, topic.getTopicId().toString() + "failed xml validation.");
 			return false;
 		}
 
 		return true;
 	}
 
-	protected boolean validateIdAttributesUnique(final Topic xmlData, final String searchTagsUrl, final List<String> usedIds,
-			final DocbookBuildingOptions docbookBuildingOptions)
+	protected boolean validateIdAttributesUnique(final Topic topic, final String searchTagsUrl, final List<String> usedIds, final DocbookBuildingOptions docbookBuildingOptions)
 	{
-		final NodeList elements = xmlData.getTempTopicXMLDoc().getDocumentElement().getChildNodes();
+		final NodeList elements = topic.getTempTopicXMLDoc().getDocumentElement().getChildNodes();
 		for (int i = 0; i < elements.getLength(); ++i)
 		{
-			final String retValue = validateIdAttributesUnique(xmlData, searchTagsUrl, elements.item(i), usedIds);
+			final String retValue = validateIdAttributesUnique(topic, searchTagsUrl, elements.item(i), usedIds);
 			if (retValue != null)
 			{
-				populateIdXMLDataFromDB(errorTopic, xmlData, false, searchTagsUrl, docbookBuildingOptions);
-				errors += DocbookUtils.buildErrorListItem(xmlData.getTopicId().toString(), "uses an id attribute called \"" + retValue
-						+ "\" that is already used in another topic.");
+				populateIdXMLDataFromDB(errorTopic, topic, false, searchTagsUrl, docbookBuildingOptions);
+				addErrorToTopic(topic, topic.getTopicId().toString() + "uses an id attribute called \"" + retValue + "\" that is already used in another topic.");
 				return false;
 			}
 		}
@@ -1619,7 +1609,8 @@ public class DocbookBuilder
 				if (usedIds.contains(idAttibuteValue))
 				{
 					return idAttibuteValue;
-				} else
+				}
+				else
 				{
 					usedIds.add(idAttibuteValue);
 				}
@@ -1678,8 +1669,7 @@ public class DocbookBuilder
 	protected void processTopicDraftWarning(final Topic xmlData, final Topic topic)
 	{
 		// if this topic has not been marked as final, add a note
-		if (!(tagIdToTopicMap.containsKey(Constants.TOPIC_FINAL_LIFECYCLE) && tagIdToTopicMap.get(Constants.TOPIC_FINAL_LIFECYCLE).containsKey(
-				topic.getTopicId())))
+		if (!(tagIdToTopicMap.containsKey(Constants.TOPIC_FINAL_LIFECYCLE) && tagIdToTopicMap.get(Constants.TOPIC_FINAL_LIFECYCLE).containsKey(topic.getTopicId())))
 		{
 			final Element note = xmlData.getTempTopicXMLDoc().createElement("note");
 			final Element title = xmlData.getTempTopicXMLDoc().createElement("title");
@@ -1713,8 +1703,7 @@ public class DocbookBuilder
 	/**
 	 * Adds some debug information and links to the end of the topic
 	 */
-	protected void processTopicAdditionalInfo(final Topic xmlData, final Topic topic, final String searchTagsUrl,
-			final DocbookBuildingOptions docbookBuildingOptions)
+	protected void processTopicAdditionalInfo(final Topic xmlData, final Topic topic, final String searchTagsUrl, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		// SIMPLESECT TO HOLD OTHER LINKS
 		final Element bugzillaSection = xmlData.getTempTopicXMLDoc().createElement("simplesect");
@@ -1736,15 +1725,10 @@ public class DocbookBuilder
 			bugzillaULink.setTextContent("Report a bug");
 
 			final SimpleDateFormat formatter = new SimpleDateFormat(Constants.FILTER_DISPLAY_DATE_FORMAT);
-			final String whiteboard = URLEncoder.encode(
-					"Topic ID:" + topic.getTopicId() + " Skynet Build: " + Constants.BUILD + " Topic Title: " + topic.getTopicTitle() + " Topic Revision: "
-							+ topic.getLatestRevision() + " Topic Revision Date: " + formatter.format(topic.getLatestRevisionDate()) + " Topic Tags: "
-							+ topic.getCommaSeparatedTagList(), "UTF-8");
+			final String whiteboard = URLEncoder.encode("Topic ID:" + topic.getTopicId() + " Skynet Build: " + Constants.BUILD + " Topic Title: " + topic.getTopicTitle() + " Topic Revision: " + topic.getLatestRevision() + " Topic Revision Date: " + formatter.format(topic.getLatestRevisionDate()) + " Topic Tags: "
+					+ topic.getCommaSeparatedTagList(), "UTF-8");
 
-			bugzillaULink
-					.setAttribute("url",
-							"https://bugzilla.redhat.com/enter_bug.cgi?product=Topic+Tool&component=topics-EAP6&keywords=Documentation&status_whiteboard="
-									+ whiteboard);
+			bugzillaULink.setAttribute("url", "https://bugzilla.redhat.com/enter_bug.cgi?product=Topic+Tool&component=topics-EAP6&keywords=Documentation&status_whiteboard=" + whiteboard);
 
 			/*
 			 * only add the elements to the XML DOM if there was no excpetion
@@ -1752,7 +1736,8 @@ public class DocbookBuilder
 			 */
 			bugzillaSection.appendChild(bugzillaPara);
 			bugzillaPara.appendChild(bugzillaULink);
-		} catch (final Exception ex)
+		}
+		catch (final Exception ex)
 		{
 			ExceptionUtilities.handleException(ex);
 		}
@@ -1763,10 +1748,7 @@ public class DocbookBuilder
 		surveyPara.setAttribute("role", ROLE_CREATE_BUG_PARA);
 		bugzillaSection.appendChild(surveyPara);
 
-		final Text startSurveyText = xmlData
-				.getTempTopicXMLDoc()
-				.createTextNode(
-						"Thank you for evaluating the new documentation format for JBoss Enterprise Application Platform. Let us know what you think by taking a short ");
+		final Text startSurveyText = xmlData.getTempTopicXMLDoc().createTextNode("Thank you for evaluating the new documentation format for JBoss Enterprise Application Platform. Let us know what you think by taking a short ");
 		surveyPara.appendChild(startSurveyText);
 
 		final Element surveyULink = xmlData.getTempTopicXMLDoc().createElement("ulink");
@@ -1837,7 +1819,7 @@ public class DocbookBuilder
 					fileRefAttribute.setNodeValue("images/" + fileRefAttribute.getNodeValue());
 				}
 
-				imageLocations.add(fileRefAttribute.getNodeValue());
+				imageLocations.add(new TopicImageData(topic, fileRefAttribute.getNodeValue()));
 			}
 		}
 	}
@@ -1849,9 +1831,7 @@ public class DocbookBuilder
 	 * This should be enforced when topics are created, but currently this is
 	 * not the case.
 	 */
-	protected boolean validateTopicTags(final Topic xmlData, final Topic topic, final String searchTagsUrl,
-			final ArrayList<List<TagToCategory>> mandatoryExclusiveTagCollections, final ArrayList<List<TagToCategory>> mandatoryTagCollections,
-			final DocbookBuildingOptions docbookBuildingOptions)
+	protected boolean validateTopicTags(final Topic xmlData, final Topic topic, final String searchTagsUrl, final ArrayList<List<TagToCategory>> mandatoryExclusiveTagCollections, final ArrayList<List<TagToCategory>> mandatoryTagCollections, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		/*
 		 * make sure topics have the required tags assigned to them. this should
@@ -1885,17 +1865,19 @@ public class DocbookBuilder
 					error += " " + foundTag.getTagName() + " [" + foundTag.getTagId() + "]";
 				error += " assigned to it from a mutually exclusive catgeory group";
 
-				errors += DocbookUtils.buildErrorListItem(xmlData.getTopicId().toString(), error);
-
-				return false;
-			} else if (foundTypeTags.size() == 0)
-			{
-				populateIdXMLDataFromDB(errorTagsTopic, xmlData, true, searchTagsUrl, docbookBuildingOptions);
-
-				errors += DocbookUtils.buildErrorListItem(xmlData.getTopicId().toString(), "is missing tags in an exclusive mandatory category");
+				addErrorToTopic(topic, xmlData.getTopicId().toString() + error);
 
 				return false;
 			}
+			else
+				if (foundTypeTags.size() == 0)
+				{
+					populateIdXMLDataFromDB(errorTagsTopic, xmlData, true, searchTagsUrl, docbookBuildingOptions);
+
+					addErrorToTopic(topic, xmlData.getTopicId().toString() + "is missing tags in an exclusive mandatory category");
+
+					return false;
+				}
 		}
 
 		for (final List<TagToCategory> mandatoryCollection : mandatoryTagCollections)
@@ -1913,7 +1895,7 @@ public class DocbookBuilder
 			{
 				populateIdXMLDataFromDB(errorTagsTopic, xmlData, true, searchTagsUrl, docbookBuildingOptions);
 
-				errors += DocbookUtils.buildErrorListItem(xmlData.getTopicId().toString(), "is missing tags in a mandatory category");
+				addErrorToTopic(topic, xmlData.getTopicId().toString() + "is missing tags in a mandatory category");
 
 				return false;
 			}
@@ -1927,10 +1909,8 @@ public class DocbookBuilder
 	 * the search list is processed, its xml retrieved and validated, related
 	 * topics noted and recursively processed, and image locations fixed up
 	 */
-	protected void processTopic(final WorkingMemory businessRulesWorkingMemory, final Topic topic,
-			final ArrayList<List<TagToCategory>> mandatoryExclusiveTagCollections, final ArrayList<List<TagToCategory>> mandatoryTagCollections,
-			final int roleCategoryID, final String searchTagsUrl, final List<TagToCategory> tagToCategories, final List<String> usedIds,
-			final DocbookBuildingOptions docbookBuildingOptions)
+	protected void processTopic(final WorkingMemory businessRulesWorkingMemory, final Topic topic, final ArrayList<List<TagToCategory>> mandatoryExclusiveTagCollections, final ArrayList<List<TagToCategory>> mandatoryTagCollections, final int roleCategoryID, final String searchTagsUrl,
+			final List<TagToCategory> tagToCategories, final List<String> usedIds, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		/* we have already processed this topic, don't do it again */
 		if (topicIdToTopicMap.containsKey(topic.getTopicId()))
@@ -2033,8 +2013,7 @@ public class DocbookBuilder
 				 */
 				if (docbookBuildingOptions.isProcessRelatedTopics() && !docbookBuildingOptions.isBuildNarrative())
 				{
-					processTopic(businessRulesWorkingMemory, topicToTopic.getRelatedTopic(), mandatoryExclusiveTagCollections, mandatoryTagCollections,
-							roleCategoryID, searchTagsUrl, tagToCategories, usedIds, docbookBuildingOptions);
+					processTopic(businessRulesWorkingMemory, topicToTopic.getRelatedTopic(), mandatoryExclusiveTagCollections, mandatoryTagCollections, roleCategoryID, searchTagsUrl, tagToCategories, usedIds, docbookBuildingOptions);
 				}
 			}
 		}
@@ -2070,7 +2049,7 @@ public class DocbookBuilder
 		// if no matching tags were found, create a warning
 		if (!foundTechnology)
 		{
-			warnings += DocbookUtils.buildErrorListItem(topic.getTopicId().toString(), "is not tagged with a technology type", false);
+			addErrorToTopic(topic, topic.getTopicId().toString() + "is not tagged with a technology type", false);
 		}
 
 		return foundTechnology;
@@ -2229,8 +2208,7 @@ public class DocbookBuilder
 
 				for (final Topic xmlMap : tocTopicList)
 				{
-					parentOnlyFolder.getChildren().add(
-							new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId(), xmlMap.getTempNavLinkDocbook()));
+					parentOnlyFolder.getChildren().add(new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId(), xmlMap.getTempNavLinkDocbook()));
 				}
 
 				// now loop over the concern tags for the parent tag only
@@ -2257,8 +2235,7 @@ public class DocbookBuilder
 
 						for (final Topic xmlMap : concernTopicList)
 						{
-							concernLevelFolder.getChildren().add(
-									new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId(), xmlMap.getTempNavLinkDocbook()));
+							concernLevelFolder.getChildren().add(new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId(), xmlMap.getTempNavLinkDocbook()));
 						}
 					}
 				}
@@ -2278,8 +2255,7 @@ public class DocbookBuilder
 					 * this collection will hold the those list items that
 					 * appear under a first level folder
 					 */
-					final TocFolderElement equivalentFolder = new TocFolderElement(docbookBuildingOptions, firstLevelTag.getTagName() + " / "
-							+ secondaryTag.getTagName());
+					final TocFolderElement equivalentFolder = new TocFolderElement(docbookBuildingOptions, firstLevelTag.getTagName() + " / " + secondaryTag.getTagName());
 
 					// add those topics that aren't tagged with a concern.
 
@@ -2297,8 +2273,7 @@ public class DocbookBuilder
 
 					for (final Topic xmlMap : topicList)
 					{
-						equivalentFolder.getChildren().add(
-								new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId(), xmlMap.getTempNavLinkDocbook()));
+						equivalentFolder.getChildren().add(new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId(), xmlMap.getTempNavLinkDocbook()));
 					}
 
 					// now loop over the concern tags
@@ -2321,8 +2296,7 @@ public class DocbookBuilder
 
 							for (final Topic xmlMap : concernTopicList)
 							{
-								concernLevelFolder.getChildren().add(
-										new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId(), xmlMap.getTempNavLinkDocbook()));
+								concernLevelFolder.getChildren().add(new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId(), xmlMap.getTempNavLinkDocbook()));
 							}
 						}
 
@@ -2457,8 +2431,7 @@ public class DocbookBuilder
 				{
 					for (final Topic xmlMap : tocTopicList)
 					{
-						parentOnlyFolder.getChildren().add(
-								new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId(), xmlMap.getTempNavLinkDocbook()));
+						parentOnlyFolder.getChildren().add(new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId(), xmlMap.getTempNavLinkDocbook()));
 					}
 				}
 
@@ -2510,8 +2483,7 @@ public class DocbookBuilder
 						{
 							for (final Topic xmlMap : topicList)
 							{
-								concernLevelFolder.getChildren().add(
-										new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId(), xmlMap.getTempNavLinkDocbook()));
+								concernLevelFolder.getChildren().add(new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId(), xmlMap.getTempNavLinkDocbook()));
 							}
 						}
 					}
@@ -2525,5 +2497,23 @@ public class DocbookBuilder
 
 		tocTopLevel.generateCode();
 		return tocTopLevel;
+	}
+
+	private void addErrorToTopic(final Topic topic, final String message)
+	{
+		addErrorToTopic(topic, message, true);
+	}
+
+	private void addErrorToTopic(final Topic topic, final String message, boolean error)
+	{
+		if (!this.errors.containsKey(topic))
+			this.errors.put(topic, new TopicErrorData());
+
+		final TopicErrorData topicErrorData = this.errors.get(topic);
+
+		if (error)
+			topicErrorData.getErrors().add(message);
+		else
+			topicErrorData.getWarnings().add(message);
 	}
 }
