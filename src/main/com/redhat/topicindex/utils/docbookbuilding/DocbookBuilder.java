@@ -993,8 +993,8 @@ public class DocbookBuilder
 			final String tags = topic.getCommaSeparatedTagList();
 			final String url = getTopicSkynetURL(topic);
 
-			topicErrorItems.add("INFO: Topic Tags " + tags);
-			topicErrorItems.add("INFO: <ulink url=\"" + url + "\">Topic URL</ulink>");
+			topicErrorItems.add(DocbookUtils.buildListItem("INFO: Topic Tags " + tags));
+			topicErrorItems.add(DocbookUtils.buildListItem("INFO: <ulink url=\"" + url + "\">Topic URL</ulink>"));
 
 			for (final String error : errors.get(topic).getErrors())
 				topicErrorItems.add(DocbookUtils.buildListItem("ERROR: " + error));
