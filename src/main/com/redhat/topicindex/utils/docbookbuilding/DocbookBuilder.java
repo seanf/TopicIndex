@@ -664,9 +664,9 @@ public class DocbookBuilder
 							injectionErrors = injectionErrors.substring(0, injectionErrors.length() - 2);
 							addErrorToTopic(
 									topic,
-											"Topic references Topic(s) "
-													+ injectionErrors
-													+ " in a custom injection point, but this topic has either not been related in the database, or was not matched by the filter. The later might occur if you are building a narrative and the injected topic was not listed in the Topic ID field, or you have not selected the 'Include all related topics' option.");
+									"Topic references Topic(s) "
+											+ injectionErrors
+											+ " in a custom injection point, but this topic has either not been related in the database, or was not matched by the filter. The later might occur if you are building a narrative and the injected topic was not listed in the Topic ID field, or you have not selected the 'Include all related topics' option.");
 						}
 						else
 						{
@@ -985,20 +985,37 @@ public class DocbookBuilder
 	private String buildErrorChapter()
 	{
 		String errorItemizedLists = "";
-		
+
 		for (final Topic topic : errors.keySet())
 		{
 			final List<String> topicErrorItems = new ArrayList<String>();
-			
+
+			final String tags = topic.getCommaSeparatedTagList();
+			final String url = getTopicSkynetURL(topic);
+
+			topicErrorItems.add("INFO: Topic Tags " + tags);
+			topicErrorItems.add("INFO: <ulink url=\"" + url + "\">Topic URL</ulink>");
+
 			for (final String error : errors.get(topic).getErrors())
 				topicErrorItems.add(DocbookUtils.buildListItem("ERROR: " + error));
-			
+
 			for (final String warning : errors.get(topic).getWarnings())
 				topicErrorItems.add(DocbookUtils.buildListItem("WARNING: " + warning));
-			
-			/* this should never be false, because a topic will only be listed in the errors collection once a error or warning has been added */
-			if (topicErrorItems.size() != 0)
-				errorItemizedLists += DocbookUtils.wrapListItems(topicErrorItems, "Topic ID " + topic.getTopicId(), DocbookUtils.ERROR_XREF_ID_PREFIX + topic.getTopicId());
+
+			/*
+			 * this should never be false, because a topic will only be listed
+			 * in the errors collection once a error or warning has been added.
+			 * The count of 2 comes from the standard list items we added above
+			 * for the tags and url.
+			 */
+			if (topicErrorItems.size() > 2)
+			{
+				final String title = "Topic ID " + topic.getTopicId();
+				final String id = DocbookUtils.ERROR_XREF_ID_PREFIX + topic.getTopicId();
+
+				errorItemizedLists += DocbookUtils.wrapListItems(topicErrorItems, title, id);
+			}
+
 		}
 
 		return DocbookUtils.buildChapter(errorItemizedLists, "Compiler Output");
@@ -1766,7 +1783,7 @@ public class DocbookBuilder
 		final Element skynetLinkULink = xmlData.getTempTopicXMLDoc().createElement("ulink");
 		skynetElement.appendChild(skynetLinkULink);
 		skynetLinkULink.setTextContent("View in Skynet");
-		skynetLinkULink.setAttribute("url", Constants.SERVER_URL + "/TopicIndex/CustomSearchTopicList.seam?topicIds=" + topic.getTopicId());
+		skynetLinkULink.setAttribute("url", getTopicSkynetURL(topic));
 
 		// SKYNET VERSION
 
@@ -2513,5 +2530,10 @@ public class DocbookBuilder
 			topicErrorData.getErrors().add(message);
 		else
 			topicErrorData.getWarnings().add(message);
+	}
+
+	private String getTopicSkynetURL(final Topic topic)
+	{
+		return Constants.SERVER_URL + "/TopicIndex/CustomSearchTopicList.seam?topicIds=" + topic.getTopicId();
 	}
 }
