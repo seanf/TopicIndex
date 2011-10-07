@@ -112,32 +112,6 @@ public class DocbookUtils
 		return textNode;
 	}
 	
-	public static String buildErrorListItem(final String topicID, final String error)
-	{
-		return buildErrorListItem(topicID, error, true, null);
-	}
-	
-	public static String buildErrorListItem(final String topicID, final String error, final boolean addXRefId)
-	{
-		return buildErrorListItem(topicID, error, addXRefId, null);
-	}
-	
-	public static String buildErrorListItem(final String topicID, final String error, final boolean addXRefId, final String codeExample)
-	{
-		String revalue = "<listitem";
-		if (addXRefId)
-			revalue += " id=\"" + ERROR_XREF_ID_PREFIX + topicID + "\" xreflabel=\"Topic " + topicID + "\"";
-		
-		revalue += "><para>Topic <ulink url=\"" + Constants.SERVER_URL + "/TopicIndex/CustomSearchTopicList.seam?topicIds=" + topicID + "\">" + topicID + "</ulink> " + error; 
-		
-		if (codeExample != null)
-			revalue += "<programlisting><![CDATA[" + codeExample + "]]></programlisting>";
-			
-		revalue	 += "</para></listitem>\n";
-		
-		return revalue;	
-	}
-	
 	public static String buildListItem(final String error)
 	{
 		return "<listitem><para>" + error + "</para></listitem>\n";

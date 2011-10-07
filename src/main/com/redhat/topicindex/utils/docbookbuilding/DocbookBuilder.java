@@ -664,11 +664,10 @@ public class DocbookBuilder
 							injectionErrors = injectionErrors.substring(0, injectionErrors.length() - 2);
 							addErrorToTopic(
 									topic,
-									DocbookUtils.buildErrorListItem(
-											topicID.toString(),
-											"references Topic(s) "
+											topicID.toString() +
+											" references Topic(s) "
 													+ injectionErrors
-													+ " in a custom injection point, but this topic has either not been related in the database, or was not matched by the filter. The later might occur if you are building a narrative and the injected topic was not listed in the Topic ID field, or you have not selected the 'Include all related topics' option."));
+													+ " in a custom injection point, but this topic has either not been related in the database, or was not matched by the filter. The later might occur if you are building a narrative and the injected topic was not listed in the Topic ID field, or you have not selected the 'Include all related topics' option.");
 						}
 						else
 						{
@@ -1452,7 +1451,7 @@ public class DocbookBuilder
 		if (docbookBuildingOptions.isSuppressErrorsPage())
 			retValue = retValue.replace(TOPIC_ERROR_LINK_MARKER, "");
 		else
-			retValue = retValue.replace(TOPIC_ERROR_LINK_MARKER, "<para>Please review the compiler error for <xref linkend=\"TagErrorXRef#TOPICID#\"/> for more detailed information.</para>");
+			retValue = retValue.replace(TOPIC_ERROR_LINK_MARKER, "<para>Please review the compiler error for <xref linkend=\"" + DocbookUtils.ERROR_XREF_ID_PREFIX + "#TOPICID#\"/> for more detailed information.</para>");
 
 		// replace the various markers
 		retValue = retValue.replace(TOPIC_ID_MARKER, xmlData.getTopicId().toString()).replace(TOPIC_TITLE_MARKER, EntityUtilities.cleanTextForXML(xmlData.getTopicTitle())).replace(TOPIC_TEXT_MARKER, EntityUtilities.cleanTextForXML(xmlData.getTopicText())).replace(XREF_ID_MARKER, xref)
