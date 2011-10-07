@@ -954,7 +954,7 @@ public class DocbookBuilder
 					if (imageFile != null)
 					{
 						success = true;
-						files.put("Book/en-US/" + imageLocation, imageFile.getImageData());
+						files.put("Book/en-US/" + imageLocation.getImageName(), imageFile.getImageData());
 					}
 					else
 					{
@@ -973,7 +973,7 @@ public class DocbookBuilder
 			/* put in a place holder */
 			if (!success)
 			{
-				files.put("Book/en-US/" + imageLocation, failpenguinPng);
+				files.put("Book/en-US/" + imageLocation.getImageName(), failpenguinPng);
 			}
 
 			final float progress = (float) imageProgress / (float) imageTotal * 100;
