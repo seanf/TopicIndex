@@ -1406,7 +1406,7 @@ public class DocbookBuilder
 		final HashMap<String, String> urlVars = filter.getUrlVariables();
 		for (final Entry<String, String> var : urlVars.entrySet())
 			searchTagsUrl = EntityUtilities.addParameter(searchTagsUrl, var.getKey(), var.getValue());
-		searchTagsUrl = Constants.SERVER_URL + "/CustomSearchTopics.seam" + searchTagsUrl;
+		searchTagsUrl = Constants.SERVER_URL + "/TopicIndex/CustomSearchTopics.seam" + searchTagsUrl;
 
 		/*
 		 * build an initial list of "root" topics from the search page to be
