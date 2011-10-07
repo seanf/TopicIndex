@@ -664,8 +664,7 @@ public class DocbookBuilder
 							injectionErrors = injectionErrors.substring(0, injectionErrors.length() - 2);
 							addErrorToTopic(
 									topic,
-											topicID.toString() +
-											" references Topic(s) "
+											"Topic references Topic(s) "
 													+ injectionErrors
 													+ " in a custom injection point, but this topic has either not been related in the database, or was not matched by the filter. The later might occur if you are building a narrative and the injected topic was not listed in the Topic ID field, or you have not selected the 'Include all related topics' option.");
 						}
@@ -1539,7 +1538,7 @@ public class DocbookBuilder
 			populateIdXMLDataFromDB(errorTopic, topic, false, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
 			System.out.println(topic.getTopicId().toString() + " failed docbook validation after the injection points were processed.");
 
-			addErrorToTopic(topic, topic.getTopicId().toString() + "failed docbook validation after the injection points were processed. The error was <emphasis>" + validator.getErrorText() + "</emphasis> The XML after the injections points were processed is: <programlisting><![CDATA[" + originalXML + "]]></programlisting>");
+			addErrorToTopic(topic, "Topic failed docbook validation after the injection points were processed. The error was <emphasis>" + validator.getErrorText() + "</emphasis> The XML after the injections points were processed is: <programlisting><![CDATA[" + originalXML + "]]></programlisting>");
 			return false;
 		}
 
@@ -1559,7 +1558,7 @@ public class DocbookBuilder
 		if (topic.getTopicXML() == null || topic.getTopicXML().trim().length() == 0)
 		{
 			populateIdXMLDataFromDB(errorTopic, topic, false, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
-			addErrorToTopic(topic, topic.getTopicId().toString() + "has a blank Topic XML field");
+			addErrorToTopic(topic, "Topic has a blank Topic XML field");
 			return false;
 		}
 
@@ -1571,7 +1570,7 @@ public class DocbookBuilder
 		{
 			populateIdXMLDataFromDB(errorTopic, topic, false, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
 
-			addErrorToTopic(topic, topic.getTopicId().toString() + "failed xml validation.");
+			addErrorToTopic(topic, "Topic failed xml validation.");
 			return false;
 		}
 
@@ -1587,7 +1586,7 @@ public class DocbookBuilder
 			if (retValue != null)
 			{
 				populateIdXMLDataFromDB(errorTopic, topic, false, searchTagsUrl, docbookBuildingOptions);
-				addErrorToTopic(topic, topic.getTopicId().toString() + "uses an id attribute called \"" + retValue + "\" that is already used in another topic.");
+				addErrorToTopic(topic, "Topic uses an id attribute called \"" + retValue + "\" that is already used in another topic.");
 				return false;
 			}
 		}
@@ -1864,7 +1863,7 @@ public class DocbookBuilder
 					error += " " + foundTag.getTagName() + " [" + foundTag.getTagId() + "]";
 				error += " assigned to it from a mutually exclusive catgeory group";
 
-				addErrorToTopic(topic, xmlData.getTopicId().toString() + error);
+				addErrorToTopic(topic, error);
 
 				return false;
 			}
@@ -1873,7 +1872,7 @@ public class DocbookBuilder
 				{
 					populateIdXMLDataFromDB(errorTagsTopic, xmlData, true, searchTagsUrl, docbookBuildingOptions);
 
-					addErrorToTopic(topic, xmlData.getTopicId().toString() + "is missing tags in an exclusive mandatory category");
+					addErrorToTopic(topic, "Topic is missing tags in an exclusive mandatory category");
 
 					return false;
 				}
@@ -1894,7 +1893,7 @@ public class DocbookBuilder
 			{
 				populateIdXMLDataFromDB(errorTagsTopic, xmlData, true, searchTagsUrl, docbookBuildingOptions);
 
-				addErrorToTopic(topic, xmlData.getTopicId().toString() + "is missing tags in a mandatory category");
+				addErrorToTopic(topic, "Topic is missing tags in a mandatory category");
 
 				return false;
 			}
@@ -2048,7 +2047,7 @@ public class DocbookBuilder
 		// if no matching tags were found, create a warning
 		if (!foundTechnology)
 		{
-			addErrorToTopic(topic, topic.getTopicId().toString() + "is not tagged with a technology type", false);
+			addErrorToTopic(topic, "Topic is not tagged with a technology type", false);
 		}
 
 		return foundTechnology;
