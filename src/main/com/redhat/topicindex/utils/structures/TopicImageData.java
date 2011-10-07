@@ -33,7 +33,8 @@ public class TopicImageData
 
 	public TopicImageData(final Topic topic, final String imageName)
 	{
-
+		this.topic = topic;
+		this.imageName = imageName;
 	}
 
 }
