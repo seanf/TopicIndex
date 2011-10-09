@@ -94,6 +94,15 @@
 					<h:selectBooleanCheckbox id="hasIncomingRelationships"
 						value="#{topic.hasIncomingRelationships}" />
 				</s:decorate>
+				
+				<s:decorate template="/layout/display.xhtml"
+					rendered="#{s:hasPermission('FilterTextFreeSearch', 'Rendered', null)}">
+					<ui:define name="label"><h:outputText label="You can find details on the Lucene search syntax http://lucene.apache.org/java/2_4_0/queryparsersyntax.html" value="Free Text Search"/></ui:define>
+					<h:inputText size="125" id="topicFreeTextSearch"
+						value="#{topic.topicTextSearch}" />
+				</s:decorate>
+				
+				
 
 				<s:decorate template="/layout/display.xhtml">
 					<ui:define name="label">Match</ui:define>
