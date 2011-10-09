@@ -463,7 +463,7 @@ public class TopicFilter
 
 	public void setTopicTextSearch(final String topicTextSearch)
 	{
-		this.topicTextSearch = topicTextSearch.trim();
+		this.topicTextSearch = topicTextSearch == null ? null : topicTextSearch.trim();
 	}
 
 	public List<Integer> getTopicTextSearchIDs()
