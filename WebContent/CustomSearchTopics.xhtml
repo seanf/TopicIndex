@@ -19,17 +19,6 @@
 		<rich:jQuery selector="input[id*='tag-']" timing="onload"
 			query="each(function(index, element){if (element.checked){jQuery('input[id*=' + element.id.replace('tag', 'tagnot') + ']').removeAttr('disabled');} else {jQuery('input[id*=' + element.id.replace('tag', 'tagnot') + ']').attr('disabled', true);}})" />
 
-		<h:graphicImage value="/img/skynet.png" alt="Redhat Logo"
-			style="vertical-align:middle; padding: 10px" />
-		<h:outputText value="Skynet"
-			style="font-weight:bold; font-size: large; padding: 10px" />
-		<br />
-		<h:outputText value="All your topics are belong to us!"
-			style="padding: 10px" />
-
-		<br />
-		<br />
-
 		<h:form id="topicIndexSearch" styleClass="edit">
 
 			<div class="actionButtons">
@@ -45,6 +34,7 @@
 			</div>
 
 			<div style="clear: both" />
+			<br/>
 
 			<rich:tabPanel switchType="client">
 				<rich:tab label="Tags">
@@ -124,16 +114,19 @@
 				</rich:tab>
 			</rich:tabPanel>
 
+			<div style="clear: both"/>
+			<br/>
+
 			<div class="actionButtons">
 				<h:commandButton id="search" value="Search"
 					action="#{customTagSearch.doSearch()}" />
 				<s:button id="reset" value="Reset" includePageParams="false" />
+				<h:commandButton id="newTopicBottom" value="Create New Topic"
+					action="#{customTagSearch.getCreateNewTopicUrl()}" />
 				<h:commandButton id="xmlDownload" value="Download XML"
 					action="#{customTagSearch.downloadXML()}" />
-
 				<h:commandButton id="docbookBottom" value="Docbook"
 					action="#{customTagSearch.buildDocbook()}" />
-
 			</div>
 
 		</h:form>
