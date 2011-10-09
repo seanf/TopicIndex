@@ -14,76 +14,13 @@
 		<script
 			src="#{facesContext.externalContext.requestContextPath}/filterscripts.js"></script>
 
-		<rich:panel>
-			<f:facet name="header">Topic ID: [#{relatedTopicTagsList.topicTopicId}] Title: #{relatedTopicTagsList.instance.topicTitle} - Currently Related Topics</f:facet>
 
-			<rich:dataTable id="relatedOutgoingTopicsList" var="relatedTopic"
-				value="#{relatedTopicTagsList.instance.oneWayRelatedTopicsArray}">
-				<f:facet name="header">
-					<h:outputText value="One Way Outgoing Relationships" />
-				</f:facet>
-				<h:column>
-					<f:facet name="header">
-						<h:outputText>ID</h:outputText>
-					</f:facet>
-					<h:outputText value="#{relatedTopic.topicId}" />
-				</h:column>
-				<h:column>
-					<f:facet name="header">
-						<h:outputText>Title</h:outputText>
-					</f:facet>
-					<h:outputText value="#{relatedTopic.topicTitle}" />
-				</h:column>
-			</rich:dataTable>
-
-			<br />
-			<br />
-
-			<rich:dataTable id="relatedTwoWayTopicsList" var="relatedTopic"
-				value="#{relatedTopicTagsList.instance.twoWayRelatedTopicsArray}">
-				<f:facet name="header">
-					<h:outputText value="Two Way Relationships" />
-				</f:facet>
-				<h:column>
-					<h:outputText value="#{relatedTopic.topicId}" />
-				</h:column>
-				<h:column>
-					<f:facet name="header">
-						<h:outputText>Title</h:outputText>
-					</f:facet>
-					<h:outputText value="#{relatedTopic.topicTitle}" />
-				</h:column>
-			</rich:dataTable>
-
-			<br />
-			<br />
-
-			<rich:dataTable id="relatedIncomingTopicsList" var="relatedTopic"
-				value="#{relatedTopicTagsList.instance.incomingRelatedTopicsArray}">
-				<f:facet name="header">
-					<h:outputText value="One Way Incoming Relationships" />
-				</f:facet>
-				<h:column>
-					<f:facet name="header">
-						<h:outputText>ID</h:outputText>
-					</f:facet>
-					<h:outputText value="#{relatedTopic.topicId}" />
-				</h:column>
-				<h:column>
-					<f:facet name="header">
-						<h:outputText>Title</h:outputText>
-					</f:facet>
-					<h:outputText value="#{relatedTopic.topicTitle}" />
-				</h:column>
-			</rich:dataTable>
-
-		</rich:panel>
 
 		<br />
 		<br />
 
 		<rich:simpleTogglePanel switchType="client" opened="false">
-			<f:facet name="header">Filters and Search</f:facet>
+			<f:facet name="header">Details and Search</f:facet>
 
 			<h:form id="topicSearch" styleClass="edit">
 
@@ -93,7 +30,7 @@
 				</div>
 
 				<div style="clear: both" />
-				<br/>
+				<br />
 
 				<rich:tabPanel switchType="client">
 					<rich:tab label="Tags">
@@ -108,10 +45,75 @@
 							<ui:param name="topic" value="#{relatedTopicTagsList.topic}" />
 						</ui:include>
 					</rich:tab>
+					<rich:tab label="Current Relationships">
+						<h:outputText
+							value="Topic ID: [#{relatedTopicTagsList.topicTopicId}] Title: #{relatedTopicTagsList.instance.topicTitle} - Currently Related Topics" />
+
+						<rich:dataTable id="relatedOutgoingTopicsList" var="relatedTopic"
+							value="#{relatedTopicTagsList.instance.oneWayRelatedTopicsArray}">
+							<f:facet name="header">
+								<h:outputText value="One Way Outgoing Relationships" />
+							</f:facet>
+							<h:column>
+								<f:facet name="header">
+									<h:outputText>ID</h:outputText>
+								</f:facet>
+								<h:outputText value="#{relatedTopic.topicId}" />
+							</h:column>
+							<h:column>
+								<f:facet name="header">
+									<h:outputText>Title</h:outputText>
+								</f:facet>
+								<h:outputText value="#{relatedTopic.topicTitle}" />
+							</h:column>
+						</rich:dataTable>
+
+						<br />
+						<br />
+
+						<rich:dataTable id="relatedTwoWayTopicsList" var="relatedTopic"
+							value="#{relatedTopicTagsList.instance.twoWayRelatedTopicsArray}">
+							<f:facet name="header">
+								<h:outputText value="Two Way Relationships" />
+							</f:facet>
+							<h:column>
+								<h:outputText value="#{relatedTopic.topicId}" />
+							</h:column>
+							<h:column>
+								<f:facet name="header">
+									<h:outputText>Title</h:outputText>
+								</f:facet>
+								<h:outputText value="#{relatedTopic.topicTitle}" />
+							</h:column>
+						</rich:dataTable>
+
+						<br />
+						<br />
+
+						<rich:dataTable id="relatedIncomingTopicsList" var="relatedTopic"
+							value="#{relatedTopicTagsList.instance.incomingRelatedTopicsArray}">
+							<f:facet name="header">
+								<h:outputText value="One Way Incoming Relationships" />
+							</f:facet>
+							<h:column>
+								<f:facet name="header">
+									<h:outputText>ID</h:outputText>
+								</f:facet>
+								<h:outputText value="#{relatedTopic.topicId}" />
+							</h:column>
+							<h:column>
+								<f:facet name="header">
+									<h:outputText>Title</h:outputText>
+								</f:facet>
+								<h:outputText value="#{relatedTopic.topicTitle}" />
+							</h:column>
+						</rich:dataTable>
+
+					</rich:tab>
 				</rich:tabPanel>
 
 				<div style="clear: both" />
-			<br/>
+				<br />
 
 				<div class="actionButtons">
 					<h:commandButton id="searchBottom" value="Search"
