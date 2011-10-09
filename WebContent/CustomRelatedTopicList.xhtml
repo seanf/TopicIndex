@@ -92,30 +92,26 @@
 						action="#{relatedTopicTagsList.doSearch()}" />
 				</div>
 
-				<br />
-				<br />
-				<br />
+				<div style="clear: both" />
+				<br/>
 
-				<rich:panel>
-					<f:facet name="header">Topic Tag Filter</f:facet>
+				<rich:tabPanel switchType="client">
+					<rich:tab label="Tags">
+						<ui:include src="/WEB-INF/templates/TagSelectAndNotSelect.xhtml">
+							<ui:param name="selectedTags"
+								value="#{relatedTopicTagsList.selectedTags.projectCategories}" />
+							<ui:param name="logicEnabled" value="#{true}" />
+						</ui:include>
+					</rich:tab>
+					<rich:tab label="Fields">
+						<ui:include src="/WEB-INF/templates/TopicFieldSearch.xhtml">
+							<ui:param name="topic" value="#{relatedTopicTagsList.topic}" />
+						</ui:include>
+					</rich:tab>
+				</rich:tabPanel>
 
-					<ui:include src="/WEB-INF/templates/TagSelectAndNotSelect.xhtml">
-						<ui:param name="selectedTags"
-							value="#{relatedTopicTagsList.selectedTags.projectCategories}" />
-						<ui:param name="logicEnabled" value="#{true}" />
-					</ui:include>
-
-				</rich:panel>
-
-				<br />
-				<br />
-
-				<ui:include src="/WEB-INF/templates/TopicFieldSearch.xhtml">
-					<ui:param name="topic" value="#{relatedTopicTagsList.topic}" />
-				</ui:include>
-
-				<br />
-				<br />
+				<div style="clear: both" />
+			<br/>
 
 				<div class="actionButtons">
 					<h:commandButton id="searchBottom" value="Search"
@@ -132,7 +128,7 @@
 		<rich:panel>
 			<f:facet name="header">Topic Search Results (#{empty relatedTopicTagsList.resultList ? 0 : (relatedTopicTagsList.paginated ? relatedTopicTagsList.resultCount : relatedTopicTagsList.resultList.size)}) #{relatedTopicTagsList.searchTagHeading}</f:facet>
 
-			<ui:include src="/WEB-INF/templates/BulkRelationshipActions.xhtml"/>
+			<ui:include src="/WEB-INF/templates/BulkRelationshipActions.xhtml" />
 
 			<div class="tableControl">
 

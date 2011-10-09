@@ -6,8 +6,7 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:c="http://java.sun.com/jstl/core">
 
-	<rich:panel style="width: 100%; overflow: auto;">
-		<f:facet name="header">Topic Field Filters</f:facet>
+
 		<h:panelGrid id="grid" columns="1">
 			<h:panelGroup>
 
@@ -101,8 +100,6 @@
 					<h:inputText size="125" id="topicFreeTextSearch"
 						value="#{topic.topicTextSearch}" />
 				</s:decorate>
-				
-				
 
 				<s:decorate template="/layout/display.xhtml">
 					<ui:define name="label">Match</ui:define>
@@ -114,5 +111,5 @@
 				</s:decorate>
 			</h:panelGroup>
 		</h:panelGrid>
-	</rich:panel>
+		
 </ui:composition>
