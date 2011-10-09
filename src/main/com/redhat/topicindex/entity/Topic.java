@@ -301,7 +301,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 			if (topicList.length() != 0)
 				topicList += ", ";
 
-			topicList += "<span title=\"" + relatedTopic.getTopicTitle() + " \n" + relatedTopic.getTagsList() + "\">"
+			topicList += "<span title=\"" + relatedTopic.getTopicTitle() + " \n" + relatedTopic.getCommaSeparatedTagList() + "\">"
 					+ topicToTopic.getRelatedTopic().getTopicId() + "</span>";
 		}
 		return topicList;

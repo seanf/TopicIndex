@@ -470,9 +470,7 @@
 
 					<h:column
 						rendered="#{s:hasPermission('RelatedTopicTagsListRelatedTopicsColumn', 'Rendered', null)}">
-						<f:facet name="header">
-		                Related Topics
-		            </f:facet>
+						<f:facet name="header">Related Topics</f:facet>
 						<h:outputText value="#{_topic.relatedTopicsList}" escape="false" />
 					</h:column>
 
