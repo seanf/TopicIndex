@@ -1,3 +1,15 @@
+function displayLogicPanel(project, category)
+{
+	// show the chevrons pointing left
+	jQuery('div[id*=logicPanel-' + project + '-' + category + '_switch_off]')[0].style.display = 'none';
+	// hide the chevrons pointing right
+	jQuery('div[id*=logicPanel-' + project + '-' + category + '_switch_on]')[0].style.display = '';
+	// show the panel body
+	jQuery('div[id*=logicPanel-' + project + '-' + category + '_body]')[0].style.display = '';
+	// set the status to true to indicate that the panel is open
+	SimpleTogglePanelManager.panels.get(jQuery('div[id*=logicPanel-' + project + '-' + category + ']')[0]).status = "true";
+}
+
 function toggleTags(project, category)
 {
 	jQuery('input[id*=tag-' + project + "-" + category + ']').each(
@@ -12,7 +24,7 @@ function toggleTags(project, category)
 					);
 			}
 		); 
-	jQuery('div[id*=logicPanel-' + project + "-" + category + '_body]')[0].style.display = '';
+	displayLogicPanel(project, category);
 }
 
 function toggleNotTags(project, category)
@@ -23,7 +35,7 @@ function toggleNotTags(project, category)
 				element.checked=!element.checked
 			}
 		); 
-	jQuery('div[id*=logicPanel-' + category + '_body]')[0].style.display = '';
+	displayLogicPanel(project, category);
 }
 
 function tagChecked(checkbox, project, category)
@@ -41,8 +53,10 @@ function tagChecked(checkbox, project, category)
 			); 
 	
 		// open the logic panel if more than two are checked
-		if (count >= 2) 
-			jQuery('div[id*=logicPanel-' + project + "-" + category + '_body]')[0].style.display = ''; 
+		if (count >= 2)
+		{
+			displayLogicPanel(project, category);
+		}
 	}
 	catch(err)
 	{
