@@ -17,7 +17,7 @@ import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 
-import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
+
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.ecs.commonutils.HTTPUtilities;
 import com.redhat.ecs.commonutils.MIMEUtilities;

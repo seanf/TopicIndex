@@ -19,6 +19,11 @@
 		<br />
 		<br />
 
+		<h:outputText
+			value="Topic ID: #{relatedTopicTagsList.topicTopicId} Title: #{relatedTopicTagsList.instance.topicTitle}" />
+		<br />
+		<br />
+
 		<rich:simpleTogglePanel switchType="client" opened="false">
 			<f:facet name="header">Details and Search</f:facet>
 
@@ -46,8 +51,6 @@
 						</ui:include>
 					</rich:tab>
 					<rich:tab label="Current Relationships">
-						<h:outputText
-							value="Topic ID: [#{relatedTopicTagsList.topicTopicId}] Title: #{relatedTopicTagsList.instance.topicTitle} - Currently Related Topics" />
 
 						<rich:dataTable id="relatedOutgoingTopicsList" var="relatedTopic"
 							value="#{relatedTopicTagsList.instance.oneWayRelatedTopicsArray}">

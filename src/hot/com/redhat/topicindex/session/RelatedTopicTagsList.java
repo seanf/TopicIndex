@@ -10,6 +10,7 @@ import org.jboss.seam.annotations.Name;
 
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.topicindex.entity.Filter;
+import com.redhat.topicindex.entity.FilterField;
 import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.filter.TopicFilter;
 import com.redhat.topicindex.utils.Constants;
@@ -167,6 +168,10 @@ public class RelatedTopicTagsList extends ExtendedTopicList
 		
 		// preselect the tags on the web page that relate to the tags selected by the filter
 		EntityUtilities.populateTopicTags(selectedTags, filter, false);
+		
+		// sync up the filter field values
+		for (final FilterField field : filter.getFilterFields())
+			this.topic.setFieldValue(field.getField(), field.getValue());
 	}
 
 	public String doSearch()
@@ -182,15 +187,12 @@ public class RelatedTopicTagsList extends ExtendedTopicList
 	protected String getSearchUrlVars(final String startRecord)
 	{
 		final Filter filter = new Filter();
-		
-		// populate the filter against the ui
-		EntityUtilities.syncFilterWithTags(filter, selectedTags);
 		EntityUtilities.syncFilterWithCategories(filter, selectedTags);
 		EntityUtilities.syncFilterWithFieldUIElements(filter, topic);
-		
-		final String retValue = "topicTopicId=" + topicTopicId + "&" + filter.buildFilterUrlVars();
-		
-		return retValue;
+		EntityUtilities.syncFilterWithTags(filter, selectedTags);
+
+		final String params = filter.buildFilterUrlVars();
+		return "topicTopicId=" + topicTopicId + "&" + params;
 	}
 	
 	public boolean isRelatedTo(final Integer otherTopicId)
