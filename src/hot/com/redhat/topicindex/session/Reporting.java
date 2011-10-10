@@ -21,7 +21,7 @@ import com.redhat.topicindex.reporting.HTMLChart;
 import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.EntityUtilities;
 import com.redhat.topicindex.utils.structures.DroolsEvent;
-import com.redhat.topicindex.utils.structures.Pair;
+import com.redhat.ecs.commonstructures.Pair;
 
 @Name("reporting")
 public class Reporting 
