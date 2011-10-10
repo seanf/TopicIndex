@@ -57,7 +57,6 @@ import com.redhat.topicindex.sort.TopicTitleSorter;
 import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.EntityUtilities;
 import com.redhat.topicindex.utils.LineEndFormatter;
-import com.redhat.topicindex.utils.XMLFormatter;
 import com.redhat.topicindex.utils.XMLValidator;
 import com.redhat.topicindex.utils.docbookbuilding.toc.TocFolderElement;
 import com.redhat.topicindex.utils.docbookbuilding.toc.TocLink;
@@ -474,7 +473,7 @@ public class DocbookBuilder
 		{
 			final String commentContent = comment.getNodeValue();
 
-			// * compile the regular expression */
+			/* compile the regular expression */
 			final NamedPattern injectionSequencePattern = NamedPattern.compile(regularExpression);
 			/* find any matches */
 			final NamedMatcher injectionSequencematcher = injectionSequencePattern.matcher(commentContent);
@@ -1037,9 +1036,6 @@ public class DocbookBuilder
 		/* build the chapter containing the compiler errors */
 		final String compilerOutput = buildErrorChapter();
 
-		/* create a formatter to clean up the XML */
-		final XMLFormatter xmlFormatter = new XMLFormatter();
-
 		/*
 		 * the narrative style will not include a TOC or Eclipse plugin, and
 		 * includes a different publican.cfg file
@@ -1057,18 +1053,18 @@ public class DocbookBuilder
 			final String eclipseToc = tocTopLevel.getEclipseXml();
 
 			// add the files that make up the Eclipse help package
-			files.put("Book/eclipse/com.redhat.eap6.doc_1.0.0/toc.xml", getStringBytes(xmlFormatter.formatXML(eclipseToc)));
-			files.put("Book/eclipse/com.redhat.eap6.doc_1.0.0/plugin.xml", getStringBytes(xmlFormatter.formatXML(pluginXml)));
+			files.put("Book/eclipse/com.redhat.eap6.doc_1.0.0/toc.xml", getStringBytes(eclipseToc));
+			files.put("Book/eclipse/com.redhat.eap6.doc_1.0.0/plugin.xml", getStringBytes(pluginXml));
 			files.put("Book/eclipse_package.sh", getStringBytes(LineEndFormatter.convertToLinuxLineEndings(eclisePackageSh)));
 			files.put("Book/publican_eclipse.cfg", getStringBytes(publicanEclipseCfg));
-			files.put("Book/en-US/Toc.xml", getStringBytes(xmlFormatter.formatXML(toc)));
-			files.put("Book/en-US/StartPage.xml", getStringBytes(xmlFormatter.formatXML(startPage == null ? "" : startPage)));
+			files.put("Book/en-US/Toc.xml", getStringBytes(toc));
+			files.put("Book/en-US/StartPage.xml", getStringBytes(startPage == null ? "" : startPage));
 
 			for (final TagToCategory topicTag : topicTypeTagIDs)
 			{
 				if (tagIdToDocbookMap.containsKey(topicTag.getTag().getTagId()) && tagIdToDocbookMap.get(topicTag.getTag().getTagId()).length() != 0)
 				{
-					files.put("Book/en-US/" + topicTag.getTag().getTagName().replaceAll(" ", "") + "s.xml", getStringBytes(xmlFormatter.formatXML(tagIdToDocbookMap.get(topicTag.getTag().getTagId()))));
+					files.put("Book/en-US/" + topicTag.getTag().getTagName().replaceAll(" ", "") + "s.xml", getStringBytes(tagIdToDocbookMap.get(topicTag.getTag().getTagId())));
 				}
 			}
 
@@ -1079,7 +1075,7 @@ public class DocbookBuilder
 		{
 			if (tagIdToDocbookMap.containsKey(Constants.TAG_ID_NARRATIVE))
 			{
-				files.put("Book/en-US/Narrative.xml", getStringBytes(xmlFormatter.formatXML(tagIdToDocbookMap.get(Constants.TAG_ID_NARRATIVE))));
+				files.put("Book/en-US/Narrative.xml", getStringBytes(tagIdToDocbookMap.get(Constants.TAG_ID_NARRATIVE)));
 			}
 
 			// now add the Publican files
@@ -1097,9 +1093,9 @@ public class DocbookBuilder
 		files.put("Book/packager/en-US/spec.in", getStringBytes(spec_in));
 
 		// replace the date marker in the Book.XML file
-		files.put("Book/en-US/Book_Info.xml", xmlFormatter.formatXML(bookInfoXml.replace(DATE_YYMMDD_TEXT_MARKER, new StringBuilder(new SimpleDateFormat("yyMMdd").format(new Date())))).getBytes());
+		files.put("Book/en-US/Book_Info.xml", bookInfoXml.replace(DATE_YYMMDD_TEXT_MARKER, new StringBuilder(new SimpleDateFormat("yyMMdd").format(new Date()))).getBytes());
 
-		files.put("Book/en-US/Author_Group.xml", getStringBytes(xmlFormatter.formatXML(authorGroupXml)));
+		files.put("Book/en-US/Author_Group.xml", getStringBytes(authorGroupXml));
 		files.put("Book/en-US/Book.ent", getStringBytes(bookEnt));
 
 		// these files are used by the YUI treeview
@@ -1114,12 +1110,12 @@ public class DocbookBuilder
 		files.put("Book/en-US/files/check1.gif", check1Gif);
 		files.put("Book/en-US/files/check2.gif", check2Gif);
 
-		files.put("Book/en-US/images/icon.svg", getStringBytes(xmlFormatter.formatXML(iconSvg)));
-		files.put("Book/en-US/images/jboss.svg", getStringBytes(xmlFormatter.formatXML(jbossSvg)));
+		files.put("Book/en-US/images/icon.svg", getStringBytes(iconSvg));
+		files.put("Book/en-US/images/jboss.svg", getStringBytes(jbossSvg));
 
 		if (tagIdToDocbookMap.containsKey(Constants.TAG_ID_ERROR))
 		{
-			files.put("Book/en-US/ErrorTopics.xml", getStringBytes(xmlFormatter.formatXML(tagIdToDocbookMap.get(Constants.TAG_ID_ERROR))));
+			files.put("Book/en-US/ErrorTopics.xml", getStringBytes(tagIdToDocbookMap.get(Constants.TAG_ID_ERROR)));
 		}
 
 		/*
@@ -1130,7 +1126,7 @@ public class DocbookBuilder
 
 		if (!docbookBuildingOptions.isSuppressErrorsPage())
 		{
-			files.put("Book/en-US/Errors.xml", getStringBytes(xmlFormatter.formatXML(compilerOutput == null ? "" : compilerOutput)));
+			files.put("Book/en-US/Errors.xml", getStringBytes(compilerOutput == null ? "" : compilerOutput));
 			bookXmlXiIncludes += "	<xi:include href=\"Errors.xml\" xmlns:xi=\"http://www.w3.org/2001/XInclude\" />\n";
 		}
 
@@ -1167,8 +1163,8 @@ public class DocbookBuilder
 		// replace the marker in the book.xml template
 		final String thisBookXml = bookXml.replace(BOOK_XML_XI_INCLUDES_MARKER, bookXmlXiIncludes);
 
-		files.put("Book/en-US/Book.xml", getStringBytes(xmlFormatter.formatXML(thisBookXml)));
-		files.put("Book/en-US/Revision_History.xml", getStringBytes(xmlFormatter.formatXML(revisionHistoryXml)));
+		files.put("Book/en-US/Book.xml", getStringBytes(thisBookXml));
+		files.put("Book/en-US/Revision_History.xml", getStringBytes(revisionHistoryXml));
 
 		// now create the zip file
 		byte[] zipFile = null;

@@ -57,10 +57,10 @@ public class XMLValidator implements DOMErrorHandler, LSResourceResolver
 	            config.setParameter("resource-resolver", this);
 	            config.setParameter("error-handler", this);
 	            config.setParameter("validate", Boolean.TRUE);
-	            config.setParameter("namespaces", Boolean.FALSE);
+	            config.setParameter("namespaces", Boolean.FALSE);	
 	            core.normalizeDocument();
 			}
-			
+						
             if (this.errorsDetected)
             	return null;
             

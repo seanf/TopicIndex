@@ -59,7 +59,6 @@ import com.redhat.topicindex.sort.TopicToTopicTopicIDSort;
 import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.EntityQueries;
 import com.redhat.topicindex.utils.EntityUtilities;
-import com.redhat.topicindex.utils.XMLFormatter;
 import com.redhat.topicindex.utils.XMLValidator;
 import com.redhat.topicindex.utils.structures.NameIDSortMap;
 
@@ -998,14 +997,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 			}
 
 			this.topicXML = XMLUtilities.convertDocumentToString(doc, XML_ENCODING);
-			formatXML();
 		}
-	}
-
-	public void formatXML()
-	{
-		final XMLFormatter xmlFormatter = new XMLFormatter();
-		this.topicXML = xmlFormatter.formatXML(this.topicXML);
 	}
 
 	public void initializeFromTemplate()
