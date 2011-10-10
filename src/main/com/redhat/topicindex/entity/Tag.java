@@ -280,7 +280,7 @@ public class Tag implements java.io.Serializable
 		return retValue;
 	}
 
-	public boolean equals(final Object o)
+	/*public boolean equals(final Object o)
 	{
 		if (this == o)
 			return true;
@@ -289,11 +289,11 @@ public class Tag implements java.io.Serializable
 
 		final Tag that = (Tag) o;
 
-		if (tagId != null ? !tagId.equals(that.tagId) : that.tagId != null)
+		if (this.tagId != null ? !this.tagId.equals(that.tagId) : that.tagId != null)
 			return false;
 
 		return true;
-	}
+	}*/
 
 	public int hashCode()
 	{

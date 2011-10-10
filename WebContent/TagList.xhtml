@@ -12,16 +12,16 @@
 
     <h:form id="tagSearch" styleClass="edit">
 
-        <rich:simpleTogglePanel label="Tag Search Filter" switchType="ajax" opened="false">
+        <rich:simpleTogglePanel label="Tag Search Filter" switchType="client" opened="false">
 			<h:panelGrid id="grid" columns="1">
 				<h:panelGroup>
 		            <s:decorate template="layout/display.xhtml">
-		                <ui:define name="label">Tag name</ui:define>
+		                <ui:define name="label">Tag Name</ui:define>
 		                <h:inputText id="tagName" value="#{tagList.tag.tagName}"/>
 		            </s:decorate>
 		
 		            <s:decorate template="layout/display.xhtml">
-		                <ui:define name="label">Tag description</ui:define>
+		                <ui:define name="label">Tag Description</ui:define>
 		                <h:inputText id="tagDescription" value="#{tagList.tag.tagDescription}"/>
 		            </s:decorate>
 		

@@ -12,8 +12,7 @@
 
    <param name="projectFrom"/>
    <param name="projectProjectId" value="#{projectHome.projectProjectId}"/>
-
-
+   
    <navigation from-action="#{projectHome.persist}">
       <rule if-outcome="persisted">
          <end-conversation/>

@@ -175,7 +175,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		return this.getTopicId().compareTo(o.getTopicId());
 	}
 
-	@Override
+	/*@Override
 	public boolean equals(Object o)
 	{
 		if (this == o)
@@ -189,7 +189,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 			return false;
 
 		return true;
-	}
+	}*/
 
 	@SuppressWarnings("unchecked")
 	@Transient

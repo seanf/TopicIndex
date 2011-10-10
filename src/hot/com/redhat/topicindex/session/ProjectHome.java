@@ -77,7 +77,7 @@ public class ProjectHome extends EntityHome<Project>
 	public void populate()
 	{
 		selectedTags = new UIProjectData();
-		EntityUtilities.populateTagTags(this.getInstance(), selectedTags);
+		EntityUtilities.populateProjectTags(this.getInstance(), selectedTags);
 	}
 
 	public String update()
@@ -179,5 +179,4 @@ public class ProjectHome extends EntityHome<Project>
 	{
 		return "[]";
 	}
-
 }

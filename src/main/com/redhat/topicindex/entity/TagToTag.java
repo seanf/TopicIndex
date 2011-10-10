@@ -21,9 +21,9 @@ import org.hibernate.validator.NotNull;
  */
 @Audited
 @Entity
-@Table(name = "TagToTag", catalog = "Skynet", uniqueConstraints = @UniqueConstraint(columnNames = {
-		"PrimaryTagID", "SecondaryTagID", "RelationshipType" }))
-public class TagToTag implements java.io.Serializable 
+@Table(name = "TagToTag", catalog = "Skynet", uniqueConstraints = @UniqueConstraint(columnNames =
+{ "PrimaryTagID", "SecondaryTagID", "RelationshipType" }))
+public class TagToTag implements java.io.Serializable
 {
 	private static final long serialVersionUID = -7025237939786775336L;
 	private Integer tagToTagId;
@@ -31,13 +31,11 @@ public class TagToTag implements java.io.Serializable
 	private Tag primaryTag;
 	private Tag secondaryTag;
 
-	public TagToTag() {
+	public TagToTag()
+	{
 	}
 
-	public TagToTag(
-			final TagToTagRelationship tagToTagRelationship,
-			final Tag primaryTag, 
-			final Tag secondaryTag) 
+	public TagToTag(final TagToTagRelationship tagToTagRelationship, final Tag primaryTag, final Tag secondaryTag)
 	{
 		this.tagToTagRelationship = tagToTagRelationship;
 		this.primaryTag = primaryTag;
@@ -47,12 +45,12 @@ public class TagToTag implements java.io.Serializable
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
 	@Column(name = "TagToTagID", unique = true, nullable = false)
-	public Integer getTagToTagId() 
+	public Integer getTagToTagId()
 	{
 		return this.tagToTagId;
 	}
 
-	public void setTagToTagId(final Integer tagToTagId) 
+	public void setTagToTagId(final Integer tagToTagId)
 	{
 		this.tagToTagId = tagToTagId;
 	}
@@ -60,37 +58,39 @@ public class TagToTag implements java.io.Serializable
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "RelationshipType", nullable = false)
 	@NotNull
-	public TagToTagRelationship getTagToTagRelationship() 
+	public TagToTagRelationship getTagToTagRelationship()
 	{
 		return this.tagToTagRelationship;
 	}
 
-	public void setTagToTagRelationship(final TagToTagRelationship tagToTagRelationship) 
+	public void setTagToTagRelationship(final TagToTagRelationship tagToTagRelationship)
 	{
 		this.tagToTagRelationship = tagToTagRelationship;
 	}
-	
+
 	@ManyToOne
 	@JoinColumn(name = "PrimaryTagID", nullable = false)
 	@NotNull
-	public Tag getPrimaryTag() 
+	public Tag getPrimaryTag()
 	{
 		return this.primaryTag;
 	}
 
-	public void setPrimaryTag(final Tag primaryTag) {
+	public void setPrimaryTag(final Tag primaryTag)
+	{
 		this.primaryTag = primaryTag;
 	}
-	
+
 	@ManyToOne
 	@JoinColumn(name = "SecondaryTagID", nullable = false)
 	@NotNull
-	public Tag getSecondaryTag() 
+	public Tag getSecondaryTag()
 	{
 		return this.secondaryTag;
 	}
 
-	public void setSecondaryTag(final Tag secondaryTag) {
+	public void setSecondaryTag(final Tag secondaryTag)
+	{
 		this.secondaryTag = secondaryTag;
 	}
 

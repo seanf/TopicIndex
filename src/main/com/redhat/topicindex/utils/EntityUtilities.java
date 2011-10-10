@@ -81,28 +81,32 @@ public class EntityUtilities
 	 * This function is used to populate the data structures used to display
 	 * categories and their tags.
 	 * 
-	 * @param topic If this is not null, it is used to determine which tags are
+	 * @param topic
+	 *            If this is not null, it is used to determine which tags are
 	 *            currently selected
-	 * @param selectedTags This is a map of Category data to an ArrayList of Tag
-	 *            data. When used to represent categories, the GuiInputData
-	 *            selected field is used to indicate whether this is a mutually
-	 *            exclusive category. If true, only one tag should be able to be
-	 *            selected. If false, many tags can be selected. The decision to
-	 *            make a category mutually exclusive is left up to a Drools rule
-	 *            file in order to keep this code as process agnostic as
-	 *            possible. This function will populate the category
-	 *            GuiInputData objects (see the setSelectedItemInCategory param)
-	 *            so they can be used either way.
-	 * @param filter This object represents the filter applied to the page. Like
+	 * @param selectedTags
+	 *            This is a map of Category data to an ArrayList of Tag data.
+	 *            When used to represent categories, the GuiInputData selected
+	 *            field is used to indicate whether this is a mutually exclusive
+	 *            category. If true, only one tag should be able to be selected.
+	 *            If false, many tags can be selected. The decision to make a
+	 *            category mutually exclusive is left up to a Drools rule file
+	 *            in order to keep this code as process agnostic as possible.
+	 *            This function will populate the category GuiInputData objects
+	 *            (see the setSelectedItemInCategory param) so they can be used
+	 *            either way.
+	 * @param filter
+	 *            This object represents the filter applied to the page. Like
 	 *            topic, this is optionally used to preselect those tags that
 	 *            are used in the filter. Either filter or topic can be not
 	 *            null, but if both are supplied (and this shouldn't happen) the
 	 *            topic is used.
-	 * @param setSelectedItemInCategory If this is false, the selectedID value
-	 *            in the Key of the selectedTags parameter will not be modified
-	 *            to indicate which of the children tags has been selected. This
-	 *            needs to be set to false to avoid changing the equality of the
-	 *            keys in the TreeMap as tag selections change.
+	 * @param setSelectedItemInCategory
+	 *            If this is false, the selectedID value in the Key of the
+	 *            selectedTags parameter will not be modified to indicate which
+	 *            of the children tags has been selected. This needs to be set
+	 *            to false to avoid changing the equality of the keys in the
+	 *            TreeMap as tag selections change.
 	 */
 	@SuppressWarnings("unchecked")
 	static public void populateTags(final List<Tag> checkedTags, final UIProjectData selectedTags, final Filter filter, final boolean setSelectedItemInCategory)
@@ -199,10 +203,15 @@ public class EntityUtilities
 				selectedTags.getProjectCategories().add(projectDetails);
 
 				/*
-				 * Step 1: find the tags assigned to a product
+				 * Step 1. find the tags assigned to a product.
+				 */
+				final Set<TagToProject> tags = project.getTagToProjects();
+
+				/*
+				 * Step 2: find the categories that the tags assigned to this
+				 * product exist in
 				 */
 				final List<Category> projectCategories = new ArrayList<Category>();
-				final Set<TagToProject> tags = project.getTagToProjects();
 				for (final TagToProject tagToProject : tags)
 				{
 					final Tag tag = tagToProject.getTag();
@@ -217,8 +226,10 @@ public class EntityUtilities
 				}
 
 				/*
-				 * Step 2: find the categories assigned to the tags found in
-				 * step 1
+				 * Step 3: loop over the categories found in step 2, which
+				 * we know contain tags assigned to the product, and pull
+				 * out the tags that are associated with the product we are
+				 * looking at
 				 */
 				for (final Category category : projectCategories)
 				{
@@ -248,12 +259,7 @@ public class EntityUtilities
 						}
 					}
 
-					/*
-					 * Step 3: loop over the categories found in step 2, which
-					 * we know contain tags assigned to the product, and pull
-					 * out the tags that are associated with the product we are
-					 * looking at
-					 */
+					// sync with the UI data object
 					final Set<TagToCategory> tagsInCategory = category.getTagToCategories();
 					for (final TagToCategory tagToCategory : tagsInCategory)
 					{
@@ -329,10 +335,12 @@ public class EntityUtilities
 				{
 					if (filterCategory.getCategoryState() == Constants.CATEGORY_INTERNAL_AND_STATE)
 						retValue.setInternalLogic(Constants.AND_LOGIC);
-					else if (filterCategory.getCategoryState() == Constants.CATEGORY_INTERNAL_OR_STATE)
-						retValue.setInternalLogic(Constants.OR_LOGIC);
-					else if (filterCategory.getCategoryState() == Constants.CATEGORY_EXTERNAL_AND_STATE)
-						retValue.setExternalLogic(Constants.AND_LOGIC);
+					else
+						if (filterCategory.getCategoryState() == Constants.CATEGORY_INTERNAL_OR_STATE)
+							retValue.setInternalLogic(Constants.OR_LOGIC);
+						else
+							if (filterCategory.getCategoryState() == Constants.CATEGORY_EXTERNAL_AND_STATE)
+								retValue.setExternalLogic(Constants.AND_LOGIC);
 					if (filterCategory.getCategoryState() == Constants.CATEGORY_EXTERNAL_OR_STATE)
 						retValue.setExternalLogic(Constants.OR_LOGIC);
 				}
@@ -343,7 +351,7 @@ public class EntityUtilities
 	}
 
 	@SuppressWarnings("javadoc")
-	static private UITagData createUITagData(final Tag tag, final Integer catID, final Filter filter, final List<Tag> selectedTags, final List<TagToCategory> tagToCategoryList)
+	static private UITagData createUITagData(final Tag tag, final Integer catID, final Filter filter, final List<Tag> checkedTags, final List<TagToCategory> tagToCategoryList)
 	{
 		final Integer tagId = tag.getTagId();
 		final String tagName = tag.getTagName();
@@ -357,18 +365,22 @@ public class EntityUtilities
 		boolean selected = false;
 		boolean selectedNot = false;
 
-		if (selectedTags != null)
+		if (checkedTags != null)
 		{
-			selected = selectedTags.contains(tag);
+			selected = checkedTags.contains(tag);
 		}
 		// ... or by the filter
-		else if (filter != null)
+		else
 		{
-			final int tagState = filter.hasTag(tagId);
-			if (tagState == Constants.NOT_MATCH_TAG_STATE)
-				selected = selectedNot = true;
-			else if (tagState == Constants.MATCH_TAG_STATE)
-				selected = true;
+			if (filter != null)
+			{
+				final int tagState = filter.hasTag(tagId);
+				if (tagState == Constants.NOT_MATCH_TAG_STATE)
+					selected = selectedNot = true;
+				else
+					if (tagState == Constants.MATCH_TAG_STATE)
+						selected = true;
+			}
 		}
 
 		// find the sorting order
@@ -447,7 +459,7 @@ public class EntityUtilities
 		}
 	}
 
-	static public void populateTagTags(final Project project, final UIProjectData selectedTags)
+	static public void populateProjectTags(final Project project, final UIProjectData selectedTags)
 	{
 		populateTags(project.getTags(), selectedTags, null, true);
 	}
@@ -461,12 +473,15 @@ public class EntityUtilities
 	 * This function is used to populate the data structures that display the
 	 * categories that a tag can and does belong to.
 	 * 
-	 * @param tag The Tag being displayed
-	 * @param categories A collection of data structures representing the
-	 *            categories
-	 * @param selectedCategories A collection of selected categories
-	 * @param tagSortValues A collection of data structures representing the
-	 *            tags sorting order within a category
+	 * @param tag
+	 *            The Tag being displayed
+	 * @param categories
+	 *            A collection of data structures representing the categories
+	 * @param selectedCategories
+	 *            A collection of selected categories
+	 * @param tagSortValues
+	 *            A collection of data structures representing the tags sorting
+	 *            order within a category
 	 */
 	@SuppressWarnings("unchecked")
 	static public void populateTagCategories(final Tag tag, final List<UICategoryData> categories)
@@ -553,15 +568,21 @@ public class EntityUtilities
 	 * This function takes the url parameters and uses them to populate a Filter
 	 * object
 	 * 
-	 * @param filterHome The object that is used to manage the Filter object
-	 * @param context This is used to access the url parameters
-	 * @param filterName The name of the url parameter that defines a Filter ID
-	 * @param tagPrefix The prefix assigned to url parameters that identify tag
+	 * @param filterHome
+	 *            The object that is used to manage the Filter object
+	 * @param context
+	 *            This is used to access the url parameters
+	 * @param filterName
+	 *            The name of the url parameter that defines a Filter ID
+	 * @param tagPrefix
+	 *            The prefix assigned to url parameters that identify tag
 	 *            filters
-	 * @param categoryInternalPrefix The prefix assigned to url parameters that
-	 *            identify category internal logic settings
-	 * @param categoryExternalPrefix The prefix assigned to url parameters that
-	 *            identify category external logic settings
+	 * @param categoryInternalPrefix
+	 *            The prefix assigned to url parameters that identify category
+	 *            internal logic settings
+	 * @param categoryExternalPrefix
+	 *            The prefix assigned to url parameters that identify category
+	 *            external logic settings
 	 */
 	public static Filter populateFilter(final FacesContext context, final String filterName, final String tagPrefix, final String categoryInternalPrefix, final String categoryExternalPrefix)
 	{
@@ -782,16 +803,21 @@ public class EntityUtilities
 	 * additional request parameters to define the boolean operations to use
 	 * between tags in a category, and between categories.
 	 * 
-	 * @param tagPrefix Defines the request parameter prefix that defines a tag
-	 *            to be matched
-	 * @param notTagPrefix Defines the request parameter prefix that defines a
-	 *            tag to be not matched
-	 * @param categoryInternalPrefix Defines the request parameter prefix that
-	 *            defines the boolean operation between tags
-	 * @param categoryExternalPrefix Defines the request parameter prefix that
-	 *            defines the boolean operation between categories
-	 * @param filterDatabase Used to store the tags, grouped by category. Needs
-	 *            to be not null.
+	 * @param tagPrefix
+	 *            Defines the request parameter prefix that defines a tag to be
+	 *            matched
+	 * @param notTagPrefix
+	 *            Defines the request parameter prefix that defines a tag to be
+	 *            not matched
+	 * @param categoryInternalPrefix
+	 *            Defines the request parameter prefix that defines the boolean
+	 *            operation between tags
+	 * @param categoryExternalPrefix
+	 *            Defines the request parameter prefix that defines the boolean
+	 *            operation between categories
+	 * @param filterDatabase
+	 *            Used to store the tags, grouped by category. Needs to be not
+	 *            null.
 	 * @return the clause to append to the EJBQL select statement
 	 */
 	public static String buildQuery(final FacesContext context, final Filter filter)
@@ -834,12 +860,15 @@ public class EntityUtilities
 
 						if (categoryState == Constants.CATEGORY_INTERNAL_AND_STATE)
 							catInternalLogic = Constants.AND_LOGIC;
-						else if (categoryState == Constants.CATEGORY_INTERNAL_OR_STATE)
-							catInternalLogic = Constants.OR_LOGIC;
-						else if (categoryState == Constants.CATEGORY_EXTERNAL_AND_STATE)
-							catExternalLogic = Constants.AND_LOGIC;
-						else if (categoryState == Constants.CATEGORY_EXTERNAL_OR_STATE)
-							catExternalLogic = Constants.OR_LOGIC;
+						else
+							if (categoryState == Constants.CATEGORY_INTERNAL_OR_STATE)
+								catInternalLogic = Constants.OR_LOGIC;
+							else
+								if (categoryState == Constants.CATEGORY_EXTERNAL_AND_STATE)
+									catExternalLogic = Constants.AND_LOGIC;
+								else
+									if (categoryState == Constants.CATEGORY_EXTERNAL_OR_STATE)
+										catExternalLogic = Constants.OR_LOGIC;
 					}
 				}
 
@@ -848,7 +877,7 @@ public class EntityUtilities
 				 * exist (or not) in this category
 				 */
 				String categoryBlock = "";
-				
+
 				boolean matchedSomeTags = false;
 
 				final Set<FilterTag> filterTags = filter.getFilterTags();
@@ -863,7 +892,7 @@ public class EntityUtilities
 					if (tag.isInCategory(category) && tag.isInProject(project))
 					{
 						matchedSomeTags = true;
-						
+
 						// get the TagID for convenience
 						final String value = tag.getTagId().toString();
 						/*
@@ -892,20 +921,20 @@ public class EntityUtilities
 				if (matchedSomeTags)
 				{
 					categoryBlock = "(" + categoryBlock + ")";
-	
+
 					// append this clause to the appropriate block
 					if (catExternalLogic.equals(Constants.AND_LOGIC))
 					{
 						if (andQueryBlock.length() != 0)
 							andQueryBlock += " " + Constants.AND_LOGIC + " ";
-	
+
 						andQueryBlock += categoryBlock;
 					}
 					else
 					{
 						if (orQueryBlock.length() != 0)
 							orQueryBlock += " " + Constants.OR_LOGIC + " ";
-	
+
 						orQueryBlock += categoryBlock;
 					}
 				}
@@ -976,45 +1005,49 @@ public class EntityUtilities
 						{
 							myQuery += "topic.topicTimeStamp >= '" + fieldValue + "'";
 						}
-						else if (filterField.getField().equals(Constants.TOPIC_ENDDATE_FILTER_VAR))
-						{
-							myQuery += "topic.topicTimeStamp <= '" + fieldValue + "'";
-						}
+						else
+							if (filterField.getField().equals(Constants.TOPIC_ENDDATE_FILTER_VAR))
+							{
+								myQuery += "topic.topicTimeStamp <= '" + fieldValue + "'";
+							}
 					}
 					catch (final Exception ex)
 					{
-						ExceptionUtilities.handleException(ex);
-					}
-				}
-				else if (fieldName.equals(Constants.TOPIC_HAS_RELATIONSHIPS))
-				{
-					int minimum = 0;
-					if (fieldValue.equalsIgnoreCase("true"))
-						minimum = 1;
-
-					myQuery += "topic.parentTopicToTopics.size >= " + minimum;
-				}
-				else if (fieldName.equals(Constants.TOPIC_IDS_FILTER_VAR))
-				{
-					myQuery += "topic.topicId in (" + fieldValue + ")";
-				}
-				else if (fieldName.equals(Constants.TOPIC_RELATED_TO))
-				{
-					try
-					{
-						final Integer topicId = Integer.parseInt(fieldValue);
-						myQuery += "topic.topicId in (" + getRelatedTopicIDsString(topicId) + ")";
-					}
-					catch (final Exception ex)
-					{
-						// failed to parse integer
 						ExceptionUtilities.handleException(ex);
 					}
 				}
 				else
-				{
-					myQuery += "'" + fieldName.toLowerCase() + "' like '%" + fieldValue.toLowerCase() + "%')";
-				}
+					if (fieldName.equals(Constants.TOPIC_HAS_RELATIONSHIPS))
+					{
+						int minimum = 0;
+						if (fieldValue.equalsIgnoreCase("true"))
+							minimum = 1;
+
+						myQuery += "topic.parentTopicToTopics.size >= " + minimum;
+					}
+					else
+						if (fieldName.equals(Constants.TOPIC_IDS_FILTER_VAR))
+						{
+							myQuery += "topic.topicId in (" + fieldValue + ")";
+						}
+						else
+							if (fieldName.equals(Constants.TOPIC_RELATED_TO))
+							{
+								try
+								{
+									final Integer topicId = Integer.parseInt(fieldValue);
+									myQuery += "topic.topicId in (" + getRelatedTopicIDsString(topicId) + ")";
+								}
+								catch (final Exception ex)
+								{
+									// failed to parse integer
+									ExceptionUtilities.handleException(ex);
+								}
+							}
+							else
+							{
+								myQuery += "'" + fieldName.toLowerCase() + "' like '%" + fieldValue.toLowerCase() + "%')";
+							}
 			}
 		}
 
@@ -1134,9 +1167,12 @@ public class EntityUtilities
 	 * A utility function that is used to append url parameters to a collection
 	 * of url parameters
 	 * 
-	 * @param params The existing url parameter string
-	 * @param name The parameter name
-	 * @param value The parameter value
+	 * @param params
+	 *            The existing url parameter string
+	 * @param name
+	 *            The parameter name
+	 * @param value
+	 *            The parameter value
 	 * @return The url parameters that were passed in via params, with the new
 	 *         parameter appended to it
 	 */
@@ -1150,10 +1186,14 @@ public class EntityUtilities
 	 * A utility function that is used to append url parameters to a collection
 	 * of url parameters
 	 * 
-	 * @param params The existing url parameter string
-	 * @param name The parameter name
-	 * @param value The parameter value
-	 * @param defaultValue Used in place of value if it is null
+	 * @param params
+	 *            The existing url parameter string
+	 * @param name
+	 *            The parameter name
+	 * @param value
+	 *            The parameter value
+	 * @param defaultValue
+	 *            Used in place of value if it is null
 	 * @return The url parameters that were passed in via params, with the new
 	 *         parameter appended to it
 	 */
@@ -1385,12 +1425,13 @@ public class EntityUtilities
 				filter.getFilterFields().add(newField);
 			}
 			// update a FilterField entity
-			else if (filterField.size() == 1)
-			{
-				newField = filterField.get(0);
-				newField.setValue(fixedFieldValue);
-				newField.setDescription(fieldDescription);
-			}
+			else
+				if (filterField.size() == 1)
+				{
+					newField = filterField.get(0);
+					newField.setValue(fixedFieldValue);
+					newField.setDescription(fieldDescription);
+				}
 		}
 		else
 		{

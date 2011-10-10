@@ -40,12 +40,12 @@ public class Project implements java.io.Serializable
 	public Project() {
 	}
 
-	public Project(String projectName) {
+	public Project(final String projectName) {
 		this.projectName = projectName;
 	}
 
-	public Project(String projectName, String projectDescription,
-			Set<TagToProject> tagToProjects) {
+	public Project(final String projectName, final String projectDescription,
+			final Set<TagToProject> tagToProjects) {
 		this.projectName = projectName;
 		this.projectDescription = projectDescription;
 		this.tagToProjects = tagToProjects;
@@ -180,5 +180,6 @@ public class Project implements java.io.Serializable
     	
     	return retValue;
     }
+ 
 
 }
