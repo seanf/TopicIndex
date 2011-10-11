@@ -29,7 +29,6 @@ public class TocLink extends TocElement
 	{
 		super(docbookBuildingOptions, label);
 		this.pageName = pageName;
-		this.docbook = "<listitem><para><ulink url=\"" + pageName + ".html\">" + label + "</ulink></para></listitem>";
 	}
 	
 	public TocLink(final DocbookBuildingOptions docbookBuildingOptions, final String label, final Integer topicId)
@@ -61,5 +60,6 @@ public class TocLink extends TocElement
 	public void generateCode() 
 	{
 		this.eclipseXml = "<topic label=\"" + label + "\" href=\"" + pageName + ".html\"/>";
+		this.docbook = "<listitem><para><ulink url=\"" + pageName + ".html\">" + label + "</ulink></para></listitem>";
 	}
 }
