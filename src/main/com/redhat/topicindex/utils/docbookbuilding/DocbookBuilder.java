@@ -1063,12 +1063,18 @@ public class DocbookBuilder
 		}
 		
 		/* add an xml file for each topic TODO: ordering for narrative style */
+		String topics = "";
 		for (final Topic topic : tocTopicDatabase.getTopics())
 		{
 			final String fileName = "Topic" + topic.getTopicId() + ".xml";
-			files.put("Book/en-US/" + fileName, topic.getTempTopicXMLDocString().getBytes());
-			bookXmlXiIncludes += "	<xi:include href=\"" + fileName + "\" xmlns:xi=\"http://www.w3.org/2001/XInclude\" />\n";
+			files.put("Book/en-US/" + fileName, DocbookUtils.addXMLBoilerplate(topic.getTempTopicXMLDocString()).getBytes());
+			topics += "	<xi:include href=\"" + fileName + "\" xmlns:xi=\"http://www.w3.org/2001/XInclude\" />\n";
 		}
+		
+		topics = DocbookUtils.addXMLBoilerplate(DocbookUtils.buildChapter(topics, ""));
+		files.put("Book/en-US/Topics.xml", topics.getBytes());
+		
+		bookXmlXiIncludes += "	<xi:include href=\"Topics.xml\" xmlns:xi=\"http://www.w3.org/2001/XInclude\" />\n";
 
 		// replace the marker in the book.xml template
 		final String thisBookXml = bookXml.replace(BOOK_XML_XI_INCLUDES_MARKER, bookXmlXiIncludes);

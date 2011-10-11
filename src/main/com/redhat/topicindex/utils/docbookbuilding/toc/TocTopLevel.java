@@ -44,8 +44,10 @@ public class TocTopLevel extends TocFolderElement
 		this.docbook = DocbookUtils.wrapListItems(childrenDocbook, label);
 
 		/* wrap the whole thing up in a para/div */
-		this.docbook = DocbookUtils.wrapInPara(this.docbook, AttributeBuilder.NAV_TOC_PARENT_ROLE, docbookBuildingOptions != null
-				&& docbookBuildingOptions.isEnableDynamicTreeToc() ? AttributeBuilder.NAV_TOC_PARENT_ID : AttributeBuilder.NAV_DISABLED_TOC_PARENT_ID);
+		final String idAttribute = docbookBuildingOptions != null
+				&& docbookBuildingOptions.isEnableDynamicTreeToc() ? AttributeBuilder.NAV_TOC_PARENT_ID : AttributeBuilder.NAV_DISABLED_TOC_PARENT_ID;
+		
+		this.docbook = DocbookUtils.wrapInPara(this.docbook, AttributeBuilder.NAV_TOC_PARENT_ROLE, idAttribute);
 
 		/*
 		 * wrap it up again in another div. this allows us to add elements above
