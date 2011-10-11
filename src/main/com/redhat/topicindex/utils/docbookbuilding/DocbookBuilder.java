@@ -580,10 +580,7 @@ public class DocbookBuilder
 	{
 		System.out.println("Processing injection points");
 
-		/* find a list of topics to process */
-		final List<Topic> topicsToProcess = tocTopicDatabase.getMatchingTopicsFromTagToCategory(topicTypeTagIDs);
-
-		for (final Topic topic : topicsToProcess)
+		for (final Topic topic : tocTopicDatabase.getTopics())
 		{
 			final Integer topicID = topic.getTopicId();
 
