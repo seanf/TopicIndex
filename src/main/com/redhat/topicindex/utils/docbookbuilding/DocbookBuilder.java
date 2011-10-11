@@ -2109,7 +2109,6 @@ public class DocbookBuilder
 		{
 			// a convenience variable
 			final Tag firstLevelTag = firstLevelCategoryTag.getTag();
-			final Integer firstLevelTagId = firstLevelTag.getTagId();
 
 			/*
 			 * get a list of tags that are equivalent to this parent tag. we
@@ -2128,34 +2127,28 @@ public class DocbookBuilder
 				final TocFolderElement parentOnlyFolder = new TocFolderElement(docbookBuildingOptions, firstLevelTag.getTagName());
 
 				// list of topic ids to match
-				final List<Tag> matchTagIds = new ArrayList<Tag>();
-				matchTagIds.add(firstLevelTag);
+				final List<Tag> matchTag = new ArrayList<Tag>();
+				matchTag.add(firstLevelTag);
 
 				// list of topic ids to exclude
-				final List<Tag> excludeTagIds = new ArrayList<Tag>();
-				excludeTagIds.addAll(thisChildrenTags);
-				excludeTagIds.addAll(concernTags);
+				final List<Tag> excludeTag = new ArrayList<Tag>();
+				excludeTag.addAll(thisChildrenTags);
+				excludeTag.addAll(concernTags);
 
 				/*
 				 * find those topics that *only* have a parent tag, and no
 				 * concern tags. these will be placed at the top of the tree
 				 */
-				final List<Topic> parentOnlyTopicList = tocTopicDatabase.getMatchingTopics(matchTagIds, excludeTagIds, false);
+				final List<Topic> parentOnlyTopicList = tocTopicDatabase.getMatchingTopics(matchTag, excludeTag);
 
 				/*
-				 * find those topics that have a child tag. these will be placed
+				 * find those topics that have a child tag, but no concern. these will be placed
 				 * below the parent only topics
 				 */
 				final List<Topic> chidlrenTopicList = new ArrayList<Topic>();
 				for (final Tag childTag : thisChildrenTags)
 				{
-					final List<Tag> matchChildTag = new ArrayList<Tag>();
-					matchChildTag.add(childTag);
-
-					final List<Tag> excludeChildTag = new ArrayList<Tag>();
-					excludeChildTag.addAll(concernTags);
-
-					final List<Topic> matchingTopics = tocTopicDatabase.getMatchingTopics(matchChildTag, excludeChildTag);
+					final List<Topic> matchingTopics = tocTopicDatabase.getMatchingTopics(childTag, concernTags);
 
 					CollectionUtilities.addAllThatDontExist(matchingTopics, chidlrenTopicList);
 				}
@@ -2175,14 +2168,13 @@ public class DocbookBuilder
 					}
 				}
 
-				// now loop over the concern tags
+				/* now loop over the concern tags */
 				final List<TagToCategory> sortedCategories = new ArrayList<TagToCategory>(secondLevelCategory.getTagToCategories());
 				Collections.sort(sortedCategories);
 
 				for (final TagToCategory secondLevelCategoryTag : sortedCategories)
 				{
 					final Tag concernTag = secondLevelCategoryTag.getTag();
-					final Integer concernTagId = concernTag.getTagId();
 
 					final List<Tag> matchConcernTags = new ArrayList<Tag>();
 					matchConcernTags.add(firstLevelTag);

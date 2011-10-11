@@ -45,23 +45,21 @@ public class TocTopicDatabase
 		
 		for (final Topic topic : topics)
 		{
-			final List<Tag> topicTags = topic.getTags();
-			
 			/* check to see if the topic has only the matching tags */
-			if (haveOnlyMatchingTags && topicTags.size() != matchingTags.size())
+			if (haveOnlyMatchingTags && topic.getTopicToTags().size() != matchingTags.size())
 				continue;
 			
 			/* check for matching tags */
 			for (final Tag matchingTag : matchingTags)
 			{
-				if (!topicTags.contains(matchingTag))
+				if (!topic.isTaggedWith(matchingTag))
 					continue;
 			}
 			
 			/* check for excluded tags */
 			for (final Tag excludeTag : excludeTags)
 			{
-				if (topicTags.contains(excludeTag))
+				if (topic.isTaggedWith(excludeTag))
 					continue;
 			}
 			
