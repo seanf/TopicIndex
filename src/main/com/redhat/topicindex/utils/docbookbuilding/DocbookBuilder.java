@@ -53,6 +53,7 @@ import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.entity.TopicToTag;
 import com.redhat.topicindex.entity.TopicToTopic;
 import com.redhat.topicindex.sort.ExternalListSort;
+import com.redhat.topicindex.sort.TagToCategorySortingComparator;
 import com.redhat.topicindex.sort.TopicTitleSorter;
 import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.EntityUtilities;
@@ -1357,6 +1358,8 @@ public class DocbookBuilder
 	 */
 	protected boolean postValidateTopicDocbook(final Topic topic, final String searchTagsUrl, final int roleCategoryID, final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
 	{
+		System.out.println("Post Validating XML For Topic " + topic.getTopicTitle());
+		
 		final XMLValidator validator = new XMLValidator();
 
 		// get the xml document, or null if it was not valid
@@ -1467,8 +1470,7 @@ public class DocbookBuilder
 	{
 		final List<TagToCategory> tags = getTagToCatgeories(roleCategoryID, tagToCategories);
 
-		Collections.sort(tags);
-		Collections.reverse(tags);
+		Collections.sort(tags, new TagToCategorySortingComparator());
 
 		for (final TagToCategory tagToCat : tags)
 		{
@@ -1754,9 +1756,9 @@ public class DocbookBuilder
 		 */
 		topic.initializeTempTopicXMLDoc();
 
-		topic.setTempNavLinkDocbook(DocbookUtils.buildXRefListItem(topic.getXRefID(),
 		/* the role is defined as the topic type and topic lifecycle */
-		AttributeBuilder.GENERIC_NAV_LINK_ROLE + " " + getTopicLifecycleRole(topic, roleCategoryID, tagToCategories)));
+		final String role = AttributeBuilder.GENERIC_NAV_LINK_ROLE + " " + getTopicLifecycleRole(topic, roleCategoryID, tagToCategories);
+		topic.setTempNavLinkDocbook(DocbookUtils.buildXRefListItem(topic.getXRefID(), role));
 
 		/* assign the topic data to the toc topic database */
 		tocTopicDatabase.getTopics().add(topic);
@@ -1866,7 +1868,7 @@ public class DocbookBuilder
 	protected List<TagToCategory> getTagToCatgeories(final Integer categoryID, final List<TagToCategory> tagToCategories)
 	{
 		final List<TagToCategory> retValue = filter(having(on(TagToCategory.class).getCategory().getCategoryId(), equalTo(categoryID)), tagToCategories);
-		Collections.sort(retValue);
+		Collections.sort(retValue, new TagToCategorySortingComparator());
 		return retValue;
 	}
 
@@ -1900,7 +1902,7 @@ public class DocbookBuilder
 
 		final List<TagToCategory> combinedTechnologyTagToCategories = new ArrayList<TagToCategory>(firstLevelCategoryOne.getTagToCategories());
 		combinedTechnologyTagToCategories.addAll(firstLevelCategoryTwo.getTagToCategories());
-		Collections.sort(combinedTechnologyTagToCategories);
+		Collections.sort(combinedTechnologyTagToCategories, new TagToCategorySortingComparator());
 
 		/*
 		 * this container will hold those list items that appear in the top
@@ -1965,7 +1967,7 @@ public class DocbookBuilder
 
 				// now loop over the concern tags for the parent tag only
 				final List<TagToCategory> sortedCategories = new ArrayList<TagToCategory>(secondLevelCategory.getTagToCategories());
-				Collections.sort(sortedCategories);
+				Collections.sort(sortedCategories, new TagToCategorySortingComparator());
 
 				for (final TagToCategory secondLevelCategoryTag : sortedCategories)
 				{
@@ -2083,7 +2085,7 @@ public class DocbookBuilder
 
 		final List<TagToCategory> combinedTechnologyTagToCategories = new ArrayList<TagToCategory>(firstLevelCategoryOne.getTagToCategories());
 		combinedTechnologyTagToCategories.addAll(firstLevelCategoryTwo.getTagToCategories());
-		Collections.sort(combinedTechnologyTagToCategories);
+		Collections.sort(combinedTechnologyTagToCategories, new TagToCategorySortingComparator());
 
 		/*
 		 * this container will hold those list items that appear in the top
@@ -2176,7 +2178,7 @@ public class DocbookBuilder
 
 				/* now loop over the concern tags */
 				final List<TagToCategory> sortedCategories = new ArrayList<TagToCategory>(secondLevelCategory.getTagToCategories());
-				Collections.sort(sortedCategories);
+				Collections.sort(sortedCategories, new TagToCategorySortingComparator());
 
 				for (final TagToCategory secondLevelCategoryTag : sortedCategories)
 				{

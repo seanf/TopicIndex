@@ -231,8 +231,12 @@ public class TocTopicDatabase
 	{
 		final List<Tag> retValue = new ArrayList<Tag>();
 		for (final TagToCategory topicToTag : collection)
+		{
 			if (topicToTag != null)
+			{
 				retValue.add(topicToTag.getTag());
+			}
+		}
 		return retValue;
 	}
 }
