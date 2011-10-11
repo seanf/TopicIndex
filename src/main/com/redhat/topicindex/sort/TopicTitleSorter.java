@@ -8,19 +8,33 @@ import java.util.Map;
 import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.utils.docbookbuilding.InjectionTopicData;
 
-public class TopicTitleSorter implements ExternalMapSort<Integer, Topic, InjectionTopicData>
+public class TopicTitleSorter implements ExternalListSort<Integer, Topic, InjectionTopicData>
 {
-	 public void sort(final Map<Integer, Topic> map, final List<InjectionTopicData> list) 
+	 public void sort(final List<Topic> topics, final List<InjectionTopicData> list) 
 	    {
-	        if (map == null || list == null)
+	        if (topics == null || list == null)
 	        	return;
 		 
 		 	Collections.sort(list, new Comparator<InjectionTopicData>() 
 	        {
 	            public int compare(final InjectionTopicData o1, final InjectionTopicData o2)
 	            {
-	            	final boolean v1Exists = map.containsKey(o1.topicId);
-	            	final boolean v2Exists = map.containsKey(o2.topicId);
+	            	Topic topic1 = null;
+	            	Topic topic2 = null;
+	            	
+	            	for (final Topic topic : topics)
+	            	{
+	            		if (topic.getTopicId().equals(o1.topicId))
+	            			topic1 = topic;
+	            		if (topic.getTopicId().equals(o2.topicId))
+	            			topic2 = topic;
+	            		
+	            		if (topic1 != null && topic2 != null)
+	            			break;
+	            	}
+	            	
+	            	final boolean v1Exists = topic1 != null;
+	            	final boolean v2Exists = topic2 != null;
 	            	
 	            	if (!v1Exists && !v2Exists)
 	            		return 0;
@@ -29,8 +43,8 @@ public class TopicTitleSorter implements ExternalMapSort<Integer, Topic, Injecti
 	            	if (!v2Exists)
 	            		return 1;
 	            	
-	            	final Topic v1 = map.get(o1.topicId);
-	            	final Topic v2 = map.get(o2.topicId);
+	            	final Topic v1 = topic1;
+	            	final Topic v2 = topic2;
 	            	
 	            	if (v1 == null && v2 == null)
 	            		return 0;

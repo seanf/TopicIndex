@@ -53,7 +53,6 @@ import com.redhat.ecs.commonutils.DocBookUtilities;
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.ecs.commonutils.XMLUtilities;
 import com.redhat.topicindex.sort.TagNameComparator;
-import com.redhat.topicindex.sort.TopicTitleComparator;
 import com.redhat.topicindex.sort.TopicToTagTagIDSort;
 import com.redhat.topicindex.sort.TopicToTopicTopicIDSort;
 import com.redhat.topicindex.utils.Constants;
@@ -268,6 +267,17 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		retValue.addAll(getOneWayRelatedTopicsArray());
 		retValue.addAll(getTwoWayRelatedTopicsArray());
 		retValue.addAll(getIncomingRelatedTopicsArray());
+		return retValue;
+	}
+	
+	@Transient
+	public List<Topic> getOutgoingTopicsArray()
+	{
+		final ArrayList<Topic> retValue = new ArrayList<Topic>();
+		for (final TopicToTopic topicToTopic : this.getParentTopicToTopics())
+		{
+			retValue.add(topicToTopic.getRelatedTopic());
+		}
 		return retValue;
 	}
 
@@ -563,6 +573,26 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	{
 		for (final TopicToTopic topicToTopic : this.getParentTopicToTopics())
 			if (topicToTopic.getRelatedTopic().equals(relatedTopic))
+				return true;
+
+		return false;
+	}
+	
+	@Transient
+	public boolean isTaggedWith(final Integer tagId)
+	{
+		for (final TopicToTag topicToTag : this.getTopicToTags())
+			if (topicToTag.getTag().getTagId().equals(tagId))
+				return true;
+
+		return false;
+	}
+
+	@Transient
+	public boolean isTaggedWith(final Tag tag)
+	{
+		for (final TopicToTag topicToTag : this.getTopicToTags())
+			if (topicToTag.getTag().equals(tag))
 				return true;
 
 		return false;

@@ -52,7 +52,7 @@ import com.redhat.topicindex.entity.TagToTag;
 import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.entity.TopicToTag;
 import com.redhat.topicindex.entity.TopicToTopic;
-import com.redhat.topicindex.sort.ExternalMapSort;
+import com.redhat.topicindex.sort.ExternalListSort;
 import com.redhat.topicindex.sort.TopicTitleSorter;
 import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.EntityUtilities;
@@ -61,6 +61,7 @@ import com.redhat.topicindex.utils.XMLValidator;
 import com.redhat.topicindex.utils.docbookbuilding.toc.TocFolderElement;
 import com.redhat.topicindex.utils.docbookbuilding.toc.TocLink;
 import com.redhat.topicindex.utils.docbookbuilding.toc.TocTopLevel;
+import com.redhat.topicindex.utils.docbookbuilding.tocdatabase.TocTopicDatabase;
 import com.redhat.topicindex.utils.structures.DroolsEvent;
 import com.redhat.topicindex.utils.structures.TopicErrorData;
 import com.redhat.topicindex.utils.structures.TopicImageData;
@@ -196,7 +197,6 @@ public class DocbookBuilder
 	protected String pluginXml;
 	protected String eclisePackageSh;
 	protected String publicanEclipseCfg;
-	protected String narrativePublicanCfg;
 
 	protected Integer invisibleTagID;
 
@@ -371,19 +371,7 @@ public class DocbookBuilder
 	/** The Docbook role (which becomes a CSS class) for the survey link para */
 	protected static final String ROLE_SURVEY_PARA = "RoleCreateBugPara";
 
-	/*
-	 * The collections below take the topics that are to be included in the
-	 * docbook build and provide an easy way to reference them by the tags that
-	 * are applied to the topics, and by the topic id's. In this way we can look
-	 * up topics by tag and by id.
-	 */
-
-	/** tag to topic map */
-	protected HashMap<Integer, HashMap<Integer, Topic>> tagIdToTopicMap = new HashMap<Integer, HashMap<Integer, Topic>>();
-	/** topic id to topic map */
-	protected HashMap<Integer, Topic> topicIdToTopicMap = new HashMap<Integer, Topic>();
-	/** tag id to final compiled docbook */
-	protected HashMap<Integer, String> tagIdToDocbookMap = new HashMap<Integer, String>();
+	protected final TocTopicDatabase tocTopicDatabase = new TocTopicDatabase();
 
 	/**
 	 * Holds the compiler errors that form the Errors.xml file in the compiled
@@ -462,7 +450,7 @@ public class DocbookBuilder
 	 * @return a list of topics that were injected but not related
 	 */
 	protected String processCustomInjectionPoints(final ArrayList<Integer> customInjectionIds, final HashMap<Node, InjectionListData> customInjections, final int injectionPointType, final Integer topidID, final Topic topicData, final String regularExpression,
-			final ExternalMapSort<Integer, Topic, InjectionTopicData> sortComparator, final DocbookBuildingOptions docbookBuildingOptions)
+			final ExternalListSort<Integer, Topic, InjectionTopicData> sortComparator, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		final Document xmlDocument = topicData.getTempTopicXMLDoc();
 
@@ -495,7 +483,7 @@ public class DocbookBuilder
 
 					/* sort the InjectionTopicData list of required */
 					if (sortComparator != null)
-						sortComparator.sort(topicIdToTopicMap, sequenceIDs);
+						sortComparator.sort(tocTopicDatabase.getTopics(), sequenceIDs);
 
 					/* loop over all the topic ids in the injection point */
 					for (final InjectionTopicData sequenceID : sequenceIDs)
@@ -512,7 +500,7 @@ public class DocbookBuilder
 						 * look for the topic mentioned in the injection point
 						 * in the list of related topics
 						 */
-						if (topicData.getRelatedTopicIDs().contains(sequenceID.topicId) && topicIdToTopicMap.containsKey(sequenceID.topicId))
+						if (topicData.getRelatedTopicIDs().contains(sequenceID.topicId) && tocTopicDatabase.containsTopic(sequenceID.topicId))
 						{
 							/*
 							 * this injected topic is also related, so we don't
@@ -551,11 +539,11 @@ public class DocbookBuilder
 							/* wrap the xref up in a listitem */
 							if (sequenceID.optional)
 							{
-								list.add(DocbookUtils.buildEmphasisPrefixedXRef(xmlDocument, OPTIONAL_LIST_PREFIX, topicIdToTopicMap.get(sequenceID.topicId).getXRefID()));
+								list.add(DocbookUtils.buildEmphasisPrefixedXRef(xmlDocument, OPTIONAL_LIST_PREFIX, tocTopicDatabase.getTopic(sequenceID.topicId).getXRefID()));
 							}
 							else
 							{
-								list.add(DocbookUtils.buildXRef(xmlDocument, topicIdToTopicMap.get(sequenceID.topicId).getXRefID()));
+								list.add(DocbookUtils.buildXRef(xmlDocument, tocTopicDatabase.getTopic(sequenceID.topicId).getXRefID()));
 							}
 
 							/*
@@ -591,207 +579,161 @@ public class DocbookBuilder
 	{
 		System.out.println("Processing injection points");
 
-		/*
-		 * this defines how many injection points are processed before a new
-		 * status update is printed to the output
-		 */
-		final int progressPoints = 50;
-		int currentProgressPoints = progressPoints;
+		/* find a list of topics to process */
+		final List<Topic> topicsToProcess = tocTopicDatabase.getMatchingTopicsFromTagToCategory(topicTypeTagIDs);
 
-		/* loop through each topic, and build up the list of related topics */
-		int categoryProgress = 0;
-		final int categoryTotal = topicTypeTagIDs.size();
-
-		for (final TagToCategory topicTypeTag : topicTypeTagIDs)
+		for (final Topic topic : topicsToProcess)
 		{
-			if (tagIdToTopicMap.containsKey(topicTypeTag.getTag().getTagId()))
+			final Integer topicID = topic.getTopicId();
+
+			/*
+			 * don't bother processing injection points for invalid topics
+			 */
+			if (!topic.isTempInvalidTopic())
 			{
+				/***************** PROCESS CUSTOM INJECTION POINTS *****************/
+
 				/*
-				 * loop over the topics that have one of the type tags assigned
-				 * to it
+				 * keep a track of the topics we inject into custom locations,
+				 * so we don't then inject them again
 				 */
-				final HashMap<Integer, Topic> topics = tagIdToTopicMap.get(topicTypeTag.getTag().getTagId());
+				final ArrayList<Integer> customInjectionIds = new ArrayList<Integer>();
 
-				int topicProgress = 0;
-				final int topicSize = topics.keySet().size();
+				/*
+				 * this collection keeps a track of the injection point markers
+				 * and the docbook lists that we will be replacing them with
+				 */
+				final HashMap<Node, InjectionListData> customInjections = new HashMap<Node, InjectionListData>();
 
-				for (final Integer topicID : topics.keySet())
+				String injectionErrors = processCustomInjectionPoints(customInjectionIds, customInjections, ORDEREDLIST_INJECTION_POINT, topicID, topic, CUSTOM_INJECTION_SEQUENCE_RE, null, docbookBuildingOptions);
+				injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, XREF_INJECTION_POINT, topicID, topic, CUSTOM_INJECTION_SINGLE_RE, null, docbookBuildingOptions);
+				injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, topicID, topic, CUSTOM_INJECTION_LIST_RE, null, docbookBuildingOptions);
+				injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, topicID, topic, CUSTOM_ALPHA_SORT_INJECTION_LIST_RE, new TopicTitleSorter(), docbookBuildingOptions);
+				injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, LIST_INJECTION_POINT, topicID, topic, CUSTOM_INJECTION_LISTITEMS_RE, null, docbookBuildingOptions);
+
+				if (injectionErrors.length() != 0)
 				{
-					/* display a progress notification */
-					--currentProgressPoints;
-					if (currentProgressPoints <= 0)
+					populateIdXMLDataFromDB(errorTopic, topic, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
+
+					/* remove the last ", " from the error string */
+					injectionErrors = injectionErrors.substring(0, injectionErrors.length() - 2);
+					addErrorToTopic(
+							topic,
+							"Topic references Topic(s) "
+									+ injectionErrors
+									+ " in a custom injection point, but this topic has either not been related in the database, or was not matched by the filter. The later might occur if you are building a narrative and the injected topic was not listed in the Topic ID field, or you have not selected the 'Include all related topics' option.");
+				}
+				else
+				{
+					/* now make the custom injection point substitutions */
+					for (final Node customInjectionCommentNode : customInjections.keySet())
 					{
-						currentProgressPoints = progressPoints;
-						final float progress = (((float) categoryProgress / (float) categoryTotal) + ((float) topicProgress / (float) topicSize / (float) categoryTotal)) * 100.0f;
-						System.out.println("Processing injection points " + Math.round(progress) + "% done");
+						final InjectionListData injectionListData = customInjections.get(customInjectionCommentNode);
+						List<Element> list = null;
+
+						/*
+						 * this may not be true if we are not building all
+						 * related topics
+						 */
+						if (injectionListData.listItems.size() != 0)
+						{
+							if (injectionListData.listType == ORDEREDLIST_INJECTION_POINT)
+							{
+								list = DocbookUtils.wrapOrderedListItemsInPara(topic.getTempTopicXMLDoc(), injectionListData.listItems);
+							}
+							else if (injectionListData.listType == XREF_INJECTION_POINT)
+							{
+								list = injectionListData.listItems.get(0);
+							}
+							else if (injectionListData.listType == ITEMIZEDLIST_INJECTION_POINT)
+							{
+								list = DocbookUtils.wrapItemizedListItemsInPara(topic.getTempTopicXMLDoc(), injectionListData.listItems);
+							}
+							else if (injectionListData.listType == LIST_INJECTION_POINT)
+							{
+								list = DocbookUtils.wrapItemsInListItems(topic.getTempTopicXMLDoc(), injectionListData.listItems);
+							}
+						}
+
+						if (list != null)
+						{
+							for (final Element element : list)
+							{
+								customInjectionCommentNode.getParentNode().insertBefore(element, customInjectionCommentNode);
+							}
+
+							customInjectionCommentNode.getParentNode().removeChild(customInjectionCommentNode);
+						}
 					}
 
-					final Topic topic = topics.get(topicID);
+					/***************** PROCESS GENERIC INJECTION POINTS *****************/
 
 					/*
-					 * don't bother processing injection points for invalid
-					 * topics
+					 * don't add generic injection points when building a
+					 * narrative style
 					 */
-					if (!topic.isTempInvalidTopic())
+					if (!docbookBuildingOptions.isBuildNarrative())
 					{
-						/***************** PROCESS CUSTOM INJECTION POINTS *****************/
-
 						/*
-						 * keep a track of the topics we inject into custom
-						 * locations, so we don't then inject them again
+						 * this collection will hold the lists of related topics
 						 */
-						final ArrayList<Integer> customInjectionIds = new ArrayList<Integer>();
+						final HashMap<Tag, ArrayList<Topic>> relatedLists = new HashMap<Tag, ArrayList<Topic>>();
 
-						/*
-						 * this collection keeps a track of the injection point
-						 * markers and the docbook lists that we will be
-						 * replacing them with
-						 */
-						final HashMap<Node, InjectionListData> customInjections = new HashMap<Node, InjectionListData>();
-
-						String injectionErrors = processCustomInjectionPoints(customInjectionIds, customInjections, ORDEREDLIST_INJECTION_POINT, topicID, topic, CUSTOM_INJECTION_SEQUENCE_RE, null, docbookBuildingOptions);
-						injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, XREF_INJECTION_POINT, topicID, topic, CUSTOM_INJECTION_SINGLE_RE, null, docbookBuildingOptions);
-						injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, topicID, topic, CUSTOM_INJECTION_LIST_RE, null, docbookBuildingOptions);
-						injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, topicID, topic, CUSTOM_ALPHA_SORT_INJECTION_LIST_RE, new TopicTitleSorter(), docbookBuildingOptions);
-						injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, LIST_INJECTION_POINT, topicID, topic, CUSTOM_INJECTION_LISTITEMS_RE, null, docbookBuildingOptions);
-
-						if (injectionErrors.length() != 0)
+						/* wrap each related topic in a listitem tag */
+						for (final Topic relatedTopic : topic.getOutgoingTopicsArray())
 						{
-							populateIdXMLDataFromDB(errorTopic, topic, false, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
-
-							/* remove the last ", " from the error string */
-							injectionErrors = injectionErrors.substring(0, injectionErrors.length() - 2);
-							addErrorToTopic(
-									topic,
-									"Topic references Topic(s) "
-											+ injectionErrors
-											+ " in a custom injection point, but this topic has either not been related in the database, or was not matched by the filter. The later might occur if you are building a narrative and the injected topic was not listed in the Topic ID field, or you have not selected the 'Include all related topics' option.");
-						}
-						else
-						{
-							/* now make the custom injection point substitutions */
-							for (final Node customInjectionCommentNode : customInjections.keySet())
-							{
-								final InjectionListData injectionListData = customInjections.get(customInjectionCommentNode);
-								List<Element> list = null;
-
-								/*
-								 * this may not be true if we are not building
-								 * all related topics
-								 */
-								if (injectionListData.listItems.size() != 0)
-								{
-									if (injectionListData.listType == ORDEREDLIST_INJECTION_POINT)
-									{
-										list = DocbookUtils.wrapOrderedListItemsInPara(topic.getTempTopicXMLDoc(), injectionListData.listItems);
-									}
-									else
-										if (injectionListData.listType == XREF_INJECTION_POINT)
-										{
-											list = injectionListData.listItems.get(0);
-										}
-										else
-											if (injectionListData.listType == ITEMIZEDLIST_INJECTION_POINT)
-											{
-												list = DocbookUtils.wrapItemizedListItemsInPara(topic.getTempTopicXMLDoc(), injectionListData.listItems);
-											}
-											else
-												if (injectionListData.listType == LIST_INJECTION_POINT)
-												{
-													list = DocbookUtils.wrapItemsInListItems(topic.getTempTopicXMLDoc(), injectionListData.listItems);
-												}
-								}
-
-								if (list != null)
-								{
-									for (final Element element : list)
-									{
-										customInjectionCommentNode.getParentNode().insertBefore(element, customInjectionCommentNode);
-									}
-
-									customInjectionCommentNode.getParentNode().removeChild(customInjectionCommentNode);
-								}
-							}
-
-							/***************** PROCESS GENERIC INJECTION POINTS *****************/
-
 							/*
-							 * don't add generic injection points when building
-							 * a narrative style
+							 * don't process those topics that were / injected
+							 * into custom injection points
 							 */
-							if (!docbookBuildingOptions.isBuildNarrative())
+							if (!customInjectionIds.contains(relatedTopic))
 							{
-								/*
-								 * this collection will hold the lists of
-								 * related topics
-								 */
-								final HashMap<Tag, ArrayList<Topic>> relatedLists = new HashMap<Tag, ArrayList<Topic>>();
-
-								/* wrap each related topic in a listitem tag */
-								for (final Integer relatedTopic : topic.getRelatedTopicIDs())
+								// loop through the topic type tags
+								for (final TagToCategory primaryTopicTypeTag : topicTypeTagIDs)
 								{
+									final Integer primaryTopicTypeTagId = primaryTopicTypeTag.getTag().getTagId();
+
 									/*
-									 * don't process those topics that were /
-									 * injected into custom injection points
+									 * see if we have processed a related topic
+									 * with one of the topic type tags this may
+									 * never be true if not processing all
+									 * related topics
 									 */
-									if (!customInjectionIds.contains(relatedTopic))
+									if (relatedTopic.isTaggedWith(primaryTopicTypeTagId))
 									{
-										// loop through the topic type tags
-										for (final TagToCategory primaryTopicTypeTag : topicTypeTagIDs)
-										{
-											final Integer primaryTopicTypeTagId = primaryTopicTypeTag.getTag().getTagId();
+										/*
+										 * at this point we have found a topic
+										 * that is related, has not been
+										 * included in any custom injection
+										 * points, and has been processed
+										 */
 
-											/*
-											 * see if we have processed a
-											 * related topic with one of the
-											 * topic type tags this may never be
-											 * true if not processing all
-											 * related topics
-											 */
-											if (tagIdToTopicMap.containsKey(primaryTopicTypeTagId) && tagIdToTopicMap.get(primaryTopicTypeTagId).containsKey(relatedTopic))
-											{
-												/*
-												 * at this point we have found a
-												 * topic that is related, has
-												 * not been included in any
-												 * custom injection points, and
-												 * has been processed
-												 */
+										if (!relatedLists.containsKey(primaryTopicTypeTag.getTag()))
+											relatedLists.put(primaryTopicTypeTag.getTag(), new ArrayList<Topic>());
 
-												if (!relatedLists.containsKey(primaryTopicTypeTag.getTag()))
-													relatedLists.put(primaryTopicTypeTag.getTag(), new ArrayList<Topic>());
+										/*
+										 * add the related topic to the
+										 * relatedLists collection against the
+										 * topic type tag that has been assigned
+										 * to the related topic
+										 */
+										relatedLists.get(primaryTopicTypeTag.getTag()).add(relatedTopic);
 
-												/*
-												 * add the related topic to the
-												 * relatedLists collection
-												 * against the topic type tag
-												 * that has been assigned to the
-												 * related topic
-												 */
-												relatedLists.get(primaryTopicTypeTag.getTag()).add(topicIdToTopicMap.get(relatedTopic));
-
-												break;
-											}
-										}
+										break;
 									}
 								}
-
-								insertGenericInjectionLinks(topic.getTempTopicXMLDoc(), relatedLists);
 							}
-
-							/*
-							 * make sure the xml is valid after all of our
-							 * modifications
-							 */
-							postValidateTopicDocbook(topic, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
 						}
+
+						insertGenericInjectionLinks(topic.getTempTopicXMLDoc(), relatedLists);
 					}
 
-					++topicProgress;
+					/*
+					 * make sure the xml is valid after all of our modifications
+					 */
+					postValidateTopicDocbook(topic, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
 				}
 			}
-
-			++categoryProgress;
 		}
 
 		System.out.println("Processing injection points 100% done");
@@ -990,30 +932,30 @@ public class DocbookBuilder
 			for (final Topic topic : errors.keySet())
 			{
 				final List<String> topicErrorItems = new ArrayList<String>();
-	
+
 				final String tags = topic.getCommaSeparatedTagList();
 				final String url = getTopicSkynetURL(topic);
-	
+
 				topicErrorItems.add(DocbookUtils.buildListItem("INFO: " + tags));
 				topicErrorItems.add(DocbookUtils.buildListItem("INFO: <ulink url=\"" + url + "\">Topic URL</ulink>"));
-	
+
 				for (final String error : errors.get(topic).getErrors())
 					topicErrorItems.add(DocbookUtils.buildListItem("ERROR: " + error));
-	
+
 				for (final String warning : errors.get(topic).getWarnings())
 					topicErrorItems.add(DocbookUtils.buildListItem("WARNING: " + warning));
-	
+
 				/*
-				 * this should never be false, because a topic will only be listed
-				 * in the errors collection once a error or warning has been added.
-				 * The count of 2 comes from the standard list items we added above
-				 * for the tags and url.
+				 * this should never be false, because a topic will only be
+				 * listed in the errors collection once a error or warning has
+				 * been added. The count of 2 comes from the standard list items
+				 * we added above for the tags and url.
 				 */
 				if (topicErrorItems.size() > 2)
 				{
 					final String title = "Topic ID " + topic.getTopicId();
 					final String id = DocbookUtils.ERROR_XREF_ID_PREFIX + topic.getTopicId();
-	
+
 					errorItemizedLists += DocbookUtils.wrapListItems(topicErrorItems, title, id);
 				}
 			}
@@ -1033,6 +975,7 @@ public class DocbookBuilder
 	 */
 	protected void buildZipFile(final List<TagToCategory> topicTypeTagIDs, final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
 	{
+
 		/* build up the files that will make up the zip file */
 		final HashMap<String, byte[]> files = new HashMap<String, byte[]>();
 
@@ -1046,47 +989,25 @@ public class DocbookBuilder
 		 * the narrative style will not include a TOC or Eclipse plugin, and
 		 * includes a different publican.cfg file
 		 */
-		String publicnCfgFixed = "";
-		if (!docbookBuildingOptions.isBuildNarrative())
-		{
-			// build the table of contents
-			final TocTopLevel tocTopLevel = buildTOCCommonNameOnly(docbookBuildingOptions);
+		String publicnCfgFixed = publicanCfg;
 
-			// get the HTML TOC
-			final String toc = tocTopLevel.getDocbook();
+		// build the table of contents
+		final TocTopLevel tocTopLevel = buildTOCCommonNameOnly(docbookBuildingOptions);
 
-			// get the Eclipse TOC
-			final String eclipseToc = tocTopLevel.getEclipseXml();
+		// get the HTML TOC
+		final String toc = tocTopLevel.getDocbook();
 
-			// add the files that make up the Eclipse help package
-			files.put("Book/eclipse/com.redhat.eap6.doc_1.0.0/toc.xml", getStringBytes(eclipseToc));
-			files.put("Book/eclipse/com.redhat.eap6.doc_1.0.0/plugin.xml", getStringBytes(pluginXml));
-			files.put("Book/eclipse_package.sh", getStringBytes(LineEndFormatter.convertToLinuxLineEndings(eclisePackageSh)));
-			files.put("Book/publican_eclipse.cfg", getStringBytes(publicanEclipseCfg));
-			files.put("Book/en-US/Toc.xml", getStringBytes(toc));
-			files.put("Book/en-US/StartPage.xml", getStringBytes(startPage == null ? "" : startPage));
+		// get the Eclipse TOC
+		final String eclipseToc = tocTopLevel.getEclipseXml();
 
-			for (final TagToCategory topicTag : topicTypeTagIDs)
-			{
-				if (tagIdToDocbookMap.containsKey(topicTag.getTag().getTagId()) && tagIdToDocbookMap.get(topicTag.getTag().getTagId()).length() != 0)
-				{
-					files.put("Book/en-US/" + topicTag.getTag().getTagName().replaceAll(" ", "") + "s.xml", getStringBytes(tagIdToDocbookMap.get(topicTag.getTag().getTagId())));
-				}
-			}
+		// add the files that make up the Eclipse help package
+		files.put("Book/eclipse/com.redhat.eap6.doc_1.0.0/toc.xml", getStringBytes(eclipseToc));
+		files.put("Book/eclipse/com.redhat.eap6.doc_1.0.0/plugin.xml", getStringBytes(pluginXml));
+		files.put("Book/eclipse_package.sh", getStringBytes(LineEndFormatter.convertToLinuxLineEndings(eclisePackageSh)));
+		files.put("Book/publican_eclipse.cfg", getStringBytes(publicanEclipseCfg));
+		files.put("Book/en-US/Toc.xml", getStringBytes(toc));
+		files.put("Book/en-US/StartPage.xml", getStringBytes(startPage == null ? "" : startPage));
 
-			// now add the publican files
-			publicnCfgFixed = publicanCfg;
-		}
-		else
-		{
-			if (tagIdToDocbookMap.containsKey(Constants.TAG_ID_NARRATIVE))
-			{
-				files.put("Book/en-US/Narrative.xml", getStringBytes(tagIdToDocbookMap.get(Constants.TAG_ID_NARRATIVE)));
-			}
-
-			// now add the Publican files
-			publicnCfgFixed = narrativePublicanCfg;
-		}
 
 		// fix the Publican CFG file
 		if (docbookBuildingOptions.isPublicanShowRemarks() && publicnCfgFixed != null)
@@ -1119,11 +1040,6 @@ public class DocbookBuilder
 		files.put("Book/en-US/images/icon.svg", getStringBytes(iconSvg));
 		files.put("Book/en-US/images/jboss.svg", getStringBytes(jbossSvg));
 
-		if (tagIdToDocbookMap.containsKey(Constants.TAG_ID_ERROR))
-		{
-			files.put("Book/en-US/ErrorTopics.xml", getStringBytes(tagIdToDocbookMap.get(Constants.TAG_ID_ERROR)));
-		}
-
 		/*
 		 * build the middle of the Book.xml file, where we include references to
 		 * the topic type pages that were built above
@@ -1136,11 +1052,6 @@ public class DocbookBuilder
 			bookXmlXiIncludes += "	<xi:include href=\"Errors.xml\" xmlns:xi=\"http://www.w3.org/2001/XInclude\" />\n";
 		}
 
-		if (tagIdToDocbookMap.containsKey(Constants.TAG_ID_ERROR))
-		{
-			bookXmlXiIncludes += "	<xi:include href=\"ErrorTopics.xml\" xmlns:xi=\"http://www.w3.org/2001/XInclude\" />\n";
-		}
-
 		/*
 		 * only reference the Toc.xml file if we are not building a narrative
 		 * book
@@ -1149,21 +1060,14 @@ public class DocbookBuilder
 		{
 			bookXmlXiIncludes += "	<xi:include href=\"Toc.xml\" xmlns:xi=\"http://www.w3.org/2001/XInclude\" />";
 			bookXmlXiIncludes += "	<xi:include href=\"StartPage.xml\" xmlns:xi=\"http://www.w3.org/2001/XInclude\" />";
-
-			for (final TagToCategory topicTag : topicTypeTagIDs)
-			{
-				if (tagIdToDocbookMap.containsKey(topicTag.getTag().getTagId()) && tagIdToDocbookMap.get(topicTag.getTag().getTagId()).length() != 0)
-				{
-					bookXmlXiIncludes += "	<xi:include href=\"" + topicTag.getTag().getTagName().replaceAll(" ", "") + "s.xml\" xmlns:xi=\"http://www.w3.org/2001/XInclude\" />\n";
-				}
-			}
 		}
-		else
+		
+		/* add an xml file for each topic TODO: ordering for narrative style */
+		for (final Topic topic : tocTopicDatabase.getTopics())
 		{
-			if (tagIdToDocbookMap.containsKey(Constants.TAG_ID_NARRATIVE))
-			{
-				bookXmlXiIncludes += "	<xi:include href=\"Narrative.xml\" xmlns:xi=\"http://www.w3.org/2001/XInclude\" />\n";
-			}
+			final String fileName = "Topic" + topic.getTopicId() + ".xml";
+			files.put("Book/en-US/" + fileName, topic.getTempTopicXMLDocString().getBytes());
+			bookXmlXiIncludes += "	<xi:include href=\"" + fileName + "\" xmlns:xi=\"http://www.w3.org/2001/XInclude\" />\n";
 		}
 
 		// replace the marker in the book.xml template
@@ -1214,84 +1118,6 @@ public class DocbookBuilder
 	}
 
 	/**
-	 * Uses those topics that belong to a particular tag to build a docbook
-	 * chapter
-	 * 
-	 * @param tagId
-	 *            The TagID that the topics need to belong to in order to be
-	 *            included in the chapter
-	 * @param tagName
-	 *            The TagName that belongs to the TagID
-	 */
-	protected void buildChapterFromCollection(final Integer tagId, final List<Integer> buildOrder)
-	{
-		if (tagIdToTopicMap.containsKey(tagId))
-		{
-			// loop over the topics that have one of the type tags assigned to
-			// it
-			final HashMap<Integer, Topic> topics = tagIdToTopicMap.get(tagId);
-
-			String sections = "";
-
-			for (final Integer orderedTopicID : buildOrder)
-			{
-				if (topics.containsKey(orderedTopicID))
-					sections += topics.get(orderedTopicID).getTempTopicXMLDocString();
-			}
-
-			for (final Integer topicID : topics.keySet())
-			{
-				/*
-				 * those with a specific order are added first, and should now
-				 * be skipped
-				 */
-				if (buildOrder.contains(topicID))
-					continue;
-
-				/*
-				 * take the XML Document we have been modifying, convert it to
-				 * text, and add it to the section
-				 */
-				if (topics.containsKey(topicID))
-					sections += topics.get(topicID).getTempTopicXMLDocString();
-			}
-
-			// build up the sections into a chapter
-			if (sections.length() != 0)
-			{
-				tagIdToDocbookMap.put(tagId, DocbookUtils.addXMLBoilerplate(DocbookUtils.buildChapter(sections, "")));
-			}
-		}
-	}
-
-	/**
-	 * Builds chapters for all the tags in the topicTypeTagIDs collection
-	 * 
-	 * @param topicTypeTagIDs
-	 *            This holds a collection of Tags that are used to build the
-	 *            chapters (usually the Topic Type tags, like Concept, Task ,
-	 *            Reference etc).
-	 */
-	protected void buildChapters(final List<TagToCategory> topicTypeTagIDs, final List<Integer> buildOrder)
-	{
-		for (final TagToCategory topicTypeTag : topicTypeTagIDs)
-			buildChapterFromCollection(topicTypeTag.getTag().getTagId(), buildOrder);
-
-		/*
-		 * we know, in addition to the core tag types that will be included as
-		 * chapters, that we also need to include those topics that couldn't be
-		 * mapped to a tag because of validation errors
-		 */
-		buildChapterFromCollection(Constants.TAG_ID_ERROR, buildOrder);
-
-		/*
-		 * when building a narrative, all topics are in a single chapter in a
-		 * specific order
-		 */
-		buildChapterFromCollection(Constants.TAG_ID_NARRATIVE, buildOrder);
-	}
-
-	/**
 	 * Loads the strings for the file templates from the database
 	 */
 	protected void loadConstantsFromDB()
@@ -1331,7 +1157,6 @@ public class DocbookBuilder
 		pluginXml = loadStringConstant(PLUGIN_XML_ID);
 		eclisePackageSh = loadStringConstant(ECLIPSE_PACKAGE_SH_ID);
 		publicanEclipseCfg = loadStringConstant(PUBLICAN_ECLIPSE_CFG_ID);
-		narrativePublicanCfg = loadStringConstant(NARRATIVE_PUBLICAN_CFG_ID);
 	}
 
 	protected byte[] loadBlobConstant(final Integer id)
@@ -1454,9 +1279,6 @@ public class DocbookBuilder
 			}
 		}
 
-		// build up the xml from the process topics into chapters
-		buildChapters(topicTypeTagIDs, buildOrder);
-
 		// now build the publican zip file that will be sent to the user
 		buildZipFile(topicTypeTagIDs, tagToCategories, docbookBuildingOptions);
 	}
@@ -1483,10 +1305,10 @@ public class DocbookBuilder
 	 * the ROLE_MARKER has been defined in the template, and then calls the 2nd
 	 * populateIdXMLDataFromDB function to populate the rest of the template.
 	 */
-	protected void populateIdXMLDataFromDB(final String errorTemplate, final Topic xmlData, final boolean assignToErrorTag, final String filterUrl, final int roleCategoryID, final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
+	protected void populateIdXMLDataFromDB(final String errorTemplate, final Topic xmlData, final String filterUrl, final int roleCategoryID, final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		final String fixedTemplate = errorTemplate.replaceAll(ROLE_MARKER, xmlData.getTempTopicRole());
-		populateIdXMLDataFromDB(fixedTemplate, xmlData, assignToErrorTag, filterUrl, docbookBuildingOptions);
+		populateIdXMLDataFromDB(fixedTemplate, xmlData, filterUrl, docbookBuildingOptions);
 	}
 
 	/**
@@ -1508,24 +1330,10 @@ public class DocbookBuilder
 	 * @param filterUrl
 	 *            The URL that is used to get back to the tag search screen
 	 */
-	protected void populateIdXMLDataFromDB(final String errorTemplate, final Topic xmlData, final boolean assignToErrorTag, final String filterUrl, final DocbookBuildingOptions docbookBuildingOptions)
+	protected void populateIdXMLDataFromDB(final String errorTemplate, final Topic xmlData, final String filterUrl, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		xmlData.setTempTopicXMLDoc(buildErrorTopic(errorTemplate, xmlData, xmlData.getXRefID(), filterUrl, docbookBuildingOptions));
 		xmlData.setTempInvalidTopic(true);
-
-		/*
-		 * the topic needs to be included in the final build, but does not have
-		 * valid tags that we can associate with it. so we associate it with the
-		 * "error tag". all topics with the error tag will be included in the
-		 * docbook build, which is important if they are related to other
-		 * topics.
-		 */
-		if (assignToErrorTag)
-		{
-			if (!tagIdToTopicMap.containsKey(Constants.TAG_ID_ERROR))
-				tagIdToTopicMap.put(Constants.TAG_ID_ERROR, new HashMap<Integer, Topic>());
-			tagIdToTopicMap.get(Constants.TAG_ID_ERROR).put(xmlData.getTopicId(), xmlData);
-		}
 	}
 
 	/**
@@ -1554,7 +1362,7 @@ public class DocbookBuilder
 			 */
 			final String originalXML = XMLUtilities.cleanXMLForInclusionInCDATA(topic.getTempTopicXMLDocString());
 
-			populateIdXMLDataFromDB(errorTopic, topic, false, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
+			populateIdXMLDataFromDB(errorTopic, topic, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
 			System.out.println(topic.getTopicId().toString() + " failed docbook validation after the injection points were processed.");
 
 			addErrorToTopic(topic, "Topic failed docbook validation after the injection points were processed. The error was <emphasis>" + validator.getErrorText() + "</emphasis> The XML after the injections points were processed is: <programlisting><![CDATA[" + originalXML + "]]></programlisting>");
@@ -1576,7 +1384,7 @@ public class DocbookBuilder
 		// see if we have some xml to work with
 		if (topic.getTopicXML() == null || topic.getTopicXML().trim().length() == 0)
 		{
-			populateIdXMLDataFromDB(errorTopic, topic, false, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
+			populateIdXMLDataFromDB(errorTopic, topic, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
 			addErrorToTopic(topic, "Topic has a blank Topic XML field");
 			return false;
 		}
@@ -1587,7 +1395,7 @@ public class DocbookBuilder
 		 */
 		if (topic.getTempTopicXMLDoc() == null)
 		{
-			populateIdXMLDataFromDB(errorTopic, topic, false, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
+			populateIdXMLDataFromDB(errorTopic, topic, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
 
 			addErrorToTopic(topic, "Topic failed xml validation.");
 			return false;
@@ -1604,7 +1412,7 @@ public class DocbookBuilder
 			final String retValue = validateIdAttributesUnique(topic, searchTagsUrl, elements.item(i), usedIds);
 			if (retValue != null)
 			{
-				populateIdXMLDataFromDB(errorTopic, topic, false, searchTagsUrl, docbookBuildingOptions);
+				populateIdXMLDataFromDB(errorTopic, topic, searchTagsUrl, docbookBuildingOptions);
 				addErrorToTopic(topic, "Topic uses an id attribute called \"" + retValue + "\" that is already used in another topic.");
 				return false;
 			}
@@ -1649,7 +1457,7 @@ public class DocbookBuilder
 	 * Find the highest priority topic lifecycle tag assigned to a topic and
 	 * returns it. This is used when assigning a role to section element.
 	 */
-	protected String getTopicLifecycleRole(final Integer topicID, final int roleCategoryID, final List<TagToCategory> tagToCategories)
+	protected String getTopicLifecycleRole(final Topic topic, final int roleCategoryID, final List<TagToCategory> tagToCategories)
 	{
 		final List<TagToCategory> tags = getTagToCatgeories(roleCategoryID, tagToCategories);
 
@@ -1660,7 +1468,7 @@ public class DocbookBuilder
 		{
 			final Integer tagID = tagToCat.getTag().getTagId();
 
-			if (tagIdToTopicMap.containsKey(tagID) && tagIdToTopicMap.get(tagID).containsKey(topicID))
+			if (topic.isTaggedWith(tagID))
 				return tagToCat.getTag().getTagName().replaceAll(" ", "");
 		}
 
@@ -1674,7 +1482,7 @@ public class DocbookBuilder
 	 */
 	protected void processTopicLifecycleRole(final Topic xmlData, final Topic topic, final int roleCategoryID, final List<TagToCategory> tagToCategories)
 	{
-		final String topicTagRole = getTopicLifecycleRole(topic.getTopicId(), roleCategoryID, tagToCategories);
+		final String topicTagRole = getTopicLifecycleRole(topic, roleCategoryID, tagToCategories);
 		if (topicTagRole.length() != 0)
 			xmlData.getTempTopicXMLDoc().getDocumentElement().setAttribute("role", topicTagRole);
 	}
@@ -1686,7 +1494,7 @@ public class DocbookBuilder
 	protected void processTopicDraftWarning(final Topic xmlData, final Topic topic)
 	{
 		// if this topic has not been marked as final, add a note
-		if (!(tagIdToTopicMap.containsKey(Constants.TOPIC_FINAL_LIFECYCLE) && tagIdToTopicMap.get(Constants.TOPIC_FINAL_LIFECYCLE).containsKey(topic.getTopicId())))
+		if (!xmlData.isTaggedWith(Constants.TOPIC_FINAL_LIFECYCLE))
 		{
 			final Element note = xmlData.getTempTopicXMLDoc().createElement("note");
 			final Element title = xmlData.getTempTopicXMLDoc().createElement("title");
@@ -1875,7 +1683,7 @@ public class DocbookBuilder
 
 			if (foundTypeTags.size() > 1)
 			{
-				populateIdXMLDataFromDB(errorTagsTopic, xmlData, true, searchTagsUrl, docbookBuildingOptions);
+				populateIdXMLDataFromDB(errorTagsTopic, xmlData, searchTagsUrl, docbookBuildingOptions);
 
 				String error = "Topic " + topic.getTopicId() + " has tags";
 				for (final Tag foundTag : foundTypeTags)
@@ -1886,15 +1694,14 @@ public class DocbookBuilder
 
 				return false;
 			}
-			else
-				if (foundTypeTags.size() == 0)
-				{
-					populateIdXMLDataFromDB(errorTagsTopic, xmlData, true, searchTagsUrl, docbookBuildingOptions);
+			else if (foundTypeTags.size() == 0)
+			{
+				populateIdXMLDataFromDB(errorTagsTopic, xmlData, searchTagsUrl, docbookBuildingOptions);
 
-					addErrorToTopic(topic, "Topic is missing tags in an exclusive mandatory category");
+				addErrorToTopic(topic, "Topic is missing tags in an exclusive mandatory category");
 
-					return false;
-				}
+				return false;
+			}
 		}
 
 		for (final List<TagToCategory> mandatoryCollection : mandatoryTagCollections)
@@ -1910,7 +1717,7 @@ public class DocbookBuilder
 
 			if (foundTypeTags == 0)
 			{
-				populateIdXMLDataFromDB(errorTagsTopic, xmlData, true, searchTagsUrl, docbookBuildingOptions);
+				populateIdXMLDataFromDB(errorTagsTopic, xmlData, searchTagsUrl, docbookBuildingOptions);
 
 				addErrorToTopic(topic, "Topic is missing tags in a mandatory category");
 
@@ -1930,7 +1737,7 @@ public class DocbookBuilder
 			final List<TagToCategory> tagToCategories, final List<String> usedIds, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		/* we have already processed this topic, don't do it again */
-		if (topicIdToTopicMap.containsKey(topic.getTopicId()))
+		if (tocTopicDatabase.containsTopic(topic.getTopicId()))
 			return;
 
 		System.out.println("Processing Topic " + topic.getTopicTitle());
@@ -1941,99 +1748,68 @@ public class DocbookBuilder
 		 */
 		topic.initializeTempTopicXMLDoc();
 
-		// check to make sure this topic has not already been processed
-		if (!topicIdToTopicMap.containsKey(topic.getTopicId()))
+		topic.setTempNavLinkDocbook(DocbookUtils.buildXRefListItem(topic.getXRefID(),
+		/* the role is defined as the topic type and topic lifecycle */
+		AttributeBuilder.GENERIC_NAV_LINK_ROLE + " " + getTopicLifecycleRole(topic, roleCategoryID, tagToCategories)));
+
+		/* assign the topic data to the toc topic database */
+		tocTopicDatabase.getTopics().add(topic);
+
+		/********** VALIDATE THE TAGS **********/
+
+		if (!validateTopicTags(topic, topic, searchTagsUrl, mandatoryExclusiveTagCollections, mandatoryTagCollections, docbookBuildingOptions))
+			return;
+
+		/********** SET TOPIC ROLE **********/
+
+		// define the role, which uses the topic lifecycle tag
+		topic.setTempTopicRole(getTopicLifecycleRole(topic, roleCategoryID, tagToCategories));
+
+		/********** ADDITIONAL VALIDATION **********/
+
+		/*
+		 * make sure that we have valid XML. this won't check the validity of
+		 * the docbook, but will ensure that we are working with valid xml.
+		 */
+		if (!validateTopicXML(topic, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions))
+			return;
+
+		/*
+		 * make sure this topic is not trying to use an id attribute that has
+		 * been used previously
+		 */
+		if (!validateIdAttributesUnique(topic, searchTagsUrl, usedIds, docbookBuildingOptions))
+			return;
+
+		/********** TOPIC IS VALID **********/
+
+		/*
+		 * At this point we have a valid topic, so we can apply the various
+		 * additions and fixes to it
+		 */
+
+		processTopicID(topic);
+		processTopicCalculatePriority(topic, topic, businessRulesWorkingMemory);
+		processTopicLifecycleRole(topic, topic, roleCategoryID, tagToCategories);
+		processTopicDraftWarning(topic, topic);
+		// processTopicViewRotationLinks(xmlData, topic, tagToCategories);
+		processTopicAdditionalInfo(topic, topic, searchTagsUrl, docbookBuildingOptions);
+		processTopicFixImages(topic, topic);
+
+		/********** PROCESS RELATED TOPICS **********/
+
+		for (final TopicToTopic topicToTopic : topic.getParentTopicToTopics())
 		{
-			topic.setTempNavLinkDocbook(DocbookUtils.buildXRefListItem(topic.getXRefID(),
-			/* the role is defined as the topic type and topic lifecycle */
-			AttributeBuilder.GENERIC_NAV_LINK_ROLE + " " + getTopicLifecycleRole(topic.getTopicId(), roleCategoryID, tagToCategories)));
-
-			/* assign the topic data to the topic id map */
-			topicIdToTopicMap.put(topic.getTopicId(), topic);
-
-			/********** VALIDATE THE TAGS **********/
-
-			if (!validateTopicTags(topic, topic, searchTagsUrl, mandatoryExclusiveTagCollections, mandatoryTagCollections, docbookBuildingOptions))
-				return;
-
-			/********** ASSIGN THE TOPIC TO THE TAG MAP **********/
-
 			/*
-			 * we know the topic has the required tags, so we can now add the
-			 * topic to the tag map, which will allow us to easily reference
-			 * this topic by its tags
+			 * don't process related topics when creating a narrative, or when
+			 * specifically instructed not to
 			 */
-			for (final TopicToTag topicToTag : topic.getTopicToTags())
+			if (docbookBuildingOptions.isProcessRelatedTopics() && !docbookBuildingOptions.isBuildNarrative())
 			{
-				final Integer topicTagId = topicToTag.getTag().getTagId();
-
-				if (!tagIdToTopicMap.containsKey(topicTagId))
-					tagIdToTopicMap.put(topicTagId, new HashMap<Integer, Topic>());
-
-				tagIdToTopicMap.get(topicTagId).put(topic.getTopicId(), topic);
-			}
-
-			/*
-			 * if we are building a narrative, all topics get placed in a
-			 * special category
-			 */
-			if (docbookBuildingOptions.isBuildNarrative())
-			{
-				if (!tagIdToTopicMap.containsKey(Constants.TAG_ID_NARRATIVE))
-					tagIdToTopicMap.put(Constants.TAG_ID_NARRATIVE, new HashMap<Integer, Topic>());
-
-				tagIdToTopicMap.get(Constants.TAG_ID_NARRATIVE).put(topic.getTopicId(), topic);
-			}
-
-			// define the role, which uses the topic lifecycle tag
-			topic.setTempTopicRole(getTopicLifecycleRole(topic.getTopicId(), roleCategoryID, tagToCategories));
-
-			/********** ADDITIONAL VALIDATION **********/
-
-			/*
-			 * make sure that we have valid XML. this won't check the validity
-			 * of the docbook, but will ensure that we are working with valid
-			 * xml.
-			 */
-			if (!validateTopicXML(topic, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions))
-				return;
-
-			/*
-			 * make sure this topic is not trying to use an id attribute that
-			 * has been used previously
-			 */
-			if (!validateIdAttributesUnique(topic, searchTagsUrl, usedIds, docbookBuildingOptions))
-				return;
-
-			/********** TOPIC IS VALID **********/
-
-			/*
-			 * At this point we have a valid topic, so we can apply the various
-			 * additions and fixes to it
-			 */
-
-			processTopicID(topic);
-			processTopicCalculatePriority(topic, topic, businessRulesWorkingMemory);
-			processTopicLifecycleRole(topic, topic, roleCategoryID, tagToCategories);
-			processTopicDraftWarning(topic, topic);
-			// processTopicViewRotationLinks(xmlData, topic, tagToCategories);
-			processTopicAdditionalInfo(topic, topic, searchTagsUrl, docbookBuildingOptions);
-			processTopicFixImages(topic, topic);
-
-			/********** PROCESS RELATED TOPICS **********/
-
-			for (final TopicToTopic topicToTopic : topic.getParentTopicToTopics())
-			{
-				/*
-				 * don't process related topics when creating a narrative, or
-				 * when specifically instructed not to
-				 */
-				if (docbookBuildingOptions.isProcessRelatedTopics() && !docbookBuildingOptions.isBuildNarrative())
-				{
-					processTopic(businessRulesWorkingMemory, topicToTopic.getRelatedTopic(), mandatoryExclusiveTagCollections, mandatoryTagCollections, roleCategoryID, searchTagsUrl, tagToCategories, usedIds, docbookBuildingOptions);
-				}
+				processTopic(businessRulesWorkingMemory, topicToTopic.getRelatedTopic(), mandatoryExclusiveTagCollections, mandatoryTagCollections, roleCategoryID, searchTagsUrl, tagToCategories, usedIds, docbookBuildingOptions);
 			}
 		}
+
 	}
 
 	/**
@@ -2096,47 +1872,6 @@ public class DocbookBuilder
 	}
 
 	/**
-	 * Uses Hamcrest filters to pull out topics that match the supplied tags
-	 */
-	protected List<Topic> findTopicsForToc(final List<Integer> tagIds, final List<Integer> excludeTagIDs, final boolean limitToTags)
-	{
-		List<Topic> topicList = null;
-		for (final Integer topicType : new Integer[]
-		{ Constants.CONCEPTUALOVERVIEW_TAG_ID, Constants.TASK_TAG_ID })
-		{
-			LambdaJMatcher<Object> matcher = having(on(Topic.class).getTagIDs(), hasItem(topicType));
-
-			/*
-			 * add a limiter if we want the collection to include only the tags
-			 * we have included
-			 */
-			if (limitToTags)
-				matcher = matcher.and(having(on(Topic.class).getTagIDs().size(), equalTo(tagIds.size() + 1)));
-
-			// build a list of inclusions
-			for (final Integer includeTagId : tagIds)
-				matcher = matcher.and(having(on(Topic.class).getTagIDs(), hasItem(includeTagId)));
-
-			// build up a list of exclusions
-			if (excludeTagIDs != null)
-			{
-				for (final Object excludeTagId : excludeTagIDs)
-					matcher = matcher.and(not(having(on(Topic.class).getTagIDs(), hasItem(excludeTagId))));
-			}
-
-			final List<Topic> thisTopicList = filter(matcher, topicIdToTopicMap.values());
-
-			if (topicList == null)
-				topicList = thisTopicList;
-			else
-				topicList.addAll(thisTopicList);
-
-		}
-
-		return topicList;
-	}
-
-	/**
 	 * This function builds a TOC that shows children tags in the TOC next to
 	 * their parent names.
 	 */
@@ -2179,9 +1914,9 @@ public class DocbookBuilder
 		}
 
 		// get a list of concern tags
-		final List<Integer> concernTags = new ArrayList<Integer>();
+		final List<Tag> concernTags = new ArrayList<Tag>();
 		for (final TagToCategory concernTag : secondLevelCategory.getTagToCategories())
-			concernTags.add(concernTag.getTag().getTagId());
+			concernTags.add(concernTag.getTag());
 
 		/*
 		 * loop over the first level category. the tags in this category will
@@ -2191,7 +1926,6 @@ public class DocbookBuilder
 		{
 			// a convenience variable
 			final Tag firstLevelTag = firstLevelCategoryTag.getTag();
-			final Integer firstLevelTagId = firstLevelTag.getTagId();
 
 			/*
 			 * get a list of tags that are equivalent to this parent tag. we
@@ -2200,9 +1934,9 @@ public class DocbookBuilder
 			 * topic can be tagged with a child and parent tag, where the child
 			 * tag is a child of another parent)
 			 */
-			final List<Integer> thisChildrenTags = new ArrayList<Integer>();
+			final List<Tag> thisChildrenTags = new ArrayList<Tag>();
 			for (final TagToTag childTag : firstLevelTag.getChildrenTagToTags())
-				thisChildrenTags.add(childTag.getSecondaryTag().getTagId());
+				thisChildrenTags.add(childTag.getSecondaryTag());
 
 			// don't process child tags directly
 			if (firstLevelTag.getParentTagToTags().size() == 0)
@@ -2210,18 +1944,13 @@ public class DocbookBuilder
 				final TocFolderElement parentOnlyFolder = new TocFolderElement(docbookBuildingOptions, firstLevelTag.getTagName());
 
 				// find those topics that *only* have a parent tag
-				final List<Topic> tocTopicList = findTopicsForToc(new ArrayList<Integer>()
-				{
-					{
-						add(firstLevelTagId);
-					}
-				}, new ArrayList<Integer>()
+				final List<Topic> tocTopicList = tocTopicDatabase.getMatchingTopics(firstLevelTag, new ArrayList<Tag>()
 				{
 					{
 						addAll(thisChildrenTags);
 						addAll(concernTags);
 					}
-				}, false);
+				});
 
 				for (final Topic xmlMap : tocTopicList)
 				{
@@ -2235,15 +1964,14 @@ public class DocbookBuilder
 				for (final TagToCategory secondLevelCategoryTag : sortedCategories)
 				{
 					final Tag concernTag = secondLevelCategoryTag.getTag();
-					final Integer concernTagId = concernTag.getTagId();
 
-					final List<Topic> concernTopicList = findTopicsForToc(new ArrayList<Integer>()
+					final List<Topic> concernTopicList = tocTopicDatabase.getMatchingTopics(new ArrayList<Tag>()
 					{
 						{
-							add(firstLevelTagId);
-							add(concernTagId);
+							add(firstLevelTag);
+							add(concernTag);
 						}
-					}, thisChildrenTags, false);
+					}, thisChildrenTags);
 
 					if (concernTopicList.size() != 0)
 					{
@@ -2281,12 +2009,7 @@ public class DocbookBuilder
 					 * grabbing these topics. having the child tag implies
 					 * having the main tag
 					 */
-					final List<Topic> topicList = findTopicsForToc(new ArrayList<Integer>()
-					{
-						{
-							add(secondaryTag.getTagId());
-						}
-					}, concernTags, false);
+					final List<Topic> topicList = tocTopicDatabase.getMatchingTopics(secondaryTag, concernTags, false);
 
 					for (final Topic xmlMap : topicList)
 					{
@@ -2298,13 +2021,13 @@ public class DocbookBuilder
 					{
 						final Tag concernTag = secondLevelCategoryTag.getTag();
 
-						final List<Topic> concernTopicList = findTopicsForToc(new ArrayList<Integer>()
+						final List<Topic> concernTopicList = tocTopicDatabase.getMatchingTopics(new ArrayList<Tag>()
 						{
 							{
-								add(secondaryTag.getTagId());
-								add(concernTag.getTagId());
+								add(secondaryTag);
+								add(concernTag);
 							}
-						}, null, false);
+						});
 
 						if (concernTopicList.size() != 0)
 						{
@@ -2366,17 +2089,17 @@ public class DocbookBuilder
 		tocTopLevel.getChildren().add(new TocLink(docbookBuildingOptions, "HOME", "index"));
 
 		// get a list of tags that are equivalent to another parent tag
-		final List<Integer> childrenTags = new ArrayList<Integer>();
+		final List<Tag> childrenTags = new ArrayList<Tag>();
 		for (final TagToCategory firstLevelCategoryTag : combinedTechnologyTagToCategories)
 		{
 			if (firstLevelCategoryTag.getTag().getParentTagToTags().size() != 0)
-				childrenTags.add(firstLevelCategoryTag.getTag().getTagId());
+				childrenTags.add(firstLevelCategoryTag.getTag());
 		}
 
 		// get a list of concern tags
-		final List<Integer> concernTags = new ArrayList<Integer>();
+		final List<Tag> concernTags = new ArrayList<Tag>();
 		for (final TagToCategory concernTag : secondLevelCategory.getTagToCategories())
-			concernTags.add(concernTag.getTag().getTagId());
+			concernTags.add(concernTag.getTag());
 
 		/*
 		 * loop over the first level category. the tags in this category will
@@ -2395,9 +2118,9 @@ public class DocbookBuilder
 			 * topic can be tagged with a child and parent tag, where the child
 			 * tag is a child of another parent)
 			 */
-			final List<Integer> thisChildrenTags = new ArrayList<Integer>();
+			final List<Tag> thisChildrenTags = new ArrayList<Tag>();
 			for (final TagToTag childTag : firstLevelTag.getChildrenTagToTags())
-				thisChildrenTags.add(childTag.getSecondaryTag().getTagId());
+				thisChildrenTags.add(childTag.getSecondaryTag());
 
 			// don't process child tags directly
 			if (firstLevelTag.getParentTagToTags().size() == 0)
@@ -2405,11 +2128,11 @@ public class DocbookBuilder
 				final TocFolderElement parentOnlyFolder = new TocFolderElement(docbookBuildingOptions, firstLevelTag.getTagName());
 
 				// list of topic ids to match
-				final List<Integer> matchTagIds = new ArrayList<Integer>();
-				matchTagIds.add(firstLevelTagId);
+				final List<Tag> matchTagIds = new ArrayList<Tag>();
+				matchTagIds.add(firstLevelTag);
 
 				// list of topic ids to exclude
-				final List<Integer> excludeTagIds = new ArrayList<Integer>();
+				final List<Tag> excludeTagIds = new ArrayList<Tag>();
 				excludeTagIds.addAll(thisChildrenTags);
 				excludeTagIds.addAll(concernTags);
 
@@ -2417,22 +2140,22 @@ public class DocbookBuilder
 				 * find those topics that *only* have a parent tag, and no
 				 * concern tags. these will be placed at the top of the tree
 				 */
-				final List<Topic> parentOnlyTopicList = findTopicsForToc(matchTagIds, excludeTagIds, false);
+				final List<Topic> parentOnlyTopicList = tocTopicDatabase.getMatchingTopics(matchTagIds, excludeTagIds, false);
 
 				/*
 				 * find those topics that have a child tag. these will be placed
 				 * below the parent only topics
 				 */
 				final List<Topic> chidlrenTopicList = new ArrayList<Topic>();
-				for (final Integer childTagID : thisChildrenTags)
+				for (final Tag childTag : thisChildrenTags)
 				{
-					final List<Integer> matchChildTagIds = new ArrayList<Integer>();
-					matchChildTagIds.add(childTagID);
+					final List<Tag> matchChildTag = new ArrayList<Tag>();
+					matchChildTag.add(childTag);
 
-					final List<Integer> excludeChildTagIds = new ArrayList<Integer>();
-					excludeChildTagIds.addAll(concernTags);
+					final List<Tag> excludeChildTag = new ArrayList<Tag>();
+					excludeChildTag.addAll(concernTags);
 
-					final List<Topic> matchingTopics = findTopicsForToc(matchChildTagIds, excludeChildTagIds, false);
+					final List<Topic> matchingTopics = tocTopicDatabase.getMatchingTopics(matchChildTag, excludeChildTag);
 
 					CollectionUtilities.addAllThatDontExist(matchingTopics, chidlrenTopicList);
 				}
@@ -2461,28 +2184,28 @@ public class DocbookBuilder
 					final Tag concernTag = secondLevelCategoryTag.getTag();
 					final Integer concernTagId = concernTag.getTagId();
 
-					final List<Integer> matchConcernTagIds = new ArrayList<Integer>();
-					matchConcernTagIds.add(firstLevelTagId);
-					matchConcernTagIds.add(concernTagId);
+					final List<Tag> matchConcernTags = new ArrayList<Tag>();
+					matchConcernTags.add(firstLevelTag);
+					matchConcernTags.add(concernTag);
 
 					/*
 					 * find those topics that have only the parent tag, and the
 					 * concern tag
 					 */
-					final List<Topic> parentOnlyConcernTopicList = findTopicsForToc(matchConcernTagIds, thisChildrenTags, false);
+					final List<Topic> parentOnlyConcernTopicList = tocTopicDatabase.getMatchingTopics(matchConcernTags, thisChildrenTags);
 
 					/*
 					 * find those topics that have a child tag, and the concern
 					 * tag
 					 */
 					final List<Topic> childrenConcernTopicList = new ArrayList<Topic>();
-					for (final Integer childTagID : thisChildrenTags)
+					for (final Tag childTag : thisChildrenTags)
 					{
-						final List<Integer> matchChildTagIds = new ArrayList<Integer>();
-						matchChildTagIds.add(childTagID);
-						matchChildTagIds.add(concernTagId);
+						final List<Tag> matchChildTags = new ArrayList<Tag>();
+						matchChildTags.add(childTag);
+						matchChildTags.add(concernTag);
 
-						final List<Topic> matchingTopics = findTopicsForToc(matchChildTagIds, null, false);
+						final List<Topic> matchingTopics = tocTopicDatabase.getMatchingTopics(matchChildTags);
 
 						CollectionUtilities.addAllThatDontExist(matchingTopics, childrenConcernTopicList);
 					}

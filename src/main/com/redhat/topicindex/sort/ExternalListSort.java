@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * Defines a class that can be used to sort a List<V> against a Map<T, U>
  */
-public interface ExternalMapSort <T, U, V>
+public interface ExternalListSort <T, U, V>
 {
-	void sort (final Map<T, U> map, List<V> list);
+	void sort (final List<U> map, List<V> list);
 }

@@ -180,13 +180,6 @@ public class Constants
 	public static final Integer TASK_TAG_ID = 4;
 	public static final Integer WRITTEN_TAG_ID = 19;
 
-	/** This identifies the "tag id" of those topics that fail validation */
-	public static final Integer TAG_ID_ERROR = -1;
-	/**
-	 * This identifies the "tag id" of those topics grouped together in a
-	 * narrative build
-	 */
-	public static final Integer TAG_ID_NARRATIVE = -2;
 
 	/**
 	 * This identifies the the tag that is assigned to a topics when it is in
