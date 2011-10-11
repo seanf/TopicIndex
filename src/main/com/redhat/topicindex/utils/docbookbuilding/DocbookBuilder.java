@@ -985,36 +985,42 @@ public class DocbookBuilder
 	{
 		String errorItemizedLists = "";
 
-		for (final Topic topic : errors.keySet())
+		if (errors.size() != 0)
 		{
-			final List<String> topicErrorItems = new ArrayList<String>();
-
-			final String tags = topic.getCommaSeparatedTagList();
-			final String url = getTopicSkynetURL(topic);
-
-			topicErrorItems.add(DocbookUtils.buildListItem("INFO: " + tags));
-			topicErrorItems.add(DocbookUtils.buildListItem("INFO: <ulink url=\"" + url + "\">Topic URL</ulink>"));
-
-			for (final String error : errors.get(topic).getErrors())
-				topicErrorItems.add(DocbookUtils.buildListItem("ERROR: " + error));
-
-			for (final String warning : errors.get(topic).getWarnings())
-				topicErrorItems.add(DocbookUtils.buildListItem("WARNING: " + warning));
-
-			/*
-			 * this should never be false, because a topic will only be listed
-			 * in the errors collection once a error or warning has been added.
-			 * The count of 2 comes from the standard list items we added above
-			 * for the tags and url.
-			 */
-			if (topicErrorItems.size() > 2)
+			for (final Topic topic : errors.keySet())
 			{
-				final String title = "Topic ID " + topic.getTopicId();
-				final String id = DocbookUtils.ERROR_XREF_ID_PREFIX + topic.getTopicId();
-
-				errorItemizedLists += DocbookUtils.wrapListItems(topicErrorItems, title, id);
+				final List<String> topicErrorItems = new ArrayList<String>();
+	
+				final String tags = topic.getCommaSeparatedTagList();
+				final String url = getTopicSkynetURL(topic);
+	
+				topicErrorItems.add(DocbookUtils.buildListItem("INFO: " + tags));
+				topicErrorItems.add(DocbookUtils.buildListItem("INFO: <ulink url=\"" + url + "\">Topic URL</ulink>"));
+	
+				for (final String error : errors.get(topic).getErrors())
+					topicErrorItems.add(DocbookUtils.buildListItem("ERROR: " + error));
+	
+				for (final String warning : errors.get(topic).getWarnings())
+					topicErrorItems.add(DocbookUtils.buildListItem("WARNING: " + warning));
+	
+				/*
+				 * this should never be false, because a topic will only be listed
+				 * in the errors collection once a error or warning has been added.
+				 * The count of 2 comes from the standard list items we added above
+				 * for the tags and url.
+				 */
+				if (topicErrorItems.size() > 2)
+				{
+					final String title = "Topic ID " + topic.getTopicId();
+					final String id = DocbookUtils.ERROR_XREF_ID_PREFIX + topic.getTopicId();
+	
+					errorItemizedLists += DocbookUtils.wrapListItems(topicErrorItems, title, id);
+				}
 			}
-
+		}
+		else
+		{
+			errorItemizedLists = "<para>No Errors Found</para>";
 		}
 
 		return DocbookUtils.buildChapter(errorItemizedLists, "Compiler Output");
