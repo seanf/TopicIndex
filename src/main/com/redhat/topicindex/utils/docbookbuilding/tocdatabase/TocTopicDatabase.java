@@ -64,7 +64,7 @@ public class TocTopicDatabase
 					break;					
 				}
 			}
-			if (foundMatchingTag)
+			if (!foundMatchingTag)
 				continue;
 
 			/* check for excluded tags */
