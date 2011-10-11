@@ -677,53 +677,76 @@ public class DocbookBuilder
 						 */
 						final HashMap<Tag, ArrayList<Topic>> relatedLists = new HashMap<Tag, ArrayList<Topic>>();
 
+						String genericInjectionErrors = "";
+
 						/* wrap each related topic in a listitem tag */
 						for (final Topic relatedTopic : topic.getOutgoingTopicsArray())
 						{
-							/*
-							 * don't process those topics that were / injected
-							 * into custom injection points
-							 */
-							if (!customInjectionIds.contains(relatedTopic))
+							if (!tocTopicDatabase.containsTopic(relatedTopic))
 							{
-								// loop through the topic type tags
-								for (final TagToCategory primaryTopicTypeTag : topicTypeTagIDs)
+								if (genericInjectionErrors.length() != 0)
+									genericInjectionErrors += ", ";
+								genericInjectionErrors += relatedTopic.getTopicId();
+							}
+							else
+							{
+								/*
+								 * don't process those topics that were /
+								 * injected into custom injection points
+								 */
+								if (!customInjectionIds.contains(relatedTopic))
 								{
-									final Integer primaryTopicTypeTagId = primaryTopicTypeTag.getTag().getTagId();
-
-									/*
-									 * see if we have processed a related topic
-									 * with one of the topic type tags this may
-									 * never be true if not processing all
-									 * related topics
-									 */
-									if (relatedTopic.isTaggedWith(primaryTopicTypeTagId))
+									// loop through the topic type tags
+									for (final TagToCategory primaryTopicTypeTag : topicTypeTagIDs)
 									{
-										/*
-										 * at this point we have found a topic
-										 * that is related, has not been
-										 * included in any custom injection
-										 * points, and has been processed
-										 */
-
-										if (!relatedLists.containsKey(primaryTopicTypeTag.getTag()))
-											relatedLists.put(primaryTopicTypeTag.getTag(), new ArrayList<Topic>());
+										final Integer primaryTopicTypeTagId = primaryTopicTypeTag.getTag().getTagId();
 
 										/*
-										 * add the related topic to the
-										 * relatedLists collection against the
-										 * topic type tag that has been assigned
-										 * to the related topic
+										 * see if we have processed a related
+										 * topic with one of the topic type tags
+										 * this may never be true if not
+										 * processing all related topics
 										 */
-										relatedLists.get(primaryTopicTypeTag.getTag()).add(relatedTopic);
+										if (relatedTopic.isTaggedWith(primaryTopicTypeTagId))
+										{
+											/*
+											 * at this point we have found a
+											 * topic that is related, has not
+											 * been included in any custom
+											 * injection points, and has been
+											 * processed
+											 */
 
-										break;
+											if (!relatedLists.containsKey(primaryTopicTypeTag.getTag()))
+												relatedLists.put(primaryTopicTypeTag.getTag(), new ArrayList<Topic>());
+
+											/*
+											 * add the related topic to the
+											 * relatedLists collection against
+											 * the topic type tag that has been
+											 * assigned to the related topic
+											 */
+											relatedLists.get(primaryTopicTypeTag.getTag()).add(relatedTopic);
+
+											break;
+										}
 									}
 								}
 							}
 						}
 
-						insertGenericInjectionLinks(topic.getTempTopicXMLDoc(), relatedLists);
+						if (genericInjectionErrors.length() != 0 && !docbookBuildingOptions.isIgnoreMissingCustomInjections())
+						{
+							addErrorToTopic(
+									topic,
+									"Topic references Topic(s) "
+											+ genericInjectionErrors
+											+ ", but these topics were not matched by the filter. This might occur if you are building a narrative and the related topic was not listed in the Topic ID field, or you have not selected the 'Include all related topics' option.");
+						}
+						else
+						{
+							insertGenericInjectionLinks(topic.getTempTopicXMLDoc(), relatedLists);
+						}
 					}
 
 					/*
@@ -1006,7 +1029,6 @@ public class DocbookBuilder
 		files.put("Book/en-US/Toc.xml", getStringBytes(toc));
 		files.put("Book/en-US/StartPage.xml", getStringBytes(startPage == null ? "" : startPage));
 
-
 		// fix the Publican CFG file
 		if (docbookBuildingOptions.isPublicanShowRemarks() && publicnCfgFixed != null)
 			publicnCfgFixed += "\nshow_remarks: 1";
@@ -1059,7 +1081,7 @@ public class DocbookBuilder
 			bookXmlXiIncludes += "	<xi:include href=\"Toc.xml\" xmlns:xi=\"http://www.w3.org/2001/XInclude\" />";
 			bookXmlXiIncludes += "	<xi:include href=\"StartPage.xml\" xmlns:xi=\"http://www.w3.org/2001/XInclude\" />";
 		}
-		
+
 		/* add an xml file for each topic TODO: ordering for narrative style */
 		String topics = "";
 		for (final Topic topic : tocTopicDatabase.getTopics())
@@ -1068,10 +1090,10 @@ public class DocbookBuilder
 			files.put("Book/en-US/" + fileName, DocbookUtils.addXMLBoilerplate(topic.getTempTopicXMLDocString()).getBytes());
 			topics += "	<xi:include href=\"" + fileName + "\" xmlns:xi=\"http://www.w3.org/2001/XInclude\" />\n";
 		}
-		
+
 		topics = DocbookUtils.addXMLBoilerplate(DocbookUtils.buildChapter(topics, ""));
 		files.put("Book/en-US/Topics.xml", topics.getBytes());
-		
+
 		bookXmlXiIncludes += "	<xi:include href=\"Topics.xml\" xmlns:xi=\"http://www.w3.org/2001/XInclude\" />\n";
 
 		// replace the marker in the book.xml template
@@ -2145,8 +2167,8 @@ public class DocbookBuilder
 				final List<Topic> parentOnlyTopicList = tocTopicDatabase.getMatchingTopics(matchTag, excludeTag);
 
 				/*
-				 * find those topics that have a child tag, but no concern. these will be placed
-				 * below the parent only topics
+				 * find those topics that have a child tag, but no concern.
+				 * these will be placed below the parent only topics
 				 */
 				final List<Topic> chidlrenTopicList = new ArrayList<Topic>();
 				for (final Tag childTag : thisChildrenTags)

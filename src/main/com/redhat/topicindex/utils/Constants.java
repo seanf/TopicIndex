@@ -7,6 +7,8 @@ public class Constants
 	 * in the format yyyymmdd-hhmm
 	 */
 	public static final String BUILD = "20111011-1631";
+	
+	public static final String TOPIC_XREF_PREFIX = "TopicID";
 
 	/** The format of the date to be displayed by any date widget */
 	public static final String FILTER_DISPLAY_DATE_FORMAT = "dd MMM yyyy HH:mm";

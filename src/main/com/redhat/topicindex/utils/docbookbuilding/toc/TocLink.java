@@ -1,5 +1,6 @@
 package com.redhat.topicindex.utils.docbookbuilding.toc;
 
+import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.docbookbuilding.DocbookBuildingOptions;
 
 /**
@@ -21,7 +22,7 @@ public class TocLink extends TocElement
 	
 	protected void setTopicId(final Integer topicId)
 	{
-		this.pageName = "TopicID" + topicId;
+		this.pageName = Constants.TOPIC_XREF_PREFIX + topicId;
 	}
 	
 	public TocLink(final DocbookBuildingOptions docbookBuildingOptions, final String label, final String pageName)
@@ -34,13 +35,13 @@ public class TocLink extends TocElement
 	public TocLink(final DocbookBuildingOptions docbookBuildingOptions, final String label, final Integer topicId)
 	{
 		super(docbookBuildingOptions, label);
-		this.pageName = "TopicID" + topicId;
+		this.pageName = Constants.TOPIC_XREF_PREFIX + topicId;
 	}
 	
 	public TocLink(final DocbookBuildingOptions docbookBuildingOptions, final String label, final Integer topicId, final String docbook)
 	{
 		super(docbookBuildingOptions, label, docbook);
-		this.pageName = "TopicID" + topicId;
+		this.pageName = Constants.TOPIC_XREF_PREFIX + topicId;
 		
 	}
 	

@@ -125,7 +125,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	private Integer tempRelativePriority;
 	/** true if this topic has failed validation */
 	private boolean tempInvalidTopic = false;
-	/** The Docbook ListItem that holds an XRef to this topic */
+	/** The Docbook ListItem that holds an XRef to this topic. This link is used when building the TOC */
 	private String tempNavLinkDocbook;
 
 	public Topic()
@@ -877,7 +877,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	@Transient
 	public String getXRefID()
 	{
-		return "TopicID" + this.topicId;
+		return Constants.TOPIC_XREF_PREFIX + this.topicId;
 	}
 
 	@Transient
