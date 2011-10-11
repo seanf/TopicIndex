@@ -1355,8 +1355,6 @@ public class DocbookBuilder
 	 */
 	protected boolean postValidateTopicDocbook(final Topic topic, final String searchTagsUrl, final int roleCategoryID, final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
 	{
-		System.out.println("Post Validating XML For Topic " + topic.getTopicTitle());
-		
 		final XMLValidator validator = new XMLValidator();
 
 		// get the xml document, or null if it was not valid
