@@ -65,6 +65,7 @@ import com.redhat.topicindex.utils.docbookbuilding.toc.TocTopLevel;
 import com.redhat.topicindex.utils.docbookbuilding.tocdatabase.TocTopicDatabase;
 import com.redhat.topicindex.utils.structures.DroolsEvent;
 import com.redhat.topicindex.utils.structures.TopicErrorData;
+import com.redhat.topicindex.utils.structures.TopicErrorDatabase;
 import com.redhat.topicindex.utils.structures.TopicImageData;
 
 /**
@@ -378,7 +379,7 @@ public class DocbookBuilder
 	 * Holds the compiler errors that form the Errors.xml file in the compiled
 	 * docbook
 	 */
-	protected Map<Topic, TopicErrorData> errors = new HashMap<Topic, TopicErrorData>();
+	protected TopicErrorDatabase errorDatabase = new TopicErrorDatabase();
 
 	/**
 	 * Holds information on file url locations, which will be downloaded and
@@ -501,7 +502,7 @@ public class DocbookBuilder
 						 * look for the topic mentioned in the injection point
 						 * in the list of related topics
 						 */
-						if (topicData.getRelatedTopicIDs().contains(sequenceID.topicId) && tocTopicDatabase.containsTopic(sequenceID.topicId))
+						if (topicData.isRelatedTo(sequenceID.topicId) && tocTopicDatabase.containsTopic(sequenceID.topicId))
 						{
 							/*
 							 * this injected topic is also related, so we don't
@@ -615,7 +616,7 @@ public class DocbookBuilder
 
 					/* remove the last ", " from the error string */
 					injectionErrors = injectionErrors.substring(0, injectionErrors.length() - 2);
-					addErrorToTopic(
+					errorDatabase.addError(
 							topic,
 							"Topic references Topic(s) "
 									+ injectionErrors
@@ -737,11 +738,8 @@ public class DocbookBuilder
 
 						if (genericInjectionErrors.length() != 0 && !docbookBuildingOptions.isIgnoreMissingCustomInjections())
 						{
-							addErrorToTopic(
-									topic,
-									"Topic references Topic(s) "
-											+ genericInjectionErrors
-											+ ", but these topics were not matched by the filter. This might occur if you are building a narrative and the related topic was not listed in the Topic ID field, or you have not selected the 'Include all related topics' option.");
+							errorDatabase.addError(topic, "Topic references Topic(s) " + genericInjectionErrors
+									+ ", but these topics were not matched by the filter. This might occur if you are building a narrative and the related topic was not listed in the Topic ID field, or you have not selected the 'Include all related topics' option.");
 						}
 						else
 						{
@@ -919,14 +917,14 @@ public class DocbookBuilder
 					}
 					else
 					{
-						addErrorToTopic(imageLocation.getTopic(), "ImageFile ID " + topicID + " from image location " + imageLocation + " was not found!");
+						errorDatabase.addError(imageLocation.getTopic(), "ImageFile ID " + topicID + " from image location " + imageLocation + " was not found!");
 						System.out.println("ImageFile ID " + topicID + " from image location " + imageLocation + " was not found!");
 					}
 				}
 				catch (final Exception ex)
 				{
 					success = false;
-					addErrorToTopic(imageLocation.getTopic(), imageLocation + " is not a valid image. Must be in the format [ImageFileID].extension e.g. 123.png, or images/321.jpg");
+					errorDatabase.addError(imageLocation.getTopic(), imageLocation + " is not a valid image. Must be in the format [ImageFileID].extension e.g. 123.png, or images/321.jpg");
 					ExceptionUtilities.handleException(ex);
 				}
 			}
@@ -948,10 +946,12 @@ public class DocbookBuilder
 	{
 		String errorItemizedLists = "";
 
-		if (errors.size() != 0)
+		if (errorDatabase.hasItems())
 		{
-			for (final Topic topic : errors.keySet())
+			for (final TopicErrorData topicErrorData : errorDatabase.getErrors())
 			{
+				final Topic topic = topicErrorData.getTopic();
+
 				final List<String> topicErrorItems = new ArrayList<String>();
 
 				final String tags = topic.getCommaSeparatedTagList();
@@ -960,10 +960,10 @@ public class DocbookBuilder
 				topicErrorItems.add(DocbookUtils.buildListItem("INFO: " + tags));
 				topicErrorItems.add(DocbookUtils.buildListItem("INFO: <ulink url=\"" + url + "\">Topic URL</ulink>"));
 
-				for (final String error : errors.get(topic).getErrors())
+				for (final String error : topicErrorData.getItemsOfType(TopicErrorDatabase.ERROR))
 					topicErrorItems.add(DocbookUtils.buildListItem("ERROR: " + error));
 
-				for (final String warning : errors.get(topic).getWarnings())
+				for (final String warning : topicErrorData.getItemsOfType(TopicErrorDatabase.WARNING))
 					topicErrorItems.add(DocbookUtils.buildListItem("WARNING: " + warning));
 
 				/*
@@ -1391,7 +1391,7 @@ public class DocbookBuilder
 			populateIdXMLDataFromDB(errorTopic, topic, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
 			System.out.println(topic.getTopicId().toString() + " failed docbook validation after the injection points were processed.");
 
-			addErrorToTopic(topic, "Topic failed docbook validation after the injection points were processed. The error was <emphasis>" + validator.getErrorText() + "</emphasis> The XML after the injections points were processed is: <programlisting><![CDATA[" + originalXML + "]]></programlisting>");
+			errorDatabase.addError(topic, "Topic failed docbook validation after the injection points were processed. The error was <emphasis>" + validator.getErrorText() + "</emphasis> The XML after the injections points were processed is: <programlisting><![CDATA[" + originalXML + "]]></programlisting>");
 			return false;
 		}
 
@@ -1411,7 +1411,7 @@ public class DocbookBuilder
 		if (topic.getTopicXML() == null || topic.getTopicXML().trim().length() == 0)
 		{
 			populateIdXMLDataFromDB(errorTopic, topic, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
-			addErrorToTopic(topic, "Topic has a blank Topic XML field");
+			errorDatabase.addError(topic, "Topic has a blank Topic XML field");
 			return false;
 		}
 
@@ -1423,7 +1423,7 @@ public class DocbookBuilder
 		{
 			populateIdXMLDataFromDB(errorTopic, topic, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
 
-			addErrorToTopic(topic, "Topic failed xml validation.");
+			errorDatabase.addError(topic, "Topic failed xml validation.");
 			return false;
 		}
 
@@ -1439,7 +1439,7 @@ public class DocbookBuilder
 			if (retValue != null)
 			{
 				populateIdXMLDataFromDB(errorTopic, topic, searchTagsUrl, docbookBuildingOptions);
-				addErrorToTopic(topic, "Topic uses an id attribute called \"" + retValue + "\" that is already used in another topic.");
+				errorDatabase.addError(topic, "Topic uses an id attribute called \"" + retValue + "\" that is already used in another topic.");
 				return false;
 			}
 		}
@@ -1715,7 +1715,7 @@ public class DocbookBuilder
 					error += " " + foundTag.getTagName() + " [" + foundTag.getTagId() + "]";
 				error += " assigned to it from a mutually exclusive catgeory group";
 
-				addErrorToTopic(topic, error);
+				errorDatabase.addError(topic, error);
 
 				return false;
 			}
@@ -1723,7 +1723,7 @@ public class DocbookBuilder
 			{
 				populateIdXMLDataFromDB(errorTagsTopic, xmlData, searchTagsUrl, docbookBuildingOptions);
 
-				addErrorToTopic(topic, "Topic is missing tags in an exclusive mandatory category");
+				errorDatabase.addError(topic, "Topic is missing tags in an exclusive mandatory category");
 
 				return false;
 			}
@@ -1744,7 +1744,7 @@ public class DocbookBuilder
 			{
 				populateIdXMLDataFromDB(errorTagsTopic, xmlData, searchTagsUrl, docbookBuildingOptions);
 
-				addErrorToTopic(topic, "Topic is missing tags in a mandatory category");
+				errorDatabase.addError(topic, "Topic is missing tags in a mandatory category");
 
 				return false;
 			}
@@ -1867,7 +1867,7 @@ public class DocbookBuilder
 		// if no matching tags were found, create a warning
 		if (!foundTechnology)
 		{
-			addErrorToTopic(topic, "Topic is not tagged with a technology type", false);
+			errorDatabase.addWarning(topic, "Topic is not tagged with a technology type");
 		}
 
 		return foundTechnology;
@@ -2254,24 +2254,6 @@ public class DocbookBuilder
 
 		tocTopLevel.generateCode();
 		return tocTopLevel;
-	}
-
-	private void addErrorToTopic(final Topic topic, final String message)
-	{
-		addErrorToTopic(topic, message, true);
-	}
-
-	private void addErrorToTopic(final Topic topic, final String message, boolean error)
-	{
-		if (!this.errors.containsKey(topic))
-			this.errors.put(topic, new TopicErrorData());
-
-		final TopicErrorData topicErrorData = this.errors.get(topic);
-
-		if (error)
-			topicErrorData.getErrors().add(message);
-		else
-			topicErrorData.getWarnings().add(message);
 	}
 
 	private String getTopicSkynetURL(final Topic topic)
