@@ -1600,7 +1600,7 @@ public class DocbookBuilder
 		 * if the xml is not blank, but the tempTopicXMLDoc variable is null, we
 		 * must have had some invalid xml
 		 */
-		if (validateTopicXMLDocument(topic))
+		if (!validateTopicXMLDocument(topic))
 		{
 			populateIdXMLDataFromDB(errorTopic, topic, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
 
