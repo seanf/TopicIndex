@@ -25,29 +25,17 @@ public class TocLink extends TocElement
 		this.pageName = Constants.TOPIC_XREF_PREFIX + topicId;
 	}
 	
-	public TocLink(final DocbookBuildingOptions docbookBuildingOptions, final String label, final String pageName)
+	public TocLink(final DocbookBuildingOptions docbookBuildingOptions, final String label, final String id)
 	{
-		super(docbookBuildingOptions, label);
-		this.pageName = pageName;
+		super(docbookBuildingOptions, label, id);
+		this.pageName = Constants.TOPIC_XREF_PREFIX + id;
 	}
 	
-	public TocLink(final DocbookBuildingOptions docbookBuildingOptions, final String label, final Integer topicId)
+	public TocLink(final DocbookBuildingOptions docbookBuildingOptions, final String label, final String id, final String docbook)
 	{
-		super(docbookBuildingOptions, label);
-		this.pageName = Constants.TOPIC_XREF_PREFIX + topicId;
-	}
-	
-	public TocLink(final DocbookBuildingOptions docbookBuildingOptions, final String label, final Integer topicId, final String docbook)
-	{
-		super(docbookBuildingOptions, label, docbook);
-		this.pageName = Constants.TOPIC_XREF_PREFIX + topicId;
+		super(docbookBuildingOptions, label, id, docbook);
+		this.pageName = Constants.TOPIC_XREF_PREFIX + id;
 		
-	}
-	
-	public TocLink(final DocbookBuildingOptions docbookBuildingOptions, final String label)
-	{
-		super(docbookBuildingOptions, label);
-		this.pageName = "";
 	}
 	
 	public TocLink()

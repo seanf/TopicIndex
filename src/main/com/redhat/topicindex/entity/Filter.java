@@ -24,6 +24,7 @@ import org.hibernate.envers.Audited;
 import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
 
+import com.redhat.ecs.commonutils.CollectionUtilities;
 import com.redhat.topicindex.utils.Constants;
 
 /**
@@ -374,6 +375,162 @@ public class Filter implements java.io.Serializable
 		}
 
 		return urlVars;
+	}
+	
+	/**
+	 * This function is used to create the HQL query where clause that is
+	 * appended to the generic EJBQL (as created in default EntityList objects)
+	 * select statement. It takes the request parameters to get the tags that
+	 * are to be included in the clause, groups them by category, and then take
+	 * additional request parameters to define the boolean operations to use
+	 * between tags in a category, and between categories.
+	 * 
+	 * @return the clause to append to the EJBQL select statement
+	 */
+	public String buildQuery()
+	{
+		// the categories to be ANDed will be added to this string
+		String andQueryBlock = "";
+		// the categories to be ORed will be added to this string
+		String orQueryBlock = "";
+
+		// loop over the projects that the tags in this filter are assigned to
+		for (final Project project : this.getFilterTagProjects())
+		{
+			// loop over the categories of tags we found
+			for (final Category category : this.getFilterTagCategories())
+			{
+				// define the default logic used for the FilterTag categories
+				String catInternalLogic = Constants.OR_LOGIC;
+				String catExternalLogic = Constants.AND_LOGIC;
+
+				/*
+				 * Now loop over the FilterCategories, looking for any
+				 * categories that specify a particular boolean logic to apply.
+				 * Remember that not all FilterTags will have an associated
+				 * FilterCategory that specifies the logic to use, in which case
+				 * the default logic defined above will be used.
+				 */
+				final Set<FilterCategory> filterCatgeories = this.getFilterCategories();
+				for (final FilterCategory filterCatgeory : filterCatgeories)
+				{
+					final boolean categoryMatch = category.equals(filterCatgeory.getCategory());
+					/*
+					 * project or filterCatgeory.getProject() might be null.
+					 * CollectionUtilities.isEqual deals with this situation
+					 */
+					final boolean projectMatch = CollectionUtilities.isEqual(project, filterCatgeory.getProject());
+
+					if (categoryMatch && projectMatch)
+					{
+						final int categoryState = filterCatgeory.getCategoryState();
+
+						if (categoryState == Constants.CATEGORY_INTERNAL_AND_STATE)
+							catInternalLogic = Constants.AND_LOGIC;
+						else
+							if (categoryState == Constants.CATEGORY_INTERNAL_OR_STATE)
+								catInternalLogic = Constants.OR_LOGIC;
+							else
+								if (categoryState == Constants.CATEGORY_EXTERNAL_AND_STATE)
+									catExternalLogic = Constants.AND_LOGIC;
+								else
+									if (categoryState == Constants.CATEGORY_EXTERNAL_OR_STATE)
+										catExternalLogic = Constants.OR_LOGIC;
+					}
+				}
+
+				/*
+				 * now build up the HQL that checks to see if the FilterTags
+				 * exist (or not) in this category
+				 */
+				String categoryBlock = "";
+
+				boolean matchedSomeTags = false;
+
+				final Set<FilterTag> filterTags = this.getFilterTags();
+				for (final FilterTag filterTag : filterTags)
+				{
+					final Tag tag = filterTag.getTag();
+
+					/*
+					 * first check to make sure that the FilterTag is actually
+					 * associated with the category we are looking at now
+					 */
+					if (tag.isInCategory(category) && tag.isInProject(project))
+					{
+						matchedSomeTags = true;
+
+						/* get the TagID for convenience */
+						final String value = tag.getTagId().toString();
+						/*
+						 * a FilterTag state of 1 "means exists in category",
+						 * and 0 means "does not exist in category"
+						 */
+						final boolean matchTag = filterTag.getTagState() == Constants.MATCH_TAG_STATE;
+
+						if (categoryBlock.length() != 0)
+							categoryBlock += " " + catInternalLogic + " ";
+
+						if (matchTag)
+						{
+							/* match the tag in this category */
+							categoryBlock += "exists (select 1 from TopicToTag topicToTag where topicToTag.topic = topic and topicToTag.tag.tagId = " + value + ") ";
+						}
+						else
+						{
+							/* make sure this tag does not exist in this
+							 category */
+							categoryBlock += "not exists (select 1 from TopicToTag topicToTag where topicToTag.topic = topic and topicToTag.tag.tagId = " + value + ") ";
+						}
+					}
+				}
+
+				if (matchedSomeTags)
+				{
+					categoryBlock = "(" + categoryBlock + ")";
+
+					// append this clause to the appropriate block
+					if (catExternalLogic.equals(Constants.AND_LOGIC))
+					{
+						if (andQueryBlock.length() != 0)
+							andQueryBlock += " " + Constants.AND_LOGIC + " ";
+
+						andQueryBlock += categoryBlock;
+					}
+					else
+					{
+						if (orQueryBlock.length() != 0)
+							orQueryBlock += " " + Constants.OR_LOGIC + " ";
+
+						orQueryBlock += categoryBlock;
+					}
+				}
+
+			}
+		}
+
+		String query = "";
+
+		// build up the category query if some conditions were specified
+		// if not, we will just return an empty string
+		if (andQueryBlock.length() != 0 || orQueryBlock.length() != 0)
+		{
+			// add the and categories
+			if (andQueryBlock.length() != 0)
+				query += "(" + andQueryBlock + ")";
+
+			// add the or categories
+			if (orQueryBlock.length() != 0)
+				query += (query.length() != 0 ? " And " : "") + "(" + orQueryBlock + ")";
+
+			// add the where clause
+			// have to join the topic and its collection of tags in order for
+			// the filter to work
+			if (query.length() != 0)
+				query = " where " + query;
+		}
+
+		return query;
 	}
 
 }

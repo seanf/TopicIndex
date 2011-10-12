@@ -52,6 +52,18 @@ public class TocTopicDatabase
 	{
 		return getMatchingTopicsFromInteger(tag).size() != 0;
 	}
+	
+	public List<Tag> getTagsFromCategories(final List<Integer> categoryIds)
+	{
+		final List<Tag> retValue = new ArrayList<Tag>();
+		
+		for (final Topic topic : topics)
+		{
+			CollectionUtilities.addAllThatDontExist(topic.getTagsInCategoriesByID(categoryIds), retValue);
+		}
+		
+		return retValue;
+	}
 
 	public List<Topic> getMatchingTopicsFromInteger(final List<Integer> matchingTags, final List<Integer> excludeTags, final boolean haveOnlyMatchingTags)
 	{

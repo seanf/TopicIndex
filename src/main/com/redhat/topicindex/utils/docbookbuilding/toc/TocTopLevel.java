@@ -12,14 +12,14 @@ import com.redhat.topicindex.utils.docbookbuilding.DocbookUtils;
  */
 public class TocTopLevel extends TocFolderElement
 {
-	public TocTopLevel(final DocbookBuildingOptions docbookBuildingOptions, final String label, final List<TocElement> children)
+	public TocTopLevel(final DocbookBuildingOptions docbookBuildingOptions, final String label, final String id, final List<TocElement> children)
 	{
-		super(docbookBuildingOptions, label, children);
+		super(docbookBuildingOptions, label, id, children);
 	}
 
-	public TocTopLevel(final DocbookBuildingOptions docbookBuildingOptions, final String label)
+	public TocTopLevel(final DocbookBuildingOptions docbookBuildingOptions, final String label, final String id)
 	{
-		super(docbookBuildingOptions, label);
+		super(docbookBuildingOptions, label, id);
 	}
 
 	public TocTopLevel(final DocbookBuildingOptions docbookBuildingOptions)

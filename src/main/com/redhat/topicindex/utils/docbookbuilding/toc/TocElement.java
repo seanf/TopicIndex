@@ -7,38 +7,43 @@ import com.redhat.topicindex.utils.docbookbuilding.DocbookBuildingOptions;
  */
 public abstract class TocElement 
 {
+	/** The name of this element */
 	protected String label;
+	/** The DocBook XML that is used to render this element */
 	protected String docbook;
+	/** The XML that is used to render this element in an Eclipse tree */
 	protected String eclipseXml;
+	/** The options specified by the user when building the DocBook */
 	protected DocbookBuildingOptions docbookBuildingOptions;
+	/** The id of this element */
+	protected String id;
 
 	public String getLabel() 
 	{
 		return label;
 	}
 
-	public void setLabel(final DocbookBuildingOptions docbookBuildingOptions, final String label) 
+	public void setLabel(final String label) 
 	{
 		this.label = label;
-		this.docbookBuildingOptions = docbookBuildingOptions;
-		this.docbook = "";
-		this.eclipseXml = "";
 	}
 	
-	public TocElement(final DocbookBuildingOptions docbookBuildingOptions, final String label, final String docbook)
+	public TocElement(final DocbookBuildingOptions docbookBuildingOptions, final String label, final String id, final String docbook)
 	{
 		this.label = label;
 		this.docbookBuildingOptions = docbookBuildingOptions;
 		this.docbook = docbook;
 		this.eclipseXml = "";
+		this.id = id;
 	}
 	
-	public TocElement(final DocbookBuildingOptions docbookBuildingOptions, final String label)
+	public TocElement(final DocbookBuildingOptions docbookBuildingOptions, final String label, final String id)
 	{
 		this.label = label;
 		this.docbookBuildingOptions = docbookBuildingOptions;
 		this.docbook = "";
 		this.eclipseXml = "";
+		this.id = id;
 	}
 	
 	public TocElement(final DocbookBuildingOptions docbookBuildingOptions)
@@ -78,4 +83,14 @@ public abstract class TocElement
 	}
 	
 	public abstract void generateCode();
+
+	public String getId()
+	{
+		return id;
+	}
+
+	public void setId(String id)
+	{
+		this.id = id;
+	}
 }

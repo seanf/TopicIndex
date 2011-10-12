@@ -168,7 +168,7 @@ public class ExtendedTopicList extends TopicList
 				filterVars = filter.getUrlVariables();
 	
 				// add the and and or categories clause to the default statement
-				final String query = EntityUtilities.buildQuery(FacesContext.getCurrentInstance(), filter);
+				final String query = filter.buildQuery();
 				this.constructedEJBQL = Topic.SELECT_ALL_QUERY + " " + query;
 			}
 			else

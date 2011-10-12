@@ -19,7 +19,6 @@ import com.redhat.topicindex.reporting.googlecharts.GooglePieChart;
 import com.redhat.topicindex.reporting.googlecharts.GoogleBarChart;
 
 global Topic topic;
-global Topic idXmlMap;
 global TreeMap guiInputData;
 global ArrayList quickTags;
 global UserPrefsData userPrefsData;
@@ -624,7 +623,7 @@ rule "Calculate Relative Priority"
 	when
 		DroolsEvent(eventName == "CalculateRelativePriority")
 	then 
-		idXmlMap.setTempRelativePriority(calculateRelativePriority(topic));
+		topic.setTempRelativePriority(calculateRelativePriority(topic));
 end
 
 rule "Populate IA User Preferences"
