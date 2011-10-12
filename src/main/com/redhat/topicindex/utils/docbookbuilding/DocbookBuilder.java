@@ -1345,6 +1345,11 @@ public class DocbookBuilder
 		buildZipFile(topicTypeTagIDs, tagToCategories, docbookBuildingOptions);
 	}
 
+	/**
+	 * This function will take a look at the topics that have been added to the topicDatabase, and create
+	 * new Topics for landing pages for the intersection between the technology / common name tags and concern tags.
+	 * @param usedIds
+	 */
 	private void processTagDescriptionTopics(final List<String> usedIds)
 	{
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
@@ -1436,12 +1441,20 @@ public class DocbookBuilder
 					processTopicID(landingPage);
 					processTopicFixImages(landingPage);
 					
+					/* Insert some links to those topics that have both the technology / common name tag and the concern tag */
+					final List<Node> listitems = new ArrayList<Node>();
+					for (final Topic matchingTopic : matchingTopics)
+						listitems.add(DocbookUtils.createRelatedTopicLink(landingPage.getTempTopicXMLDoc(), matchingTopic.getXRefID()));
+					final Node itemizedlist = DocbookUtils.wrapListItems(landingPage.getTempTopicXMLDoc(), listitems);
+					landingPage.getTempTopicXMLDoc().getDocumentElement().appendChild(itemizedlist);
+					
 					/* Decrement the landing page topic id counter */
 					--nextLandingPageId;					
 				}
 			}
 		}
 	}
+
 
 	private Document buildErrorTopic(final String template, final Topic xmlData, final String xref, final String filterUrl,
 			final DocbookBuildingOptions docbookBuildingOptions)
