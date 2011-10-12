@@ -451,8 +451,7 @@ public class DocbookBuilder
 	 * 
 	 * @return a list of topics that were injected but not related
 	 */
-	private String processCustomInjectionPoints(final ArrayList<Integer> customInjectionIds, final HashMap<Node, InjectionListData> customInjections,
-			final int injectionPointType, final Integer topidID, final Topic topicData, final String regularExpression,
+	private String processCustomInjectionPoints(final ArrayList<Integer> customInjectionIds, final HashMap<Node, InjectionListData> customInjections, final int injectionPointType, final Integer topidID, final Topic topicData, final String regularExpression,
 			final ExternalListSort<Integer, Topic, InjectionTopicData> sortComparator, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		final Document xmlDocument = topicData.getTempTopicXMLDoc();
@@ -585,8 +584,7 @@ public class DocbookBuilder
 	 * This function takes the list of topics and their related topics and
 	 * injects xrefs
 	 */
-	private void processInjections(final List<TagToCategory> topicTypeTagIDs, final String searchTagsUrl, final int roleCategoryID,
-			final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
+	private void processInjections(final List<TagToCategory> topicTypeTagIDs, final String searchTagsUrl, final int roleCategoryID, final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		System.out.println("Processing injection points");
 
@@ -613,16 +611,11 @@ public class DocbookBuilder
 				 */
 				final HashMap<Node, InjectionListData> customInjections = new HashMap<Node, InjectionListData>();
 
-				String injectionErrors = processCustomInjectionPoints(customInjectionIds, customInjections, ORDEREDLIST_INJECTION_POINT, topicID, topic,
-						CUSTOM_INJECTION_SEQUENCE_RE, null, docbookBuildingOptions);
-				injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, XREF_INJECTION_POINT, topicID, topic,
-						CUSTOM_INJECTION_SINGLE_RE, null, docbookBuildingOptions);
-				injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, topicID, topic,
-						CUSTOM_INJECTION_LIST_RE, null, docbookBuildingOptions);
-				injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, topicID, topic,
-						CUSTOM_ALPHA_SORT_INJECTION_LIST_RE, new TopicTitleSorter(), docbookBuildingOptions);
-				injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, LIST_INJECTION_POINT, topicID, topic,
-						CUSTOM_INJECTION_LISTITEMS_RE, null, docbookBuildingOptions);
+				String injectionErrors = processCustomInjectionPoints(customInjectionIds, customInjections, ORDEREDLIST_INJECTION_POINT, topicID, topic, CUSTOM_INJECTION_SEQUENCE_RE, null, docbookBuildingOptions);
+				injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, XREF_INJECTION_POINT, topicID, topic, CUSTOM_INJECTION_SINGLE_RE, null, docbookBuildingOptions);
+				injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, topicID, topic, CUSTOM_INJECTION_LIST_RE, null, docbookBuildingOptions);
+				injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, topicID, topic, CUSTOM_ALPHA_SORT_INJECTION_LIST_RE, new TopicTitleSorter(), docbookBuildingOptions);
+				injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, LIST_INJECTION_POINT, topicID, topic, CUSTOM_INJECTION_LISTITEMS_RE, null, docbookBuildingOptions);
 
 				if (injectionErrors.length() != 0)
 				{
@@ -757,12 +750,8 @@ public class DocbookBuilder
 
 						if (genericInjectionErrors.length() != 0 && !docbookBuildingOptions.isIgnoreMissingCustomInjections())
 						{
-							errorDatabase
-									.addError(
-											topic,
-											"Topic references Topic(s) "
-													+ genericInjectionErrors
-													+ ", but these topics were not matched by the filter. This might occur if you are building a narrative and the related topic was not listed in the Topic ID field, or you have not selected the 'Include all related topics' option.");
+							errorDatabase.addError(topic, "Topic references Topic(s) " + genericInjectionErrors
+									+ ", but these topics were not matched by the filter. This might occur if you are building a narrative and the related topic was not listed in the Topic ID field, or you have not selected the 'Include all related topics' option.");
 						}
 						else
 						{
@@ -940,16 +929,14 @@ public class DocbookBuilder
 					}
 					else
 					{
-						errorDatabase.addError(imageLocation.getTopic(), "ImageFile ID " + topicID + " from image location " + imageLocation
-								+ " was not found!");
+						errorDatabase.addError(imageLocation.getTopic(), "ImageFile ID " + topicID + " from image location " + imageLocation + " was not found!");
 						System.out.println("ImageFile ID " + topicID + " from image location " + imageLocation + " was not found!");
 					}
 				}
 				catch (final Exception ex)
 				{
 					success = false;
-					errorDatabase.addError(imageLocation.getTopic(), imageLocation
-							+ " is not a valid image. Must be in the format [ImageFileID].extension e.g. 123.png, or images/321.jpg");
+					errorDatabase.addError(imageLocation.getTopic(), imageLocation + " is not a valid image. Must be in the format [ImageFileID].extension e.g. 123.png, or images/321.jpg");
 					ExceptionUtilities.handleException(ex);
 				}
 			}
@@ -1019,8 +1006,7 @@ public class DocbookBuilder
 	 * compilation process and packages them up with some static Docbook Strings
 	 * to produce a ZIP file that is sent to the user
 	 */
-	private void buildZipFile(final List<TagToCategory> topicTypeTagIDs, final List<TagToCategory> tagToCategories,
-			final DocbookBuildingOptions docbookBuildingOptions)
+	private void buildZipFile(final List<TagToCategory> topicTypeTagIDs, final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 
 		/* build up the files that will make up the zip file */
@@ -1066,8 +1052,7 @@ public class DocbookBuilder
 		files.put("Book/packager/en-US/spec.in", getStringBytes(spec_in));
 
 		// replace the date marker in the Book.XML file
-		files.put("Book/en-US/Book_Info.xml", bookInfoXml
-				.replace(DATE_YYMMDD_TEXT_MARKER, new StringBuilder(new SimpleDateFormat("yyMMdd").format(new Date()))).getBytes());
+		files.put("Book/en-US/Book_Info.xml", bookInfoXml.replace(DATE_YYMMDD_TEXT_MARKER, new StringBuilder(new SimpleDateFormat("yyMMdd").format(new Date()))).getBytes());
 
 		files.put("Book/en-US/Author_Group.xml", getStringBytes(authorGroupXml));
 		files.put("Book/en-US/Book.ent", getStringBytes(bookEnt));
@@ -1149,9 +1134,8 @@ public class DocbookBuilder
 	 * user and processes them to validate the xml in the topic SVN repo,
 	 * process the related topics and fix up image paths
 	 */
-	private void processTopics(final WorkingMemory businessRulesWorkingMemory, final Filter filter,
-			final ArrayList<List<TagToCategory>> mandatoryExclusiveTagCollections, final ArrayList<List<TagToCategory>> mandatoryTagCollections,
-			final int roleCategoryID, final String searchTagsUrl, final List<TagToCategory> tagToCategories, final List<String> usedIds, final DocbookBuildingOptions docbookBuildingOptions)
+	private void processTopics(final WorkingMemory businessRulesWorkingMemory, final Filter filter, final ArrayList<List<TagToCategory>> mandatoryExclusiveTagCollections, final ArrayList<List<TagToCategory>> mandatoryTagCollections, final int roleCategoryID, final String searchTagsUrl,
+			final List<TagToCategory> tagToCategories, final List<String> usedIds, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		final List<Topic> topicList = EntityUtilities.getTopicsFromFilter(filter);
 
@@ -1160,8 +1144,7 @@ public class DocbookBuilder
 		 * related topics etc
 		 */
 		for (final Topic topic : topicList)
-			processTopic(businessRulesWorkingMemory, topic, mandatoryExclusiveTagCollections, mandatoryTagCollections, roleCategoryID, searchTagsUrl,
-					tagToCategories, usedIds, docbookBuildingOptions);
+			processTopic(businessRulesWorkingMemory, topic, mandatoryExclusiveTagCollections, mandatoryTagCollections, roleCategoryID, searchTagsUrl, tagToCategories, usedIds, docbookBuildingOptions);
 
 	}
 
@@ -1262,7 +1245,8 @@ public class DocbookBuilder
 		mandatoryExclusiveTags.add(topicTypeTagIDs);
 
 		/*
-		 * All topics need at least a technology or common name along with a concern
+		 * All topics need at least a technology or common name along with a
+		 * concern
 		 */
 		final ArrayList<List<TagToCategory>> mandatoryTags = new ArrayList<List<TagToCategory>>();
 		mandatoryTags.add(technologyCommonNameTagIDs);
@@ -1277,7 +1261,7 @@ public class DocbookBuilder
 		for (final Entry<String, String> var : urlVars.entrySet())
 			searchTagsUrl = EntityUtilities.addParameter(searchTagsUrl, var.getKey(), var.getValue());
 		searchTagsUrl = Constants.SERVER_URL + "/TopicIndex/CustomSearchTopics.seam" + searchTagsUrl;
-		
+
 		/*
 		 * this collection holds all the id attributes used by the topics we use
 		 * this list to look for duplicates which would cause docbook
@@ -1289,8 +1273,7 @@ public class DocbookBuilder
 		 * build an initial list of "root" topics from the search page to be
 		 * processed
 		 */
-		processTopics(businessRulesWorkingMemory, filter, mandatoryExclusiveTags, mandatoryTags, Constants.LIFECYCLE_CATEGORY_ID, searchTagsUrl,
-				tagToCategories, usedIds, docbookBuildingOptions);
+		processTopics(businessRulesWorkingMemory, filter, mandatoryExclusiveTags, mandatoryTags, Constants.LIFECYCLE_CATEGORY_ID, searchTagsUrl, tagToCategories, usedIds, docbookBuildingOptions);
 
 		/*
 		 * add a collection of tag description topics
@@ -1310,8 +1293,7 @@ public class DocbookBuilder
 		final List<Integer> buildOrder = new ArrayList<Integer>();
 		if (docbookBuildingOptions.isBuildNarrative())
 		{
-			final FilterField topicIdField = selectFirst(filter.getFilterFields(),
-					having(on(FilterField.class).getField(), equalTo(Constants.TOPIC_IDS_FILTER_VAR)));
+			final FilterField topicIdField = selectFirst(filter.getFilterFields(), having(on(FilterField.class).getField(), equalTo(Constants.TOPIC_IDS_FILTER_VAR)));
 
 			if (topicIdField != null)
 			{
@@ -1341,118 +1323,156 @@ public class DocbookBuilder
 	}
 
 	/**
-	 * This function will take a look at the topics that have been added to the topicDatabase, and create
-	 * new Topics for landing pages for the intersection between the technology / common name tags and concern tags.
+	 * This function will take a look at the topics that have been added to the
+	 * topicDatabase, and create new Topics for landing pages for the
+	 * intersection between the technology / common name tags and concern tags.
+	 * 
 	 * @param usedIds
 	 */
 	private void processTagDescriptionTopics(final List<String> usedIds)
 	{
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
-		
-		/* Get a reference to the tag description tag*/
+
+		/* Get a reference to the tag description tag */
 		final Tag tagDescription = entityManager.find(Tag.class, Constants.TAG_DESCRIPTION_TAG_ID);
-		
+
 		/* The categories that make up the top level of the toc */
 		final List<Integer> techCommonNameCategories = CollectionUtilities.toArrayList(Constants.COMMON_NAME_CATEGORY_ID, Constants.TECHNOLOGY_CATEGORY_ID);
-		
+
 		/* The categories that make up the second level of the toc */
 		final List<Integer> concernCatgeory = CollectionUtilities.toArrayList(Constants.CONCERN_CATEGORY_ID);
-		
-		/* Get the tags that have been applied to topics in this build from the tech and common name categories */
+
+		/*
+		 * Get the tags that have been applied to topics in this build from the
+		 * tech and common name categories
+		 */
 		final List<Tag> techCommonNameTags = topicDatabase.getTagsFromCategories(techCommonNameCategories);
-		
-		/* Get the tags that have been applied to topics in this build from the tech and common name categories */
+
+		/*
+		 * Get the tags that have been applied to topics in this build from the
+		 * tech and common name categories
+		 */
 		final List<Tag> concernTags = topicDatabase.getTagsFromCategories(concernCatgeory);
-		
-		/* Landing pages are just topics, but with negative ids to distinguish them from opics pulled out of the database */
+
+		/*
+		 * Landing pages are just topics, but with negative ids to distinguish
+		 * them from opics pulled out of the database
+		 */
 		int nextLandingPageId = -1;
-		
+
 		/* Loop over all the tech and common name tags */
 		for (final Tag techCommonNameTag : techCommonNameTags)
 		{
-			/* A flag to let us know if this technology or common name should appear in the treeview */
+			/*
+			 * A flag to let us know if this technology or common name should
+			 * appear in the treeview
+			 */
 			boolean foundConcernForThisTechnology = false;
-			
+
 			/* Loop over all the concern tags */
 			for (final Tag concernTag : concernTags)
 			{
-				/* See if we have topics that match this intersection of tech / common name and concern */
+				/*
+				 * See if we have topics that match this intersection of tech /
+				 * common name and concern
+				 */
 				final List<Topic> matchingTopics = topicDatabase.getMatchingTopicsFromTag(techCommonNameTag, concernTag);
-				
+
 				if (matchingTopics.size() != 0)
 				{
-					/* We should create a folder for this technology / common name */
+					/*
+					 * We should create a folder for this technology / common
+					 * name
+					 */
 					foundConcernForThisTechnology = true;
-					
-					/* Try to find a topic in the database that can be used as a template for this landing page. Build up a Filter object, as this provides a convenient way to build a query that will get us the topics we need */
+
+					/*
+					 * Try to find a topic in the database that can be used as a
+					 * template for this landing page. Build up a Filter object,
+					 * as this provides a convenient way to build a query that
+					 * will get us the topics we need
+					 */
 					final Filter filter = new Filter();
-					
+
 					final FilterTag techCommonNameFilterTag = new FilterTag();
 					techCommonNameFilterTag.setTag(techCommonNameTag);
 					techCommonNameFilterTag.setTagState(Constants.MATCH_TAG_STATE);
-										
+
 					final FilterTag concernNameFilterTag = new FilterTag();
 					concernNameFilterTag.setTag(concernTag);
 					concernNameFilterTag.setTagState(Constants.MATCH_TAG_STATE);
-					
+
 					final FilterTag tagDescriptionFilterTag = new FilterTag();
 					tagDescriptionFilterTag.setTag(tagDescription);
 					tagDescriptionFilterTag.setTagState(Constants.MATCH_TAG_STATE);
-					
+
 					filter.getFilterTags().add(techCommonNameFilterTag);
 					filter.getFilterTags().add(concernNameFilterTag);
 					filter.getFilterTags().add(tagDescriptionFilterTag);
-					
+
 					final String query = filter.buildQuery();
-					
+
 					final List<Topic> templates = entityManager.createQuery(Topic.SELECT_ALL_QUERY + " " + query).getResultList();
 					Topic template = templates.size() != 0 ? templates.get(0) : null;
-					
+
 					/* Validate the template */
 					if (template != null)
 					{
 						if (!validateTopicXML(template) || validateIdAttributesUnique(template, usedIds) != null)
 							template = null;
 					}
-					
-					/* We have topics that match this intersection, so we need to build a landing page */
+
+					/*
+					 * We have topics that match this intersection, so we need
+					 * to build a landing page
+					 */
 					final Topic landingPage = new Topic();
 					landingPage.setTopicId(nextLandingPageId);
 					landingPage.setTopicTitle(techCommonNameTag.getTagName() + " " + concernTag.getTagName());
-					
-					/* Apply the xml from the template topic, or a generic template if not template topic exists */
+
+					/*
+					 * Apply the xml from the template topic, or a generic
+					 * template if not template topic exists
+					 */
 					if (template != null)
 						landingPage.setTopicXML(template.getTopicXML());
 					else
 						landingPage.setTopicXML(landingPageTemplateXml);
-					
-					/* Validate the topic, which will copy the title we set above into the XML */
+
+					/*
+					 * Validate the topic, which will copy the title we set
+					 * above into the XML
+					 */
 					landingPage.validate();
-					
+
 					/* Convert the XML text into a Document object */
 					landingPage.initializeTempTopicXMLDoc();
-					
-					/* Apply some of the standard fixes to the landing page topics */
+
+					/*
+					 * Apply some of the standard fixes to the landing page
+					 * topics
+					 */
 					processTopicID(landingPage);
 					processTopicFixImages(landingPage);
-					
-					/* Insert some links to those topics that have both the technology / common name tag and the concern tag */
+
+					/*
+					 * Insert some links to those topics that have both the
+					 * technology / common name tag and the concern tag
+					 */
 					final List<Node> listitems = new ArrayList<Node>();
 					for (final Topic matchingTopic : matchingTopics)
 						listitems.add(DocbookUtils.createRelatedTopicLink(landingPage.getTempTopicXMLDoc(), matchingTopic.getXRefID()));
 					final Node itemizedlist = DocbookUtils.wrapListItems(landingPage.getTempTopicXMLDoc(), listitems);
 					landingPage.getTempTopicXMLDoc().getDocumentElement().appendChild(itemizedlist);
-					
+
 					/* Decrement the landing page topic id counter */
-					--nextLandingPageId;					
+					--nextLandingPageId;
 				}
 			}
 		}
 	}
 
-
-	private Document buildErrorTopic(final String template, final Topic xmlData, final String xref, final String filterUrl,
-			final DocbookBuildingOptions docbookBuildingOptions)
+	private Document buildErrorTopic(final String template, final Topic xmlData, final String xref, final String filterUrl, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		String retValue = template;
 
@@ -1460,13 +1480,10 @@ public class DocbookBuilder
 		if (docbookBuildingOptions.isSuppressErrorsPage())
 			retValue = retValue.replace(TOPIC_ERROR_LINK_MARKER, "");
 		else
-			retValue = retValue.replace(TOPIC_ERROR_LINK_MARKER, "<para>Please review the compiler error for <xref linkend=\""
-					+ DocbookUtils.ERROR_XREF_ID_PREFIX + "#TOPICID#\"/> for more detailed information.</para>");
+			retValue = retValue.replace(TOPIC_ERROR_LINK_MARKER, "<para>Please review the compiler error for <xref linkend=\"" + DocbookUtils.ERROR_XREF_ID_PREFIX + "#TOPICID#\"/> for more detailed information.</para>");
 
 		// replace the various markers
-		retValue = retValue.replace(TOPIC_ID_MARKER, xmlData.getTopicId().toString())
-				.replace(TOPIC_TITLE_MARKER, EntityUtilities.cleanTextForXML(xmlData.getTopicTitle()))
-				.replace(TOPIC_TEXT_MARKER, EntityUtilities.cleanTextForXML(xmlData.getTopicText())).replace(XREF_ID_MARKER, xref)
+		retValue = retValue.replace(TOPIC_ID_MARKER, xmlData.getTopicId().toString()).replace(TOPIC_TITLE_MARKER, EntityUtilities.cleanTextForXML(xmlData.getTopicTitle())).replace(TOPIC_TEXT_MARKER, EntityUtilities.cleanTextForXML(xmlData.getTopicText())).replace(XREF_ID_MARKER, xref)
 				.replace(TAG_FILTER_URL_MARKER, filterUrl.replace("&", "&amp;")).replace(BUILD_MARKER, Constants.BUILD);
 
 		return XMLUtilities.convertStringToDocument(retValue);
@@ -1477,8 +1494,7 @@ public class DocbookBuilder
 	 * the ROLE_MARKER has been defined in the template, and then calls the 2nd
 	 * populateIdXMLDataFromDB function to populate the rest of the template.
 	 */
-	private void populateIdXMLDataFromDB(final String errorTemplate, final Topic xmlData, final String filterUrl, final int roleCategoryID,
-			final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
+	private void populateIdXMLDataFromDB(final String errorTemplate, final Topic xmlData, final String filterUrl, final int roleCategoryID, final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		final String fixedTemplate = errorTemplate.replaceAll(ROLE_MARKER, xmlData.getTempTopicRole());
 		populateIdXMLDataFromDB(fixedTemplate, xmlData, filterUrl, docbookBuildingOptions);
@@ -1501,8 +1517,7 @@ public class DocbookBuilder
 	 * @param filterUrl
 	 *            The URL that is used to get back to the tag search screen
 	 */
-	private void populateIdXMLDataFromDB(final String errorTemplate, final Topic xmlData, final String filterUrl,
-			final DocbookBuildingOptions docbookBuildingOptions)
+	private void populateIdXMLDataFromDB(final String errorTemplate, final Topic xmlData, final String filterUrl, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		xmlData.setTempTopicXMLDoc(buildErrorTopic(errorTemplate, xmlData, xmlData.getXRefID(), filterUrl, docbookBuildingOptions));
 		xmlData.setTempInvalidTopic(true);
@@ -1521,8 +1536,7 @@ public class DocbookBuilder
 	 * 
 	 * This is done after the injections are generated.
 	 */
-	private boolean postValidateTopicDocbook(final Topic topic, final String searchTagsUrl, final int roleCategoryID,
-			final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
+	private boolean postValidateTopicDocbook(final Topic topic, final String searchTagsUrl, final int roleCategoryID, final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		final XMLValidator validator = new XMLValidator();
 
@@ -1538,10 +1552,7 @@ public class DocbookBuilder
 			populateIdXMLDataFromDB(errorTopic, topic, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
 			System.out.println(topic.getTopicId().toString() + " failed docbook validation after the injection points were processed.");
 
-			errorDatabase.addError(topic,
-					"Topic failed docbook validation after the injection points were processed. The error was <emphasis>" + validator.getErrorText()
-							+ "</emphasis> The XML after the injections points were processed is: <programlisting><![CDATA[" + originalXML
-							+ "]]></programlisting>");
+			errorDatabase.addError(topic, "Topic failed docbook validation after the injection points were processed. The error was <emphasis>" + validator.getErrorText() + "</emphasis> The XML after the injections points were processed is: <programlisting><![CDATA[" + originalXML + "]]></programlisting>");
 			return false;
 		}
 
@@ -1551,9 +1562,9 @@ public class DocbookBuilder
 	private boolean validateTopicXMLText(final Topic topic)
 	{
 		// see if we have some xml to work with
-		return topic.getTopicXML() != null && topic.getTopicXML().trim().length() != 0;
+		return !(topic.getTopicXML() == null || topic.getTopicXML().trim().length() == 0);
 	}
-	
+
 	private boolean validateTopicXMLDocument(final Topic topic)
 	{
 		/*
@@ -1562,12 +1573,12 @@ public class DocbookBuilder
 		 */
 		return topic.getTempTopicXMLDoc() != null;
 	}
-	
+
 	private boolean validateTopicXML(final Topic topic)
 	{
 		return validateTopicXMLText(topic) && validateTopicXMLDocument(topic);
 	}
-	
+
 	/**
 	 * Test to make sure the XML is valid. This is done by getting Xerces to
 	 * parse the xml, and if no exceptions and thrown we assume the xml is ok.
@@ -1575,8 +1586,7 @@ public class DocbookBuilder
 	 * the repo is valid. But until the topic tool implements some kind of
 	 * validation, this step is required.
 	 */
-	private boolean validateTopicXML(final Topic topic, final String searchTagsUrl, final int roleCategoryID, final List<TagToCategory> tagToCategories,
-			final DocbookBuildingOptions docbookBuildingOptions)
+	private boolean validateTopicXML(final Topic topic, final String searchTagsUrl, final int roleCategoryID, final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		// see if we have some xml to work with
 		if (!validateTopicXMLText(topic))
@@ -1600,22 +1610,25 @@ public class DocbookBuilder
 
 		return true;
 	}
-	
+
 	private String validateIdAttributesUnique(final Topic topic, final List<String> usedIds)
 	{
-		final NodeList elements = topic.getTempTopicXMLDoc().getDocumentElement().getChildNodes();
+		final Document document = topic.getTempTopicXMLDoc();
+		final Element root = document.getDocumentElement();
+		final NodeList elements = root.getChildNodes();
+
 		for (int i = 0; i < elements.getLength(); ++i)
 		{
 			final String retValue = validateIdAttributesUnique(topic, elements.item(i), usedIds);
 			if (retValue != null)
 				return retValue;
 		}
+		
 
 		return null;
 	}
 
-	private boolean validateIdAttributesUnique(final Topic topic, final String searchTagsUrl, final List<String> usedIds,
-			final DocbookBuildingOptions docbookBuildingOptions)
+	private boolean validateIdAttributesUnique(final Topic topic, final String searchTagsUrl, final List<String> usedIds, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		final String retValue = validateIdAttributesUnique(topic, usedIds);
 
@@ -1735,8 +1748,7 @@ public class DocbookBuilder
 	/**
 	 * Adds some debug information and links to the end of the topic
 	 */
-	private void processTopicAdditionalInfo(final Topic topic, final String searchTagsUrl,
-			final DocbookBuildingOptions docbookBuildingOptions)
+	private void processTopicAdditionalInfo(final Topic topic, final String searchTagsUrl, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		// SIMPLESECT TO HOLD OTHER LINKS
 		final Element bugzillaSection = topic.getTempTopicXMLDoc().createElement("simplesect");
@@ -1758,15 +1770,10 @@ public class DocbookBuilder
 			bugzillaULink.setTextContent("Report a bug");
 
 			final SimpleDateFormat formatter = new SimpleDateFormat(Constants.FILTER_DISPLAY_DATE_FORMAT);
-			final String whiteboard = URLEncoder.encode(
-					"Topic ID:" + topic.getTopicId() + " Skynet Build: " + Constants.BUILD + " Topic Title: " + topic.getTopicTitle() + " Topic Revision: "
-							+ topic.getLatestRevision() + " Topic Revision Date: " + formatter.format(topic.getLatestRevisionDate()) + " Topic Tags: "
-							+ topic.getCommaSeparatedTagList(), "UTF-8");
+			final String whiteboard = URLEncoder.encode("Topic ID:" + topic.getTopicId() + " Skynet Build: " + Constants.BUILD + " Topic Title: " + topic.getTopicTitle() + " Topic Revision: " + topic.getLatestRevision() + " Topic Revision Date: " + formatter.format(topic.getLatestRevisionDate()) + " Topic Tags: "
+					+ topic.getCommaSeparatedTagList(), "UTF-8");
 
-			bugzillaULink
-					.setAttribute("url",
-							"https://bugzilla.redhat.com/enter_bug.cgi?product=Topic+Tool&component=topics-EAP6&keywords=Documentation&status_whiteboard="
-									+ whiteboard);
+			bugzillaULink.setAttribute("url", "https://bugzilla.redhat.com/enter_bug.cgi?product=Topic+Tool&component=topics-EAP6&keywords=Documentation&status_whiteboard=" + whiteboard);
 
 			/*
 			 * only add the elements to the XML DOM if there was no excpetion
@@ -1786,10 +1793,7 @@ public class DocbookBuilder
 		surveyPara.setAttribute("role", ROLE_CREATE_BUG_PARA);
 		bugzillaSection.appendChild(surveyPara);
 
-		final Text startSurveyText = topic
-				.getTempTopicXMLDoc()
-				.createTextNode(
-						"Thank you for evaluating the new documentation format for JBoss Enterprise Application Platform. Let us know what you think by taking a short ");
+		final Text startSurveyText = topic.getTempTopicXMLDoc().createTextNode("Thank you for evaluating the new documentation format for JBoss Enterprise Application Platform. Let us know what you think by taking a short ");
 		surveyPara.appendChild(startSurveyText);
 
 		final Element surveyULink = topic.getTempTopicXMLDoc().createElement("ulink");
@@ -1871,9 +1875,7 @@ public class DocbookBuilder
 	 * This should be enforced when topics are created, but currently this is
 	 * not the case.
 	 */
-	private boolean validateTopicTags(final Topic xmlData, final Topic topic, final String searchTagsUrl,
-			final ArrayList<List<TagToCategory>> mandatoryExclusiveTagCollections, final ArrayList<List<TagToCategory>> mandatoryTagCollections,
-			final DocbookBuildingOptions docbookBuildingOptions)
+	private boolean validateTopicTags(final Topic xmlData, final Topic topic, final String searchTagsUrl, final ArrayList<List<TagToCategory>> mandatoryExclusiveTagCollections, final ArrayList<List<TagToCategory>> mandatoryTagCollections, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		/*
 		 * make sure topics have the required tags assigned to them. this should
@@ -1950,10 +1952,8 @@ public class DocbookBuilder
 	 * the search list is processed, its xml retrieved and validated, related
 	 * topics noted and recursively processed, and image locations fixed up
 	 */
-	private void processTopic(final WorkingMemory businessRulesWorkingMemory, final Topic topic,
-			final ArrayList<List<TagToCategory>> mandatoryExclusiveTagCollections, final ArrayList<List<TagToCategory>> mandatoryTagCollections,
-			final int roleCategoryID, final String searchTagsUrl, final List<TagToCategory> tagToCategories, final List<String> usedIds,
-			final DocbookBuildingOptions docbookBuildingOptions)
+	private void processTopic(final WorkingMemory businessRulesWorkingMemory, final Topic topic, final ArrayList<List<TagToCategory>> mandatoryExclusiveTagCollections, final ArrayList<List<TagToCategory>> mandatoryTagCollections, final int roleCategoryID, final String searchTagsUrl,
+			final List<TagToCategory> tagToCategories, final List<String> usedIds, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		/* we have already processed this topic, don't do it again */
 		if (topicDatabase.containsTopic(topic))
@@ -2024,8 +2024,7 @@ public class DocbookBuilder
 		{
 			for (final TopicToTopic topicToTopic : topic.getParentTopicToTopics())
 			{
-				processTopic(businessRulesWorkingMemory, topicToTopic.getRelatedTopic(), mandatoryExclusiveTagCollections, mandatoryTagCollections,
-						roleCategoryID, searchTagsUrl, tagToCategories, usedIds, docbookBuildingOptions);
+				processTopic(businessRulesWorkingMemory, topicToTopic.getRelatedTopic(), mandatoryExclusiveTagCollections, mandatoryTagCollections, roleCategoryID, searchTagsUrl, tagToCategories, usedIds, docbookBuildingOptions);
 			}
 		}
 
@@ -2160,8 +2159,7 @@ public class DocbookBuilder
 			// don't process child tags directly
 			if (firstLevelTag.getParentTagToTags().size() == 0)
 			{
-				final TocFolderElement parentOnlyFolder = new TocFolderElement(docbookBuildingOptions, firstLevelTag.getTagName(), firstLevelTag.getTagId()
-						.toString());
+				final TocFolderElement parentOnlyFolder = new TocFolderElement(docbookBuildingOptions, firstLevelTag.getTagName(), firstLevelTag.getTagId().toString());
 
 				// find those topics that *only* have a parent tag
 				final List<Topic> tocTopicList = topicDatabase.getMatchingTopicsFromTag(firstLevelTag, new ArrayList<Tag>()
@@ -2174,8 +2172,7 @@ public class DocbookBuilder
 
 				for (final Topic xmlMap : tocTopicList)
 				{
-					parentOnlyFolder.getChildren().add(
-							new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId().toString(), xmlMap.getTempNavLinkDocbook()));
+					parentOnlyFolder.getChildren().add(new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId().toString(), xmlMap.getTempNavLinkDocbook()));
 				}
 
 				// now loop over the concern tags for the parent tag only
@@ -2196,15 +2193,12 @@ public class DocbookBuilder
 
 					if (concernTopicList.size() != 0)
 					{
-						final TocFolderElement concernLevelFolder = new TocFolderElement(docbookBuildingOptions, concernTag.getTagName(), concernTag.getTagId()
-								.toString());
+						final TocFolderElement concernLevelFolder = new TocFolderElement(docbookBuildingOptions, concernTag.getTagName(), concernTag.getTagId().toString());
 						parentOnlyFolder.getChildren().add(concernLevelFolder);
 
 						for (final Topic xmlMap : concernTopicList)
 						{
-							concernLevelFolder.getChildren()
-									.add(new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId().toString(), xmlMap
-											.getTempNavLinkDocbook()));
+							concernLevelFolder.getChildren().add(new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId().toString(), xmlMap.getTempNavLinkDocbook()));
 						}
 					}
 				}
@@ -2224,8 +2218,7 @@ public class DocbookBuilder
 					 * this collection will hold the those list items that
 					 * appear under a first level folder
 					 */
-					final TocFolderElement equivalentFolder = new TocFolderElement(docbookBuildingOptions, firstLevelTag.getTagName() + " / "
-							+ secondaryTag.getTagName(), firstLevelTag.getTagId() + "/" + secondaryTag.getTagId());
+					final TocFolderElement equivalentFolder = new TocFolderElement(docbookBuildingOptions, firstLevelTag.getTagName() + " / " + secondaryTag.getTagName(), firstLevelTag.getTagId() + "/" + secondaryTag.getTagId());
 
 					// add those topics that aren't tagged with a concern.
 
@@ -2238,8 +2231,7 @@ public class DocbookBuilder
 
 					for (final Topic xmlMap : topicList)
 					{
-						equivalentFolder.getChildren().add(
-								new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId().toString(), xmlMap.getTempNavLinkDocbook()));
+						equivalentFolder.getChildren().add(new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId().toString(), xmlMap.getTempNavLinkDocbook()));
 					}
 
 					// now loop over the concern tags
@@ -2257,15 +2249,12 @@ public class DocbookBuilder
 
 						if (concernTopicList.size() != 0)
 						{
-							final TocFolderElement concernLevelFolder = new TocFolderElement(docbookBuildingOptions, concernTag.getTagName(), concernTag
-									.getTagId().toString());
+							final TocFolderElement concernLevelFolder = new TocFolderElement(docbookBuildingOptions, concernTag.getTagName(), concernTag.getTagId().toString());
 							equivalentFolder.getChildren().add(concernLevelFolder);
 
 							for (final Topic xmlMap : concernTopicList)
 							{
-								concernLevelFolder.getChildren().add(
-										new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId().toString(), xmlMap
-												.getTempNavLinkDocbook()));
+								concernLevelFolder.getChildren().add(new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId().toString(), xmlMap.getTempNavLinkDocbook()));
 							}
 						}
 
@@ -2353,8 +2342,7 @@ public class DocbookBuilder
 			// don't process child tags directly
 			if (firstLevelTag.getParentTagToTags().size() == 0)
 			{
-				final TocFolderElement parentOnlyFolder = new TocFolderElement(docbookBuildingOptions, firstLevelTag.getTagName(), firstLevelTag.getTagId()
-						.toString());
+				final TocFolderElement parentOnlyFolder = new TocFolderElement(docbookBuildingOptions, firstLevelTag.getTagName(), firstLevelTag.getTagId().toString());
 
 				// list of topic ids to match
 				final List<Tag> matchTag = new ArrayList<Tag>();
@@ -2394,8 +2382,7 @@ public class DocbookBuilder
 				{
 					for (final Topic xmlMap : tocTopicList)
 					{
-						parentOnlyFolder.getChildren().add(
-								new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId().toString(), xmlMap.getTempNavLinkDocbook()));
+						parentOnlyFolder.getChildren().add(new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId().toString(), xmlMap.getTempNavLinkDocbook()));
 					}
 				}
 
@@ -2435,8 +2422,7 @@ public class DocbookBuilder
 
 					if (parentOnlyConcernTopicList.size() != 0 || childrenConcernTopicList.size() != 0)
 					{
-						final TocFolderElement concernLevelFolder = new TocFolderElement(docbookBuildingOptions, concernTag.getTagName(), concernTag.getTagId()
-								.toString());
+						final TocFolderElement concernLevelFolder = new TocFolderElement(docbookBuildingOptions, concernTag.getTagName(), concernTag.getTagId().toString());
 						parentOnlyFolder.getChildren().add(concernLevelFolder);
 
 						final ArrayList<List<Topic>> topicCollections = new ArrayList<List<Topic>>();
@@ -2447,9 +2433,7 @@ public class DocbookBuilder
 						{
 							for (final Topic xmlMap : topicList)
 							{
-								concernLevelFolder.getChildren().add(
-										new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId().toString(), xmlMap
-												.getTempNavLinkDocbook()));
+								concernLevelFolder.getChildren().add(new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId().toString(), xmlMap.getTempNavLinkDocbook()));
 							}
 						}
 					}
