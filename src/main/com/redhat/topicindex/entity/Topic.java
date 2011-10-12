@@ -53,6 +53,7 @@ import com.redhat.ecs.commonutils.DocBookUtilities;
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.ecs.commonutils.XMLUtilities;
 import com.redhat.topicindex.sort.TagNameComparator;
+import com.redhat.topicindex.sort.TagToCategorySortingComparator;
 import com.redhat.topicindex.sort.TopicToTagTagIDSort;
 import com.redhat.topicindex.sort.TopicToTopicTopicIDSort;
 import com.redhat.topicindex.utils.Constants;
@@ -757,7 +758,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		for (final Category category : tagDB.keySet())
 		{
 			// sort by the tags position in the category
-			Collections.sort(tagDB.get(category), Collections.reverseOrder());
+			Collections.sort(tagDB.get(category), new TagToCategorySortingComparator(false));
 
 			// because of the way we have ordered the tagDB collections, and
 			// the ArrayLists it contains, this process will remove those tags
