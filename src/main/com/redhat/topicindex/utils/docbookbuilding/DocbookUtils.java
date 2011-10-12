@@ -157,6 +157,11 @@ public class DocbookUtils
 		return "<listitem>" + content + "</listitem>";
 	}
 	
+	public static String wrapListItems(final List<String> listItems)
+	{
+		return wrapListItems(listItems, null, null);
+	}
+	
 	public static String wrapListItems(final List<String> listItems, final String title)
 	{
 		return wrapListItems(listItems, title, null);
@@ -306,13 +311,21 @@ public class DocbookUtils
 			"</simplesect>";
 	}
 	
-	public static Element wrapListItems(final List<Node> listItems, final String title, final Document xmlDoc)
+	public static Element wrapListItems(final Document xmlDoc, final List<Node> listItems)
+	{
+		return wrapListItems(xmlDoc, listItems, null);
+	}
+	
+	public static Element wrapListItems(final Document xmlDoc, final List<Node> listItems, final String title)
 	{
 		final Element formalParaElement = xmlDoc.createElement("formalpara");
 		
-		final Element titleElement = xmlDoc.createElement("title");
-		formalParaElement.appendChild(titleElement);
-		titleElement.setTextContent(title);
+		if (title != null)
+		{
+			final Element titleElement = xmlDoc.createElement("title");
+			formalParaElement.appendChild(titleElement);
+			titleElement.setTextContent(title);
+		}
 		
 		final Element paraElement = xmlDoc.createElement("para");
 		formalParaElement.appendChild(paraElement);
@@ -340,10 +353,11 @@ public class DocbookUtils
 			parent.appendChild(insert);
 	}
 	
-	public static Node createRelatedTopicLink(final Document xmlDoc, final Node parent, final String xref)
+	public static Node createRelatedTopicLink(final Document xmlDoc, final String xref, final Node parent)
 	{
 		final Element listItem = xmlDoc.createElement("listitem");
-		parent.appendChild(listItem);
+		if (parent != null)
+			parent.appendChild(listItem);
 		
 		final Element paraItem = xmlDoc.createElement("para");
 		listItem.appendChild(paraItem);
@@ -353,6 +367,11 @@ public class DocbookUtils
 		paraItem.appendChild(xrefItem);
 		
 		return listItem;
+	}
+	
+	public static Node createRelatedTopicLink(final Document xmlDoc, final String xref)
+	{
+		return createRelatedTopicLink(xmlDoc, xref, null);
 	}
 	
 	public static Node createRelatedTopicItemizedList(final Document xmlDoc, final String title)

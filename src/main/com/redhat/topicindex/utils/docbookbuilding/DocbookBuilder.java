@@ -54,6 +54,7 @@ import com.redhat.topicindex.entity.TopicToTag;
 import com.redhat.topicindex.entity.TopicToTopic;
 import com.redhat.topicindex.sort.ExternalListSort;
 import com.redhat.topicindex.sort.TagToCategorySortingComparator;
+import com.redhat.topicindex.sort.TopicTitleComparator;
 import com.redhat.topicindex.sort.TopicTitleSorter;
 import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.EntityUtilities;
@@ -820,7 +821,7 @@ public class DocbookBuilder
 					final Node itemizedlist = DocbookUtils.createRelatedTopicItemizedList(xmlDoc, "Related " + tag.getTagName() + "s");
 
 					for (final Topic relatedTopic : relatedLists.get(tag))
-						DocbookUtils.createRelatedTopicLink(xmlDoc, itemizedlist, relatedTopic.getXRefID());
+						DocbookUtils.createRelatedTopicLink(xmlDoc, relatedTopic.getXRefID(), itemizedlist);
 
 					if (titleNode != null)
 					{
@@ -872,7 +873,7 @@ public class DocbookBuilder
 					final Node itemizedlist = DocbookUtils.createRelatedTopicItemizedList(xmlDoc, "Related " + tag.getTagName() + "s");
 
 					for (final Topic relatedTopic : relatedLists.get(tag))
-						DocbookUtils.createRelatedTopicLink(xmlDoc, itemizedlist, relatedTopic.getXRefID());
+						DocbookUtils.createRelatedTopicLink(xmlDoc, relatedTopic.getXRefID(), itemizedlist);
 
 					if (simplesectNode != null)
 						xmlDoc.getDocumentElement().insertBefore(itemizedlist, simplesectNode);
@@ -1325,10 +1326,49 @@ public class DocbookBuilder
 	{
 		for (final Topic topic : topicDatabase.getTopics())
 		{
-			/* we are only intereted in tag description topics */
+			
+			
+			/* we are only interested in tag description topics */
 			if (topic.isTaggedWith(Constants.TAG_DESCRIPTION_TAG_ID))
 			{
-
+				/* A collection of list items that will be appended to the topic */ 
+				final List<Node> listitems = new ArrayList<Node>();
+				
+				/* The categories that make up the top level of the toc */
+				final List<Integer> techCommonNameCategories = CollectionUtilities.toArrayList(Constants.COMMON_NAME_CATEGORY_ID, Constants.TECHNOLOGY_CATEGORY_ID);
+				
+				/* The tags that this topic is tagged with that fall into the categories above */
+				final List<Tag> techCommonNameTags = topic.getTagsInCategoriesByID(techCommonNameCategories);
+				
+				/* The categories that make up the second level of the toc */
+				final List<Integer> concernCatgeory = CollectionUtilities.toArrayList(Constants.CONCERN_CATEGORY_ID);
+				
+				/* The tags that this topic is tagged with that fall into the categories above */
+				final List<Tag> concernTags = topic.getTagsInCategoriesByID(concernCatgeory);
+				
+				/* Loop over the two collections of tags, looking for topics that are tagged with both */
+				for (final Tag commonNameTechTag : techCommonNameTags)
+				{
+					for (final Tag concernTag : concernTags)
+					{
+						final List<Integer> tagsToMatch = CollectionUtilities.toArrayList(commonNameTechTag.getTagId(), concernTag.getTagId());
+						final List<Topic> matchingTopics = topicDatabase.getMatchingTopicsFromInteger(tagsToMatch, Constants.TAG_DESCRIPTION_TAG_ID);
+						
+						/* sort the list of topics by name */
+						Collections.sort(matchingTopics, new TopicTitleComparator());
+						
+						/* create a listitem pointing to each matching topic */
+						for (final Topic matchingTopic : matchingTopics)
+							listitems.add(DocbookUtils.createRelatedTopicLink(topic.getTempTopicXMLDoc(), matchingTopic.getXRefID()));
+					}
+				}
+				
+				/* If we have found some matching topics, place them into an imemizedlist, and append that to the end of the document */
+				if (listitems.size() != 0)
+				{
+					final Node itemizedList = DocbookUtils.wrapListItems(topic.getTempTopicXMLDoc(), listitems);
+					topic.getTempTopicXMLDoc().getDocumentElement().appendChild(itemizedList);
+				}
 			}
 		}
 	}
@@ -2048,7 +2088,7 @@ public class DocbookBuilder
 				final TocFolderElement parentOnlyFolder = new TocFolderElement(docbookBuildingOptions, firstLevelTag.getTagName());
 
 				// find those topics that *only* have a parent tag
-				final List<Topic> tocTopicList = topicDatabase.getMatchingTopics(firstLevelTag, new ArrayList<Tag>()
+				final List<Topic> tocTopicList = topicDatabase.getMatchingTopicsFromTag(firstLevelTag, new ArrayList<Tag>()
 				{
 					{
 						addAll(thisChildrenTags);
@@ -2069,7 +2109,7 @@ public class DocbookBuilder
 				{
 					final Tag concernTag = secondLevelCategoryTag.getTag();
 
-					final List<Topic> concernTopicList = topicDatabase.getMatchingTopics(new ArrayList<Tag>()
+					final List<Topic> concernTopicList = topicDatabase.getMatchingTopicsFromTag(new ArrayList<Tag>()
 					{
 						{
 							add(firstLevelTag);
@@ -2113,7 +2153,7 @@ public class DocbookBuilder
 					 * grabbing these topics. having the child tag implies
 					 * having the main tag
 					 */
-					final List<Topic> topicList = topicDatabase.getMatchingTopics(secondaryTag, concernTags, false);
+					final List<Topic> topicList = topicDatabase.getMatchingTopicsFromTag(secondaryTag, concernTags);
 
 					for (final Topic xmlMap : topicList)
 					{
@@ -2125,7 +2165,7 @@ public class DocbookBuilder
 					{
 						final Tag concernTag = secondLevelCategoryTag.getTag();
 
-						final List<Topic> concernTopicList = topicDatabase.getMatchingTopics(new ArrayList<Tag>()
+						final List<Topic> concernTopicList = topicDatabase.getMatchingTopicsFromTag(new ArrayList<Tag>()
 						{
 							{
 								add(secondaryTag);
@@ -2243,7 +2283,7 @@ public class DocbookBuilder
 				 * find those topics that *only* have a parent tag, and no
 				 * concern tags. these will be placed at the top of the tree
 				 */
-				final List<Topic> parentOnlyTopicList = topicDatabase.getMatchingTopics(matchTag, excludeTag);
+				final List<Topic> parentOnlyTopicList = topicDatabase.getMatchingTopicsFromTag(matchTag, excludeTag);
 
 				/*
 				 * find those topics that have a child tag, but no concern.
@@ -2252,7 +2292,7 @@ public class DocbookBuilder
 				final List<Topic> chidlrenTopicList = new ArrayList<Topic>();
 				for (final Tag childTag : thisChildrenTags)
 				{
-					final List<Topic> matchingTopics = topicDatabase.getMatchingTopics(childTag, concernTags);
+					final List<Topic> matchingTopics = topicDatabase.getMatchingTopicsFromTag(childTag, concernTags);
 
 					CollectionUtilities.addAllThatDontExist(matchingTopics, chidlrenTopicList);
 				}
@@ -2288,7 +2328,7 @@ public class DocbookBuilder
 					 * find those topics that have only the parent tag, and the
 					 * concern tag
 					 */
-					final List<Topic> parentOnlyConcernTopicList = topicDatabase.getMatchingTopics(matchConcernTags, thisChildrenTags);
+					final List<Topic> parentOnlyConcernTopicList = topicDatabase.getMatchingTopicsFromTag(matchConcernTags, thisChildrenTags);
 
 					/*
 					 * find those topics that have a child tag, and the concern
@@ -2301,7 +2341,7 @@ public class DocbookBuilder
 						matchChildTags.add(childTag);
 						matchChildTags.add(concernTag);
 
-						final List<Topic> matchingTopics = topicDatabase.getMatchingTopics(matchChildTags);
+						final List<Topic> matchingTopics = topicDatabase.getMatchingTopicsFromTag(matchChildTags);
 
 						CollectionUtilities.addAllThatDontExist(matchingTopics, childrenConcernTopicList);
 					}
