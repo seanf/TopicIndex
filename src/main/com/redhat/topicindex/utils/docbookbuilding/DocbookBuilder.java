@@ -1251,8 +1251,8 @@ public class DocbookBuilder
 		 */
 
 		final List<TagToCategory> topicTypeTagIDs = getTagToCatgeories(Constants.TYPE_CATEGORY_ID, tagToCategories);
-		final List<TagToCategory> technologyTagIDs = getTagToCatgeories(Constants.TECHNOLOGY_CATEGORY_ID, tagToCategories);
-		final List<TagToCategory> commonNameTagIDs = getTagToCatgeories(Constants.COMMON_NAME_CATEGORY_ID, tagToCategories);
+		final List<TagToCategory> technologyCommonNameTagIDs = getTagToCatgeories(Constants.TECHNOLOGY_CATEGORY_ID, tagToCategories);
+		technologyCommonNameTagIDs.addAll(getTagToCatgeories(Constants.COMMON_NAME_CATEGORY_ID, tagToCategories));
 		final List<TagToCategory> concernTagIDs = getTagToCatgeories(Constants.CONCERN_CATEGORY_ID, tagToCategories);
 
 		/*
@@ -1265,7 +1265,7 @@ public class DocbookBuilder
 		 * All topics need at least a technology or common name along with a concern
 		 */
 		final ArrayList<List<TagToCategory>> mandatoryTags = new ArrayList<List<TagToCategory>>();
-		mandatoryTags.add(CollectionUtilities.mergeLists(technologyTagIDs, commonNameTagIDs));
+		mandatoryTags.add(technologyCommonNameTagIDs);
 		mandatoryTags.add(concernTagIDs);
 
 		/*
