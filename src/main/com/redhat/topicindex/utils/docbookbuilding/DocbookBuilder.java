@@ -1236,7 +1236,6 @@ public class DocbookBuilder
 		return tagToCategories;
 	}
 
-	@SuppressWarnings("serial")
 	public void buildDocbookZipFile(final Filter filter, final WorkingMemory businessRulesWorkingMemory, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		reloadSystemPreferences(businessRulesWorkingMemory);
@@ -1254,6 +1253,7 @@ public class DocbookBuilder
 		final List<TagToCategory> topicTypeTagIDs = getTagToCatgeories(Constants.TYPE_CATEGORY_ID, tagToCategories);
 		final List<TagToCategory> technologyTagIDs = getTagToCatgeories(Constants.TECHNOLOGY_CATEGORY_ID, tagToCategories);
 		final List<TagToCategory> commonNameTagIDs = getTagToCatgeories(Constants.COMMON_NAME_CATEGORY_ID, tagToCategories);
+		final List<TagToCategory> concernTagIDs = getTagToCatgeories(Constants.CONCERN_CATEGORY_ID, tagToCategories);
 
 		/*
 		 * All topics require a topic type, and only one can be assigned
@@ -1262,16 +1262,11 @@ public class DocbookBuilder
 		mandatoryExclusiveTags.add(topicTypeTagIDs);
 
 		/*
-		 * All topics need at least a technology or common name
+		 * All topics need at least a technology or common name along with a concern
 		 */
 		final ArrayList<List<TagToCategory>> mandatoryTags = new ArrayList<List<TagToCategory>>();
-		mandatoryTags.add(new ArrayList<TagToCategory>()
-		{
-			{
-				addAll(technologyTagIDs);
-				addAll(commonNameTagIDs);
-			}
-		});
+		mandatoryTags.add(CollectionUtilities.mergeLists(technologyTagIDs, commonNameTagIDs));
+		mandatoryTags.add(concernTagIDs);
 
 		/*
 		 * build the URL that will return to this screen with the appropriate
