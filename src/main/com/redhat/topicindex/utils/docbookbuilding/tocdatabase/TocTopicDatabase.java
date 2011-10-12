@@ -17,6 +17,12 @@ public class TocTopicDatabase
 {
 	private List<Topic> topics = new ArrayList<Topic>();
 
+	public void addTopic(final Topic topic)
+	{
+		if (!containsTopic(topic))
+			topics.add(topic);
+	}
+	
 	public boolean containsTopic(final Topic topic)
 	{
 		return topics.contains(topic);

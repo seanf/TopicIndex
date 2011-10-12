@@ -181,6 +181,7 @@ public class Constants
 	public static final Integer REFERENCE_TAG_ID = 6;
 	public static final Integer TASK_TAG_ID = 4;
 	public static final Integer WRITTEN_TAG_ID = 19;
+	public static final Integer TAG_DESCRIPTION_TAG_ID = 177;
 
 
 	/**
