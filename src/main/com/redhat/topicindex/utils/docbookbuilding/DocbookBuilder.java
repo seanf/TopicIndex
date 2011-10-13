@@ -1422,7 +1422,7 @@ public class DocbookBuilder
 					{
 						for (final Tag concernTagOrChild : concernTagAndChildTags)
 						{
-							final List<Topic> thisMatchingTopics = topicDatabase.getMatchingTopicsFromTag(techTagOrChild, concernTagOrChild);
+							final List<Topic> thisMatchingTopics = topicDatabase.getMatchingTopicsFromTag(CollectionUtilities.toArrayList(techTagOrChild, concernTagOrChild));
 							CollectionUtilities.addAllThatDontExist(thisMatchingTopics, matchingTopics);
 						}
 					}
@@ -1704,7 +1704,7 @@ public class DocbookBuilder
 		{
 			populateIdXMLDataFromDB(errorTopic, topic, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
 
-			errorDatabase.addError(topic, "Topic failed xml validation.");
+			errorDatabase.addError(topic, "Topic failed XML validation.");
 			return false;
 		}
 
