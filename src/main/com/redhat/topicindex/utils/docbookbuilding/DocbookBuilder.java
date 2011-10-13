@@ -1006,7 +1006,7 @@ public class DocbookBuilder
 	 * compilation process and packages them up with some static Docbook Strings
 	 * to produce a ZIP file that is sent to the user
 	 */
-	private void buildZipFile(final List<TagToCategory> topicTypeTagIDs, final List<TagToCategory> tagToCategories, final List<String> usedIds, final DocbookBuildingOptions docbookBuildingOptions)
+	private void buildZipFile(final List<TagToCategory> topicTypeTagIDs, final List<TagToCategory> tagToCategories, final List<String> usedIds, final TocTopLevel tocTopLevel, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 
 		/* build up the files that will make up the zip file */
@@ -1023,9 +1023,6 @@ public class DocbookBuilder
 		 * includes a different publican.cfg file
 		 */
 		String publicnCfgFixed = publicanCfg;
-
-		// build the table of contents
-		final TocTopLevel tocTopLevel = buildTOCAndLandingPages(usedIds, docbookBuildingOptions);
 
 		// get the HTML TOC
 		final String toc = tocTopLevel.getDocbook();
@@ -1278,7 +1275,7 @@ public class DocbookBuilder
 		/*
 		 * add a collection of tag description topics
 		 */
-		buildTOCAndLandingPages(usedIds, docbookBuildingOptions);
+		final TocTopLevel retValue = buildTOCAndLandingPages(usedIds, docbookBuildingOptions);
 
 		/*
 		 * take the information gathered by the processTopic() function, and use
@@ -1319,7 +1316,7 @@ public class DocbookBuilder
 		}
 
 		// now build the publican zip file that will be sent to the user
-		buildZipFile(topicTypeTagIDs, tagToCategories, usedIds, docbookBuildingOptions);
+		buildZipFile(topicTypeTagIDs, tagToCategories, usedIds, retValue, docbookBuildingOptions);
 	}
 
 	/**
