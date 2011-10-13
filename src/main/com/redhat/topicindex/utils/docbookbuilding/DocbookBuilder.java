@@ -1466,8 +1466,6 @@ public class DocbookBuilder
 
 						final String query = filter.buildQuery();
 
-						System.out.println("Query: " + query);
-
 						final List<Topic> templates = entityManager.createQuery(Topic.SELECT_ALL_QUERY + " " + query).getResultList();
 
 						if (templates.size() == 1)

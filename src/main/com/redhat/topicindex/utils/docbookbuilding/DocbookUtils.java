@@ -318,25 +318,22 @@ public class DocbookUtils
 	
 	public static Element wrapListItems(final Document xmlDoc, final List<Node> listItems, final String title)
 	{
-		final Element formalParaElement = xmlDoc.createElement("formalpara");
-		
-		if (title != null)
-		{
-			final Element titleElement = xmlDoc.createElement("title");
-			formalParaElement.appendChild(titleElement);
-			titleElement.setTextContent(title);
-		}
-		
 		final Element paraElement = xmlDoc.createElement("para");
-		formalParaElement.appendChild(paraElement);
 		
 		final Element itemizedlistElement = xmlDoc.createElement("itemizedlist");
 		paraElement.appendChild(itemizedlistElement);
 		
+		if (title != null)
+		{
+			final Element titleElement = xmlDoc.createElement("title");
+			itemizedlistElement.appendChild(titleElement);
+			titleElement.setTextContent(title);
+		}
+		
 		for (final Node listItem : listItems)
 			itemizedlistElement.appendChild(listItem);
 		
-		return formalParaElement;
+		return paraElement;
 	}
 	
 	public static void insertNodeAfter(final Node reference, final Node insert)
