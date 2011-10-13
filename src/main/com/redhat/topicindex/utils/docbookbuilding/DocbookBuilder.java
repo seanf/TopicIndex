@@ -1430,15 +1430,18 @@ public class DocbookBuilder
 					/* build a landing page for these topics (if any were found */
 					if (matchingTopics.size() != 0)
 					{
+						/* Sort the topics by title */
+						Collections.sort(matchingTopics, new TopicTitleComparator());
+						
 						/* define a title for the landing page */
-						final String landingPageTitle = techCommonNameTag.getTagName() + " " + concernTag.getTagName();
+						final String landingPageTitle = techCommonNameTag.getTagName() + " > " + concernTag.getTagName();
 						
 						/*
 						 * we have found topics that fall into this intersection
 						 * of technology / common name and concern tags. create
 						 * a link in the treeview
 						 */						
-						landingPageLinks.add(new TocLink(docbookBuildingOptions, landingPageTitle, nextLandingPageId + ""));
+						landingPageLinks.add(new TocLink(docbookBuildingOptions, concernTag.getTagName(), nextLandingPageId + ""));
 
 						/*
 						 * Try to find a topic in the database that can be used
@@ -1492,6 +1495,12 @@ public class DocbookBuilder
 						final Topic landingPage = new Topic();
 						landingPage.setTopicId(nextLandingPageId);
 						landingPage.setTopicTitle(landingPageTitle);
+						
+						/*
+						 * Validate the topic, which will copy the title we set
+						 * above into the XML
+						 */
+						landingPage.validate();
 
 						/*
 						 * Apply the xml from the template topic, or a generic
@@ -1513,12 +1522,6 @@ public class DocbookBuilder
 							landingPage.setTopicXML("<section><title/></section>");
 							landingPage.initializeTempTopicXMLDoc();
 						}
-
-						/*
-						 * Validate the topic, which will copy the title we set
-						 * above into the XML
-						 */
-						landingPage.validate();
 
 						/*
 						 * Apply some of the standard fixes to the landing page
