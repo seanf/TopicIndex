@@ -35,6 +35,12 @@ public class TocFolderElement extends TocElement
 		this.children = new ArrayList<TocElement>();
 	}
 	
+	public TocFolderElement(final DocbookBuildingOptions docbookBuildingOptions, final String label)
+	{
+		super(docbookBuildingOptions, label);
+		this.children = new ArrayList<TocElement>();
+	}
+	
 	public TocFolderElement(final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		super(docbookBuildingOptions);

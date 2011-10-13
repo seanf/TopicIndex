@@ -1006,7 +1006,7 @@ public class DocbookBuilder
 	 * compilation process and packages them up with some static Docbook Strings
 	 * to produce a ZIP file that is sent to the user
 	 */
-	private void buildZipFile(final List<TagToCategory> topicTypeTagIDs, final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
+	private void buildZipFile(final List<TagToCategory> topicTypeTagIDs, final List<TagToCategory> tagToCategories, final List<String> usedIds, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 
 		/* build up the files that will make up the zip file */
@@ -1025,7 +1025,7 @@ public class DocbookBuilder
 		String publicnCfgFixed = publicanCfg;
 
 		// build the table of contents
-		final TocTopLevel tocTopLevel = buildTOCCommonNameOnly(docbookBuildingOptions);
+		final TocTopLevel tocTopLevel = buildTOCAndLandingPages(usedIds, docbookBuildingOptions);
 
 		// get the HTML TOC
 		final String toc = tocTopLevel.getDocbook();
@@ -1278,7 +1278,7 @@ public class DocbookBuilder
 		/*
 		 * add a collection of tag description topics
 		 */
-		processTagDescriptionTopics(usedIds);
+		buildTOCAndLandingPages(usedIds, docbookBuildingOptions);
 
 		/*
 		 * take the information gathered by the processTopic() function, and use
@@ -1319,7 +1319,7 @@ public class DocbookBuilder
 		}
 
 		// now build the publican zip file that will be sent to the user
-		buildZipFile(topicTypeTagIDs, tagToCategories, docbookBuildingOptions);
+		buildZipFile(topicTypeTagIDs, tagToCategories, usedIds, docbookBuildingOptions);
 	}
 
 	/**
@@ -1329,8 +1329,10 @@ public class DocbookBuilder
 	 * 
 	 * @param usedIds
 	 */
-	private void processTagDescriptionTopics(final List<String> usedIds)
-	{
+	private TocTopLevel buildTOCAndLandingPages(final List<String> usedIds, final DocbookBuildingOptions docbookBuildingOptions)
+	{		
+		final TocTopLevel tocTopLevel = new TocTopLevel(docbookBuildingOptions);
+		
 		try
 		{
 			System.out.println("Processing landing pages");
@@ -1363,32 +1365,83 @@ public class DocbookBuilder
 			 * distinguish them from opics pulled out of the database
 			 */
 			int nextLandingPageId = -1;
+			
+			
 
 			/* Loop over all the tech and common name tags */
 			for (final Tag techCommonNameTag : techCommonNameTags)
 			{
-				/*
-				 * A flag to let us know if this technology or common name
-				 * should appear in the treeview
-				 */
-				boolean foundConcernForThisTechnology = false;
+				/* This collection will hold the tock links to the landing pages */
+				final List<TocLink> landingPageLinks = new ArrayList<TocLink>();
 
 				/* Loop over all the concern tags */
 				for (final Tag concernTag : concernTags)
 				{
 					/*
-					 * See if we have topics that match this intersection of
-					 * tech / common name and concern
+					 * tags that are encompassed by another tag don't show up in
+					 * the toc
 					 */
-					final List<Topic> matchingTopics = topicDatabase.getMatchingTopicsFromTag(techCommonNameTag, concernTag);
+					final boolean techCommonNameTagHasParent = techCommonNameTag.getParentTagToTags().size() != 0;
+					final boolean concernTagHasParent = concernTag.getParentTagToTags().size() != 0;
 
+					if (techCommonNameTagHasParent || concernTagHasParent)
+						continue;
+
+					/*
+					 * See if we have topics that match this intersection of
+					 * tech / common name and concern. We also have to deal with
+					 * those tags that these technology and concern tags
+					 * encompass. To do this we build up a list of tags that
+					 * includes the technology parent and all it's children, and
+					 * the concern parent and all it's children. We will then
+					 * check each tech tag against each concern tag.
+					 */
+
+					/* build up the list of tech tags */
+					final List<Tag> techCommonNameTagAndChildTags = new ArrayList<Tag>();
+					techCommonNameTagAndChildTags.add(techCommonNameTag);
+					for (final TagToTag childTechCommonNameTag : techCommonNameTag.getChildrenTagToTags())
+					{
+						final Tag childTag = childTechCommonNameTag.getSecondaryTag();
+						techCommonNameTagAndChildTags.add(childTag);
+					}
+
+					/* build up a list of cencern tags */
+					final List<Tag> concernTagAndChildTags = new ArrayList<Tag>();
+					concernTagAndChildTags.add(concernTag);
+					for (final TagToTag childConcernTag : concernTag.getChildrenTagToTags())
+					{
+						final Tag childTag = childConcernTag.getSecondaryTag();
+						concernTagAndChildTags.add(childTag);
+					}
+
+					/*
+					 * find those topics that are tagged with any of the tech
+					 * tags and any of the concern tags
+					 */
+					final List<Topic> matchingTopics = new ArrayList<Topic>();
+
+					for (final Tag techTagOrChild : techCommonNameTagAndChildTags)
+					{
+						for (final Tag concernTagOrChild : concernTagAndChildTags)
+						{
+							final List<Topic> thisMatchingTopics = topicDatabase.getMatchingTopicsFromTag(techTagOrChild, concernTagOrChild);
+							CollectionUtilities.addAllThatDontExist(thisMatchingTopics, matchingTopics);
+						}
+					}
+
+					/* build a landing page for these topics (if any were found */
 					if (matchingTopics.size() != 0)
 					{
+						/* define a title for the landing page */
+						final String landingPageTitle = techCommonNameTag.getTagName() + " " + concernTag.getTagName();
+						
 						/*
-						 * We should create a folder for this technology /
-						 * common name
-						 */
-						foundConcernForThisTechnology = true;
+						 * we have found topics that fall into this intersection
+						 * of technology / common name and concern tags. create
+						 * a link in the treeview
+						 */						
+						landingPageLinks.add(new TocLink(docbookBuildingOptions, landingPageTitle, nextLandingPageId + ""));
 
 						/*
 						 * Try to find a topic in the database that can be used
@@ -1443,7 +1496,7 @@ public class DocbookBuilder
 						 */
 						final Topic landingPage = new Topic();
 						landingPage.setTopicId(nextLandingPageId);
-						landingPage.setTopicTitle(techCommonNameTag.getTagName() + " " + concernTag.getTagName());
+						landingPage.setTopicTitle(landingPageTitle);
 
 						/*
 						 * Apply the xml from the template topic, or a generic
@@ -1489,16 +1542,32 @@ public class DocbookBuilder
 						final Node itemizedlist = DocbookUtils.wrapListItems(landingPage.getTempTopicXMLDoc(), listitems);
 						landingPage.getTempTopicXMLDoc().getDocumentElement().appendChild(itemizedlist);
 
+						/* Add the landing page to the topic pool */
+						topicDatabase.addTopic(landingPage);
+
 						/* Decrement the landing page topic id counter */
 						--nextLandingPageId;
 					}
 				}
+				
+				/* test to see if there were any topics to add under this tech */
+				if (landingPageLinks.size() != 0)
+				{
+					final TocFolderElement tocFolder = new TocFolderElement(docbookBuildingOptions, techCommonNameTag.getTagName());
+					tocFolder.getChildren().addAll(landingPageLinks);
+					tocTopLevel.getChildren().add(tocFolder);
+				}
+					
 			}
+			
+			
 		}
 		catch (final Exception ex)
 		{
 			ExceptionUtilities.handleException(ex);
 		}
+		
+		return tocTopLevel;
 	}
 
 	private Document buildErrorTopic(final String template, final Topic xmlData, final String xref, final String filterUrl, final DocbookBuildingOptions docbookBuildingOptions)

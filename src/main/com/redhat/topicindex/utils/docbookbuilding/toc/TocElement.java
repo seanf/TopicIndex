@@ -46,6 +46,15 @@ public abstract class TocElement
 		this.id = id;
 	}
 	
+	public TocElement(final DocbookBuildingOptions docbookBuildingOptions, final String label)
+	{
+		this.label = label;
+		this.docbookBuildingOptions = docbookBuildingOptions;
+		this.docbook = "";
+		this.eclipseXml = "";
+		this.id = "";
+	}
+	
 	public TocElement(final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		this.label = "";
