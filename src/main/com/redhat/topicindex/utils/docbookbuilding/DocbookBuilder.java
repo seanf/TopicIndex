@@ -1434,7 +1434,7 @@ public class DocbookBuilder
 						Collections.sort(matchingTopics, new TopicTitleComparator());
 						
 						/* define a title for the landing page */
-						final String landingPageTitle = techCommonNameTag.getTagName() + " > " + concernTag.getTagName();
+						final String landingPageTitle = techCommonNameTag.getTagName() + " &gt; " + concernTag.getTagName();
 						
 						/*
 						 * we have found topics that fall into this intersection
@@ -1522,7 +1522,7 @@ public class DocbookBuilder
 							landingPage.setTopicXML("<section><title>" + landingPage.getTopicTitle() + "</title></section>");
 							landingPage.initializeTempTopicXMLDoc();
 						}
-
+						
 						/*
 						 * Apply some of the standard fixes to the landing page
 						 * topics
@@ -1551,8 +1551,10 @@ public class DocbookBuilder
 				/* test to see if there were any topics to add under this tech */
 				if (landingPageLinks.size() != 0)
 				{
+					/* if so, create a folder, and add all of the concern links to it */
 					final TocFolderElement tocFolder = new TocFolderElement(docbookBuildingOptions, techCommonNameTag.getTagName());
 					tocFolder.getChildren().addAll(landingPageLinks);
+					/* add the tech folder to the top level folder */
 					tocTopLevel.getChildren().add(tocFolder);
 				}
 					
