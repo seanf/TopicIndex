@@ -1494,6 +1494,7 @@ public class DocbookBuilder
 						 */
 						final Topic landingPage = new Topic();
 						landingPage.setTopicId(nextLandingPageId);
+						landingPage.setTopicTitle(landingPageTitle);
 
 						/*
 						 * Apply the xml from the template topic, or a generic
@@ -1503,9 +1504,6 @@ public class DocbookBuilder
 							landingPage.setTopicXML(template.getTopicXML());
 						else
 							landingPage.setTopicXML(landingPageTemplateXml);
-						
-						/* set the topic title */
-						landingPage.setTopicTitle(landingPageTitle);
 						
 						/*
 						 * Validate the topic, which will copy the title we set
