@@ -1494,13 +1494,6 @@ public class DocbookBuilder
 						 */
 						final Topic landingPage = new Topic();
 						landingPage.setTopicId(nextLandingPageId);
-						landingPage.setTopicTitle(landingPageTitle);
-						
-						/*
-						 * Validate the topic, which will copy the title we set
-						 * above into the XML
-						 */
-						landingPage.validate();
 
 						/*
 						 * Apply the xml from the template topic, or a generic
@@ -1510,6 +1503,15 @@ public class DocbookBuilder
 							landingPage.setTopicXML(template.getTopicXML());
 						else
 							landingPage.setTopicXML(landingPageTemplateXml);
+						
+						/* set the topic title */
+						landingPage.setTopicTitle(landingPageTitle);
+						
+						/*
+						 * Validate the topic, which will copy the title we set
+						 * above into the XML
+						 */
+						landingPage.validate();
 
 						landingPage.initializeTempTopicXMLDoc();
 
@@ -1519,7 +1521,7 @@ public class DocbookBuilder
 						 */
 						if (!validateTopicXML(landingPage) || validateIdAttributesUnique(landingPage, usedIds) != null)
 						{
-							landingPage.setTopicXML("<section><title/></section>");
+							landingPage.setTopicXML("<section><title>" + landingPage.getTopicTitle() + "</title></section>");
 							landingPage.initializeTempTopicXMLDoc();
 						}
 
