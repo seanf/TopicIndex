@@ -1515,7 +1515,7 @@ public class DocbookBuilder
 						 */
 						if (!validateTopicXML(landingPage) || validateIdAttributesUnique(landingPage, usedIds) != null)
 						{
-							landingPage.setTopicXML("<section></section>");
+							landingPage.setTopicXML("<section><title/></section>");
 							landingPage.initializeTempTopicXMLDoc();
 						}
 
@@ -1594,7 +1594,8 @@ public class DocbookBuilder
 	 */
 	private void populateIdXMLDataFromDB(final String errorTemplate, final Topic xmlData, final String filterUrl, final int roleCategoryID, final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
 	{
-		final String fixedTemplate = errorTemplate.replaceAll(ROLE_MARKER, xmlData.getTempTopicRole());
+		final String replacement = xmlData.getTempTopicRole() == null ? "" : xmlData.getTempTopicRole();		
+		final String fixedTemplate = errorTemplate.replaceAll(ROLE_MARKER, replacement);
 		populateIdXMLDataFromDB(fixedTemplate, xmlData, filterUrl, docbookBuildingOptions);
 	}
 
