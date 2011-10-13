@@ -1562,6 +1562,7 @@ public class DocbookBuilder
 			ExceptionUtilities.handleException(ex);
 		}
 		
+		tocTopLevel.generateCode();
 		return tocTopLevel;
 	}
 
