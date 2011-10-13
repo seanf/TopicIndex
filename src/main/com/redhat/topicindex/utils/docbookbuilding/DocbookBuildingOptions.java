@@ -6,11 +6,11 @@ package com.redhat.topicindex.utils.docbookbuilding;
  */
 public class DocbookBuildingOptions 
 {
-	private boolean processRelatedTopics = true;
+	private boolean processRelatedTopics = false;
 	private boolean publicanShowRemarks = false;
 	private boolean enableDynamicTreeToc = true;
 	private boolean buildNarrative = false;
-	private boolean ignoreMissingCustomInjections = false;
+	private boolean ignoreMissingCustomInjections = true;
 	private boolean suppressErrorsPage = false;
 
 	public void setProcessRelatedTopics(final boolean processRelatedTopics) {

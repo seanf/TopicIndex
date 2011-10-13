@@ -45,7 +45,7 @@ public class TocTopicDatabase
 
 	public boolean containsTopicsWithTag(final Tag tag)
 	{
-		return getMatchingTopicsFromInteger(tag.getTagId()).size() != 0;
+		return getMatchingTopicsFromTag(tag).size() != 0;
 	}
 	
 	public boolean containsTopicsWithTag(final Integer tag)

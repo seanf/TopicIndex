@@ -32,7 +32,8 @@ import com.redhat.topicindex.utils.Constants;
  */
 @Entity
 @Audited
-@Table(name = "Filter", catalog = "Skynet", uniqueConstraints = @UniqueConstraint(columnNames = {"FilterName" })) 
+@Table(name = "Filter", catalog = "Skynet", uniqueConstraints = @UniqueConstraint(columnNames =
+{ "FilterName" }))
 public class Filter implements java.io.Serializable
 {
 	public static final String SELECT_ALL_QUERY = "select filter from Filter filter";
@@ -138,7 +139,8 @@ public class Filter implements java.io.Serializable
 	 * Loops through the FilterTags held by this Filter, and returns the state
 	 * of the tag if it exists, and -1 if it does not.
 	 * 
-	 * @param tagID The id of the tag to get the state of
+	 * @param tagID
+	 *            The id of the tag to get the state of
 	 * @return -1 if the tag was not found, otherwise the state of the tag
 	 */
 	public int hasTag(final Integer tagID)
@@ -228,24 +230,30 @@ public class Filter implements java.io.Serializable
 	public String getFilterTitle()
 	{
 		String desc = "";
-		
+
 		/* Loop over all the categories that the filter tags belong to */
 		for (final Category category : this.getFilterTagCategories())
 		{
 			String categoryDesc = category.getCategoryName() + ": ";
 			String tagDesc = "";
-			
+
 			/* This will be shown in the topic list results title */
 			String internalLogic = Constants.DEFAULT_INTERNAL_LOGIC;
-			
+
 			/* Find out if the category does not have the default internal logic */
 			final Set<FilterCategory> filterCategories = this.getFilterCategories();
 			for (final FilterCategory filterCategory : filterCategories)
 			{
-				/* if a filter category has been saved that matches the category we are looking at now.. */ 
+				/*
+				 * if a filter category has been saved that matches the category
+				 * we are looking at now..
+				 */
 				if (filterCategory.getCategory().equals(category))
 				{
-					/* ...and it defines an internal logic state, update the internalLogic variable */
+					/*
+					 * ...and it defines an internal logic state, update the
+					 * internalLogic variable
+					 */
 					if (filterCategory.getCategoryState() == Constants.CATEGORY_INTERNAL_AND_STATE)
 						internalLogic = Constants.AND_LOGIC;
 					else if (filterCategory.getCategoryState() == Constants.CATEGORY_INTERNAL_OR_STATE)
@@ -260,7 +268,7 @@ public class Filter implements java.io.Serializable
 				{
 					if (tagDesc.length() != 0)
 						tagDesc += " " + internalLogic + " ";
-					
+
 					if (tag.getTagState() == Constants.NOT_MATCH_TAG_STATE)
 						tagDesc += "Not ";
 
@@ -376,7 +384,7 @@ public class Filter implements java.io.Serializable
 
 		return urlVars;
 	}
-	
+
 	/**
 	 * This function is used to create the HQL query where clause that is
 	 * appended to the generic EJBQL (as created in default EntityList objects)
@@ -397,7 +405,7 @@ public class Filter implements java.io.Serializable
 		// loop over the projects that the tags in this filter are assigned to
 		for (final Project project : this.getFilterTagProjects())
 		{
-			// loop over the categories of tags we found
+			// loop over the categories that the tags in this filter are assigned to
 			for (final Category category : this.getFilterTagCategories())
 			{
 				// define the default logic used for the FilterTag categories
@@ -427,15 +435,12 @@ public class Filter implements java.io.Serializable
 
 						if (categoryState == Constants.CATEGORY_INTERNAL_AND_STATE)
 							catInternalLogic = Constants.AND_LOGIC;
-						else
-							if (categoryState == Constants.CATEGORY_INTERNAL_OR_STATE)
-								catInternalLogic = Constants.OR_LOGIC;
-							else
-								if (categoryState == Constants.CATEGORY_EXTERNAL_AND_STATE)
-									catExternalLogic = Constants.AND_LOGIC;
-								else
-									if (categoryState == Constants.CATEGORY_EXTERNAL_OR_STATE)
-										catExternalLogic = Constants.OR_LOGIC;
+						else if (categoryState == Constants.CATEGORY_INTERNAL_OR_STATE)
+							catInternalLogic = Constants.OR_LOGIC;
+						else if (categoryState == Constants.CATEGORY_EXTERNAL_AND_STATE)
+							catExternalLogic = Constants.AND_LOGIC;
+						else if (categoryState == Constants.CATEGORY_EXTERNAL_OR_STATE)
+							catExternalLogic = Constants.OR_LOGIC;
 					}
 				}
 
@@ -478,8 +483,10 @@ public class Filter implements java.io.Serializable
 						}
 						else
 						{
-							/* make sure this tag does not exist in this
-							 category */
+							/*
+							 * make sure this tag does not exist in this
+							 * category
+							 */
 							categoryBlock += "not exists (select 1 from TopicToTag topicToTag where topicToTag.topic = topic and topicToTag.tag.tagId = " + value + ") ";
 						}
 					}

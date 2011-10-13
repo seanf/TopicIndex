@@ -1331,144 +1331,173 @@ public class DocbookBuilder
 	 */
 	private void processTagDescriptionTopics(final List<String> usedIds)
 	{
-		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
-
-		/* Get a reference to the tag description tag */
-		final Tag tagDescription = entityManager.find(Tag.class, Constants.TAG_DESCRIPTION_TAG_ID);
-
-		/* The categories that make up the top level of the toc */
-		final List<Integer> techCommonNameCategories = CollectionUtilities.toArrayList(Constants.COMMON_NAME_CATEGORY_ID, Constants.TECHNOLOGY_CATEGORY_ID);
-
-		/* The categories that make up the second level of the toc */
-		final List<Integer> concernCatgeory = CollectionUtilities.toArrayList(Constants.CONCERN_CATEGORY_ID);
-
-		/*
-		 * Get the tags that have been applied to topics in this build from the
-		 * tech and common name categories
-		 */
-		final List<Tag> techCommonNameTags = topicDatabase.getTagsFromCategories(techCommonNameCategories);
-
-		/*
-		 * Get the tags that have been applied to topics in this build from the
-		 * tech and common name categories
-		 */
-		final List<Tag> concernTags = topicDatabase.getTagsFromCategories(concernCatgeory);
-
-		/*
-		 * Landing pages are just topics, but with negative ids to distinguish
-		 * them from opics pulled out of the database
-		 */
-		int nextLandingPageId = -1;
-
-		/* Loop over all the tech and common name tags */
-		for (final Tag techCommonNameTag : techCommonNameTags)
+		try
 		{
-			/*
-			 * A flag to let us know if this technology or common name should
-			 * appear in the treeview
-			 */
-			boolean foundConcernForThisTechnology = false;
+			System.out.println("Processing landing pages");
 
-			/* Loop over all the concern tags */
-			for (final Tag concernTag : concernTags)
+			final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+
+			/* Get a reference to the tag description tag */
+			final Tag tagDescription = entityManager.find(Tag.class, Constants.TAG_DESCRIPTION_TAG_ID);
+
+			/* The categories that make up the top level of the toc */
+			final List<Integer> techCommonNameCategories = CollectionUtilities.toArrayList(Constants.COMMON_NAME_CATEGORY_ID, Constants.TECHNOLOGY_CATEGORY_ID);
+
+			/* The categories that make up the second level of the toc */
+			final List<Integer> concernCatgeory = CollectionUtilities.toArrayList(Constants.CONCERN_CATEGORY_ID);
+
+			/*
+			 * Get the tags that have been applied to topics in this build from
+			 * the tech and common name categories
+			 */
+			final List<Tag> techCommonNameTags = topicDatabase.getTagsFromCategories(techCommonNameCategories);
+
+			/*
+			 * Get the tags that have been applied to topics in this build from
+			 * the tech and common name categories
+			 */
+			final List<Tag> concernTags = topicDatabase.getTagsFromCategories(concernCatgeory);
+
+			/*
+			 * Landing pages are just topics, but with negative ids to
+			 * distinguish them from opics pulled out of the database
+			 */
+			int nextLandingPageId = -1;
+
+			/* Loop over all the tech and common name tags */
+			for (final Tag techCommonNameTag : techCommonNameTags)
 			{
 				/*
-				 * See if we have topics that match this intersection of tech /
-				 * common name and concern
+				 * A flag to let us know if this technology or common name
+				 * should appear in the treeview
 				 */
-				final List<Topic> matchingTopics = topicDatabase.getMatchingTopicsFromTag(techCommonNameTag, concernTag);
+				boolean foundConcernForThisTechnology = false;
 
-				if (matchingTopics.size() != 0)
+				/* Loop over all the concern tags */
+				for (final Tag concernTag : concernTags)
 				{
 					/*
-					 * We should create a folder for this technology / common
-					 * name
+					 * See if we have topics that match this intersection of
+					 * tech / common name and concern
 					 */
-					foundConcernForThisTechnology = true;
+					final List<Topic> matchingTopics = topicDatabase.getMatchingTopicsFromTag(techCommonNameTag, concernTag);
 
-					/*
-					 * Try to find a topic in the database that can be used as a
-					 * template for this landing page. Build up a Filter object,
-					 * as this provides a convenient way to build a query that
-					 * will get us the topics we need
-					 */
-					final Filter filter = new Filter();
-
-					final FilterTag techCommonNameFilterTag = new FilterTag();
-					techCommonNameFilterTag.setTag(techCommonNameTag);
-					techCommonNameFilterTag.setTagState(Constants.MATCH_TAG_STATE);
-
-					final FilterTag concernNameFilterTag = new FilterTag();
-					concernNameFilterTag.setTag(concernTag);
-					concernNameFilterTag.setTagState(Constants.MATCH_TAG_STATE);
-
-					final FilterTag tagDescriptionFilterTag = new FilterTag();
-					tagDescriptionFilterTag.setTag(tagDescription);
-					tagDescriptionFilterTag.setTagState(Constants.MATCH_TAG_STATE);
-
-					filter.getFilterTags().add(techCommonNameFilterTag);
-					filter.getFilterTags().add(concernNameFilterTag);
-					filter.getFilterTags().add(tagDescriptionFilterTag);
-
-					final String query = filter.buildQuery();
-
-					final List<Topic> templates = entityManager.createQuery(Topic.SELECT_ALL_QUERY + " " + query).getResultList();
-					Topic template = templates.size() != 0 ? templates.get(0) : null;
-
-					/* Validate the template */
-					if (template != null)
+					if (matchingTopics.size() != 0)
 					{
-						if (!validateTopicXML(template) || validateIdAttributesUnique(template, usedIds) != null)
-							template = null;
+						/*
+						 * We should create a folder for this technology /
+						 * common name
+						 */
+						foundConcernForThisTechnology = true;
+
+						/*
+						 * Try to find a topic in the database that can be used
+						 * as a template for this landing page. Build up a
+						 * Filter object, as this provides a convenient way to
+						 * build a query that will get us the topics we need
+						 */
+						final Filter filter = new Filter();
+
+						final FilterTag techCommonNameFilterTag = new FilterTag();
+						techCommonNameFilterTag.setTag(techCommonNameTag);
+						techCommonNameFilterTag.setTagState(Constants.MATCH_TAG_STATE);
+
+						final FilterTag concernNameFilterTag = new FilterTag();
+						concernNameFilterTag.setTag(concernTag);
+						concernNameFilterTag.setTagState(Constants.MATCH_TAG_STATE);
+
+						final FilterTag tagDescriptionFilterTag = new FilterTag();
+						tagDescriptionFilterTag.setTag(tagDescription);
+						tagDescriptionFilterTag.setTagState(Constants.MATCH_TAG_STATE);
+
+						filter.getFilterTags().add(techCommonNameFilterTag);
+						filter.getFilterTags().add(concernNameFilterTag);
+						filter.getFilterTags().add(tagDescriptionFilterTag);
+
+						final String query = filter.buildQuery();
+
+						System.out.println("Query: " + query);
+
+						final List<Topic> templates = entityManager.createQuery(Topic.SELECT_ALL_QUERY + " " + query).getResultList();
+
+						if (templates.size() == 1)
+							System.out.println("Found a template for " + techCommonNameTag.getTagName() + " / " + concernTag.getTagName());
+						else if (templates.size() > 1)
+							System.out.println("Found multiple templates for " + techCommonNameTag.getTagName() + " / " + concernTag.getTagName() + ". Using the first one.");
+
+						Topic template = templates.size() != 0 ? templates.get(0) : null;
+
+						/* Validate the template */
+						if (template != null)
+						{
+							template.initializeTempTopicXMLDoc();
+
+							/* if validation fails, ignore the template */
+							if (!validateTopicXML(template) || validateIdAttributesUnique(template, usedIds) != null)
+								template = null;
+						}
+
+						/*
+						 * We have topics that match this intersection, so we
+						 * need to build a landing page
+						 */
+						final Topic landingPage = new Topic();
+						landingPage.setTopicId(nextLandingPageId);
+						landingPage.setTopicTitle(techCommonNameTag.getTagName() + " " + concernTag.getTagName());
+
+						/*
+						 * Apply the xml from the template topic, or a generic
+						 * template if not template topic exists
+						 */
+						if (template != null)
+							landingPage.setTopicXML(template.getTopicXML());
+						else
+							landingPage.setTopicXML(landingPageTemplateXml);
+
+						landingPage.initializeTempTopicXMLDoc();
+
+						/*
+						 * if validation fails at this point the template in the
+						 * database is not valid, so revert to a base template
+						 */
+						if (!validateTopicXML(landingPage) || validateIdAttributesUnique(landingPage, usedIds) != null)
+						{
+							landingPage.setTopicXML("<section></section>");
+							landingPage.initializeTempTopicXMLDoc();
+						}
+
+						/*
+						 * Validate the topic, which will copy the title we set
+						 * above into the XML
+						 */
+						landingPage.validate();
+
+						/*
+						 * Apply some of the standard fixes to the landing page
+						 * topics
+						 */
+						processTopicID(landingPage);
+						processTopicFixImages(landingPage);
+
+						/*
+						 * Insert some links to those topics that have both the
+						 * technology / common name tag and the concern tag
+						 */
+						final List<Node> listitems = new ArrayList<Node>();
+						for (final Topic matchingTopic : matchingTopics)
+							listitems.add(DocbookUtils.createRelatedTopicLink(landingPage.getTempTopicXMLDoc(), matchingTopic.getXRefID()));
+						final Node itemizedlist = DocbookUtils.wrapListItems(landingPage.getTempTopicXMLDoc(), listitems);
+						landingPage.getTempTopicXMLDoc().getDocumentElement().appendChild(itemizedlist);
+
+						/* Decrement the landing page topic id counter */
+						--nextLandingPageId;
 					}
-
-					/*
-					 * We have topics that match this intersection, so we need
-					 * to build a landing page
-					 */
-					final Topic landingPage = new Topic();
-					landingPage.setTopicId(nextLandingPageId);
-					landingPage.setTopicTitle(techCommonNameTag.getTagName() + " " + concernTag.getTagName());
-
-					/*
-					 * Apply the xml from the template topic, or a generic
-					 * template if not template topic exists
-					 */
-					if (template != null)
-						landingPage.setTopicXML(template.getTopicXML());
-					else
-						landingPage.setTopicXML(landingPageTemplateXml);
-
-					/*
-					 * Validate the topic, which will copy the title we set
-					 * above into the XML
-					 */
-					landingPage.validate();
-
-					/* Convert the XML text into a Document object */
-					landingPage.initializeTempTopicXMLDoc();
-
-					/*
-					 * Apply some of the standard fixes to the landing page
-					 * topics
-					 */
-					processTopicID(landingPage);
-					processTopicFixImages(landingPage);
-
-					/*
-					 * Insert some links to those topics that have both the
-					 * technology / common name tag and the concern tag
-					 */
-					final List<Node> listitems = new ArrayList<Node>();
-					for (final Topic matchingTopic : matchingTopics)
-						listitems.add(DocbookUtils.createRelatedTopicLink(landingPage.getTempTopicXMLDoc(), matchingTopic.getXRefID()));
-					final Node itemizedlist = DocbookUtils.wrapListItems(landingPage.getTempTopicXMLDoc(), listitems);
-					landingPage.getTempTopicXMLDoc().getDocumentElement().appendChild(itemizedlist);
-
-					/* Decrement the landing page topic id counter */
-					--nextLandingPageId;
 				}
 			}
+		}
+		catch (final Exception ex)
+		{
+			ExceptionUtilities.handleException(ex);
 		}
 	}
 
@@ -1623,7 +1652,6 @@ public class DocbookBuilder
 			if (retValue != null)
 				return retValue;
 		}
-		
 
 		return null;
 	}
@@ -2010,7 +2038,6 @@ public class DocbookBuilder
 		processTopicCalculatePriority(topic, businessRulesWorkingMemory);
 		processTopicLifecycleRole(topic, roleCategoryID, tagToCategories);
 		processTopicDraftWarning(topic);
-		// processTopicViewRotationLinks(xmlData, topic, tagToCategories);
 		processTopicAdditionalInfo(topic, searchTagsUrl, docbookBuildingOptions);
 		processTopicFixImages(topic);
 
