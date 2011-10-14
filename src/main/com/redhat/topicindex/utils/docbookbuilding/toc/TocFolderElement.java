@@ -1,6 +1,8 @@
 package com.redhat.topicindex.utils.docbookbuilding.toc;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import com.redhat.topicindex.utils.docbookbuilding.DocbookBuildingOptions;
@@ -16,6 +18,11 @@ public class TocFolderElement extends TocElement
 	public List<TocElement> getChildren() 
 	{
 		return children;
+	}
+	
+	public void sortChildren(final Comparator<TocElement> comparator)
+	{
+		Collections.sort(children, comparator);
 	}
 
 	public void setChildren(final List<TocElement> children) 

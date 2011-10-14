@@ -55,6 +55,7 @@ import com.redhat.topicindex.entity.TopicToTag;
 import com.redhat.topicindex.entity.TopicToTopic;
 import com.redhat.topicindex.sort.ExternalListSort;
 import com.redhat.topicindex.sort.TagToCategorySortingComparator;
+import com.redhat.topicindex.sort.TocElementLabelComparator;
 import com.redhat.topicindex.sort.TopicTitleComparator;
 import com.redhat.topicindex.sort.TopicTitleSorter;
 import com.redhat.topicindex.utils.Constants;
@@ -1496,6 +1497,7 @@ public class DocbookBuilder
 					 */
 					final TocFolderElement tocFolder = new TocFolderElement(docbookBuildingOptions, techCommonNameTag.getTagName());
 					tocFolder.getChildren().addAll(landingPageLinks);
+					tocFolder.sortChildren(new TocElementLabelComparator());
 					/* add the tech folder to the top level folder */
 					tocTopLevel.getChildren().add(tocFolder);
 				}
@@ -1508,6 +1510,7 @@ public class DocbookBuilder
 			ExceptionUtilities.handleException(ex);
 		}
 
+		tocTopLevel.sortChildren(new TocElementLabelComparator());
 		tocTopLevel.generateCode();
 		return tocTopLevel;
 	}
