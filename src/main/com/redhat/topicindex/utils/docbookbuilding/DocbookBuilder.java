@@ -1376,7 +1376,7 @@ public class DocbookBuilder
 						Collections.sort(matchingTopics, new TopicTitleComparator());
 
 						/* define a title for the landing page */
-						final String landingPageTitle = techCommonNameTag.getTagName() + " &gt; " + concernTag.getTagName();
+						final String landingPageTitle = techCommonNameTag.getTagName() + " > " + concernTag.getTagName();
 
 						/*
 						 * we have found topics that fall into this intersection
@@ -1461,7 +1461,8 @@ public class DocbookBuilder
 						 */
 						if (!validateTopicXML(landingPage) || validateIdAttributesUnique(landingPage, usedIds) != null)
 						{
-							landingPage.setTopicXML("<section><title>" + landingPage.getTopicTitle() + "</title></section>");
+							landingPage.setTopicXML("<section><title></title></section>");
+							landingPage.validate();
 							landingPage.initializeTempTopicXMLDoc();
 						}
 
