@@ -779,20 +779,8 @@ public class DocbookBuilder
 	@SuppressWarnings("serial")
 	private void insertGenericInjectionLinks(final Document xmlDoc, final Map<Tag, ArrayList<Topic>> relatedLists)
 	{
-		/* related overviews are placed after the section title */
-		Node titleNode = null;
+		/* all related topics are placed before the first simplesect */
 		final NodeList nodes = xmlDoc.getDocumentElement().getChildNodes();
-		for (int i = 0; i < nodes.getLength(); ++i)
-		{
-			final Node node = nodes.item(i);
-			if (node.getNodeType() == 1 && node.getNodeName().equals("title"))
-			{
-				titleNode = node;
-				break;
-			}
-		}
-
-		/* related overviews are placed before the first simplesect */
 		Node simplesectNode = null;
 		for (int i = 0; i < nodes.getLength(); ++i)
 		{
@@ -805,69 +793,10 @@ public class DocbookBuilder
 		}
 
 		/*
-		 * place the overviews and concepts at the top of the topic. these will
-		 * end up in the reverse order that they are added to the ArrayList
+		 * place the topics at the end of the topic. They will appear in the
+		 * reverse order as the call to toArrayList()
 		 */
-		for (final Integer topTag : new ArrayList<Integer>()
-		{
-			{
-				add(Constants.CONCEPT_TAG_ID);
-				add(Constants.CONCEPTUALOVERVIEW_TAG_ID);
-			}
-		})
-		{
-			/* check for related concepts */
-			for (final Tag tag : relatedLists.keySet())
-			{
-				if (tag.getTagId() == topTag)
-				{
-					final Node itemizedlist = DocbookUtils.createRelatedTopicItemizedList(xmlDoc, "Related " + tag.getTagName() + "s");
-
-					for (final Topic relatedTopic : relatedLists.get(tag))
-						DocbookUtils.createRelatedTopicLink(xmlDoc, relatedTopic.getXRefID(), itemizedlist);
-
-					if (titleNode != null)
-					{
-						/*
-						 * insert the new node after the title, if a title
-						 * exists
-						 */
-						DocbookUtils.insertNodeAfter(titleNode, itemizedlist);
-					}
-					else
-					{
-						/*
-						 * of the title does not exist, see if any children
-						 * exist
-						 */
-						final Node firstChild = xmlDoc.getDocumentElement().getFirstChild();
-
-						if (firstChild != null)
-						{
-							/* if so, insert the new node before the first child */
-							xmlDoc.getDocumentElement().insertBefore(itemizedlist, firstChild);
-						}
-						else
-						{
-							/* if not, just add the new node */
-							xmlDoc.getDocumentElement().appendChild(itemizedlist);
-						}
-					}
-				}
-			}
-		}
-
-		/*
-		 * place the related task and reference topics and place them at the end
-		 * of the topic
-		 */
-		for (final Integer topTag : new ArrayList<Integer>()
-		{
-			{
-				add(Constants.REFERENCE_TAG_ID);
-				add(Constants.TASK_TAG_ID);
-			}
-		})
+		for (final Integer topTag : CollectionUtilities.toArrayList(Constants.REFERENCE_TAG_ID, Constants.TASK_TAG_ID, Constants.CONCEPT_TAG_ID, Constants.CONCEPTUALOVERVIEW_TAG_ID))
 		{
 			for (final Tag tag : relatedLists.keySet())
 			{
@@ -1327,9 +1256,9 @@ public class DocbookBuilder
 	 * @param usedIds
 	 */
 	private TocTopLevel buildTOCAndLandingPages(final List<String> usedIds, final DocbookBuildingOptions docbookBuildingOptions)
-	{		
+	{
 		final TocTopLevel tocTopLevel = new TocTopLevel(docbookBuildingOptions);
-		
+
 		try
 		{
 			System.out.println("Processing landing pages");
@@ -1338,6 +1267,15 @@ public class DocbookBuilder
 
 			/* Get a reference to the tag description tag */
 			final Tag tagDescription = entityManager.find(Tag.class, Constants.TAG_DESCRIPTION_TAG_ID);
+
+			/*
+			 * Get a reference to the other topic type tags that should be
+			 * displayed in the landing pages. Here we are defining that the
+			 * task and overview topics will be displayed.
+			 */
+			final List<Tag> topicTypes = new ArrayList<Tag>();
+			topicTypes.add(entityManager.find(Tag.class, Constants.TASK_TAG_ID));
+			topicTypes.add(entityManager.find(Tag.class, Constants.CONCEPTUALOVERVIEW_TAG_ID));
 
 			/* The categories that make up the top level of the toc */
 			final List<Integer> techCommonNameCategories = CollectionUtilities.toArrayList(Constants.COMMON_NAME_CATEGORY_ID, Constants.TECHNOLOGY_CATEGORY_ID);
@@ -1362,8 +1300,6 @@ public class DocbookBuilder
 			 * distinguish them from opics pulled out of the database
 			 */
 			int nextLandingPageId = -1;
-			
-			
 
 			/* Loop over all the tech and common name tags */
 			for (final Tag techCommonNameTag : techCommonNameTags)
@@ -1403,7 +1339,7 @@ public class DocbookBuilder
 						techCommonNameTagAndChildTags.add(childTag);
 					}
 
-					/* build up a list of cencern tags */
+					/* build up a list of concern tags */
 					final List<Tag> concernTagAndChildTags = new ArrayList<Tag>();
 					concernTagAndChildTags.add(concernTag);
 					for (final TagToTag childConcernTag : concernTag.getChildrenTagToTags())
@@ -1414,16 +1350,19 @@ public class DocbookBuilder
 
 					/*
 					 * find those topics that are tagged with any of the tech
-					 * tags and any of the concern tags
+					 * tags and any of the concern tags, and a topic type tag
 					 */
 					final List<Topic> matchingTopics = new ArrayList<Topic>();
 
-					for (final Tag techTagOrChild : techCommonNameTagAndChildTags)
+					for (final Tag topicType : topicTypes)
 					{
-						for (final Tag concernTagOrChild : concernTagAndChildTags)
+						for (final Tag techTagOrChild : techCommonNameTagAndChildTags)
 						{
-							final List<Topic> thisMatchingTopics = topicDatabase.getMatchingTopicsFromTag(CollectionUtilities.toArrayList(techTagOrChild, concernTagOrChild));
-							CollectionUtilities.addAllThatDontExist(thisMatchingTopics, matchingTopics);
+							for (final Tag concernTagOrChild : concernTagAndChildTags)
+							{
+								final List<Topic> thisMatchingTopics = topicDatabase.getMatchingTopicsFromTag(CollectionUtilities.toArrayList(techTagOrChild, concernTagOrChild, topicType));
+								CollectionUtilities.addAllThatDontExist(thisMatchingTopics, matchingTopics);
+							}
 						}
 					}
 
@@ -1432,15 +1371,15 @@ public class DocbookBuilder
 					{
 						/* Sort the topics by title */
 						Collections.sort(matchingTopics, new TopicTitleComparator());
-						
+
 						/* define a title for the landing page */
 						final String landingPageTitle = techCommonNameTag.getTagName() + " &gt; " + concernTag.getTagName();
-						
+
 						/*
 						 * we have found topics that fall into this intersection
 						 * of technology / common name and concern tags. create
 						 * a link in the treeview
-						 */						
+						 */
 						landingPageLinks.add(new TocLink(docbookBuildingOptions, concernTag.getTagName(), nextLandingPageId + ""));
 
 						/*
@@ -1504,7 +1443,7 @@ public class DocbookBuilder
 							landingPage.setTopicXML(template.getTopicXML());
 						else
 							landingPage.setTopicXML(landingPageTemplateXml);
-						
+
 						/*
 						 * Validate the topic, which will copy the title we set
 						 * above into the XML
@@ -1522,7 +1461,7 @@ public class DocbookBuilder
 							landingPage.setTopicXML("<section><title>" + landingPage.getTopicTitle() + "</title></section>");
 							landingPage.initializeTempTopicXMLDoc();
 						}
-						
+
 						/*
 						 * Apply some of the standard fixes to the landing page
 						 * topics
@@ -1547,26 +1486,28 @@ public class DocbookBuilder
 						--nextLandingPageId;
 					}
 				}
-				
+
 				/* test to see if there were any topics to add under this tech */
 				if (landingPageLinks.size() != 0)
 				{
-					/* if so, create a folder, and add all of the concern links to it */
+					/*
+					 * if so, create a folder, and add all of the concern links
+					 * to it
+					 */
 					final TocFolderElement tocFolder = new TocFolderElement(docbookBuildingOptions, techCommonNameTag.getTagName());
 					tocFolder.getChildren().addAll(landingPageLinks);
 					/* add the tech folder to the top level folder */
 					tocTopLevel.getChildren().add(tocFolder);
 				}
-					
+
 			}
-			
-			
+
 		}
 		catch (final Exception ex)
 		{
 			ExceptionUtilities.handleException(ex);
 		}
-		
+
 		tocTopLevel.generateCode();
 		return tocTopLevel;
 	}
@@ -1595,7 +1536,7 @@ public class DocbookBuilder
 	 */
 	private void populateIdXMLDataFromDB(final String errorTemplate, final Topic xmlData, final String filterUrl, final int roleCategoryID, final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
 	{
-		final String replacement = xmlData.getTempTopicRole() == null ? "" : xmlData.getTempTopicRole();		
+		final String replacement = xmlData.getTempTopicRole() == null ? "" : xmlData.getTempTopicRole();
 		final String fixedTemplate = errorTemplate.replaceAll(ROLE_MARKER, replacement);
 		populateIdXMLDataFromDB(fixedTemplate, xmlData, filterUrl, docbookBuildingOptions);
 	}
@@ -2129,42 +2070,6 @@ public class DocbookBuilder
 	}
 
 	/**
-	 * This function is used to add a topic to a nav page collection, assuming
-	 * the topic shares a tag that is included in the nav page collection keyset
-	 */
-	private boolean populateNavTopicCollection(final HashMap<Tag, TopicData> collection, final Topic topic, final Topic xmlData)
-	{
-		/*
-		 * we need to check that the topic has a tag that can be found in the
-		 * collections key set (the keyset essentially represnts the tags in a
-		 * particular category)
-		 */
-		boolean foundTechnology = false;
-		for (final Tag topicTag : collection.keySet())
-		{
-			// check to see that the supplied topic has the tag
-			if (filter(having(on(TopicToTag.class).getTag(), equalTo(topicTag)), topic.getTopicToTags()).size() != 0)
-			{
-				/*
-				 * assicate the topic (or at least the represnattion of the
-				 * topic in the xmlData parameter) against the tag
-				 */
-				collection.get(topicTag).map.put(topic.getTopicId(), xmlData);
-				// we expect to find at least one matching tag for this topic
-				foundTechnology = true;
-			}
-		}
-
-		// if no matching tags were found, create a warning
-		if (!foundTechnology)
-		{
-			errorDatabase.addWarning(topic, "Topic is not tagged with a technology type");
-		}
-
-		return foundTechnology;
-	}
-
-	/**
 	 * @param categoryID
 	 *            The category that the TagToCategory entities must belong to in
 	 *            order to be returned
@@ -2185,366 +2090,6 @@ public class DocbookBuilder
 		// generate the relative priority from the BRMS rule
 		businessRulesWorkingMemory.insert(new DroolsEvent("SetSystemPreferences"));
 		businessRulesWorkingMemory.fireAllRules();
-	}
-
-	/**
-	 * This function builds a TOC that shows children tags in the TOC next to
-	 * their parent names.
-	 */
-	@SuppressWarnings("serial")
-	private TocTopLevel buildTOCCommonNameTechnologyHybrid(final DocbookBuildingOptions docbookBuildingOptions)
-	{
-		/*
-		 * todo: if this toc style of navigation ends up being the standard, a
-		 * lot of the code here could be done smarter with recursive calls to
-		 * functions that generate the listitems
-		 */
-
-		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
-
-		// these categories make up the folders in the tree view
-		final Category firstLevelCategoryOne = entityManager.find(Category.class, Constants.TECHNOLOGY_CATEGORY_ID);
-		final Category firstLevelCategoryTwo = entityManager.find(Category.class, Constants.COMMON_NAME_CATEGORY_ID);
-
-		final Category secondLevelCategory = entityManager.find(Category.class, Constants.CONCERN_CATEGORY_ID);
-
-		final List<TagToCategory> combinedTechnologyTagToCategories = new ArrayList<TagToCategory>(firstLevelCategoryOne.getTagToCategories());
-		combinedTechnologyTagToCategories.addAll(firstLevelCategoryTwo.getTagToCategories());
-		Collections.sort(combinedTechnologyTagToCategories, new TagToCategorySortingComparator());
-
-		/*
-		 * this container will hold those list items that appear in the top
-		 * level of the treeview
-		 */
-		final TocTopLevel tocTopLevel = new TocTopLevel(docbookBuildingOptions, "EAP6 Documentation", "Top");
-
-		// add the home link
-		tocTopLevel.getChildren().add(new TocLink(docbookBuildingOptions, "HOME", "index"));
-
-		// get a list of tags that are equivalent to another parent tag
-		final List<Integer> childrenTags = new ArrayList<Integer>();
-		for (final TagToCategory firstLevelCategoryTag : combinedTechnologyTagToCategories)
-		{
-			if (firstLevelCategoryTag.getTag().getParentTagToTags().size() != 0)
-				childrenTags.add(firstLevelCategoryTag.getTag().getTagId());
-		}
-
-		// get a list of concern tags
-		final List<Tag> concernTags = new ArrayList<Tag>();
-		for (final TagToCategory concernTag : secondLevelCategory.getTagToCategories())
-			concernTags.add(concernTag.getTag());
-
-		/*
-		 * loop over the first level category. the tags in this category will
-		 * appear as the top level items in the tree
-		 */
-		for (final TagToCategory firstLevelCategoryTag : combinedTechnologyTagToCategories)
-		{
-			// a convenience variable
-			final Tag firstLevelTag = firstLevelCategoryTag.getTag();
-
-			/*
-			 * get a list of tags that are equivalent to this parent tag. we
-			 * will use this to determine which topics get placed under the
-			 * parent tag, and which get placed under the child tag (because a
-			 * topic can be tagged with a child and parent tag, where the child
-			 * tag is a child of another parent)
-			 */
-			final List<Tag> thisChildrenTags = new ArrayList<Tag>();
-			for (final TagToTag childTag : firstLevelTag.getChildrenTagToTags())
-				thisChildrenTags.add(childTag.getSecondaryTag());
-
-			// don't process child tags directly
-			if (firstLevelTag.getParentTagToTags().size() == 0)
-			{
-				final TocFolderElement parentOnlyFolder = new TocFolderElement(docbookBuildingOptions, firstLevelTag.getTagName(), firstLevelTag.getTagId().toString());
-
-				// find those topics that *only* have a parent tag
-				final List<Topic> tocTopicList = topicDatabase.getMatchingTopicsFromTag(firstLevelTag, new ArrayList<Tag>()
-				{
-					{
-						addAll(thisChildrenTags);
-						addAll(concernTags);
-					}
-				});
-
-				for (final Topic xmlMap : tocTopicList)
-				{
-					parentOnlyFolder.getChildren().add(new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId().toString(), xmlMap.getTempNavLinkDocbook()));
-				}
-
-				// now loop over the concern tags for the parent tag only
-				final List<TagToCategory> sortedCategories = new ArrayList<TagToCategory>(secondLevelCategory.getTagToCategories());
-				Collections.sort(sortedCategories, new TagToCategorySortingComparator());
-
-				for (final TagToCategory secondLevelCategoryTag : sortedCategories)
-				{
-					final Tag concernTag = secondLevelCategoryTag.getTag();
-
-					final List<Topic> concernTopicList = topicDatabase.getMatchingTopicsFromTag(new ArrayList<Tag>()
-					{
-						{
-							add(firstLevelTag);
-							add(concernTag);
-						}
-					}, thisChildrenTags);
-
-					if (concernTopicList.size() != 0)
-					{
-						final TocFolderElement concernLevelFolder = new TocFolderElement(docbookBuildingOptions, concernTag.getTagName(), concernTag.getTagId().toString());
-						parentOnlyFolder.getChildren().add(concernLevelFolder);
-
-						for (final Topic xmlMap : concernTopicList)
-						{
-							concernLevelFolder.getChildren().add(new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId().toString(), xmlMap.getTempNavLinkDocbook()));
-						}
-					}
-				}
-
-				// add the folder to the toc if it holds any items
-				if (parentOnlyFolder.getChildren().size() != 0)
-					tocTopLevel.getChildren().add(parentOnlyFolder);
-
-				/*****/
-
-				// loop over the children tags
-				for (final TagToTag childTagToTag : firstLevelTag.getChildrenTagToTags())
-				{
-					final Tag secondaryTag = childTagToTag.getSecondaryTag();
-
-					/*
-					 * this collection will hold the those list items that
-					 * appear under a first level folder
-					 */
-					final TocFolderElement equivalentFolder = new TocFolderElement(docbookBuildingOptions, firstLevelTag.getTagName() + " / " + secondaryTag.getTagName(), firstLevelTag.getTagId() + "/" + secondaryTag.getTagId());
-
-					// add those topics that aren't tagged with a concern.
-
-					/*
-					 * here we don't actually use the equivalent tag when
-					 * grabbing these topics. having the child tag implies
-					 * having the main tag
-					 */
-					final List<Topic> topicList = topicDatabase.getMatchingTopicsFromTag(secondaryTag, concernTags);
-
-					for (final Topic xmlMap : topicList)
-					{
-						equivalentFolder.getChildren().add(new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId().toString(), xmlMap.getTempNavLinkDocbook()));
-					}
-
-					// now loop over the concern tags
-					for (final TagToCategory secondLevelCategoryTag : secondLevelCategory.getTagToCategories())
-					{
-						final Tag concernTag = secondLevelCategoryTag.getTag();
-
-						final List<Topic> concernTopicList = topicDatabase.getMatchingTopicsFromTag(new ArrayList<Tag>()
-						{
-							{
-								add(secondaryTag);
-								add(concernTag);
-							}
-						});
-
-						if (concernTopicList.size() != 0)
-						{
-							final TocFolderElement concernLevelFolder = new TocFolderElement(docbookBuildingOptions, concernTag.getTagName(), concernTag.getTagId().toString());
-							equivalentFolder.getChildren().add(concernLevelFolder);
-
-							for (final Topic xmlMap : concernTopicList)
-							{
-								concernLevelFolder.getChildren().add(new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId().toString(), xmlMap.getTempNavLinkDocbook()));
-							}
-						}
-
-					}
-
-					// add the folder to the toc if it holds any items
-					if (equivalentFolder.getChildren().size() != 0)
-						tocTopLevel.getChildren().add(equivalentFolder);
-				}
-			}
-		}
-
-		tocTopLevel.generateCode();
-		return tocTopLevel;
-	}
-
-	/**
-	 * This function will return a TOC object where tags that are encompassed by
-	 * a parent tag do not show up in the toc directly. Instead they are listed
-	 * under their parent folders.
-	 */
-	@SuppressWarnings("serial")
-	private TocTopLevel buildTOCCommonNameOnly(final DocbookBuildingOptions docbookBuildingOptions)
-	{
-		/*
-		 * todo: if this toc style of navigation ends up being the standard, a
-		 * lot of the code here could be done smarter with recursive calls to
-		 * functions that generate the listitems
-		 */
-
-		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
-
-		// these categories make up the folders in the tree view
-		final Category firstLevelCategoryOne = entityManager.find(Category.class, Constants.TECHNOLOGY_CATEGORY_ID);
-		final Category firstLevelCategoryTwo = entityManager.find(Category.class, Constants.COMMON_NAME_CATEGORY_ID);
-
-		final Category secondLevelCategory = entityManager.find(Category.class, Constants.CONCERN_CATEGORY_ID);
-
-		final List<TagToCategory> combinedTechnologyTagToCategories = new ArrayList<TagToCategory>(firstLevelCategoryOne.getTagToCategories());
-		combinedTechnologyTagToCategories.addAll(firstLevelCategoryTwo.getTagToCategories());
-		Collections.sort(combinedTechnologyTagToCategories, new TagToCategorySortingComparator());
-
-		/*
-		 * this container will hold those list items that appear in the top
-		 * level of the treeview
-		 */
-		final TocTopLevel tocTopLevel = new TocTopLevel(docbookBuildingOptions, "EAP6 Documentation", "Top");
-
-		// add the home link
-		tocTopLevel.getChildren().add(new TocLink(docbookBuildingOptions, "HOME", "index"));
-
-		// get a list of tags that are equivalent to another parent tag
-		final List<Tag> childrenTags = new ArrayList<Tag>();
-		for (final TagToCategory firstLevelCategoryTag : combinedTechnologyTagToCategories)
-		{
-			if (firstLevelCategoryTag.getTag().getParentTagToTags().size() != 0)
-				childrenTags.add(firstLevelCategoryTag.getTag());
-		}
-
-		// get a list of concern tags
-		final List<Tag> concernTags = new ArrayList<Tag>();
-		for (final TagToCategory concernTag : secondLevelCategory.getTagToCategories())
-			concernTags.add(concernTag.getTag());
-
-		/*
-		 * loop over the first level category. the tags in this category will
-		 * appear as the top level items in the tree
-		 */
-		for (final TagToCategory firstLevelCategoryTag : combinedTechnologyTagToCategories)
-		{
-			// a convenience variable
-			final Tag firstLevelTag = firstLevelCategoryTag.getTag();
-
-			/*
-			 * get a list of tags that are equivalent to this parent tag. we
-			 * will use this to determine which topics get placed under the
-			 * parent tag, and which get placed under the child tag (because a
-			 * topic can be tagged with a child and parent tag, where the child
-			 * tag is a child of another parent)
-			 */
-			final List<Tag> thisChildrenTags = new ArrayList<Tag>();
-			for (final TagToTag childTag : firstLevelTag.getChildrenTagToTags())
-				thisChildrenTags.add(childTag.getSecondaryTag());
-
-			// don't process child tags directly
-			if (firstLevelTag.getParentTagToTags().size() == 0)
-			{
-				final TocFolderElement parentOnlyFolder = new TocFolderElement(docbookBuildingOptions, firstLevelTag.getTagName(), firstLevelTag.getTagId().toString());
-
-				// list of topic ids to match
-				final List<Tag> matchTag = new ArrayList<Tag>();
-				matchTag.add(firstLevelTag);
-
-				// list of topic ids to exclude
-				final List<Tag> excludeTag = new ArrayList<Tag>();
-				excludeTag.addAll(thisChildrenTags);
-				excludeTag.addAll(concernTags);
-
-				/*
-				 * find those topics that *only* have a parent tag, and no
-				 * concern tags. these will be placed at the top of the tree
-				 */
-				final List<Topic> parentOnlyTopicList = topicDatabase.getMatchingTopicsFromTag(matchTag, excludeTag);
-
-				/*
-				 * find those topics that have a child tag, but no concern.
-				 * these will be placed below the parent only topics
-				 */
-				final List<Topic> chidlrenTopicList = new ArrayList<Topic>();
-				for (final Tag childTag : thisChildrenTags)
-				{
-					final List<Topic> matchingTopics = topicDatabase.getMatchingTopicsFromTag(childTag, concernTags);
-
-					CollectionUtilities.addAllThatDontExist(matchingTopics, chidlrenTopicList);
-				}
-
-				/* create links to those topics that have no concern */
-				for (final List<Topic> tocTopicList : new ArrayList<List<Topic>>()
-				{
-					{
-						add(parentOnlyTopicList);
-						add(chidlrenTopicList);
-					}
-				})
-				{
-					for (final Topic xmlMap : tocTopicList)
-					{
-						parentOnlyFolder.getChildren().add(new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId().toString(), xmlMap.getTempNavLinkDocbook()));
-					}
-				}
-
-				/* now loop over the concern tags */
-				final List<TagToCategory> sortedCategories = new ArrayList<TagToCategory>(secondLevelCategory.getTagToCategories());
-				Collections.sort(sortedCategories, new TagToCategorySortingComparator());
-
-				for (final TagToCategory secondLevelCategoryTag : sortedCategories)
-				{
-					final Tag concernTag = secondLevelCategoryTag.getTag();
-
-					final List<Tag> matchConcernTags = new ArrayList<Tag>();
-					matchConcernTags.add(firstLevelTag);
-					matchConcernTags.add(concernTag);
-
-					/*
-					 * find those topics that have only the parent tag, and the
-					 * concern tag
-					 */
-					final List<Topic> parentOnlyConcernTopicList = topicDatabase.getMatchingTopicsFromTag(matchConcernTags, thisChildrenTags);
-
-					/*
-					 * find those topics that have a child tag, and the concern
-					 * tag
-					 */
-					final List<Topic> childrenConcernTopicList = new ArrayList<Topic>();
-					for (final Tag childTag : thisChildrenTags)
-					{
-						final List<Tag> matchChildTags = new ArrayList<Tag>();
-						matchChildTags.add(childTag);
-						matchChildTags.add(concernTag);
-
-						final List<Topic> matchingTopics = topicDatabase.getMatchingTopicsFromTag(matchChildTags);
-
-						CollectionUtilities.addAllThatDontExist(matchingTopics, childrenConcernTopicList);
-					}
-
-					if (parentOnlyConcernTopicList.size() != 0 || childrenConcernTopicList.size() != 0)
-					{
-						final TocFolderElement concernLevelFolder = new TocFolderElement(docbookBuildingOptions, concernTag.getTagName(), concernTag.getTagId().toString());
-						parentOnlyFolder.getChildren().add(concernLevelFolder);
-
-						final ArrayList<List<Topic>> topicCollections = new ArrayList<List<Topic>>();
-						topicCollections.add(parentOnlyConcernTopicList);
-						topicCollections.add(childrenConcernTopicList);
-
-						for (List<Topic> topicList : topicCollections)
-						{
-							for (final Topic xmlMap : topicList)
-							{
-								concernLevelFolder.getChildren().add(new TocLink(docbookBuildingOptions, xmlMap.getTopicTitle(), xmlMap.getTopicId().toString(), xmlMap.getTempNavLinkDocbook()));
-							}
-						}
-					}
-				}
-
-				// add the folder to the toc if it holds any items
-				if (parentOnlyFolder.getChildren().size() != 0)
-					tocTopLevel.getChildren().add(parentOnlyFolder);
-			}
-		}
-
-		tocTopLevel.generateCode();
-		return tocTopLevel;
 	}
 
 	private String getTopicSkynetURL(final Topic topic)
