@@ -777,7 +777,6 @@ public class DocbookBuilder
 	 * and the topic type tags that are associated with them and injects them
 	 * into the xml document.
 	 */
-	@SuppressWarnings("serial")
 	private void insertGenericInjectionLinks(final Document xmlDoc, final Map<Tag, ArrayList<Topic>> relatedLists)
 	{
 		/* all related topics are placed before the first simplesect */

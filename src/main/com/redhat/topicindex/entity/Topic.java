@@ -716,6 +716,9 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		validateTags();
 		validateRelationships();
 		syncTopicTitleWithXML();
+		
+		/* remove line breaks from the title */
+		this.topicTitle = this.topicTitle.replaceAll("\n", " ").trim();
 	}
 
 	private void validateRelationships()
