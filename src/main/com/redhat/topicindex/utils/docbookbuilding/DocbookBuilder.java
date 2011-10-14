@@ -804,8 +804,11 @@ public class DocbookBuilder
 				if (tag.getTagId() == topTag)
 				{
 					final Node itemizedlist = DocbookUtils.createRelatedTopicItemizedList(xmlDoc, "Related " + tag.getTagName() + "s");
+					
+					final ArrayList<Topic> relatedTopics = relatedLists.get(tag);
+					Collections.sort(relatedTopics, new TopicTitleComparator());
 
-					for (final Topic relatedTopic : relatedLists.get(tag))
+					for (final Topic relatedTopic : relatedTopics)
 						DocbookUtils.createRelatedTopicLink(xmlDoc, relatedTopic.getXRefID(), itemizedlist);
 
 					if (simplesectNode != null)
