@@ -45,6 +45,14 @@ end
 
 ### LINKS AT THE TOP OF THE PAGE RULES ###
 
+rule "TopicQikLinkRendered"
+	when
+		c: PermissionCheck(name == "TopicQikLink", action == "Rendered")
+		Role(name == "basicRole")
+   	then
+		c.grant();
+end
+
 rule "TagListLinkRendered"
 	when
 		c: PermissionCheck(name == "TagListLink", action == "Rendered")

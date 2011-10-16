@@ -6,7 +6,7 @@ public class Constants
 	 * The Skynet build number, displayed on the top bar of all Skynet pages. Is
 	 * in the format yyyymmdd-hhmm
 	 */
-	public static final String BUILD = "20111017-0823";
+	public static final String BUILD = "20111017-0920";
 	
 	public static final String TOPIC_XREF_PREFIX = "TopicID";
 
@@ -176,12 +176,20 @@ public class Constants
 	public static final String CONCERN_CATEGORY_NAME = "Concerns";
 	public static final Integer LIFECYCLE_CATEGORY_ID = 5;
 
+	/** The Concept tag ID */
 	public static final Integer CONCEPT_TAG_ID = 5;
+	/** The Conceptual Overview tag ID */
 	public static final Integer CONCEPTUALOVERVIEW_TAG_ID = 93;
+	/** The Reference tag ID */
 	public static final Integer REFERENCE_TAG_ID = 6;
+	/** The Task tag ID */
 	public static final Integer TASK_TAG_ID = 4;
+	/** The Written tag ID */
 	public static final Integer WRITTEN_TAG_ID = 19;
+	/** The Tag Description tag ID */
 	public static final Integer TAG_DESCRIPTION_TAG_ID = 215;
+	/** The Home tag ID */
+	public static final Integer HOME_TAG_ID = 216;
 
 
 	/**

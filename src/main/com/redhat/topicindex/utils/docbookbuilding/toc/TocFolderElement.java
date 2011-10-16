@@ -30,6 +30,11 @@ public class TocFolderElement extends TocElement
 		this.children = children;
 	}
 	
+	public void addChild(final TocElement child)
+	{
+		this.children.add(child);
+	}
+	
 	public TocFolderElement(final DocbookBuildingOptions docbookBuildingOptions, final String label, final String id, final List<TocElement> children)
 	{
 		super(docbookBuildingOptions, label, id);

@@ -23,7 +23,14 @@
    		<h:form>		
 			<rich:toolBar>
 			 	<rich:toolBarGroup>
-			    	<h:outputText value="BUILD: #{webConstants.build}" />
+			    	<h:outputText value="BUILD: #{topBar.build}" />
+			    </rich:toolBarGroup>
+			    <rich:toolBarGroup rendered="#{s:hasPermission('TopicQikLink', 'Rendered', null)}">
+			    	<h:form>
+			    		<h:inputText value="#{topBar.topicId}" size="6"/>
+			    		<h:commandButton value="View" action="#{topBar.getTopicViewUrl}" title="View the topic with the given ID. If the topic does not exist, or the ID is not valid, you will be returned to this page."/>
+			    		<h:commandButton value="Edit" action="#{topBar.getTopicEditUrl}" title="Edit the topic with the given ID. If the topic does not exist, or the ID is not valid, you will be returned to this page."/>
+			    	</h:form>
 			    </rich:toolBarGroup>		    
 			    <rich:toolBarGroup>
 			        <s:link id="homeId" view="/CustomSearchTopicList.seam?filterId=#{userPrefs.userPrefsData.homeFilter}" value="Home" propagation="none" rendered="#{not empty userPrefs.userPrefsData.homeFilter}"/>
