@@ -1,0 +1,74 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:s="http://jboss.com/products/seam/taglib"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:c="http://java.sun.com/jstl/core">
+
+	<s:decorate id="topicViewRevisionField" template="/layout/display.xhtml">
+		<ui:define name="label">Topic Revision</ui:define>
+		<h:outputText
+			value="#{empty topicHome.revision ? 'Latest' : topicHome.revision}" />
+	</s:decorate>
+
+	<s:decorate id="topicViewIdField" template="/layout/display.xhtml">
+		<ui:define name="label">Topic Title</ui:define>
+		<h:outputText
+			value="#{topic.topicTitle}" />
+	</s:decorate>
+
+	<s:decorate id="topicViewTitleField" template="/layout/display.xhtml">
+		<ui:define name="label">Topic ID</ui:define>
+		<h:outputText
+			value="#{topic.topicId}" />
+	</s:decorate>
+
+	<s:decorate id="topicViewXMLField" template="/layout/display.xhtml">
+		<ui:define name="label">Topic XML</ui:define>
+		<h:inputTextarea id="topicXML" cols="80" rows="10" readonly="true"
+			value="#{topic.topicXML}" />
+	</s:decorate>
+
+	<s:decorate id="topicViewTextField" template="/layout/display.xhtml">
+		<ui:define name="label">Description</ui:define>
+		<h:inputTextarea id="topicText" cols="80" rows="10" readonly="true"
+			value="#{topic.topicText}" />
+	</s:decorate>
+
+	<s:decorate id="topicViewAddedByField" template="/layout/display.xhtml">
+		<ui:define name="label">Topic Added By</ui:define>
+		<h:outputText
+			value="#{topic.topicAddedBy}" />
+	</s:decorate>
+
+	<s:decorate id="topicViewSourceMaterialUrls"
+		template="/layout/display.xhtml">
+		<ui:define name="label">Topic Source URLs</ui:define>
+		<rich:dataList var="url"
+			value="#{topic.topicToTopicSourceUrls.toArray()}">
+			<h:outputLink value="#{url.topicSourceUrl.sourceUrl}"
+				title="#{url.topicSourceUrl.description}">
+				<h:outputText value="Source URL"
+					rendered="#{empty url.topicSourceUrl.title}" />
+				<h:outputText value="#{url.topicSourceUrl.title}"
+					rendered="#{not empty url.topicSourceUrl.title}" />
+			</h:outputLink>
+		</rich:dataList>
+	</s:decorate>
+
+	<s:decorate id="topicViewTimeStamp" template="/layout/display.xhtml">
+		<ui:define name="label">Topic TimeStamp</ui:define>
+		<h:outputText
+			value="#{topic.topicTimeStamp}">
+			<s:convertDateTime type="both" dateStyle="short" />
+		</h:outputText>
+	</s:decorate>
+
+	<s:decorate id="topicViewTags" template="/layout/display.xhtml">
+		<ui:define name="label">Topic Tags</ui:define>
+		<h:outputText
+			value="#{topic.tagsList}"
+			escape="false" />
+	</s:decorate>
+</ui:composition>

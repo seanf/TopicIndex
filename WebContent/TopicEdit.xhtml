@@ -206,6 +206,14 @@
 					</rich:dataTable>
 
 				</rich:tab>
+				
+				<rich:tab label="Original Topic Details" title="This tab displays the original contents of the topic.">
+				<ui:include src="/WEB-INF/templates/TopicView.xhtml">
+					<ui:param name="selectedTags"
+						value="#{customTagSearch.selectedTags.projectCategories}" />
+					<ui:param name="topic" value="#{topicHome.instance}" />
+				</ui:include>
+			</rich:tab>
 
 			</rich:tabPanel>
 
