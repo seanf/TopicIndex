@@ -14,5 +14,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JSF API 1.2"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Hibernate Search 3.4.1"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/MySQL Connector"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Xalan 2.7.1"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
