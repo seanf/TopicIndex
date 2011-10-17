@@ -4,21 +4,21 @@ import java.util.Map;
 
 import com.redhat.ecs.commonutils.XSLTUtilities;
 import com.redhat.ecs.commonutils.ZipUtilities;
-import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.utils.EntityUtilities;
 
-public class TopicRenderer
+public class XMLRenderer
 {
 	private static final Integer DOCBOOK_ZIP_ID = 6;
+	private static final Integer HTML_XSL_ID = 29;
 	private static final String DOCBOOK_XSL_URL = "http://docbook.sourceforge.net/release/xsl/current/";
 	private static Map<String, byte[]> docbookFiles = null;
-	private static byte[] xsl = null;
+	private static String xsl = null;
 	
 	private static void initialize()
 	{
 		final byte[] docbookZip = EntityUtilities.loadBlobConstant(DOCBOOK_ZIP_ID);
 		docbookFiles = ZipUtilities.readZipFile(docbookZip, DOCBOOK_XSL_URL);
-		
+		xsl = EntityUtilities.loadStringConstant(HTML_XSL_ID);
 	}
 	
 	public static String transformDocbook(final String xml)

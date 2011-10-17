@@ -61,7 +61,7 @@ import com.redhat.topicindex.utils.EntityQueries;
 import com.redhat.topicindex.utils.EntityUtilities;
 import com.redhat.topicindex.utils.XMLValidator;
 import com.redhat.topicindex.utils.structures.NameIDSortMap;
-import com.redhat.topicindex.utils.topicrenderer.TopicRenderer;
+import com.redhat.topicindex.utils.topicrenderer.XMLRenderer;
 
 @Entity
 @Audited
@@ -719,7 +719,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		syncTopicTitleWithXML();
 		
 		/* render the topic html */
-		this.setTopicRendered(TopicRenderer.transformDocbook(this.getTopicXML()));
+		this.setTopicRendered(XMLRenderer.transformDocbook(this.getTopicXML()));
 		
 		/* remove line breaks from the title */
 		this.topicTitle = this.topicTitle.replaceAll("\n", " ").trim();
