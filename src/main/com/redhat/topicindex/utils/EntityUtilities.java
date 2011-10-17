@@ -31,12 +31,15 @@ import org.jsoup.Jsoup;
 
 import com.redhat.ecs.commonutils.CollectionUtilities;
 import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.entity.BlobConstants;
 import com.redhat.topicindex.entity.Category;
 import com.redhat.topicindex.entity.Filter;
 import com.redhat.topicindex.entity.FilterCategory;
 import com.redhat.topicindex.entity.FilterField;
 import com.redhat.topicindex.entity.FilterTag;
+import com.redhat.topicindex.entity.IntegerConstants;
 import com.redhat.topicindex.entity.Project;
+import com.redhat.topicindex.entity.StringConstants;
 import com.redhat.topicindex.entity.Tag;
 import com.redhat.topicindex.entity.TagToCategory;
 import com.redhat.topicindex.entity.TagToProject;
@@ -52,6 +55,27 @@ import com.redhat.topicindex.utils.structures.tags.UIProjectData;
 
 public class EntityUtilities
 {
+	public static byte[] loadBlobConstant(final Integer id)
+	{
+		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+		final BlobConstants constant = entityManager.find(BlobConstants.class, id);
+		return constant == null ? null : constant.getConstantValue();
+	}
+
+	public static Integer loadIntegerConstant(final Integer id)
+	{
+		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+		final IntegerConstants constant = entityManager.find(IntegerConstants.class, id);
+		return constant == null ? null : constant.getConstantValue();
+	}
+
+	public static String loadStringConstant(final Integer id)
+	{
+		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+		final StringConstants constant = entityManager.find(StringConstants.class, id);
+		return constant == null ? null : constant.getConstantValue();
+	}
+	
 	static public void populateTopicTags(final Topic topic, final UIProjectData selectedTags)
 	{
 		populateTags(topic.getTags(), selectedTags, null, true);
