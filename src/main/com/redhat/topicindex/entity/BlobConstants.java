@@ -16,21 +16,24 @@ import org.hibernate.validator.NotNull;
  */
 @Entity
 @Table(name = "BlobConstants", catalog = "Skynet")
-public class BlobConstants implements java.io.Serializable 
+public class BlobConstants implements java.io.Serializable
 {
 	private static final long serialVersionUID = 2142789116413087991L;
 	private Integer blobConstantsId;
 	private String constantName;
 	private byte[] constantValue;
 
-	public BlobConstants() {
+	public BlobConstants()
+	{
 	}
 
-	public BlobConstants(final String constantName) {
+	public BlobConstants(final String constantName)
+	{
 		this.constantName = constantName;
 	}
 
-	public BlobConstants(final String constantName, final byte[] constantValue) {
+	public BlobConstants(final String constantName, final byte[] constantValue)
+	{
 		this.constantName = constantName;
 		this.constantValue = constantValue;
 	}
@@ -38,31 +41,37 @@ public class BlobConstants implements java.io.Serializable
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
 	@Column(name = "BlobConstantsID", unique = true, nullable = false)
-	public Integer getBlobConstantsId() {
+	public Integer getBlobConstantsId()
+	{
 		return this.blobConstantsId;
 	}
 
-	public void setBlobConstantsId(final Integer blobConstantsId) {
+	public void setBlobConstantsId(final Integer blobConstantsId)
+	{
 		this.blobConstantsId = blobConstantsId;
 	}
 
 	@Column(name = "ConstantName", nullable = false, length = 45)
 	@NotNull
 	@Length(max = 45)
-	public String getConstantName() {
+	public String getConstantName()
+	{
 		return this.constantName;
 	}
 
-	public void setConstantName(final String constantName) {
+	public void setConstantName(final String constantName)
+	{
 		this.constantName = constantName;
 	}
 
 	@Column(name = "ConstantValue")
-	public byte[] getConstantValue() {
+	public byte[] getConstantValue()
+	{
 		return this.constantValue;
 	}
 
-	public void setConstantValue(final byte[] constantValue) {
+	public void setConstantValue(final byte[] constantValue)
+	{
 		this.constantValue = constantValue;
 	}
 
