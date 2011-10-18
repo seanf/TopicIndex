@@ -23,12 +23,21 @@ public class XMLRenderer
 	 * containing the xsl directory from /usr/share/publican
 	 */
 	private static final Integer PUBLICANXSL_ZIP_ID = 7;
+	/** The StringConstant ID of the html.xsl file */
 	private static final Integer HTML_XSL_ID = 29;
+	/**
+	 * This is the URL of the xsl files imported by the html.xsl file below. We
+	 * use this as the system id when using a URIResolver to allow us to track
+	 * the context in which files are imported.
+	 */
 	private static final String DOCBOOK_XSL_URL = "http://docbook.sourceforge.net/release/xsl/current/";
+	/**
+	 * This file is a copy of
+	 * /usr/share/publican/Common_Content/JBoss_EAP6/xsl/html.xsl
+	 */
 	private static final String HTML_XSL_SYSTEMID = "/usr/share/publican/Common_Content/JBoss_EAP6/xsl/html.xsl";
 	private static Map<String, byte[]> docbookFiles = null;
 	private static String xsl = null;
-	private static Map<String, String> globalPramaters;
 
 	private static void initialize()
 	{
@@ -41,9 +50,6 @@ public class XMLRenderer
 		ZipUtilities.mapZipFile(publicanZip, docbookFiles, "file:/usr/share/publican/");
 
 		xsl = EntityUtilities.loadStringConstant(HTML_XSL_ID);
-		
-		globalPramaters = new HashMap<String, String>();
-		globalPramaters.put("publican.version", "2.6");
 	}
 
 	public static String transformDocbook(final String xml)
@@ -52,7 +58,7 @@ public class XMLRenderer
 			initialize();
 
 		if (xml != null && xsl != null && docbookFiles != null)
-			return XSLTUtilities.transformXML(xml, xsl, HTML_XSL_SYSTEMID, globalPramaters, docbookFiles);
+			return XSLTUtilities.transformXML(xml, xsl, HTML_XSL_SYSTEMID, docbookFiles);
 
 		return null;
 	}
