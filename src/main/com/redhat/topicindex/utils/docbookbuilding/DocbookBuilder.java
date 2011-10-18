@@ -195,7 +195,6 @@ public class DocbookBuilder
 	private byte[] check1Gif;
 	private byte[] check2Gif;
 	private byte[] failpenguinPng;
-	
 
 	private String pluginXml;
 	private String eclisePackageSh;
@@ -1120,8 +1119,6 @@ public class DocbookBuilder
 		publicanEclipseCfg = EntityUtilities.loadStringConstant(PUBLICAN_ECLIPSE_CFG_ID);
 	}
 
-	
-
 	@SuppressWarnings("unchecked")
 	private List<TagToCategory> getTagToCategories()
 	{
@@ -1235,37 +1232,38 @@ public class DocbookBuilder
 
 	private Topic buildLandingPageTopic(final List<Tag> templateTags, final Integer topicId, final String title, final List<String> usedIds)
 	{
-		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+		Topic template = null;
 
-		/*
-		 * Try to find a topic in the database that can be used as a template
-		 * for this landing page. Build up a Filter object, as this provides a
-		 * convenient way to build a query that will get us the topics we need
-		 */
-		final Filter filter = new Filter();
+		/* First, search the topicDatabase */
+		final List<Topic> matchingExistingTopics = topicDatabase.getMatchingTopicsFromTag(templateTags);
+		template = matchingExistingTopics.size() != 0 ? matchingExistingTopics.get(0) : null;
 
-		for (final Tag templateTag : templateTags)
+		/* if that fails, search the database */
+		if (template == null)
 		{
-			final FilterTag filterTag = new FilterTag();
-			filterTag.setTag(templateTag);
-			filterTag.setTagState(Constants.MATCH_TAG_STATE);
-			filter.getFilterTags().add(filterTag);
-		}
+			final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 
-		final String query = filter.buildQuery();
+			/*
+			 * Try to find a topic in the database that can be used as a
+			 * template for this landing page. Build up a Filter object, as this
+			 * provides a convenient way to build a query that will get us the
+			 * topics we need
+			 */
+			final Filter filter = new Filter();
 
-		final List<Topic> templates = entityManager.createQuery(Topic.SELECT_ALL_QUERY + " " + query).getResultList();
+			for (final Tag templateTag : templateTags)
+			{
+				final FilterTag filterTag = new FilterTag();
+				filterTag.setTag(templateTag);
+				filterTag.setTagState(Constants.MATCH_TAG_STATE);
+				filter.getFilterTags().add(filterTag);
+			}
 
-		Topic template = templates.size() != 0 ? templates.get(0) : null;
+			final String query = filter.buildQuery();
 
-		/* Validate the template */
-		if (template != null)
-		{
-			template.initializeTempTopicXMLDoc();
+			final List<Topic> templates = entityManager.createQuery(Topic.SELECT_ALL_QUERY + " " + query).getResultList();
 
-			/* if validation fails, ignore the template */
-			if (!validateTopicXML(template) || validateIdAttributesUnique(template, usedIds) != null)
-				template = null;
+			template = templates.size() != 0 ? templates.get(0) : null;
 		}
 
 		/*
@@ -1284,32 +1282,22 @@ public class DocbookBuilder
 		{
 			landingPage.setTopicXML(template.getTopicXML());
 
+			landingPage.initializeTempTopicXMLDoc();
+
 			/*
 			 * the temporary landing page topics gets the templates outgoing
 			 * relationships
 			 */
-			landingPage.setChildTopicToTopics(template.getChildTopicToTopics());
+			landingPage.setParentTopicToTopics(template.getParentTopicToTopics());
 		}
-		else
-		{
-			landingPage.setTopicXML(landingPageTemplateXml);
-		}
-
-		/*
-		 * Validate the topic, which will copy the title we set above into the
-		 * XML
-		 */
-		landingPage.validate();
-
-		landingPage.initializeTempTopicXMLDoc();
 
 		/*
 		 * if validation fails at this point the template in the database is not
 		 * valid, so revert to a base template
 		 */
-		if (!validateTopicXML(landingPage) || validateIdAttributesUnique(landingPage, usedIds) != null)
+		if (template == null || (!validateTopicXML(landingPage) || validateIdAttributesUnique(landingPage, usedIds) != null))
 		{
-			landingPage.getChildTopicToTopics().clear();
+			landingPage.getParentTopicToTopics().clear();
 			landingPage.setTopicXML("<section><title></title><para></para></section>");
 			landingPage.validate();
 			landingPage.initializeTempTopicXMLDoc();
