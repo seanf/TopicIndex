@@ -12,6 +12,7 @@ public class DocbookBuildingOptions
 	private boolean buildNarrative = false;
 	private boolean ignoreMissingCustomInjections = true;
 	private boolean suppressErrorsPage = false;
+	private boolean taskAndOverviewOnly = true;
 
 	public void setProcessRelatedTopics(final boolean processRelatedTopics) {
 		this.processRelatedTopics = processRelatedTopics;
@@ -62,5 +63,15 @@ public class DocbookBuildingOptions
 	public void setSuppressErrorsPage(boolean suppressErrorsPage) 
 	{
 		this.suppressErrorsPage = suppressErrorsPage;
+	}
+
+	public boolean isTaskAndOverviewOnly()
+	{
+		return taskAndOverviewOnly;
+	}
+
+	public void setTaskAndOverviewOnly(boolean taskAndOverviewOnly)
+	{
+		this.taskAndOverviewOnly = taskAndOverviewOnly;
 	} 
 }

@@ -109,6 +109,10 @@
 						<h:selectBooleanCheckbox
 							value="#{customTagSearch.docbookBuildingOptions.suppressErrorsPage}" />
 						<h:outputText value="Suppress errors page" />
+						
+						<h:selectBooleanCheckbox
+							value="#{customTagSearch.docbookBuildingOptions.taskAndOverviewOnly}" />
+						<h:outputText value="Display only the Task and Overview topic types in the TOC and landing pages. If not enabled, all topic types will be displayed in the TOC." />
 					</h:panelGrid>
 
 				</rich:tab>

@@ -1230,7 +1230,7 @@ public class DocbookBuilder
 		buildZipFile(topicTypeTagIDs, tagToCategories, usedIds, retValue, docbookBuildingOptions);
 	}
 
-	private Topic buildLandingPageTopic(final List<Tag> templateTags, final Integer topicId, final String title, final List<String> usedIds)
+	private Topic buildLandingPageTopic(final List<Tag> templateTags, final Integer topicId, final String title, final List<String> usedIds, final boolean processedOnly)
 	{
 		Topic template = null;
 
@@ -1239,7 +1239,7 @@ public class DocbookBuilder
 		template = matchingExistingTopics.size() != 0 ? matchingExistingTopics.get(0) : null;
 
 		/* if that fails, search the database */
-		if (template == null)
+		if (template == null && !processedOnly)
 		{
 			final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 
@@ -1352,6 +1352,11 @@ public class DocbookBuilder
 			final List<Tag> topicTypes = new ArrayList<Tag>();
 			topicTypes.add(entityManager.find(Tag.class, Constants.TASK_TAG_ID));
 			topicTypes.add(entityManager.find(Tag.class, Constants.CONCEPTUALOVERVIEW_TAG_ID));
+			if (!docbookBuildingOptions.isTaskAndOverviewOnly())
+			{
+				topicTypes.add(entityManager.find(Tag.class, Constants.CONCEPT_TAG_ID));
+				topicTypes.add(entityManager.find(Tag.class, Constants.REFERENCE_TAG_ID));
+			}
 
 			/* The categories that make up the top level of the toc */
 			final List<Integer> techCommonNameCategories = CollectionUtilities.toArrayList(Constants.COMMON_NAME_CATEGORY_ID, Constants.TECHNOLOGY_CATEGORY_ID);
@@ -1385,7 +1390,7 @@ public class DocbookBuilder
 			 */
 
 			final String homeLinkLabel = "HOME";
-			buildLandingPageTopic(CollectionUtilities.toArrayList(home), nextLandingPageId, homeLinkLabel, usedIds);
+			buildLandingPageTopic(CollectionUtilities.toArrayList(home), nextLandingPageId, homeLinkLabel, usedIds, true);
 			tocTopLevel.addChild(new TocLink(docbookBuildingOptions, homeLinkLabel, nextLandingPageId + ""));
 
 			/*
@@ -1479,7 +1484,7 @@ public class DocbookBuilder
 						 * We have topics that match this intersection, so we
 						 * need to build a landing page
 						 */
-						final Topic landingPage = buildLandingPageTopic(CollectionUtilities.toArrayList(techCommonNameTag, concernTag, tagDescription), nextLandingPageId, landingPageTitle, usedIds);
+						final Topic landingPage = buildLandingPageTopic(CollectionUtilities.toArrayList(techCommonNameTag, concernTag, tagDescription), nextLandingPageId, landingPageTitle, usedIds, false);
 
 						/*
 						 * Insert some links to those topics that have both the

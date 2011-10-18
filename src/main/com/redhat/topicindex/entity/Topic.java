@@ -717,10 +717,10 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		validateTags();
 		validateRelationships();
 		syncTopicTitleWithXML();
-		
+
 		/* render the topic html */
-		//this.setTopicRendered(XMLRenderer.transformDocbook(this.getTopicXML()));
-		
+		// this.setTopicRendered(XMLRenderer.transformDocbook(this.getTopicXML()));
+
 		/* remove line breaks from the title */
 		this.topicTitle = this.topicTitle.replaceAll("\n", " ").trim();
 	}
@@ -738,13 +738,16 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 
 	private void validateTags()
 	{
-		// validate the tags that are applied to this topic. generally the gui
-		// should
-		// enforce these rules, with the exception of the bulk tag apply
-		// function
+		/*
+		 * validate the tags that are applied to this topic. generally the gui
+		 * should enforce these rules, with the exception of the bulk tag apply
+		 * function
+		 */
 
-		// create a collection of Categories mapped to TagToCategories, sorted
-		// by the Category sorting order
+		/*
+		 * create a collection of Categories mapped to TagToCategories, sorted
+		 * by the Category sorting order
+		 */
 		final TreeMap<Category, ArrayList<TagToCategory>> tagDB = new TreeMap<Category, ArrayList<TagToCategory>>(Collections.reverseOrder());
 
 		for (final TopicToTag topicToTag : this.topicToTags)
@@ -1095,7 +1098,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 			for (final TopicToTag topicToTag : this.topicToTags)
 			{
 				final Tag tag = topicToTag.getTag();
-				
+
 				if (topicToTag.getTag().isInCategory(categoryId))
 				{
 					if (!retValue.contains(tag))
@@ -1106,7 +1109,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 
 		return retValue;
 	}
-	
+
 	@Transient
 	public List<Tag> getTagsInCategories(final List<Category> categories)
 	{
