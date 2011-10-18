@@ -1,5 +1,6 @@
 package com.redhat.topicindex.utils.topicrenderer;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.redhat.ecs.commonutils.XSLTUtilities;
@@ -27,6 +28,7 @@ public class XMLRenderer
 	private static final String HTML_XSL_SYSTEMID = "/usr/share/publican/Common_Content/JBoss_EAP6/xsl/html.xsl";
 	private static Map<String, byte[]> docbookFiles = null;
 	private static String xsl = null;
+	private static Map<String, String> globalPramaters;
 
 	private static void initialize()
 	{
@@ -39,6 +41,9 @@ public class XMLRenderer
 		ZipUtilities.mapZipFile(publicanZip, docbookFiles, "file:/usr/share/publican/");
 
 		xsl = EntityUtilities.loadStringConstant(HTML_XSL_ID);
+		
+		globalPramaters = new HashMap<String, String>();
+		globalPramaters.put("publican.version", "2.6");
 	}
 
 	public static String transformDocbook(final String xml)
@@ -47,7 +52,7 @@ public class XMLRenderer
 			initialize();
 
 		if (xml != null && xsl != null && docbookFiles != null)
-			return XSLTUtilities.transformXML(xml, xsl, HTML_XSL_SYSTEMID, docbookFiles);
+			return XSLTUtilities.transformXML(xml, xsl, HTML_XSL_SYSTEMID, globalPramaters, docbookFiles);
 
 		return null;
 	}
