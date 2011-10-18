@@ -1280,10 +1280,12 @@ public class DocbookBuilder
 		 */
 		if (template != null)
 		{
+			/* copy the xml */
 			landingPage.setTopicXML(template.getTopicXML());
-
+			/* fix the title */
+			landingPage.validate();
+			/* convert the xml to a Document object */
 			landingPage.initializeTempTopicXMLDoc();
-
 			/*
 			 * the temporary landing page topics gets the templates outgoing
 			 * relationships
