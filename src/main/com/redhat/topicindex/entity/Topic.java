@@ -719,7 +719,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		syncTopicTitleWithXML();
 		
 		/* render the topic html */
-		//this.setTopicRendered(XMLRenderer.transformDocbook(this.getTopicXML()));
+		this.setTopicRendered(XMLRenderer.transformDocbook(this.getTopicXML()));
 		
 		/* remove line breaks from the title */
 		this.topicTitle = this.topicTitle.replaceAll("\n", " ").trim();

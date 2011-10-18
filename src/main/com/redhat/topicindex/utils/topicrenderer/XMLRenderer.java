@@ -24,6 +24,7 @@ public class XMLRenderer
 	private static final Integer PUBLICANXSL_ZIP_ID = 7;
 	private static final Integer HTML_XSL_ID = 29;
 	private static final String DOCBOOK_XSL_URL = "http://docbook.sourceforge.net/release/xsl/current/";
+	private static final String HTML_XSL_SYSTEMID = "/usr/share/publican/Common_Content/JBoss_EAP6/xsl/html.xsl";
 	private static Map<String, byte[]> docbookFiles = null;
 	private static String xsl = null;
 
@@ -35,18 +36,18 @@ public class XMLRenderer
 		/* load the xsl files from the docbook xsl package */
 		docbookFiles = ZipUtilities.mapZipFile(docbookZip, DOCBOOK_XSL_URL, "docbook-xsl-1.76.1/");
 		/* load the xsl files from the publican xsl zip file package */
-		ZipUtilities.mapZipFile(publicanZip, docbookFiles, "../../../");
+		ZipUtilities.mapZipFile(publicanZip, docbookFiles, "file:/usr/share/publican/");
 
 		xsl = EntityUtilities.loadStringConstant(HTML_XSL_ID);
 	}
 
 	public static String transformDocbook(final String xml)
 	{
-		//if (docbookFiles == null)
+		if (docbookFiles == null)
 			initialize();
 
 		if (xml != null && xsl != null && docbookFiles != null)
-			return XSLTUtilities.transformXML(xml, xsl, docbookFiles);
+			return XSLTUtilities.transformXML(xml, xsl, HTML_XSL_SYSTEMID, docbookFiles);
 
 		return null;
 	}
