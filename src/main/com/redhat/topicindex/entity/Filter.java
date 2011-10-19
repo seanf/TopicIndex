@@ -405,7 +405,8 @@ public class Filter implements java.io.Serializable
 		// loop over the projects that the tags in this filter are assigned to
 		for (final Project project : this.getFilterTagProjects())
 		{
-			// loop over the categories that the tags in this filter are assigned to
+			// loop over the categories that the tags in this filter are
+			// assigned to
 			for (final Category category : this.getFilterTagCategories())
 			{
 				// define the default logic used for the FilterTag categories
@@ -516,6 +517,30 @@ public class Filter implements java.io.Serializable
 			}
 		}
 
+		String filterFieldQueryBlock = "";
+		
+		/* Do an initial loop over the FilterFields, looking for the field logic value */
+		String filterFieldsLogic = "AND";
+		for (final FilterField filterField : this.getFilterFields())
+		{
+			if (filterField.getField().equals(Constants.TOPIC_LOGIC_FILTER_VAR))
+			{
+				filterFieldsLogic = filterField.getValue();
+				break;
+			}
+		}
+
+		for (final FilterField filterField : this.getFilterFields())
+		{
+			if (filterFieldQueryBlock.length() != 0)
+				filterFieldQueryBlock += " " + filterFieldsLogic + " ";
+
+			if (filterField.getField().equals(Constants.TOPIC_IDS_FILTER_VAR))
+			{
+				filterFieldQueryBlock += "topic.topicId in (" + filterField.getValue() + ")";
+			}
+		}
+
 		String query = "";
 
 		// build up the category query if some conditions were specified
@@ -529,7 +554,11 @@ public class Filter implements java.io.Serializable
 			// add the or categories
 			if (orQueryBlock.length() != 0)
 				query += (query.length() != 0 ? " And " : "") + "(" + orQueryBlock + ")";
-
+			
+			if (filterFieldQueryBlock.length() != 0)
+				query += (query.length() != 0 ? " And " : "") + "(" + filterFieldQueryBlock + ")";
+			
+			
 			// add the where clause
 			// have to join the topic and its collection of tags in order for
 			// the filter to work

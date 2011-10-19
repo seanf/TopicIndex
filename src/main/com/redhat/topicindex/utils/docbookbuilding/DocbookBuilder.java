@@ -277,9 +277,6 @@ public class DocbookBuilder
 	 */
 	private static final int LIST_INJECTION_POINT = 4;
 
-	/** Defines how many related tasks to show on the nav page */
-	private static final int MAX_RELATED_TASKS = 5;
-
 	/*
 	 * These regular expressions define the format of the custom injection
 	 * points

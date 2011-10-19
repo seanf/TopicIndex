@@ -6,6 +6,7 @@ import java.util.List;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.Text;
 
 import com.redhat.topicindex.utils.Constants;
 
@@ -55,6 +56,21 @@ public class DocbookUtils
 		return retValue;
 	}
 	
+	public static List<Element> buildULink(final Document xmlDoc, final String url, final String label)
+	{
+		final List<Element> retValue = new ArrayList<Element>();
+		
+		final Element ulinkItem = xmlDoc.createElement("ulink");
+		ulinkItem.setAttribute("url", url);
+		
+		final Text labelElement = xmlDoc.createTextNode(label);
+		ulinkItem.appendChild(labelElement);
+		
+		retValue.add(ulinkItem);
+		
+		return retValue;
+	}
+	
 	public static List<Element> buildEmphasisPrefixedXRef(final Document xmlDoc, final String prefix, final String xref)
 	{
 		final List<Element> retValue = new ArrayList<Element>();
@@ -66,6 +82,24 @@ public class DocbookUtils
 		final Element xrefItem = xmlDoc.createElement("xref");
 		xrefItem.setAttribute("linkend", xref);
 		retValue.add(xrefItem);
+		
+		return retValue;
+	}
+	
+	public static List<Element> buildEmphasisPrefixedULink(final Document xmlDoc, final String prefix, final String url, final String label)
+	{
+		final List<Element> retValue = new ArrayList<Element>();
+		
+		final Element emphasis = xmlDoc.createElement("emphasis");
+		emphasis.setTextContent(prefix);
+		retValue.add(emphasis);
+		
+		final Element xrefItem = xmlDoc.createElement("ulink");
+		xrefItem.setAttribute("url", url);
+		retValue.add(xrefItem);
+		
+		final Text labelElement = xmlDoc.createTextNode(label);
+		xrefItem.appendChild(labelElement);
 		
 		return retValue;
 	}

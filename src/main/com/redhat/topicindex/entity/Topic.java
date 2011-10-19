@@ -60,6 +60,7 @@ import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.EntityQueries;
 import com.redhat.topicindex.utils.EntityUtilities;
 import com.redhat.topicindex.utils.XMLValidator;
+import com.redhat.topicindex.utils.docbookbuilding.XMLPreProcessor;
 import com.redhat.topicindex.utils.structures.NameIDSortMap;
 import com.redhat.topicindex.utils.topicrenderer.XMLRenderer;
 
@@ -717,12 +718,24 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		validateTags();
 		validateRelationships();
 		syncTopicTitleWithXML();
-
-		/* render the topic html */
-		this.setTopicRendered(XMLRenderer.transformDocbook(this.getTopicXML()));
-
+		renderXML();
+		
 		/* remove line breaks from the title */
 		this.topicTitle = this.topicTitle.replaceAll("\n", " ").trim();
+	}
+	
+	private void renderXML()
+	{
+		final Document doc = XMLUtilities.convertStringToDocument(this.topicXML);
+		if (doc != null)
+		{			
+			final ArrayList<Integer> customInjectionIds = new ArrayList<Integer>();
+			XMLPreProcessor.processInternalInjections(customInjectionIds, doc);
+			
+			/* render the topic html */
+			final String processedXML = XMLUtilities.convertDocumentToString(doc);
+			this.setTopicRendered(XMLRenderer.transformDocbook(processedXML));
+		}
 	}
 
 	private void validateRelationships()
