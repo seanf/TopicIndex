@@ -311,7 +311,7 @@ public class XMLPreProcessor
 						final Topic relatedTopic = referencedTopicsDatabase.getTopic(sequenceID.topicId);
 
 						/* wrap the xref up in a listitem */
-						final String url = "RenderedTopic.seam?topicTopicId=" + relatedTopic.getTopicId() + "&selectedTab=Rendered+View";
+						final String url = "Topic.seam?topicTopicId=" + relatedTopic.getTopicId() + "&selectedTab=Rendered+View";
 						if (sequenceID.optional)
 						{
 							list.add(DocbookUtils.buildEmphasisPrefixedULink(xmlDocument, OPTIONAL_LIST_PREFIX, url, relatedTopic.getTopicTitle()));

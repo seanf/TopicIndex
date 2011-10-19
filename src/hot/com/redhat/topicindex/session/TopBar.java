@@ -37,7 +37,7 @@ public class TopBar
 			final Integer topicIdInt = Integer.parseInt(topicId.trim());
 			final Topic topic = entityManager.find(Topic.class, topicIdInt);
 			if (topic != null)
-				return "/Topic.xhtml?topicTopicId=" + topicId;
+				return "/Topic.xhtml?topicTopicId=" + topicIdInt;
 		}
 		catch (final Exception ex)
 		{
@@ -52,10 +52,10 @@ public class TopBar
 		try
 		{
 			final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
-			final Integer topicIdInt = Integer.parseInt(topicId);
+			final Integer topicIdInt = Integer.parseInt(topicId.trim());
 			final Topic topic = entityManager.find(Topic.class, topicIdInt);
 			if (topic != null)
-				return "/TopicEdit.xhtml?topicTopicId=" + topicId;
+				return "/TopicEdit.xhtml?topicTopicId=" + topicIdInt;
 		}
 		catch (final Exception ex)
 		{

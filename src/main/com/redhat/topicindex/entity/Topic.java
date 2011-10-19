@@ -733,7 +733,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 			XMLPreProcessor.processInternalInjections(customInjectionIds, doc);
 			
 			/* render the topic html */
-			final String processedXML = XMLUtilities.convertDocumentToString(doc);
+			final String processedXML = XMLUtilities.convertDocumentToString(doc, XML_ENCODING);
 			this.setTopicRendered(XMLRenderer.transformDocbook(processedXML));
 		}
 	}
