@@ -37,8 +37,21 @@ public class GlobalDatabaseUtilities
 		{
 			final EntityManager entityManager = (EntityManager)Component.getInstance("entityManager");
 			final List<Topic> topics = entityManager.createQuery(Topic.SELECT_ALL_QUERY).getResultList();
+			
+			final int total = topics.size();
+			final int updateFreq = 5;
+			int current = 0;
+			
 			for (final Topic topic : topics)
 			{
+				++current;
+				
+				if (current % updateFreq == 0)
+				{
+					final int progress = (int)((float)total / (float)current * 100.0f);
+					System.out.println("Rerender progress: " + progress + "%");
+				}
+				
 				topic.validate();
 				entityManager.persist(topic);
 				entityManager.flush();
