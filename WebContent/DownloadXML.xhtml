@@ -1,5 +1,4 @@
-<s:resource xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:s="http://jboss.com/products/seam/taglib"
-	data="#{fileResourceProvider.data}"
-	contentType="application/xml"
-	fileName="#{fileResourceProvider.fileName}" />
+<f:view xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html" contentType="application/xml">
+	<h:outputText value="#{empty topicHome.revision ? topicHome.instance.topicXML : topicHome.revisionInstance.topicXML}" escape="false" />
+</f:view>
