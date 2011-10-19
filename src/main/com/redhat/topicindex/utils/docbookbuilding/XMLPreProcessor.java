@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -413,5 +414,34 @@ public class XMLPreProcessor
 	private static String getURLToInternalTopic(final Integer topicId)
 	{
 		return "Topic.seam?topicTopicId=" + topicId + "&selectedTab=Rendered+View";
+	}
+
+	public static void processInternalImageFiles(final Document xmlDoc)
+	{
+		if (xmlDoc == null)
+			return;
+
+		final List<Node> imageDataNodes = XMLUtilities.getNodes(xmlDoc.getDocumentElement(), "imagedata");
+		for (final Node imageDataNode : imageDataNodes)
+		{
+			final NamedNodeMap attributes = imageDataNode.getAttributes();
+			final Node filerefAttribute = attributes.getNamedItem("fileref");
+			if (filerefAttribute != null)
+			{
+				String imageId = filerefAttribute.getTextContent();
+				imageId = imageId.replace("images/", "");
+				final int periodIndex = imageId.lastIndexOf(".");
+				if (periodIndex != -1)
+					imageId = imageId.substring(0, periodIndex);
+
+				/*
+				 * at this point imageId should be an integer that is the id of
+				 * the image uploaded in skynet. We will leave the validation of
+				 * imageId to the ImageFileDisplay class.
+				 */
+
+				filerefAttribute.setTextContent("ImageFileDisplay.seam?imageFileId=" + imageId);
+			}
+		}
 	}
 }

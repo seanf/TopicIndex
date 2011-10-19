@@ -747,6 +747,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 				final ArrayList<Integer> customInjectionIds = new ArrayList<Integer>();
 				XMLPreProcessor.processInternalInjections(this, customInjectionIds, doc);
 				XMLPreProcessor.processInternalGenericInjections(this, doc, customInjectionIds, topicTypeTagDetails);
+				XMLPreProcessor.processInternalImageFiles(doc);
 
 				/* render the topic html */
 				final String processedXML = XMLUtilities.convertDocumentToString(doc, XML_ENCODING);
