@@ -39,7 +39,7 @@ public class GlobalDatabaseUtilities
 			final List<Topic> topics = entityManager.createQuery(Topic.SELECT_ALL_QUERY).getResultList();
 			
 			final int total = topics.size();
-			final int updateFreq = 5;
+			final int updateFreq = 1;
 			int current = 0;
 			
 			for (final Topic topic : topics)
@@ -48,7 +48,7 @@ public class GlobalDatabaseUtilities
 				
 				if (current % updateFreq == 0)
 				{
-					final int progress = (int)((float)total / (float)current * 100.0f);
+					final int progress = (int)((float)current / (float)total * 100.0f);
 					System.out.println("Rerender progress: " + progress + "%");
 				}
 				
