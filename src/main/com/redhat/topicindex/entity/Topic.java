@@ -49,6 +49,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.redhat.ecs.commonstructures.Pair;
 import com.redhat.ecs.commonutils.DocBookUtilities;
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.ecs.commonutils.XMLUtilities;
@@ -727,19 +728,25 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	private void renderXML()
 	{
 		System.out.println("Topic.renderXML() ID: " + this.topicId);
-		
+
 		try
 		{
 			final Document doc = XMLUtilities.convertStringToDocument(this.topicXML);
 			if (doc != null)
 			{
-				final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
-				final Category topicTypeCategory = entityManager.find(Category.class, Constants.TYPE_CATEGORY_ID);
-				
+				/*
+				 * create a collection of the tags that make up the topics types
+				 * that will be included in generic injection points
+				 */
+				final List<Pair<Integer, String>> topicTypeTagDetails = new ArrayList<Pair<Integer, String>>();
+				topicTypeTagDetails.add(Pair.newPair(Constants.TASK_TAG_ID, Constants.TASK_TAG_NAME));
+				topicTypeTagDetails.add(Pair.newPair(Constants.REFERENCE_TAG_ID, Constants.REFERENCE_TAG_NAME));
+				topicTypeTagDetails.add(Pair.newPair(Constants.CONCEPT_TAG_ID, Constants.CONCEPT_TAG_NAME));
+				topicTypeTagDetails.add(Pair.newPair(Constants.CONCEPTUALOVERVIEW_TAG_ID, Constants.CONCEPTUALOVERVIEW_TAG_NAME));
 
 				final ArrayList<Integer> customInjectionIds = new ArrayList<Integer>();
 				XMLPreProcessor.processInternalInjections(customInjectionIds, doc);
-				XMLPreProcessor.processInternalGenericInjections(this, doc, customInjectionIds, topicTypeCategory.getTagToCategories());
+				XMLPreProcessor.processInternalGenericInjections(this, doc, customInjectionIds, topicTypeTagDetails);
 
 				/* render the topic html */
 				final String processedXML = XMLUtilities.convertDocumentToString(doc, XML_ENCODING);

@@ -165,6 +165,9 @@ public class Constants
 	 * configuration file instead of being hard coded. Any changes to the tags
 	 * will break the docbook compilation, and require this source code to be
 	 * modified to reflect the new tag ids.
+	 * 
+	 * Generally speaking, tags referenced here should eventually become fields
+	 * on a topic.
 	 */
 	public static final Integer TYPE_CATEGORY_ID = 4;
 	public static final Integer TECHNOLOGY_CATEGORY_ID = 3;
@@ -178,12 +181,16 @@ public class Constants
 
 	/** The Concept tag ID */
 	public static final Integer CONCEPT_TAG_ID = 5;
+	public static final String CONCEPT_TAG_NAME = "Conpcet";
 	/** The Conceptual Overview tag ID */
 	public static final Integer CONCEPTUALOVERVIEW_TAG_ID = 93;
+	public static final String CONCEPTUALOVERVIEW_TAG_NAME = "Overview";
 	/** The Reference tag ID */
 	public static final Integer REFERENCE_TAG_ID = 6;
+	public static final String REFERENCE_TAG_NAME = "Reference";
 	/** The Task tag ID */
 	public static final Integer TASK_TAG_ID = 4;
+	public static final String TASK_TAG_NAME = "Task";
 	/** The Written tag ID */
 	public static final Integer WRITTEN_TAG_ID = 19;
 	/** The Tag Description tag ID */

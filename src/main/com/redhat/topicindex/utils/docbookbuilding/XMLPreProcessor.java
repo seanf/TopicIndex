@@ -17,6 +17,7 @@ import org.w3c.dom.NodeList;
 
 import com.google.code.regexp.NamedMatcher;
 import com.google.code.regexp.NamedPattern;
+import com.redhat.ecs.commonstructures.Pair;
 import com.redhat.ecs.commonutils.CollectionUtilities;
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.ecs.commonutils.XMLUtilities;
@@ -30,6 +31,8 @@ import com.redhat.topicindex.sort.TopicTitleComparator;
 import com.redhat.topicindex.sort.TopicTitleSorter;
 import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.docbookbuilding.tocdatabase.TocTopicDatabase;
+import com.redhat.topicindex.utils.structures.GenericInjectionPoint;
+import com.redhat.topicindex.utils.structures.GenericInjectionPointDatabase;
 
 /**
  * This class takes the XML from a topic and modifies it to include and injected
@@ -275,6 +278,8 @@ public class XMLPreProcessor
 					final List<Topic> referencedTopics = entityManager.createQuery(Topic.SELECT_ALL_QUERY + query).getResultList();
 					final TocTopicDatabase referencedTopicsDatabase = new TocTopicDatabase();
 					referencedTopicsDatabase.setTopics(referencedTopics);
+					
+					
 
 					/* sort the InjectionTopicData list of required */
 					if (sortComparator != null)
@@ -339,12 +344,12 @@ public class XMLPreProcessor
 		}
 	}
 
-	public static void processInternalGenericInjections(final Topic topic, final Document doc, final ArrayList<Integer> customInjectionIds, final Set<TagToCategory> topicTypeTagIDs)
+	public static void processInternalGenericInjections(final Topic topic, final Document doc, final ArrayList<Integer> customInjectionIds, final List<Pair<Integer, String>> topicTypeTagIDs)
 	{
 		/*
 		 * this collection will hold the lists of related topics
 		 */
-		final HashMap<Tag, ArrayList<Topic>> relatedLists = new HashMap<Tag, ArrayList<Topic>>();
+		final GenericInjectionPointDatabase relatedLists = new GenericInjectionPointDatabase();
 
 		/* wrap each related topic in a listitem tag */
 		for (final Topic relatedTopic : topic.getOutgoingTopicsArray())
@@ -356,32 +361,16 @@ public class XMLPreProcessor
 			if (!customInjectionIds.contains(relatedTopic.getTopicId()))
 			{
 				// loop through the topic type tags
-				for (final TagToCategory primaryTopicTypeTag : topicTypeTagIDs)
+				for (final Pair<Integer, String> primaryTopicTypeTag : topicTypeTagIDs)
 				{
-					final Integer primaryTopicTypeTagId = primaryTopicTypeTag.getTag().getTagId();
-
 					/*
 					 * see if we have processed a related topic with one of the
 					 * topic type tags this may never be true if not processing
 					 * all related topics
 					 */
-					if (relatedTopic.isTaggedWith(primaryTopicTypeTagId))
+					if (relatedTopic.isTaggedWith(primaryTopicTypeTag.getFirst()))
 					{
-						/*
-						 * at this point we have found a topic that is related,
-						 * has not been included in any custom injection points,
-						 * and has been processed
-						 */
-
-						if (!relatedLists.containsKey(primaryTopicTypeTag.getTag()))
-							relatedLists.put(primaryTopicTypeTag.getTag(), new ArrayList<Topic>());
-
-						/*
-						 * add the related topic to the relatedLists collection
-						 * against the topic type tag that has been assigned to
-						 * the related topic
-						 */
-						relatedLists.get(primaryTopicTypeTag.getTag()).add(relatedTopic);
+						relatedLists.addInjectionTopic(primaryTopicTypeTag, relatedTopic);
 
 						break;
 					}
@@ -399,7 +388,7 @@ public class XMLPreProcessor
 	 * and the topic type tags that are associated with them and injects them
 	 * into the xml document.
 	 */
-	private static void insertGenericInjectionLinks(final Document xmlDoc, final Map<Tag, ArrayList<Topic>> relatedLists)
+	private static void insertGenericInjectionLinks(final Document xmlDoc, final GenericInjectionPointDatabase relatedLists)
 	{
 		/* all related topics are placed before the first simplesect */
 		final NodeList nodes = xmlDoc.getDocumentElement().getChildNodes();
@@ -420,13 +409,13 @@ public class XMLPreProcessor
 		 */
 		for (final Integer topTag : CollectionUtilities.toArrayList(Constants.REFERENCE_TAG_ID, Constants.TASK_TAG_ID, Constants.CONCEPT_TAG_ID, Constants.CONCEPTUALOVERVIEW_TAG_ID))
 		{
-			for (final Tag tag : relatedLists.keySet())
+			for (final GenericInjectionPoint genericInjectionPoint : relatedLists.getInjectionPoints())
 			{
-				if (tag.getTagId() == topTag)
+				if (genericInjectionPoint.getCategoryIDAndName().getFirst() == topTag)
 				{
-					final Node itemizedlist = DocbookUtils.createRelatedTopicItemizedList(xmlDoc, "Related " + tag.getTagName() + "s");
+					final Node itemizedlist = DocbookUtils.createRelatedTopicItemizedList(xmlDoc, "Related " + genericInjectionPoint.getCategoryIDAndName().getSecond() + "s");
 
-					final ArrayList<Topic> relatedTopics = relatedLists.get(tag);
+					final List<Topic> relatedTopics = genericInjectionPoint.getTopics();
 					Collections.sort(relatedTopics, new TopicTitleComparator());
 
 					for (final Topic relatedTopic : relatedTopics)
