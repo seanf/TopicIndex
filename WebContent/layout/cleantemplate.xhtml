@@ -58,9 +58,13 @@
 		                <f:facet name="label">
 		                	<h:outputText value="More..." />
 		                </f:facet>
+
+		                 <rich:menuItem rendered="#{s:hasPermission('RenderAllTopicsLink', 'Rendered', null)}">
+		                    <s:link action="#{globalDatabaseUtilities.renderAllTopics()}" value="Render All Topics"/>
+		                </rich:menuItem>
 		                
 		                <rich:menuItem rendered="#{s:hasPermission('IndexEntireDatabaseLink', 'Rendered', null)}">
-		                    <s:link action="#{hibernateSearchUtilities.indexEntireDatabase()}" value="Index Database"/>
+		                    <s:link action="#{globalDatabaseUtilities.indexEntireDatabase()}" value="Index Database"/>
 		                </rich:menuItem>
 		
 		                <rich:menuItem rendered="#{s:hasPermission('IntegerConstantsLink', 'Rendered', null)}">
