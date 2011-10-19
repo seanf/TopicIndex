@@ -53,7 +53,10 @@ public class TopicHome extends VersionedEntityHome<Topic>
 	private ArrayList<Integer> processedTopics = new ArrayList<Integer>();
 	private UIProjectData selectedTags;
 	private HashMap<Integer, ArrayList<Integer>> tagExclusions;
-	/** The name of the tab that is to be selected when the tab panel is displayed */
+	/**
+	 * The name of the tab that is to be selected when the tab panel is
+	 * displayed
+	 */
 	private String selectedTab;
 
 	public TopicHome()
@@ -185,9 +188,9 @@ public class TopicHome extends VersionedEntityHome<Topic>
 		 * by the time the message was calculated, the clearInstance function
 		 * had set the "topic" object to null.
 		 * 
-		 * Manually setting the EL object "lasttopic" before the persist ensures that
-		 * the messages have time to calculate their variables before the object
-		 * is reset.
+		 * Manually setting the EL object "lasttopic" before the persist ensures
+		 * that the messages have time to calculate their variables before the
+		 * object is reset.
 		 */
 
 		Contexts.getConversationContext().set("lasttopic", this.getInstance());
@@ -258,7 +261,8 @@ public class TopicHome extends VersionedEntityHome<Topic>
 
 			this.getInstance().getTopicToTopicSourceUrls().add(topicToTopicSourceUrl);
 			newTopicSourceUrl = new TopicSourceUrl();
-		} catch (final Exception ex)
+		}
+		catch (final Exception ex)
 		{
 			ExceptionUtilities.handleException(ex);
 		}
@@ -308,7 +312,8 @@ public class TopicHome extends VersionedEntityHome<Topic>
 						final Integer tagID = Integer.parseInt(key.replace(Constants.MATCH_TAG, ""));
 						topic.addTag(tagID);
 					}
-				} catch (final NumberFormatException ex)
+				}
+				catch (final NumberFormatException ex)
 				{
 					ExceptionUtilities.handleException(ex);
 				}
@@ -373,7 +378,8 @@ public class TopicHome extends VersionedEntityHome<Topic>
 						if (cat.getSelectedTag() != null)
 							selectedTagObjects.add(getTagFromId(cat.getSelectedTag()));
 
-					} else
+					}
+					else
 					{
 						// otherwise we find the selected tags from the tag
 						// GuiInputData
@@ -411,10 +417,12 @@ public class TopicHome extends VersionedEntityHome<Topic>
 							Identity.instance().checkRestriction("#{s:hasPermission('" + category.getCategory().getCategoryName() + "', 'Enabled', null)}");
 							hasPermission = true;
 							break;
-						} catch (final NotLoggedInException ex)
+						}
+						catch (final NotLoggedInException ex)
 						{
 							ExceptionUtilities.handleException(ex);
-						} catch (final AuthorizationException ex)
+						}
+						catch (final AuthorizationException ex)
 						{
 							ExceptionUtilities.handleException(ex);
 						}
@@ -428,10 +436,12 @@ public class TopicHome extends VersionedEntityHome<Topic>
 							Identity.instance().checkRestriction("#{s:hasPermission('" + existingTag.getTagName() + "', 'Enabled', null)}");
 							hasPermission = true;
 							break;
-						} catch (final NotLoggedInException ex)
+						}
+						catch (final NotLoggedInException ex)
 						{
 							ExceptionUtilities.handleException(ex);
-						} catch (final AuthorizationException ex)
+						}
+						catch (final AuthorizationException ex)
 						{
 							ExceptionUtilities.handleException(ex);
 						}
@@ -505,13 +515,23 @@ public class TopicHome extends VersionedEntityHome<Topic>
 	{
 		this.selectedTab = selectedTab;
 	}
-	
+
 	public void reRender()
 	{
-		if (this.getInstance() != null)
+		try
 		{
-			this.getInstance().validate();
-			super.update();
+			final Topic topic = this.getInstance();
+			if (topic != null)
+			{
+				final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+				topic.validate();
+				entityManager.persist(topic);
+				entityManager.flush();
+			}
+		}
+		catch (final Exception ex)
+		{
+			ExceptionUtilities.handleException(ex);
 		}
 	}
 }
