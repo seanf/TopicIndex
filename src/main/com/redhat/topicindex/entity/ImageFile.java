@@ -225,5 +225,13 @@ public class ImageFile implements java.io.Serializable
 			
 		return "application/octet-stream";
 	}
+	
+	@Transient
+	public String getImageDataString()
+	{
+		if (imageData == null)
+			return "";
+		return new String(imageData);
+	}
 
 }

@@ -414,6 +414,4 @@ public class XMLPreProcessor
 	{
 		return "Topic.seam?topicTopicId=" + topicId + "&selectedTab=Rendered+View";
 	}
-	
-	public void inlineImages
 }
