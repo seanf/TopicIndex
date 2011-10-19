@@ -6,6 +6,9 @@ import java.util.List;
 import com.redhat.ecs.commonstructures.Pair;
 import com.redhat.topicindex.entity.Topic;
 
+/**
+ * Provides a way to manage a collection of GenericInjectionPoint objects.
+ */
 public class GenericInjectionPointDatabase
 {
 	private List<GenericInjectionPoint> injectionPoints = new ArrayList<GenericInjectionPoint>();

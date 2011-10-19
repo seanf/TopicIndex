@@ -168,7 +168,7 @@ public class XMLPreProcessor
 		return retValue;
 	}
 
-	public static void processInternalInjections(final ArrayList<Integer> customInjectionIds, final Document xmlDocument)
+	public static void processInternalInjections(final Topic topic, final ArrayList<Integer> customInjectionIds, final Document xmlDocument)
 	{
 		/*
 		 * this collection keeps a track of the injection point markers and the
@@ -176,11 +176,11 @@ public class XMLPreProcessor
 		 */
 		final HashMap<Node, InjectionListData> customInjections = new HashMap<Node, InjectionListData>();
 
-		processInternalInjections(customInjectionIds, customInjections, ORDEREDLIST_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_SEQUENCE_RE, null);
-		processInternalInjections(customInjectionIds, customInjections, XREF_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_SINGLE_RE, null);
-		processInternalInjections(customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_LIST_RE, null);
-		processInternalInjections(customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, xmlDocument, CUSTOM_ALPHA_SORT_INJECTION_LIST_RE, new TopicTitleSorter());
-		processInternalInjections(customInjectionIds, customInjections, LIST_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_LISTITEMS_RE, null);
+		processInternalInjections(topic, customInjectionIds, customInjections, ORDEREDLIST_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_SEQUENCE_RE, null);
+		processInternalInjections(topic, customInjectionIds, customInjections, XREF_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_SINGLE_RE, null);
+		processInternalInjections(topic, customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_LIST_RE, null);
+		processInternalInjections(topic, customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, xmlDocument, CUSTOM_ALPHA_SORT_INJECTION_LIST_RE, new TopicTitleSorter());
+		processInternalInjections(topic, customInjectionIds, customInjections, LIST_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_LISTITEMS_RE, null);
 
 		/* now make the custom injection point substitutions */
 		for (final Node customInjectionCommentNode : customInjections.keySet())
@@ -223,7 +223,8 @@ public class XMLPreProcessor
 		}
 	}
 
-	public static void processInternalInjections(final ArrayList<Integer> customInjectionIds, final HashMap<Node, InjectionListData> customInjections, final int injectionPointType, final Document xmlDocument, final String regularExpression, final ExternalListSort<Integer, Topic, InjectionTopicData> sortComparator)
+	public static void processInternalInjections(final Topic topic, final ArrayList<Integer> customInjectionIds, final HashMap<Node, InjectionListData> customInjections, final int injectionPointType, final Document xmlDocument, final String regularExpression,
+			final ExternalListSort<Integer, Topic, InjectionTopicData> sortComparator)
 	{
 		if (xmlDocument == null)
 			return;
@@ -253,38 +254,18 @@ public class XMLPreProcessor
 					/* get the sequence of ids */
 					final List<InjectionTopicData> sequenceIDs = processTopicIdList(reMatch);
 
-					/* get a comma separated list of topic ids */
-					String referencedTopicIds = "";
-					for (final InjectionTopicData injectionTopicData : sequenceIDs)
-					{
-						if (referencedTopicIds.length() != 0)
-							referencedTopicIds += referencedTopicIds + ",";
-						referencedTopicIds += injectionTopicData.topicId.toString();
-					}
-
-					/* build a query that will return the referenced topics */
-					final Filter filter = new Filter();
-					final FilterField field = new FilterField();
-					field.setField(Constants.TOPIC_IDS_FILTER_VAR);
-					field.setValue(referencedTopicIds);
-					filter.getFilterFields().add(field);
-					final String query = filter.buildQuery();
-
 					/*
-					 * create a collection of the topics referenced by this
-					 * injection point
+					 * add the related topic into a TocTopicDatabase for
+					 * convenience
 					 */
-					final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
-					final List<Topic> referencedTopics = entityManager.createQuery(Topic.SELECT_ALL_QUERY + query).getResultList();
+					final List<Topic> relatedTopics = topic.getOutgoingTopicsArray();
 					final TocTopicDatabase referencedTopicsDatabase = new TocTopicDatabase();
-					referencedTopicsDatabase.setTopics(referencedTopics);
-					
-					
+					referencedTopicsDatabase.setTopics(relatedTopics);
 
 					/* sort the InjectionTopicData list of required */
 					if (sortComparator != null)
 					{
-						sortComparator.sort(referencedTopics, sequenceIDs);
+						sortComparator.sort(relatedTopics, sequenceIDs);
 					}
 
 					/* loop over all the topic ids in the injection point */
@@ -300,44 +281,52 @@ public class XMLPreProcessor
 						customInjectionIds.add(sequenceID.topicId);
 
 						/*
-						 * build our list
-						 */
-						List<List<Element>> list = new ArrayList<List<Element>>();
-
-						/*
-						 * each related topic is added to a string, which is
-						 * stored in the customInjections collection. the
-						 * customInjections key is the custom injection text
-						 * from the source xml. this allows us to match the
-						 * xrefs we are generating for the related topic with
-						 * the text in the xml file that these xrefs will
-						 * eventually replace
-						 */
-						if (customInjections.containsKey(comment))
-							list = customInjections.get(comment).listItems;
-
-						/*
 						 * Pull the topic out of either the main or the
 						 * reference database
 						 */
 						final Topic relatedTopic = referencedTopicsDatabase.getTopic(sequenceID.topicId);
 
-						/* wrap the xref up in a listitem */
-						final String url = getURLToInternalTopic(relatedTopic.getTopicId());
-						if (sequenceID.optional)
-						{
-							list.add(DocbookUtils.buildEmphasisPrefixedULink(xmlDocument, OPTIONAL_LIST_PREFIX, url, relatedTopic.getTopicTitle()));
-						}
-						else
-						{
-							list.add(DocbookUtils.buildULink(xmlDocument, url, relatedTopic.getTopicTitle()));
-						}
-
 						/*
-						 * save the changes back into the customInjections
-						 * collection
+						 * it is possible that the topic id referenced in the
+						 * injection point h as not been related, and therefore
+						 * is not in the referencedTopicsDatabase
 						 */
-						customInjections.put(comment, new InjectionListData(list, injectionPointType));
+						if (relatedTopic != null)
+						{
+							/*
+							 * build our list
+							 */
+							List<List<Element>> list = new ArrayList<List<Element>>();
+
+							/*
+							 * each related topic is added to a string, which is
+							 * stored in the customInjections collection. the
+							 * customInjections key is the custom injection text
+							 * from the source xml. this allows us to match the
+							 * xrefs we are generating for the related topic
+							 * with the text in the xml file that these xrefs
+							 * will eventually replace
+							 */
+							if (customInjections.containsKey(comment))
+								list = customInjections.get(comment).listItems;
+
+							/* wrap the xref up in a listitem */
+							final String url = getURLToInternalTopic(relatedTopic.getTopicId());
+							if (sequenceID.optional)
+							{
+								list.add(DocbookUtils.buildEmphasisPrefixedULink(xmlDocument, OPTIONAL_LIST_PREFIX, url, relatedTopic.getTopicTitle()));
+							}
+							else
+							{
+								list.add(DocbookUtils.buildULink(xmlDocument, url, relatedTopic.getTopicTitle()));
+							}
+
+							/*
+							 * save the changes back into the customInjections
+							 * collection
+							 */
+							customInjections.put(comment, new InjectionListData(list, injectionPointType));
+						}
 					}
 				}
 			}
@@ -381,7 +370,7 @@ public class XMLPreProcessor
 
 		insertGenericInjectionLinks(doc, relatedLists);
 	}
-	
+
 	/**
 	 * The generic injection points are placed in well defined locations within
 	 * a topics xml structure. This function takes the list of related topics
@@ -429,7 +418,7 @@ public class XMLPreProcessor
 			}
 		}
 	}
-	
+
 	private static String getURLToInternalTopic(final Integer topicId)
 	{
 		return "Topic.seam?topicTopicId=" + topicId + "&selectedTab=Rendered+View";
