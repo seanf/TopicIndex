@@ -520,13 +520,15 @@ public class TopicHome extends VersionedEntityHome<Topic>
 	{
 		try
 		{
-			final Topic topic = this.getInstance();
+			final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+			final Topic topic = entityManager.find(Topic.class, this.getTopicTopicId());
 			if (topic != null)
 			{
-				final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
-				topic.validate();
+				final String renderedTopic = topic.getTopicRendered();
+				topic.setTopicRendered(renderedTopic == null ? "" : null);
 				entityManager.persist(topic);
 				entityManager.flush();
+				this.wire();
 			}
 		}
 		catch (final Exception ex)

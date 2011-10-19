@@ -726,6 +726,8 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 
 	private void renderXML()
 	{
+		System.out.println("Topic.renderXML() ID: " + this.topicId);
+		
 		try
 		{
 			final Document doc = XMLUtilities.convertStringToDocument(this.topicXML);
