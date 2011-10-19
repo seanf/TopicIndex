@@ -204,5 +204,26 @@ public class ImageFile implements java.io.Serializable
 		
 		return "";
 	}
+	
+	@Transient
+	public String getMimeType() 
+	{
+		final int lastPeriodIndex = this.originalFileName.lastIndexOf(".");
+		if (lastPeriodIndex != -1 && lastPeriodIndex < this.originalFileName.length() - 1)
+		{
+			final String extension = this.originalFileName.substring(lastPeriodIndex + 1);
+			if (extension.equalsIgnoreCase("JPG"))
+				return "image/jpeg";
+			if (extension.equalsIgnoreCase("GIF"))
+				return "image/gif";
+			if (extension.equalsIgnoreCase("PNG"))
+				return "image/png";
+			if (extension.equalsIgnoreCase("SVG"))
+				return "image/svg+xml";
+		}
+			
+			
+		return "application/octet-stream";
+	}
 
 }
