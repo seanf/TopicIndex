@@ -505,4 +505,13 @@ public class TopicHome extends VersionedEntityHome<Topic>
 	{
 		this.selectedTab = selectedTab;
 	}
+	
+	public void reRender()
+	{
+		if (this.getInstance() != null)
+		{
+			this.getInstance().validate();
+			super.update();
+		}
+	}
 }
