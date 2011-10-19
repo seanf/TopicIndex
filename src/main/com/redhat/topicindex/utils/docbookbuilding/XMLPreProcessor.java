@@ -1,8 +1,11 @@
 package com.redhat.topicindex.utils.docbookbuilding;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 
@@ -10,15 +13,20 @@ import org.jboss.seam.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import com.google.code.regexp.NamedMatcher;
 import com.google.code.regexp.NamedPattern;
+import com.redhat.ecs.commonutils.CollectionUtilities;
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.ecs.commonutils.XMLUtilities;
 import com.redhat.topicindex.entity.Filter;
 import com.redhat.topicindex.entity.FilterField;
+import com.redhat.topicindex.entity.Tag;
+import com.redhat.topicindex.entity.TagToCategory;
 import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.sort.ExternalListSort;
+import com.redhat.topicindex.sort.TopicTitleComparator;
 import com.redhat.topicindex.sort.TopicTitleSorter;
 import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.docbookbuilding.tocdatabase.TocTopicDatabase;
@@ -160,17 +168,17 @@ public class XMLPreProcessor
 	public static void processInternalInjections(final ArrayList<Integer> customInjectionIds, final Document xmlDocument)
 	{
 		/*
-		 * this collection keeps a track of the injection point markers
-		 * and the docbook lists that we will be replacing them with
+		 * this collection keeps a track of the injection point markers and the
+		 * docbook lists that we will be replacing them with
 		 */
 		final HashMap<Node, InjectionListData> customInjections = new HashMap<Node, InjectionListData>();
-		
+
 		processInternalInjections(customInjectionIds, customInjections, ORDEREDLIST_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_SEQUENCE_RE, null);
 		processInternalInjections(customInjectionIds, customInjections, XREF_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_SINGLE_RE, null);
 		processInternalInjections(customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_LIST_RE, null);
 		processInternalInjections(customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, xmlDocument, CUSTOM_ALPHA_SORT_INJECTION_LIST_RE, new TopicTitleSorter());
 		processInternalInjections(customInjectionIds, customInjections, LIST_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_LISTITEMS_RE, null);
-		
+
 		/* now make the custom injection point substitutions */
 		for (final Node customInjectionCommentNode : customInjections.keySet())
 		{
@@ -178,8 +186,7 @@ public class XMLPreProcessor
 			List<Element> list = null;
 
 			/*
-			 * this may not be true if we are not building all
-			 * related topics
+			 * this may not be true if we are not building all related topics
 			 */
 			if (injectionListData.listItems.size() != 0)
 			{
@@ -311,7 +318,7 @@ public class XMLPreProcessor
 						final Topic relatedTopic = referencedTopicsDatabase.getTopic(sequenceID.topicId);
 
 						/* wrap the xref up in a listitem */
-						final String url = "Topic.seam?topicTopicId=" + relatedTopic.getTopicId() + "&selectedTab=Rendered+View";
+						final String url = getURLToInternalTopic(relatedTopic.getTopicId());
 						if (sequenceID.optional)
 						{
 							list.add(DocbookUtils.buildEmphasisPrefixedULink(xmlDocument, OPTIONAL_LIST_PREFIX, url, relatedTopic.getTopicTitle()));
@@ -330,5 +337,112 @@ public class XMLPreProcessor
 				}
 			}
 		}
+	}
+
+	public static void processInternalGenericInjections(final Topic topic, final Document doc, final ArrayList<Integer> customInjectionIds, final Set<TagToCategory> topicTypeTagIDs)
+	{
+		/*
+		 * this collection will hold the lists of related topics
+		 */
+		final HashMap<Tag, ArrayList<Topic>> relatedLists = new HashMap<Tag, ArrayList<Topic>>();
+
+		/* wrap each related topic in a listitem tag */
+		for (final Topic relatedTopic : topic.getOutgoingTopicsArray())
+		{
+			/*
+			 * don't process those topics that were injected into custom
+			 * injection points
+			 */
+			if (!customInjectionIds.contains(relatedTopic.getTopicId()))
+			{
+				// loop through the topic type tags
+				for (final TagToCategory primaryTopicTypeTag : topicTypeTagIDs)
+				{
+					final Integer primaryTopicTypeTagId = primaryTopicTypeTag.getTag().getTagId();
+
+					/*
+					 * see if we have processed a related topic with one of the
+					 * topic type tags this may never be true if not processing
+					 * all related topics
+					 */
+					if (relatedTopic.isTaggedWith(primaryTopicTypeTagId))
+					{
+						/*
+						 * at this point we have found a topic that is related,
+						 * has not been included in any custom injection points,
+						 * and has been processed
+						 */
+
+						if (!relatedLists.containsKey(primaryTopicTypeTag.getTag()))
+							relatedLists.put(primaryTopicTypeTag.getTag(), new ArrayList<Topic>());
+
+						/*
+						 * add the related topic to the relatedLists collection
+						 * against the topic type tag that has been assigned to
+						 * the related topic
+						 */
+						relatedLists.get(primaryTopicTypeTag.getTag()).add(relatedTopic);
+
+						break;
+					}
+				}
+			}
+
+		}
+
+		insertGenericInjectionLinks(doc, relatedLists);
+	}
+	
+	/**
+	 * The generic injection points are placed in well defined locations within
+	 * a topics xml structure. This function takes the list of related topics
+	 * and the topic type tags that are associated with them and injects them
+	 * into the xml document.
+	 */
+	private static void insertGenericInjectionLinks(final Document xmlDoc, final Map<Tag, ArrayList<Topic>> relatedLists)
+	{
+		/* all related topics are placed before the first simplesect */
+		final NodeList nodes = xmlDoc.getDocumentElement().getChildNodes();
+		Node simplesectNode = null;
+		for (int i = 0; i < nodes.getLength(); ++i)
+		{
+			final Node node = nodes.item(i);
+			if (node.getNodeType() == 1 && node.getNodeName().equals("simplesect"))
+			{
+				simplesectNode = node;
+				break;
+			}
+		}
+
+		/*
+		 * place the topics at the end of the topic. They will appear in the
+		 * reverse order as the call to toArrayList()
+		 */
+		for (final Integer topTag : CollectionUtilities.toArrayList(Constants.REFERENCE_TAG_ID, Constants.TASK_TAG_ID, Constants.CONCEPT_TAG_ID, Constants.CONCEPTUALOVERVIEW_TAG_ID))
+		{
+			for (final Tag tag : relatedLists.keySet())
+			{
+				if (tag.getTagId() == topTag)
+				{
+					final Node itemizedlist = DocbookUtils.createRelatedTopicItemizedList(xmlDoc, "Related " + tag.getTagName() + "s");
+
+					final ArrayList<Topic> relatedTopics = relatedLists.get(tag);
+					Collections.sort(relatedTopics, new TopicTitleComparator());
+
+					for (final Topic relatedTopic : relatedTopics)
+						DocbookUtils.createRelatedTopicULink(xmlDoc, getURLToInternalTopic(relatedTopic.getTopicId()), relatedTopic.getTopicTitle(), itemizedlist);
+
+					if (simplesectNode != null)
+						xmlDoc.getDocumentElement().insertBefore(itemizedlist, simplesectNode);
+					else
+						xmlDoc.getDocumentElement().appendChild(itemizedlist);
+				}
+			}
+		}
+	}
+	
+	private static String getURLToInternalTopic(final Integer topicId)
+	{
+		return "Topic.seam?topicTopicId=" + topicId + "&selectedTab=Rendered+View";
 	}
 }

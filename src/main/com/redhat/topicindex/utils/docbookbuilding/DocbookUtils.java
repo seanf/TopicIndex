@@ -405,6 +405,30 @@ public class DocbookUtils
 		return createRelatedTopicLink(xmlDoc, xref, null);
 	}
 	
+	public static Node createRelatedTopicULink(final Document xmlDoc, final String url, final String title, final Node parent)
+	{
+		final Element listItem = xmlDoc.createElement("listitem");
+		if (parent != null)
+			parent.appendChild(listItem);
+		
+		final Element paraItem = xmlDoc.createElement("para");
+		listItem.appendChild(paraItem);
+		
+		final Element xrefItem = xmlDoc.createElement("ulink");
+		xrefItem.setAttribute("url", url);
+		paraItem.appendChild(xrefItem);
+		
+		final Text labelElement = xmlDoc.createTextNode(title);
+		xrefItem.appendChild(labelElement);
+		
+		return listItem;
+	}
+	
+	public static Node createRelatedTopicULink(final Document xmlDoc, final String url, final String title)
+	{
+		return createRelatedTopicULink(xmlDoc, url, title, null);
+	}
+	
 	public static Node createRelatedTopicItemizedList(final Document xmlDoc, final String title)
 	{
 		final Node itemizedlist = xmlDoc.createElement("itemizedlist");

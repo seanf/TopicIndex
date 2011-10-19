@@ -719,22 +719,34 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		validateRelationships();
 		syncTopicTitleWithXML();
 		renderXML();
-		
+
 		/* remove line breaks from the title */
 		this.topicTitle = this.topicTitle.replaceAll("\n", " ").trim();
 	}
-	
+
 	private void renderXML()
 	{
-		final Document doc = XMLUtilities.convertStringToDocument(this.topicXML);
-		if (doc != null)
-		{			
-			final ArrayList<Integer> customInjectionIds = new ArrayList<Integer>();
-			XMLPreProcessor.processInternalInjections(customInjectionIds, doc);
-			
-			/* render the topic html */
-			final String processedXML = XMLUtilities.convertDocumentToString(doc, XML_ENCODING);
-			this.setTopicRendered(XMLRenderer.transformDocbook(processedXML));
+		try
+		{
+			final Document doc = XMLUtilities.convertStringToDocument(this.topicXML);
+			if (doc != null)
+			{
+				final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+				final Category topicTypeCategory = entityManager.find(Category.class, Constants.TYPE_CATEGORY_ID);
+				
+
+				final ArrayList<Integer> customInjectionIds = new ArrayList<Integer>();
+				XMLPreProcessor.processInternalInjections(customInjectionIds, doc);
+				XMLPreProcessor.processInternalGenericInjections(this, doc, customInjectionIds, topicTypeCategory.getTagToCategories());
+
+				/* render the topic html */
+				final String processedXML = XMLUtilities.convertDocumentToString(doc, XML_ENCODING);
+				this.setTopicRendered(XMLRenderer.transformDocbook(processedXML));
+			}
+		}
+		catch (final Exception ex)
+		{
+			ExceptionUtilities.handleException(ex);
 		}
 	}
 
