@@ -4,12 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import javax.persistence.EntityManager;
-
-import org.jboss.seam.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -21,10 +16,6 @@ import com.redhat.ecs.commonstructures.Pair;
 import com.redhat.ecs.commonutils.CollectionUtilities;
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.ecs.commonutils.XMLUtilities;
-import com.redhat.topicindex.entity.Filter;
-import com.redhat.topicindex.entity.FilterField;
-import com.redhat.topicindex.entity.Tag;
-import com.redhat.topicindex.entity.TagToCategory;
 import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.sort.ExternalListSort;
 import com.redhat.topicindex.sort.TopicTitleComparator;
