@@ -53,6 +53,8 @@ public class TopicHome extends VersionedEntityHome<Topic>
 	private ArrayList<Integer> processedTopics = new ArrayList<Integer>();
 	private UIProjectData selectedTags;
 	private HashMap<Integer, ArrayList<Integer>> tagExclusions;
+	/** The name of the tab that is to be selected when the tab panel is displayed */
+	private String selectedTab;
 
 	public TopicHome()
 	{
@@ -492,5 +494,15 @@ public class TopicHome extends VersionedEntityHome<Topic>
 		this.setCreatedMessage(createValueExpression("Successfully Created Topic With ID: #{lasttopic.topicId} Title: #{lasttopic.topicTitle}"));
 		this.setDeletedMessage(createValueExpression("Successfully Created Topic With ID: #{topic.topicId} Title: #{topic.topicTitle}"));
 		this.setUpdatedMessage(createValueExpression("Successfully Created Topic With ID: #{topic.topicId} Title: #{topic.topicTitle}"));
+	}
+
+	public String getSelectedTab()
+	{
+		return selectedTab;
+	}
+
+	public void setSelectedTab(final String selectedTab)
+	{
+		this.selectedTab = selectedTab;
 	}
 }

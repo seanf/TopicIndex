@@ -24,15 +24,17 @@
 			};
 		</script>
 
-		<rich:tabPanel switchType="client">
-			<rich:tab label="Topic Details">
+		<rich:tabPanel switchType="client"
+			selectedTab="#{topicHome.selectedTab}">
+			<rich:tab label="Topic Details" name="Topic Details">
 				<ui:include src="/WEB-INF/templates/TopicView.xhtml">
 					<ui:param name="selectedTags"
 						value="#{customTagSearch.selectedTags.projectCategories}" />
-					<ui:param name="topic" value="#{empty topicHome.revision ? topicHome.instance : topicHome.revisionInstance}" />
+					<ui:param name="topic"
+						value="#{empty topicHome.revision ? topicHome.instance : topicHome.revisionInstance}" />
 				</ui:include>
 			</rich:tab>
-			<rich:tab label="Related Topics">
+			<rich:tab label="Related Topics" name="Related Topics">
 				<ui:include src="/WEB-INF/templates/TopicViewRelatedTopics.xhtml">
 					<ui:param name="relatedTopicsArray"
 						value="#{topicHome.instance.oneWayRelatedTopicsArray}" />
@@ -57,9 +59,11 @@
 					<ui:param name="title" value="Incoming Relationships" />
 				</ui:include>
 			</rich:tab>
-			<rich:tab label="Rendered View">
+			<rich:tab label="Rendered View" height="500px" name="Rendered View">
 				<f:verbatim>
-					<iframe src="RenderedTopic.seam?topicTopicId=#{topicHome.instance.topicId}" width="100%" height="100%" frameborder="0">
+					<iframe
+						src="RenderedTopic.seam?topicTopicId=#{topicHome.instance.topicId}"
+						width="100%" height="100%" frameborder="0">
 						<p>Your browser does not support iframes.</p>
 					</iframe>
 				</f:verbatim>
