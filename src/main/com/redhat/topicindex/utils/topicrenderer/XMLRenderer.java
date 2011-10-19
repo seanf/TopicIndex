@@ -35,6 +35,8 @@ public class XMLRenderer
 
 	private static synchronized void initialize()
 	{
+		System.out.println("Initializing XMLRenderer");
+		
 		if (docbookFiles == null)
 		{
 			final byte[] docbookZip = EntityUtilities.loadBlobConstant(DOCBOOK_ZIP_ID);
