@@ -181,7 +181,7 @@ public class Constants
 
 	/** The Concept tag ID */
 	public static final Integer CONCEPT_TAG_ID = 5;
-	public static final String CONCEPT_TAG_NAME = "Conpcet";
+	public static final String CONCEPT_TAG_NAME = "Concept";
 	/** The Conceptual Overview tag ID */
 	public static final Integer CONCEPTUALOVERVIEW_TAG_ID = 93;
 	public static final String CONCEPTUALOVERVIEW_TAG_NAME = "Overview";
