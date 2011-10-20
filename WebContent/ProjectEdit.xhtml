@@ -14,20 +14,21 @@
 
 		<h:form id="project" styleClass="edit">
 			<rich:tabPanel switchType="client">
-				<rich:tab label="#{projectHome.managed ? 'Edit' : 'Add'} Project Details">
+				<rich:tab
+					label="#{projectHome.managed ? 'Edit' : 'Add'} Project Details">
 					<s:decorate id="projectNameField" template="layout/edit.xhtml">
 						<ui:define name="label">Project Name</ui:define>
 						<h:inputTextarea id="projectName" cols="80" rows="6"
 							required="true" value="#{projectHome.instance.projectName}" />
 					</s:decorate>
-	
+
 					<s:decorate id="projectDescriptionField"
 						template="layout/edit.xhtml">
 						<ui:define name="label">Project Description</ui:define>
 						<h:inputTextarea id="projectDescription" cols="80" rows="10"
 							value="#{projectHome.instance.projectDescription}" />
 					</s:decorate>
-	
+
 					<div style="clear: both">
 						<span class="required">*</span> required fields
 					</div>
@@ -35,12 +36,10 @@
 
 				<rich:tab label="Project Tags">
 					<ui:include src="/WEB-INF/templates/TagSelect.xhtml">
-						<ui:param
-							name="selectedTags"
+						<ui:param name="selectedTags"
 							value="#{projectHome.selectedTags.projectCategories}" />
-						<ui:param
-							name="homeObject"
-							value="#{projectHome}" />
+						<ui:param name="homeObject" value="#{projectHome}" />
+						<ui:param name="showSort" value="#{false}" />
 					</ui:include>
 				</rich:tab>
 			</rich:tabPanel>

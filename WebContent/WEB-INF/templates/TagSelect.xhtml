@@ -68,7 +68,7 @@
 									Otherwise we display a list of checkboxes 
 								-->
 								<c:otherwise>
-									<h:panelGrid columns="2">
+									<h:panelGrid columns="#{showSort ? '2' : '3'}">
 										<c:forEach
 											items="#{category.tags}"
 											var="categoryTag">
@@ -82,6 +82,9 @@
 												value="#{categoryTag.selected}"
 												disabled="#{!(s:hasPermission(category.name, 'Enabled', null) or s:hasPermission(categoryTag.name, 'Enabled', null))}"
 												title="#{categoryTag.description}#{not empty categoryTag.description?'&#13;&#13;':''}Tag ID: #{categoryTag.id}" />
+											<c:if test="#{showSort}">
+												<h:inputText value="#{categoryTag.sortString}"/>
+											</c:if>
 										</c:forEach>
 									</h:panelGrid>
 								</c:otherwise>

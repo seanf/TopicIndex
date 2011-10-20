@@ -1,7 +1,6 @@
 <!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<ui:composition
-	xmlns="http://www.w3.org/1999/xhtml"
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:s="http://jboss.com/products/seam/taglib"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:f="http://java.sun.com/jsf/core"
@@ -12,10 +11,10 @@
 	template="layout/cleantemplate.xhtml">
 
 	<ui:define name="body">
-	
-	<!-- Add jQuery to the page -->
-	<rich:jQuery query="console.log('Loaded jQuery')"/>
-		
+
+		<!-- Add jQuery to the page -->
+		<rich:jQuery query="console.log('Loaded jQuery')" />
+
 		<script
 			src="#{facesContext.externalContext.requestContextPath}/filterscripts.js"></script>
 
@@ -43,71 +42,45 @@
 					<br />
 					<br />
 
-					<s:decorate
-						id="topicIdField"
-						template="layout/display.xhtml">
+					<s:decorate id="topicIdField" template="layout/display.xhtml">
 						<ui:define name="label">Topic ID</ui:define>
 						<h:outputText value="#{topicHome.instance.topicId}" />
 					</s:decorate>
 
-					<s:decorate
-						id="topicTitleField"
-						template="layout/edit.xhtml"
+					<s:decorate id="topicTitleField" template="layout/edit.xhtml"
 						rendered="#{s:hasPermission('EditTopicTitle', 'Rendered', null)}">
 						<ui:define name="label">
-							<h:outputText
-								value="Topic Title"
+							<h:outputText value="Topic Title"
 								title="#{customDataLookup.lookupHelpText('TopicTopicTitle')}" />
 						</ui:define>
-						<h:inputTextarea
-							id="topicTitle"
-							cols="80"
-							rows="1"
+						<h:inputTextarea id="topicTitle" cols="80" rows="1"
 							value="#{topicHome.instance.topicTitle}" />
 					</s:decorate>
 
-					<s:decorate
-						id="topicXMLField"
-						template="layout/edit.xhtml"
+					<s:decorate id="topicXMLField" template="layout/edit.xhtml"
 						rendered="#{s:hasPermission('EditTopicXML', 'Rendered', null)}">
 						<ui:define name="label">Topic XML</ui:define>
-						<h:inputTextarea
-							id="topicXML"
-							binding="#{topicXML}"
-							cols="80"
-							rows="20"
-							value="#{topicHome.instance.topicXML}" />
+						<h:inputTextarea id="topicXML" binding="#{topicXML}" cols="80"
+							rows="20" value="#{topicHome.instance.topicXML}" />
 					</s:decorate>
 
-					<s:decorate
-						id="topicTextField"
-						template="layout/edit.xhtml"
+					<s:decorate id="topicTextField" template="layout/edit.xhtml"
 						rendered="#{s:hasPermission('EditTopicText', 'Rendered', null)}">
 						<ui:define name="label">
-							<h:outputText
-								value="Description"
+							<h:outputText value="Description"
 								title="#{customDataLookup.lookupHelpText('TopicTopicText')}" />
 						</ui:define>
-						<h:inputTextarea
-							id="topicText"
-							cols="80"
-							rows="10"
+						<h:inputTextarea id="topicText" cols="80" rows="10"
 							value="#{topicHome.instance.topicText}" />
 					</s:decorate>
 
-					<s:decorate
-						id="topicAddedByField"
-						template="layout/edit.xhtml"
+					<s:decorate id="topicAddedByField" template="layout/edit.xhtml"
 						rendered="#{s:hasPermission('EditTopicAddedBy', 'Rendered', null)}">
 						<ui:define name="label">
-							<h:outputText
-								value="Topic Added By"
+							<h:outputText value="Topic Added By"
 								title="#{customDataLookup.lookupHelpText('TopicTopicAddedBy')}" />
 						</ui:define>
-						<h:inputTextarea
-							id="topicAddedBy"
-							cols="80"
-							rows="1"
+						<h:inputTextarea id="topicAddedBy" cols="80" rows="1"
 							value="#{topicHome.instance.topicAddedBy}" />
 					</s:decorate>
 
@@ -119,23 +92,18 @@
 						rendered="#{not empty topicHome.instance.topicXML}"
 						action="#{topicHome.instance.addDetailsCommentToXML()}"
 						value="Generate Detail Comment" />
-					<h:commandButton
-						rendered="#{empty topicHome.instance.topicXML}"
+					<h:commandButton rendered="#{empty topicHome.instance.topicXML}"
 						action="#{topicHome.instance.initializeFromTemplate()}"
 						value="Generate From Template" />
 				</rich:tab>
 
 				<rich:tab label="Topic Tags">
 					<ui:include src="/WEB-INF/templates/TagSelect.xhtml">
-						<ui:param
-							name="selectedTags"
+						<ui:param name="selectedTags"
 							value="#{topicHome.selectedTags.projectCategories}" />
-						<ui:param
-							name="logicEnabled"
-							value="#{true}" />
-						<ui:param
-							name="homeObject"
-							value="#{topicHome}" />
+						<ui:param name="logicEnabled" value="#{true}" />
+						<ui:param name="homeObject" value="#{topicHome}" />
+						<ui:param name="showSort" value="#{false}" />
 					</ui:include>
 				</rich:tab>
 
@@ -143,8 +111,7 @@
 
 					<rich:dataTable
 						value="#{topicHome.instance.topicToTopicSourceUrls.toArray()}"
-						var="url"
-						id="topicSourceURLsList">
+						var="url" id="topicSourceURLsList">
 						<rich:column>
 							<f:facet name="header">
 								<h:outputText value="ID" />
@@ -157,10 +124,7 @@
 							</f:facet>
 							<h:outputText value="#{url.topicSourceUrl.title}" />
 							<f:facet name="footer">
-								<h:inputTextarea
-									id="newTopicSourceURLTitle"
-									cols="40"
-									rows="1"
+								<h:inputTextarea id="newTopicSourceURLTitle" cols="40" rows="1"
 									value="#{topicHome.newTopicSourceUrl.title}" />
 							</f:facet>
 						</rich:column>
@@ -170,10 +134,7 @@
 							</f:facet>
 							<h:outputText value="#{url.topicSourceUrl.sourceUrl}" />
 							<f:facet name="footer">
-								<h:inputTextarea
-									id="newTopicSourceURL"
-									cols="40"
-									rows="1"
+								<h:inputTextarea id="newTopicSourceURL" cols="40" rows="1"
 									value="#{topicHome.newTopicSourceUrl.sourceUrl}" />
 							</f:facet>
 						</rich:column>
@@ -183,44 +144,38 @@
 							</f:facet>
 							<h:outputText value="#{url.topicSourceUrl.description}" />
 							<f:facet name="footer">
-								<h:inputTextarea
-									id="newTopicSourceURLDescritpion"
-									cols="40"
-									rows="1"
-									value="#{topicHome.newTopicSourceUrl.description}" />
+								<h:inputTextarea id="newTopicSourceURLDescritpion" cols="40"
+									rows="1" value="#{topicHome.newTopicSourceUrl.description}" />
 							</f:facet>
 						</rich:column>
 						<rich:column>
 							<f:facet name="header">
 								<h:outputText value="Actions" />
 							</f:facet>
-							<h:commandLink
-								value="delete"
+							<h:commandLink value="delete"
 								action="#{topicHome.removeTopicURL(url)}" />
 							<f:facet name="footer">
-								<h:commandLink
-									value="save"
+								<h:commandLink value="save"
 									action="#{topicHome.saveNewTopicSourceUrl()}" />
 							</f:facet>
 						</rich:column>
 					</rich:dataTable>
 
 				</rich:tab>
-				
-				<rich:tab label="Original Topic Details" title="This tab displays the original contents of the topic.">
-				<ui:include src="/WEB-INF/templates/TopicView.xhtml">
-					<ui:param name="selectedTags"
-						value="#{customTagSearch.selectedTags.projectCategories}" />
-					<ui:param name="topic" value="#{topicHome.instance}" />
-				</ui:include>
-			</rich:tab>
+
+				<rich:tab label="Original Topic Details"
+					title="This tab displays the original contents of the topic.">
+					<ui:include src="/WEB-INF/templates/TopicView.xhtml">
+						<ui:param name="selectedTags"
+							value="#{customTagSearch.selectedTags.projectCategories}" />
+						<ui:param name="topic" value="#{topicHome.instance}" />
+					</ui:include>
+				</rich:tab>
 
 			</rich:tabPanel>
 
 			<div class="actionButtons">
-				<h:commandButton
-					id="saveandcontinue"
-					value="Save And Continue"
+				<h:commandButton id="saveandcontinue" value="Save And Continue"
 					title="Save this topic, and add a new one"
 					action="#{topicHome.persistEx(true)}"
 					disabled="#{!topicHome.wired or !s:hasPermission('EditTopicSaveButton', 'Enabled', null)}"
@@ -233,17 +188,13 @@
 	                       rendered="#{topicHome.managed}"
 	                       disabled="#{!s:hasPermission('EditTopicUpdateButton', 'Enabled', null)}"/>-->
 
-				<h:commandButton
-					id="saveandreturn"
-					value="Save And List Topics"
+				<h:commandButton id="saveandreturn" value="Save And List Topics"
 					title="Save this topic, and return to the list of topics you have created"
 					action="#{topicHome.persistEx(false)}"
 					disabled="#{!topicHome.wired or !s:hasPermission('EditTopicSaveButton', 'Enabled', null)}"
 					rendered="#{!topicHome.managed}" />
 
-				<h:commandButton
-					id="updateandreturn"
-					value="Update And List Topics"
+				<h:commandButton id="updateandreturn" value="Update And List Topics"
 					title="Update this topic, and return to the list of topics"
 					action="#{topicHome.updateEx(false)}"
 					rendered="#{topicHome.managed}"
@@ -255,28 +206,20 @@
 	                      immediate="true"
 	                       rendered="#{topicHome.managed}"/>  -->
 
-				<s:button
-					id="cancelEdit"
-					value="Cancel"
+				<s:button id="cancelEdit" value="Cancel"
 					view="/CustomSearchTopicList.xhtml"
 					rendered="#{topicHome.managed and !topicHome.doingMultipleUpdates}" />
 
-				<s:button
-					id="cancelAdd"
-					value="Cancel"
+				<s:button id="cancelAdd" value="Cancel"
 					view="/CustomSearchTopicList.xhtml"
 					rendered="#{!topicHome.managed and !topicHome.doingMultipleUpdates}" />
 
-				<s:button
-					id="cancelMultipleEdit"
-					value="List Topics"
+				<s:button id="cancelMultipleEdit" value="List Topics"
 					title="Return to a list of the topics that were modifed in this operation."
 					view="#{topicHome.multipleUpdateUrl}"
 					rendered="#{topicHome.managed and topicHome.doingMultipleUpdates}" />
 
-				<s:button
-					id="cancelMultipleAdd"
-					value="List Topics"
+				<s:button id="cancelMultipleAdd" value="List Topics"
 					title="Return to a list of the topics that were modifed in this operation."
 					view="#{topicHome.multipleUpdateUrl}"
 					rendered="#{!topicHome.managed and topicHome.doingMultipleUpdates}" />

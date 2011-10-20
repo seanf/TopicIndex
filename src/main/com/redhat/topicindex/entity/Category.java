@@ -1,6 +1,7 @@
 package com.redhat.topicindex.entity;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,13 +28,17 @@ import org.hibernate.envers.Audited;
 import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
 
+import com.redhat.ecs.commonutils.CollectionUtilities;
+import com.redhat.topicindex.sort.TagToCategorySortingComparator;
+
 @Entity
 @Audited
-@Table(name = "Category", catalog = "Skynet", uniqueConstraints = @UniqueConstraint(columnNames = {"CategoryName" }))
+@Table(name = "Category", catalog = "Skynet", uniqueConstraints = @UniqueConstraint(columnNames =
+{ "CategoryName" }))
 public class Category implements java.io.Serializable, Comparable<Category>
 {
 	public static final String SELECT_ALL_QUERY = "select category from Category category";
-	
+
 	private static final long serialVersionUID = -8650833773254246211L;
 	private Integer categoryId;
 	private String categoryName;
@@ -42,30 +47,29 @@ public class Category implements java.io.Serializable, Comparable<Category>
 	private Integer categorySort;
 	private boolean mutuallyExclusive;
 
-	public Category() {
+	public Category()
+	{
 	}
 
-	public Category(String categoryName) {
+	public Category(String categoryName)
+	{
 		this.categoryName = categoryName;
 	}
 
-	public Category(
-		final String categoryName, 
-		final String categoryDescription,
-		final Set<TagToCategory> tagToCategories) 
+	public Category(final String categoryName, final String categoryDescription, final Set<TagToCategory> tagToCategories)
 	{
 		this.categoryName = categoryName;
 		this.categoryDescription = categoryDescription;
 		this.tagToCategories = tagToCategories;
 	}
-	
-	@OneToMany(fetch = FetchType.LAZY, mappedBy="category", cascade=CascadeType.ALL)
-	public Set<TagToCategory> getTagToCategories() 
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "category", cascade = CascadeType.ALL)
+	public Set<TagToCategory> getTagToCategories()
 	{
 		return this.tagToCategories;
 	}
 
-	public void setTagToCategories(Set<TagToCategory> tagToCategories) 
+	public void setTagToCategories(Set<TagToCategory> tagToCategories)
 	{
 		this.tagToCategories = tagToCategories;
 	}
@@ -73,72 +77,82 @@ public class Category implements java.io.Serializable, Comparable<Category>
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
 	@Column(name = "CategoryID", unique = true, nullable = false)
-	public Integer getCategoryId() {
+	public Integer getCategoryId()
+	{
 		return this.categoryId;
 	}
 
-	public void setCategoryId(Integer categoryId) {
+	public void setCategoryId(Integer categoryId)
+	{
 		this.categoryId = categoryId;
 	}
 
-	//@Column(name = "CategoryName", nullable = false, length = 65535)
-	@Column(name = "CategoryName", nullable = false, columnDefinition="TEXT")
+	// @Column(name = "CategoryName", nullable = false, length = 65535)
+	@Column(name = "CategoryName", nullable = false, columnDefinition = "TEXT")
 	@NotNull
 	@Length(max = 65535)
-	public String getCategoryName() {
+	public String getCategoryName()
+	{
 		return this.categoryName;
 	}
 
-	public void setCategoryName(String categoryName) {
+	public void setCategoryName(String categoryName)
+	{
 		this.categoryName = categoryName;
 	}
 
 	@Column(name = "CategoryDescription", length = 2048)
 	@Length(max = 2048)
-	public String getCategoryDescription() {
+	public String getCategoryDescription()
+	{
 		return this.categoryDescription;
 	}
 
-	public void setCategoryDescription(String categoryDescription) {
+	public void setCategoryDescription(String categoryDescription)
+	{
 		this.categoryDescription = categoryDescription;
 	}
-	
+
 	@Column(name = "CategorySort")
-	public Integer getCategorySort() {
+	public Integer getCategorySort()
+	{
 		return this.categorySort;
 	}
 
-	public void setCategorySort(Integer categorySort) {
+	public void setCategorySort(Integer categorySort)
+	{
 		this.categorySort = categorySort;
 	}
-	
-	@Column(name = "MutuallyExclusive", nullable=false)
+
+	@Column(name = "MutuallyExclusive", nullable = false)
 	@NotNull
-	public boolean isMutuallyExclusive() {
+	public boolean isMutuallyExclusive()
+	{
 		return this.mutuallyExclusive;
 	}
 
-	public void setMutuallyExclusive(boolean mutuallyExclusive) {
+	public void setMutuallyExclusive(boolean mutuallyExclusive)
+	{
 		this.mutuallyExclusive = mutuallyExclusive;
 	}
 
-	public int compareTo(Category o) 
+	public int compareTo(Category o)
 	{
 		if (o == null)
 			return 1;
-		
+
 		if (o.getCategorySort() == null && this.getCategorySort() == null)
 			return 0;
-		
+
 		if (o.getCategorySort() == null)
 			return 1;
-		
+
 		if (this.getCategorySort() == null)
 			return -1;
-		
+
 		return this.getCategorySort().compareTo(o.getCategorySort());
 	}
-	
+
 	@Transient
 	public List<Tag> getTags()
 	{
@@ -148,27 +162,31 @@ public class Category implements java.io.Serializable, Comparable<Category>
 
 		return retValue;
 	}
-	
+
 	@Transient
 	public List<Tag> getTagsInProject(final Project project)
 	{
 		final List<Tag> retValue = new ArrayList<Tag>();
-		
+
 		for (final TagToCategory tagToCategory : this.tagToCategories)
 		{
 			final Tag tag = tagToCategory.getTag();
 			if (tag.isInProject(project))
 				retValue.add(tag);
 		}
-		
+
 		return retValue;
 	}
-	
+
 	@Transient
 	public String getTagsList()
 	{
 		String tagsList = "";
-		for (final TagToCategory tagToCatgeory : this.getTagToCategories())
+		
+		final List<TagToCategory> tags = CollectionUtilities.toArrayList(this.getTagToCategories());
+		Collections.sort(tags, new TagToCategorySortingComparator());
+		
+		for (final TagToCategory tagToCatgeory : tags)
 		{
 			if (tagsList.length() != 0)
 				tagsList += ", ";
@@ -176,7 +194,7 @@ public class Category implements java.io.Serializable, Comparable<Category>
 		}
 		return tagsList;
 	}
-	
+
 	public boolean removeTagRelationship(final Tag childTag)
 	{
 		final List<TagToCategory> children = filter(having(on(TagToCategory.class).getTag(), equalTo(childTag)), this.getTagToCategories());
