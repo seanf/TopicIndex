@@ -15,6 +15,8 @@ public class UITagDataBase
 	protected String description = "";
 	/** The sorting order */
 	protected Integer sort;
+	/** The new sorting order, e.g. used when assigning tags to a a category */
+	protected Integer newSort;
 	/** Whether or not this object has been selected */
 	protected boolean selected = false;
 	/** Whether or not this object has been "not selected" */
@@ -87,16 +89,16 @@ public class UITagDataBase
 		this.sort = sort;
 	}
 	
-	public String getSortString()
+	public String getNewSortString()
 	{
-		return this.sort == null ? null : this.sort.toString();
+		return this.newSort == null ? null : this.newSort.toString();
 	}
 	
-	public void setSortString(final String sort)
+	public void setNewSortString(final String newSort)
 	{
 		try
 		{
-			this.sort = Integer.parseInt(sort);
+			this.newSort = Integer.parseInt(newSort);
 		}
 		catch (final Exception ex)
 		{
@@ -112,5 +114,15 @@ public class UITagDataBase
 		this.sort = sort;
 		this.selected = selected;
 		this.notSelected = notSelected;
+	}
+
+	public Integer getNewSort()
+	{
+		return newSort;
+	}
+
+	public void setNewSort(Integer newSort)
+	{
+		this.newSort = newSort;
 	}
 }

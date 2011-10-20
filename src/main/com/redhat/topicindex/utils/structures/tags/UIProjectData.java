@@ -8,6 +8,7 @@ import static org.hamcrest.Matchers.equalTo;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.redhat.ecs.commonstructures.Pair;
 import com.redhat.topicindex.entity.Tag;
 import com.redhat.topicindex.entity.TagToTag;
 import com.redhat.topicindex.utils.EntityUtilities;
@@ -46,7 +47,7 @@ public class UIProjectData
 	
 	public List<Tag> getSelectedTags()
 	{
-		final ArrayList<Tag> selectedTagObjects = new ArrayList<Tag>();
+		final List<Tag> selectedTagObjects = new ArrayList<Tag>();
 
 		for (final UIProjectCategoriesData project : this.getProjectCategories())
 		{
@@ -63,6 +64,44 @@ public class UIProjectData
 		}
 		
 		return selectedTagObjects;
+	}
+	
+	public List<Pair<Tag, UITagData>> getExtendedSelectedTags()
+	{
+		final List<Pair<Tag, UITagData>> selectedTagObjects = new ArrayList<Pair<Tag, UITagData>>();
+
+		for (final UIProjectCategoriesData project : this.getProjectCategories())
+		{
+			for (final UICategoryData cat : project.getCategories())
+			{
+				// find the selected tags
+				for (final UITagData tagId : cat.getTags())
+				{
+					// if tag is selected
+					if (tagId.isSelected())
+						selectedTagObjects.add(Pair.newPair(EntityUtilities.getTagFromId(tagId.getId()), tagId));
+				}
+			}
+		}
+		
+		return selectedTagObjects;
+	}
+	
+	public List<Pair<Tag, UITagData>> getExtendedAddedTags(final List<Tag> existingTags)
+	{
+		final List<Pair<Tag, UITagData>> selectedTags = getExtendedSelectedTags();
+		
+		// now make a note of the additions
+		final List<Pair<Tag, UITagData>> addTags = new ArrayList<Pair<Tag, UITagData>>();
+		for (final Pair<Tag, UITagData> selectedTag : selectedTags)
+		{
+			if (!existingTags.contains(existingTags))
+			{
+				addTags.add(selectedTag);
+			}
+		}
+		
+		return addTags;
 	}
 	
 	public List<Tag> getAddedTags(final List<Tag> existingTags)

@@ -59,16 +59,16 @@ public class EntityUtilities
 	{
 		if (id == null)
 			return null;
-		
+
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 		final BlobConstants constant = entityManager.find(BlobConstants.class, id);
-		
+
 		if (constant == null)
 		{
 			System.out.println("Expected to find a record in the BlobConstants table with an ID of " + id);
 			return null;
 		}
-		
+
 		return constant.getConstantValue();
 	}
 
@@ -76,16 +76,16 @@ public class EntityUtilities
 	{
 		if (id == null)
 			return null;
-		
+
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 		final IntegerConstants constant = entityManager.find(IntegerConstants.class, id);
-		
+
 		if (constant == null)
 		{
 			System.out.println("Expected to find a record in the IntegerConstants table with an ID of " + id);
 			return null;
 		}
-		
+
 		return constant.getConstantValue();
 	}
 
@@ -93,19 +93,19 @@ public class EntityUtilities
 	{
 		if (id == null)
 			return null;
-		
+
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 		final StringConstants constant = entityManager.find(StringConstants.class, id);
-		
+
 		if (constant == null)
 		{
 			System.out.println("Expected to find a record in the StringConstants table with an ID of " + id);
 			return null;
 		}
-		
+
 		return constant.getConstantValue();
 	}
-	
+
 	static public void populateTopicTags(final Topic topic, final UIProjectData selectedTags)
 	{
 		populateTags(topic.getTags(), selectedTags, null, true);
@@ -280,10 +280,9 @@ public class EntityUtilities
 				}
 
 				/*
-				 * Step 3: loop over the categories found in step 2, which
-				 * we know contain tags assigned to the product, and pull
-				 * out the tags that are associated with the product we are
-				 * looking at
+				 * Step 3: loop over the categories found in step 2, which we
+				 * know contain tags assigned to the product, and pull out the
+				 * tags that are associated with the product we are looking at
 				 */
 				for (final Category category : projectCategories)
 				{
@@ -389,12 +388,10 @@ public class EntityUtilities
 				{
 					if (filterCategory.getCategoryState() == Constants.CATEGORY_INTERNAL_AND_STATE)
 						retValue.setInternalLogic(Constants.AND_LOGIC);
-					else
-						if (filterCategory.getCategoryState() == Constants.CATEGORY_INTERNAL_OR_STATE)
-							retValue.setInternalLogic(Constants.OR_LOGIC);
-						else
-							if (filterCategory.getCategoryState() == Constants.CATEGORY_EXTERNAL_AND_STATE)
-								retValue.setExternalLogic(Constants.AND_LOGIC);
+					else if (filterCategory.getCategoryState() == Constants.CATEGORY_INTERNAL_OR_STATE)
+						retValue.setInternalLogic(Constants.OR_LOGIC);
+					else if (filterCategory.getCategoryState() == Constants.CATEGORY_EXTERNAL_AND_STATE)
+						retValue.setExternalLogic(Constants.AND_LOGIC);
 					if (filterCategory.getCategoryState() == Constants.CATEGORY_EXTERNAL_OR_STATE)
 						retValue.setExternalLogic(Constants.OR_LOGIC);
 				}
@@ -431,9 +428,8 @@ public class EntityUtilities
 				final int tagState = filter.hasTag(tagId);
 				if (tagState == Constants.NOT_MATCH_TAG_STATE)
 					selected = selectedNot = true;
-				else
-					if (tagState == Constants.MATCH_TAG_STATE)
-						selected = true;
+				else if (tagState == Constants.MATCH_TAG_STATE)
+					selected = true;
 			}
 		}
 
@@ -522,12 +518,47 @@ public class EntityUtilities
 	{
 		populateTags(tag.getTags(), selectedTags, null, true);
 	}
-	
+
 	static public void populateTagTags(final Category category, final UIProjectData selectedTags)
 	{
 		populateTags(category.getTags(), selectedTags, null, true);
 	}
-	
+
+	/**
+	 * When assigning tags to a category, we need to know the sorting order of
+	 * the tags as it related to a specific category. This is different to the
+	 * sorting order used to show the tags, because those values are specific to
+	 * the categories that the tags appear in.
+	 */
+	static public void populateTagTagsSortingForCategory(final Category category, final UIProjectData selectedTags)
+	{
+		for (final UIProjectCategoriesData projectData : selectedTags.getProjectCategories())
+		{
+			for (final UICategoryData categoryData : projectData.getCategories())
+			{
+				if (categoryData.getId().equals(category.getCategoryId()))
+				{
+					for (final UITagData tagData : categoryData.getTags())
+					{
+						/*
+						 * match the sorting order for the tags in the category
+						 * with the newSort values for the UI tags
+						 */
+						
+						for (final TagToCategory tagToCategory : category.getTagToCategories())
+						{
+							if (tagData.getId().equals(tagToCategory.getTag().getTagId()))
+							{
+								tagData.setNewSort(tagToCategory.getSorting());
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	public static Tag getTagFromId(final Integer tagId)
 	{
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
@@ -861,8 +892,6 @@ public class EntityUtilities
 		return retValue;
 	}
 
-	
-
 	/**
 	 * This function will add to a query to replace the functionality of the
 	 * restrictions used by EntityQuery objects.
@@ -902,49 +931,45 @@ public class EntityUtilities
 						{
 							myQuery += "topic.topicTimeStamp >= '" + fieldValue + "'";
 						}
-						else
-							if (filterField.getField().equals(Constants.TOPIC_ENDDATE_FILTER_VAR))
-							{
-								myQuery += "topic.topicTimeStamp <= '" + fieldValue + "'";
-							}
+						else if (filterField.getField().equals(Constants.TOPIC_ENDDATE_FILTER_VAR))
+						{
+							myQuery += "topic.topicTimeStamp <= '" + fieldValue + "'";
+						}
 					}
 					catch (final Exception ex)
 					{
 						ExceptionUtilities.handleException(ex);
 					}
 				}
-				else
-					if (fieldName.equals(Constants.TOPIC_HAS_RELATIONSHIPS))
-					{
-						int minimum = 0;
-						if (fieldValue.equalsIgnoreCase("true"))
-							minimum = 1;
+				else if (fieldName.equals(Constants.TOPIC_HAS_RELATIONSHIPS))
+				{
+					int minimum = 0;
+					if (fieldValue.equalsIgnoreCase("true"))
+						minimum = 1;
 
-						myQuery += "topic.parentTopicToTopics.size >= " + minimum;
+					myQuery += "topic.parentTopicToTopics.size >= " + minimum;
+				}
+				else if (fieldName.equals(Constants.TOPIC_IDS_FILTER_VAR))
+				{
+					myQuery += "topic.topicId in (" + fieldValue + ")";
+				}
+				else if (fieldName.equals(Constants.TOPIC_RELATED_TO))
+				{
+					try
+					{
+						final Integer topicId = Integer.parseInt(fieldValue);
+						myQuery += "topic.topicId in (" + getRelatedTopicIDsString(topicId) + ")";
 					}
-					else
-						if (fieldName.equals(Constants.TOPIC_IDS_FILTER_VAR))
-						{
-							myQuery += "topic.topicId in (" + fieldValue + ")";
-						}
-						else
-							if (fieldName.equals(Constants.TOPIC_RELATED_TO))
-							{
-								try
-								{
-									final Integer topicId = Integer.parseInt(fieldValue);
-									myQuery += "topic.topicId in (" + getRelatedTopicIDsString(topicId) + ")";
-								}
-								catch (final Exception ex)
-								{
-									// failed to parse integer
-									ExceptionUtilities.handleException(ex);
-								}
-							}
-							else
-							{
-								myQuery += "'" + fieldName.toLowerCase() + "' like '%" + fieldValue.toLowerCase() + "%')";
-							}
+					catch (final Exception ex)
+					{
+						// failed to parse integer
+						ExceptionUtilities.handleException(ex);
+					}
+				}
+				else
+				{
+					myQuery += "'" + fieldName.toLowerCase() + "' like '%" + fieldValue.toLowerCase() + "%')";
+				}
 			}
 		}
 
@@ -1322,13 +1347,12 @@ public class EntityUtilities
 				filter.getFilterFields().add(newField);
 			}
 			// update a FilterField entity
-			else
-				if (filterField.size() == 1)
-				{
-					newField = filterField.get(0);
-					newField.setValue(fixedFieldValue);
-					newField.setDescription(fieldDescription);
-				}
+			else if (filterField.size() == 1)
+			{
+				newField = filterField.get(0);
+				newField.setValue(fixedFieldValue);
+				newField.setDescription(fieldDescription);
+			}
 		}
 		else
 		{

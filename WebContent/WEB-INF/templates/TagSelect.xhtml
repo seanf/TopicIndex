@@ -83,7 +83,7 @@
 												disabled="#{!(s:hasPermission(category.name, 'Enabled', null) or s:hasPermission(categoryTag.name, 'Enabled', null))}"
 												title="#{categoryTag.description}#{not empty categoryTag.description?'&#13;&#13;':''}Tag ID: #{categoryTag.id}" />
 											<c:if test="#{showSort}">
-												<h:inputText size="3" value="#{categoryTag.sortString}"/>
+												<h:inputText size="3" value="#{categoryTag.newSortString}"/>
 											</c:if>
 										</c:forEach>
 									</h:panelGrid>

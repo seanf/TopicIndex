@@ -207,7 +207,7 @@ public class Category implements java.io.Serializable, Comparable<Category>
 		return children.size() != 0;
 	}
 
-	public boolean addTagRelationship(final Tag childTag)
+	public boolean addTagRelationship(final Tag childTag, final Integer sort)
 	{
 		final List<TagToCategory> children = filter(having(on(TagToCategory.class).getTag(), equalTo(childTag)), this.getTagToCategories());
 		if (children.size() == 0)
@@ -219,6 +219,11 @@ public class Category implements java.io.Serializable, Comparable<Category>
 		}
 
 		return false;
+	}
+	
+	public boolean addTagRelationship(final Tag childTag)
+	{
+		return addTagRelationship(childTag, null);
 	}
 
 }

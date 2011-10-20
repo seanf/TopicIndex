@@ -11,6 +11,7 @@ import java.util.Set;
 
 import javax.persistence.PersistenceException;
 
+import com.redhat.ecs.commonstructures.Pair;
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.topicindex.entity.*;
 import com.redhat.topicindex.utils.EntityUtilities;
@@ -77,6 +78,7 @@ public class CategoryHome extends EntityHome<Category> implements DisplayMessage
 	{
 		selectedTags = new UIProjectData();
 		EntityUtilities.populateTagTags(this.getInstance(), selectedTags);
+		EntityUtilities.populateTagTagsSortingForCategory(this.getInstance(), selectedTags);
 	}
 
 	public UIProjectData getSelectedTags()
@@ -105,7 +107,7 @@ public class CategoryHome extends EntityHome<Category> implements DisplayMessage
 			// make a note of the tags that were removed
 			final List<Tag> removeTags = selectedTags.getRemovedTags(existingTags);
 			// make a note of the tahs that were added
-			final List<Tag> addTags = selectedTags.getAddedTags(existingTags);
+			final List<Pair<Tag, UITagData>> addTags = selectedTags.getExtendedAddedTags(existingTags);
 			
 
 			// only proceed if there are some changes to make
@@ -117,9 +119,9 @@ public class CategoryHome extends EntityHome<Category> implements DisplayMessage
 					category.removeTagRelationship(removeTag);
 				}
 
-				for (final Tag addTag : addTags)
+				for (final Pair<Tag, UITagData> addTag : addTags)
 				{
-					category.addTagRelationship(addTag);
+					category.addTagRelationship(addTag.getFirst(), addTag.getSecond().getNewSort());
 				}
 			}
 		}
