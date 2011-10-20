@@ -213,6 +213,7 @@ public class Category implements java.io.Serializable, Comparable<Category>
 		if (children.size() == 0)
 		{
 			final TagToCategory tagToCategory = new TagToCategory(childTag, this);
+			tagToCategory.setSorting(sort);
 			this.getTagToCategories().add(tagToCategory);
 			childTag.getTagToCategories().add(tagToCategory);
 			return true;

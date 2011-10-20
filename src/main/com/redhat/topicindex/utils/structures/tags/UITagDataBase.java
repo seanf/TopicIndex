@@ -121,7 +121,7 @@ public class UITagDataBase
 		return newSort;
 	}
 
-	public void setNewSort(Integer newSort)
+	public void setNewSort(final Integer newSort)
 	{
 		this.newSort = newSort;
 	}
