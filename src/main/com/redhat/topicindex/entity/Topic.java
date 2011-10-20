@@ -714,15 +714,24 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		this.childTopicToTopics = childTopicToTopics;
 	}
 
-	public void validate()
+	/**
+	 * Syncs the XML with the topic details, such as setting the topic title as
+	 * the title of the XML.
+	 */
+	public void syncXML()
 	{
-		validateTags();
-		validateRelationships();
-		syncTopicTitleWithXML();
-		renderXML();
-
 		/* remove line breaks from the title */
 		this.topicTitle = this.topicTitle.replaceAll("\n", " ").trim();
+		syncTopicTitleWithXML();
+
+	}
+
+	public void validate()
+	{
+		syncXML();
+		validateTags();
+		validateRelationships();
+		renderXML();
 	}
 
 	private void renderXML()
@@ -1153,13 +1162,13 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 			catgeoriesByID.add(category.getCategoryId());
 		return getTagsInCategoriesByID(catgeoriesByID);
 	}
-	
+
 	public void reRenderTopic()
 	{
-		final EntityManager entityManager = (EntityManager)Component.getInstance("entityManager");
-		
+		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+
 		final String topicXML = this.getTopicXML();
-		
+
 		if (!(topicXML == null || topicXML.trim().length() == 0))
 		{
 			final String renderedTopic = this.getTopicRendered();

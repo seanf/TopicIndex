@@ -1229,6 +1229,8 @@ public class DocbookBuilder
 
 	private Topic buildLandingPageTopic(final List<Tag> templateTags, final Integer topicId, final String title, final List<String> usedIds, final boolean processedOnly)
 	{
+		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+		
 		Topic template = null;
 
 		/* First, search the topicDatabase */
@@ -1238,8 +1240,6 @@ public class DocbookBuilder
 		/* if that fails, search the database */
 		if (template == null && !processedOnly)
 		{
-			final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
-
 			/*
 			 * Try to find a topic in the database that can be used as a
 			 * template for this landing page. Build up a Filter object, as this
@@ -1280,7 +1280,7 @@ public class DocbookBuilder
 			/* copy the xml */
 			landingPage.setTopicXML(template.getTopicXML());
 			/* fix the title */
-			landingPage.validate();
+			landingPage.syncXML();
 			/* convert the xml to a Document object */
 			landingPage.initializeTempTopicXMLDoc();
 			/*
@@ -1298,7 +1298,7 @@ public class DocbookBuilder
 		{
 			landingPage.getParentTopicToTopics().clear();
 			landingPage.setTopicXML("<section><title></title><para></para></section>");
-			landingPage.validate();
+			landingPage.syncXML();
 			landingPage.initializeTempTopicXMLDoc();
 		}
 
@@ -1841,21 +1841,23 @@ public class DocbookBuilder
 		}
 
 		// SURVEY LINK
+		if (docbookBuildingOptions.isInsertSurveyLink())
+		{
+			final Element surveyPara = topic.getTempTopicXMLDoc().createElement("para");
+			surveyPara.setAttribute("role", ROLE_CREATE_BUG_PARA);
+			bugzillaSection.appendChild(surveyPara);
 
-		final Element surveyPara = topic.getTempTopicXMLDoc().createElement("para");
-		surveyPara.setAttribute("role", ROLE_CREATE_BUG_PARA);
-		bugzillaSection.appendChild(surveyPara);
+			final Text startSurveyText = topic.getTempTopicXMLDoc().createTextNode("Thank you for evaluating the new documentation format for JBoss Enterprise Application Platform. Let us know what you think by taking a short ");
+			surveyPara.appendChild(startSurveyText);
 
-		final Text startSurveyText = topic.getTempTopicXMLDoc().createTextNode("Thank you for evaluating the new documentation format for JBoss Enterprise Application Platform. Let us know what you think by taking a short ");
-		surveyPara.appendChild(startSurveyText);
+			final Element surveyULink = topic.getTempTopicXMLDoc().createElement("ulink");
+			surveyPara.appendChild(surveyULink);
+			surveyULink.setTextContent("survey");
+			surveyULink.setAttribute("url", "https://www.keysurvey.com/survey/380730/106f/");
 
-		final Element surveyULink = topic.getTempTopicXMLDoc().createElement("ulink");
-		surveyPara.appendChild(surveyULink);
-		surveyULink.setTextContent("survey");
-		surveyULink.setAttribute("url", "https://www.keysurvey.com/survey/380730/106f/");
-
-		final Text endSurveyText = topic.getTempTopicXMLDoc().createTextNode(".");
-		surveyPara.appendChild(endSurveyText);
+			final Text endSurveyText = topic.getTempTopicXMLDoc().createTextNode(".");
+			surveyPara.appendChild(endSurveyText);
+		}
 
 		// VIEW IN SKYNET
 

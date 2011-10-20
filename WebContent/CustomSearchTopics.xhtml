@@ -34,7 +34,7 @@
 			</div>
 
 			<div style="clear: both" />
-			<br/>
+			<br />
 
 			<rich:tabPanel switchType="client">
 				<rich:tab label="Tags">
@@ -109,17 +109,23 @@
 						<h:selectBooleanCheckbox
 							value="#{customTagSearch.docbookBuildingOptions.suppressErrorsPage}" />
 						<h:outputText value="Suppress errors page" />
-						
+
 						<h:selectBooleanCheckbox
 							value="#{customTagSearch.docbookBuildingOptions.taskAndOverviewOnly}" />
-						<h:outputText value="Display only the Task and Overview topic types in the TOC and landing pages. If not enabled, all topic types will be displayed in the TOC." />
+						<h:outputText
+							value="Display only the Task and Overview topic types in the TOC and landing pages. If not enabled, all topic types will be displayed in the TOC." />
+
+						<h:selectBooleanCheckbox
+							value="#{customTagSearch.docbookBuildingOptions.insertSurveyLink}" />
+						<h:outputText
+							value="Insert a link to the EAP6 survey in every topic." />
 					</h:panelGrid>
 
 				</rich:tab>
 			</rich:tabPanel>
 
-			<div style="clear: both"/>
-			<br/>
+			<div style="clear: both" />
+			<br />
 
 			<div class="actionButtons">
 				<h:commandButton id="search" value="Search"

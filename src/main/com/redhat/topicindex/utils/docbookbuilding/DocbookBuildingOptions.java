@@ -13,6 +13,7 @@ public class DocbookBuildingOptions
 	private boolean ignoreMissingCustomInjections = true;
 	private boolean suppressErrorsPage = false;
 	private boolean taskAndOverviewOnly = true;
+	private boolean insertSurveyLink = true;
 
 	public void setProcessRelatedTopics(final boolean processRelatedTopics) {
 		this.processRelatedTopics = processRelatedTopics;
@@ -73,5 +74,15 @@ public class DocbookBuildingOptions
 	public void setTaskAndOverviewOnly(boolean taskAndOverviewOnly)
 	{
 		this.taskAndOverviewOnly = taskAndOverviewOnly;
+	}
+
+	public boolean isInsertSurveyLink()
+	{
+		return insertSurveyLink;
+	}
+
+	public void setInsertSurveyLink(boolean insertSurveyLink)
+	{
+		this.insertSurveyLink = insertSurveyLink;
 	} 
 }
