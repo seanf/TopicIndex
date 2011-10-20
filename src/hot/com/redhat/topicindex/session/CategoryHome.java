@@ -103,11 +103,12 @@ public class CategoryHome extends EntityHome<Category> implements DisplayMessage
 		if (category != null)
 		{
 			final List<Tag> existingTags = category.getTags();
+			final Set<TagToCategory> existingTagsExtended = category.getTagToCategories();
 
 			// make a note of the tags that were removed
 			final List<Tag> removeTags = selectedTags.getRemovedTags(existingTags);
 			// make a note of the tahs that were added
-			final List<Pair<Tag, UITagData>> addTags = selectedTags.getExtendedAddedTags(existingTags);
+			final List<Pair<Tag, UITagData>> addTags = selectedTags.getAddedOrModifiedTags(existingTagsExtended);
 			
 
 			// only proceed if there are some changes to make

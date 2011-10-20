@@ -210,6 +210,8 @@ public class Category implements java.io.Serializable, Comparable<Category>
 	public boolean addTagRelationship(final Tag childTag, final Integer sort)
 	{
 		final List<TagToCategory> children = filter(having(on(TagToCategory.class).getTag(), equalTo(childTag)), this.getTagToCategories());
+		
+		/* If this tag is not mapped at all, add it */
 		if (children.size() == 0)
 		{
 			final TagToCategory tagToCategory = new TagToCategory(childTag, this);
@@ -217,6 +219,14 @@ public class Category implements java.io.Serializable, Comparable<Category>
 			this.getTagToCategories().add(tagToCategory);
 			childTag.getTagToCategories().add(tagToCategory);
 			return true;
+		}
+		/* otherwise update the sorting order */
+		else
+		{
+			for (final TagToCategory child : children)
+			{
+				child.setSorting(sort);
+			}
 		}
 
 		return false;
