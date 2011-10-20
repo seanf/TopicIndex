@@ -47,15 +47,7 @@ public class GlobalDatabaseUtilities
 				final int progress = (int)((float)current / (float)total * 100.0f);
 				System.out.println("Rerender progress: Topic " + current + " of " + total + " (" + progress + "%)");
 				
-				final String topicXML = topic.getTopicXML();
-				
-				if (!(topicXML == null || topicXML.trim().length() == 0))
-				{
-					final String renderedTopic = topic.getTopicRendered();
-					topic.setTopicRendered(renderedTopic == null ? "" : null);
-					entityManager.persist(topic);
-					entityManager.flush();
-				}
+				topic.reRenderTopic();
 			}
 		}
 		catch (final Exception ex)

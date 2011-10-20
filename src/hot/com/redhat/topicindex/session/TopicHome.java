@@ -524,10 +524,7 @@ public class TopicHome extends VersionedEntityHome<Topic>
 			final Topic topic = entityManager.find(Topic.class, this.getTopicTopicId());
 			if (topic != null)
 			{
-				final String renderedTopic = topic.getTopicRendered();
-				topic.setTopicRendered(renderedTopic == null ? "" : null);
-				entityManager.persist(topic);
-				entityManager.flush();
+				topic.reRenderTopic();
 				this.wire();
 			}
 		}

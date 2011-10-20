@@ -1153,4 +1153,19 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 			catgeoriesByID.add(category.getCategoryId());
 		return getTagsInCategoriesByID(catgeoriesByID);
 	}
+	
+	public void reRenderTopic()
+	{
+		final EntityManager entityManager = (EntityManager)Component.getInstance("entityManager");
+		
+		final String topicXML = this.getTopicXML();
+		
+		if (!(topicXML == null || topicXML.trim().length() == 0))
+		{
+			final String renderedTopic = this.getTopicRendered();
+			this.setTopicRendered(renderedTopic == null ? "" : null);
+			entityManager.persist(this);
+			entityManager.flush();
+		}
+	}
 }
