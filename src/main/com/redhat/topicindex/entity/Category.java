@@ -14,7 +14,12 @@ import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
+import static ch.lambdaj.Lambda.filter;
+import static ch.lambdaj.Lambda.having;
+import static ch.lambdaj.Lambda.on;
 import static javax.persistence.GenerationType.IDENTITY;
+import static org.hamcrest.Matchers.equalTo;
+
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -135,6 +140,16 @@ public class Category implements java.io.Serializable, Comparable<Category>
 	}
 	
 	@Transient
+	public List<Tag> getTags()
+	{
+		final List<Tag> retValue = new ArrayList<Tag>();
+		for (final TagToCategory tag : this.tagToCategories)
+			retValue.add(tag.getTag());
+
+		return retValue;
+	}
+	
+	@Transient
 	public List<Tag> getTagsInProject(final Project project)
 	{
 		final List<Tag> retValue = new ArrayList<Tag>();
@@ -160,6 +175,32 @@ public class Category implements java.io.Serializable, Comparable<Category>
 			tagsList += tagToCatgeory.getTag().getTagName();
 		}
 		return tagsList;
+	}
+	
+	public boolean removeTagRelationship(final Tag childTag)
+	{
+		final List<TagToCategory> children = filter(having(on(TagToCategory.class).getTag(), equalTo(childTag)), this.getTagToCategories());
+		for (final TagToCategory child : children)
+		{
+			this.getTagToCategories().remove(child);
+			childTag.getParentTagToTags().remove(child);
+		}
+
+		return children.size() != 0;
+	}
+
+	public boolean addTagRelationship(final Tag childTag)
+	{
+		final List<TagToCategory> children = filter(having(on(TagToCategory.class).getTag(), equalTo(childTag)), this.getTagToCategories());
+		if (children.size() == 0)
+		{
+			final TagToCategory tagToCategory = new TagToCategory(childTag, this);
+			this.getTagToCategories().add(tagToCategory);
+			childTag.getTagToCategories().add(tagToCategory);
+			return true;
+		}
+
+		return false;
 	}
 
 }

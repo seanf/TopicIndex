@@ -522,6 +522,18 @@ public class EntityUtilities
 	{
 		populateTags(tag.getTags(), selectedTags, null, true);
 	}
+	
+	static public void populateTagTags(final Category category, final UIProjectData selectedTags)
+	{
+		populateTags(category.getTags(), selectedTags, null, true);
+	}
+	
+	public static Tag getTagFromId(final Integer tagId)
+	{
+		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+		final Tag tag = entityManager.find(Tag.class, tagId);
+		return tag;
+	}
 
 	/**
 	 * This function is used to populate the data structures that display the

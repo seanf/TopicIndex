@@ -30,19 +30,13 @@ public class TagHome extends VersionedEntityHome<Tag> implements DisplayMessageI
 {
 	/** Serializable version identifier */
 	private static final long serialVersionUID = -7321335882716157007L;
-	private UIProjectData selectedTags;
+	private List<UICategoryData> categories = new ArrayList<UICategoryData>();
 	/** The message to be displayed to the user */
 	private String displayMessage;
 
-	public void setTagTagId(final Integer id)
-	{
-		setId(id);
-	}
+	private List<UITagProjectData> projects = new ArrayList<UITagProjectData>();
 
-	public Integer getTagTagId()
-	{
-		return (Integer) getId();
-	}
+	private UIProjectData selectedTags;
 
 	@Override
 	protected Tag createInstance()
@@ -51,22 +45,9 @@ public class TagHome extends VersionedEntityHome<Tag> implements DisplayMessageI
 		return tag;
 	}
 
-	public void load()
+	public List<UICategoryData> getCategories()
 	{
-		if (isIdDefined())
-		{
-			wire();
-		}
-	}
-
-	public void wire()
-	{
-		getInstance();
-	}
-
-	public boolean isWired()
-	{
-		return true;
+		return categories;
 	}
 
 	public Tag getDefinedInstance()
@@ -74,54 +55,44 @@ public class TagHome extends VersionedEntityHome<Tag> implements DisplayMessageI
 		return isIdDefined() ? getInstance() : null;
 	}
 
-	/*********************************************************************/
-
-	private List<UICategoryData> categories = new ArrayList<UICategoryData>();
-	private List<UITagProjectData> projects = new ArrayList<UITagProjectData>();
-
-	public List<UICategoryData> getCategories()
+	@Override
+	public String getDisplayMessage()
 	{
-		return categories;
+		return displayMessage;
 	}
 
-	public void setCategories(final List<UICategoryData> value)
+	public String getExclusionArray(final Integer id)
 	{
-		categories = value;
+		return "[]";
 	}
 
-	public void populate()
+	public List<UITagProjectData> getProjects()
 	{
-		EntityUtilities.populateTagCategories(this.getInstance(), categories);
-
-		selectedTags = new UIProjectData();
-		EntityUtilities.populateTagTags(this.getInstance(), selectedTags);
-		EntityUtilities.populateTagProjects(this.getInstance(), projects);
+		return projects;
+	}
+	public UIProjectData getSelectedTags()
+	{
+		return selectedTags;
 	}
 
-	public String update()
+
+
+	public Integer getTagTagId()
 	{
-		try
+		return (Integer) getId();
+	}
+
+	public boolean isWired()
+	{
+		return true;
+	}
+
+	public void load()
+	{
+		if (isIdDefined())
 		{
-			updateCategories();
-			updateTags();
-			updateProjects();
-			return super.update();
+			wire();
 		}
-		catch (final PersistenceException ex)
-		{
-			ExceptionUtilities.handleException(ex);	
-			if (ex.getCause() instanceof ConstraintViolationException)
-				this.setDisplayMessage("The tag requires a unique name");
-			else
-				this.setDisplayMessage("The tag could not be saved");
-		}
-		catch (final Exception ex)
-		{
-			ExceptionUtilities.handleException(ex);
-			this.setDisplayMessage("The tag could not be saved");
-		}
-		
-		return null;
 	}
 
 	public String persist()
@@ -150,14 +121,123 @@ public class TagHome extends VersionedEntityHome<Tag> implements DisplayMessageI
 		return null;
 	}
 
-	private Tag getTagFromId(final Integer tagId)
+	public void populate()
 	{
-		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
-		final Tag tag = entityManager.find(Tag.class, tagId);
-		return tag;
+		EntityUtilities.populateTagCategories(this.getInstance(), categories);
+
+		selectedTags = new UIProjectData();
+		EntityUtilities.populateTagTags(this.getInstance(), selectedTags);
+		EntityUtilities.populateTagProjects(this.getInstance(), projects);
 	}
 
-	private void updateProjects()
+	public void setCategories(final List<UICategoryData> value)
+	{
+		categories = value;
+	}
+
+	public void setDisplayMessage(final String displayMessage)
+	{
+		this.displayMessage = displayMessage;
+	}
+
+	public void setProjects(final List<UITagProjectData> projects)
+	{
+		this.projects = projects;
+	}
+
+	public void setSelectedTags(final UIProjectData selectedTags)
+	{
+		this.selectedTags = selectedTags;
+	}
+
+	public void setTagTagId(final Integer id)
+	{
+		setId(id);
+	}
+
+	public String update()
+	{
+		try
+		{
+			updateCategories();
+			updateTags();
+			updateProjects();
+			return super.update();
+		}
+		catch (final PersistenceException ex)
+		{
+			ExceptionUtilities.handleException(ex);	
+			if (ex.getCause() instanceof ConstraintViolationException)
+				this.setDisplayMessage("The tag requires a unique name");
+			else
+				this.setDisplayMessage("The tag could not be saved");
+		}
+		catch (final Exception ex)
+		{
+			ExceptionUtilities.handleException(ex);
+			this.setDisplayMessage("The tag could not be saved");
+		}
+		
+		return null;
+	}
+
+	private void updateCategories()
+	{
+		try
+		{
+			final Tag tag = this.getInstance();
+
+			final ArrayList<TagToCategory> removeCategoryies = new ArrayList<TagToCategory>();
+
+			// find categories that we need to add
+			for (final UICategoryData category : categories)
+			{
+				final Integer categoryId = category.getId();
+				final Integer sortValue = category.getSort();
+				final TagToCategory existingTagToCategory = tag.getCategory(categoryId);
+
+				// if the mapping does not already exist, create it
+				if (category.isSelected() && existingTagToCategory == null)
+				{
+					final CategoryHome categoryHome = new CategoryHome();
+					categoryHome.setId(categoryId);
+					final Category existingCategory = categoryHome.getInstance();
+
+					final TagToCategory tagToCategory = new TagToCategory(tag, existingCategory);
+					tagToCategory.setSorting(sortValue);
+
+					tag.getTagToCategories().add(tagToCategory);
+				}
+				// if the mapping does exist, update it
+				else if (category.isSelected() && existingTagToCategory != null)
+				{
+					existingTagToCategory.setSorting(sortValue);
+				}
+				// if the mapping is to be removed, add it to the intermediate
+				// removeCategoryies collection
+				else if (!category.isSelected() && existingTagToCategory != null)
+				{
+					removeCategoryies.add(existingTagToCategory);
+				}
+
+			}
+
+			// remove the category mapping, from both the tag and the category
+			for (final TagToCategory removeCategory : removeCategoryies)
+			{
+				tag.getTagToCategories().remove(removeCategory);
+				removeCategory.getCategory().getTagToCategories().remove(removeCategory);
+			}
+
+		}
+		catch (final Exception ex)
+		{
+			// probably could not find the tag, but this shouldn't happen
+			ExceptionUtilities.handleException(ex);
+		}
+	}
+	
+    private void updateProjects()
 	{
 		final Tag tag = this.getInstance();
 
@@ -221,48 +301,12 @@ public class TagHome extends VersionedEntityHome<Tag> implements DisplayMessageI
 
 		if (tag != null)
 		{
-			final ArrayList<Tag> selectedTagObjects = new ArrayList<Tag>();
-
-			for (final UIProjectCategoriesData project : selectedTags.getProjectCategories())
-			{
-				for (final UICategoryData cat : project.getCategories())
-				{
-					// find the selected tags
-					for (final UITagData tagId : cat.getTags())
-					{
-						// if tag is selected
-						if (tagId.isSelected())
-							selectedTagObjects.add(getTagFromId(tagId.getId()));
-					}
-				}
-			}
-
-			// match up selected tags with existing tags
-			final Set<TagToTag> tagToTags = tag.getChildrenTagToTags();
+			final List<Tag> existingTags = tag.getTags();
 
 			// make a note of the tags that were removed
-			final ArrayList<Tag> removeTags = new ArrayList<Tag>();
-			for (final TagToTag tagToTag : tagToTags)
-			{
-				final Tag existingTag = tagToTag.getSecondaryTag();
-
-				if (!selectedTagObjects.contains(existingTag))
-				{
-					// add to external collection to avoid modifying a
-					// collection while looping over it
-					removeTags.add(existingTag);
-				}
-			}
-
-			// now make a note of the additions
-			final ArrayList<Tag> addTags = new ArrayList<Tag>();
-			for (final Tag selectedTag : selectedTagObjects)
-			{
-				if (filter(having(on(TagToTag.class).getSecondaryTag(), equalTo(selectedTag)), tagToTags).size() == 0)
-				{
-					addTags.add(selectedTag);
-				}
-			}
+			final List<Tag> removeTags = selectedTags.getRemovedTags(existingTags);
+			// make a note of the tags that were added
+			final List<Tag> addTags = selectedTags.getAddedTags(existingTags);
 
 			// only proceed if there are some changes to make
 			if (removeTags.size() != 0 || addTags.size() != 0)
@@ -280,97 +324,10 @@ public class TagHome extends VersionedEntityHome<Tag> implements DisplayMessageI
 			}
 		}
 	}
-
-	private void updateCategories()
-	{
-		try
-		{
-			final Tag tag = this.getInstance();
-
-			final ArrayList<TagToCategory> removeCategoryies = new ArrayList<TagToCategory>();
-
-			// find categories that we need to add
-			for (final UICategoryData category : categories)
-			{
-				final Integer categoryId = category.getId();
-				final Integer sortValue = category.getSort();
-				final TagToCategory existingTagToCategory = tag.getCategory(categoryId);
-
-				// if the mapping does not already exist, create it
-				if (category.isSelected() && existingTagToCategory == null)
-				{
-					final CategoryHome categoryHome = new CategoryHome();
-					categoryHome.setId(categoryId);
-					final Category existingCategory = categoryHome.getInstance();
-
-					final TagToCategory tagToCategory = new TagToCategory(tag, existingCategory);
-					tagToCategory.setSorting(sortValue);
-
-					tag.getTagToCategories().add(tagToCategory);
-				}
-				// if the mapping does exist, update it
-				else if (category.isSelected() && existingTagToCategory != null)
-				{
-					existingTagToCategory.setSorting(sortValue);
-				}
-				// if the mapping is to be removed, add it to the intermediate
-				// removeCategoryies collection
-				else if (!category.isSelected() && existingTagToCategory != null)
-				{
-					removeCategoryies.add(existingTagToCategory);
-				}
-
-			}
-
-			// remove the category mapping, from both the tag and the category
-			for (final TagToCategory removeCategory : removeCategoryies)
-			{
-				tag.getTagToCategories().remove(removeCategory);
-				removeCategory.getCategory().getTagToCategories().remove(removeCategory);
-			}
-
-		}
-		catch (final Exception ex)
-		{
-			// probably could not find the tag, but this shouldn't happen
-			ExceptionUtilities.handleException(ex);
-		}
-	}
-
-	public UIProjectData getSelectedTags()
-	{
-		return selectedTags;
-	}
-
-	public void setSelectedTags(final UIProjectData selectedTags)
-	{
-		this.selectedTags = selectedTags;
-	}
-
-	public List<UITagProjectData> getProjects()
-	{
-		return projects;
-	}
-
-	public void setProjects(final List<UITagProjectData> projects)
-	{
-		this.projects = projects;
-	}
 	
-    public String getExclusionArray(final Integer id)
+	public void wire()
 	{
-		return "[]";
-	}
-
-	@Override
-	public String getDisplayMessage()
-	{
-		return displayMessage;
-	}
-	
-	public void setDisplayMessage(final String displayMessage)
-	{
-		this.displayMessage = displayMessage;
+		getInstance();
 	}
 
 }
