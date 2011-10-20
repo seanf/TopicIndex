@@ -1,86 +1,80 @@
 <!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:s="http://jboss.com/products/seam/taglib"
-    xmlns:ui="http://java.sun.com/jsf/facelets"
-    xmlns:f="http://java.sun.com/jsf/core"
-    xmlns:h="http://java.sun.com/jsf/html"
-    xmlns:a="http://richfaces.org/a4j"
-    xmlns:rich="http://richfaces.org/rich"
-    template="layout/cleantemplate.xhtml">
+	xmlns:s="http://jboss.com/products/seam/taglib"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="layout/cleantemplate.xhtml">
 
-<ui:define name="body">
+	<ui:define name="body">
 
-    <h:form id="category" styleClass="edit">
+		<h:form id="category" styleClass="edit">
+			<rich:tabPanel switchType="client">
+				<rich:tab
+					label="#{tagHome.managed ? 'Edit' : 'Add'} Category Details">
 
-        <rich:panel>
-            <f:facet name="header">#{categoryHome.managed ? 'Edit' : 'Add'} Category</f:facet>
+					<s:decorate id="categoryNameField" template="layout/edit.xhtml">
+						<ui:define name="label">Category Name</ui:define>
+						<h:inputTextarea id="categoryName" cols="80" rows="6"
+							required="true" value="#{categoryHome.instance.categoryName}" />
+					</s:decorate>
 
-            <s:decorate id="categoryNameField" template="layout/edit.xhtml">
-                <ui:define name="label">Category Name</ui:define>
-                <h:inputTextarea id="categoryName"
-                               cols="80"
-                               rows="6"
-                           required="true"
-                              value="#{categoryHome.instance.categoryName}"/>
-            </s:decorate>
+					<s:decorate id="categoryDescriptionField"
+						template="layout/edit.xhtml">
+						<ui:define name="label">Category Description</ui:define>
+						<h:inputTextarea id="categoryDescription" cols="80" rows="10"
+							value="#{categoryHome.instance.categoryDescription}" />
+					</s:decorate>
 
-            <s:decorate id="categoryDescriptionField" template="layout/edit.xhtml">
-                <ui:define name="label">Category Description</ui:define>
-                <h:inputTextarea id="categoryDescription"
-                               cols="80"
-                               rows="10"
-                              value="#{categoryHome.instance.categoryDescription}"/>
-            </s:decorate>
-            
-            <s:decorate id="categorySortField" template="layout/edit.xhtml">
-                <ui:define name="label">Category Sort</ui:define>
-                <h:inputText id="categorySort"
-                              value="#{categoryHome.instance.categorySort}"/>
-            </s:decorate>
+					<s:decorate id="categorySortField" template="layout/edit.xhtml">
+						<ui:define name="label">Category Sort</ui:define>
+						<h:inputText id="categorySort"
+							value="#{categoryHome.instance.categorySort}" />
+					</s:decorate>
 
 
-            <div style="clear:both">
-                <span class="required">*</span>
-                required fields
-            </div>
+					<div style="clear: both">
+						<span class="required">*</span> required fields
+					</div>
+				</rich:tab>
 
-        </rich:panel>
+				<rich:tab label="Tags">
+					<ui:include src="/WEB-INF/templates/TagSelect.xhtml">
+						<ui:param name="selectedTags"
+							value="#{categoryHome.selectedTags.projectCategories}" />
+						<ui:param name="homeObject" value="#{categoryHome}" />
+					</ui:include>
+				</rich:tab>
 
-        <div class="actionButtons">
+			</rich:tabPanel>
 
-            <h:commandButton id="save"
-                          value="Save"
-                         action="#{categoryHome.persist}"
-                       disabled="#{!categoryHome.wired}"
-                       rendered="#{!categoryHome.managed}"/>
+			<div class="actionButtons">
 
-            <h:commandButton id="update"
-                          value="Save"
-                         action="#{categoryHome.update}"
-                       rendered="#{categoryHome.managed}"/>
+				<h:commandButton id="save" value="Save"
+					action="#{categoryHome.persist}" disabled="#{!categoryHome.wired}"
+					rendered="#{!categoryHome.managed}" />
 
-            <!-- <h:commandButton id="delete"
+				<h:commandButton id="update" value="Save"
+					action="#{categoryHome.update}" rendered="#{categoryHome.managed}" />
+
+				<!-- <h:commandButton id="delete"
                           value="Delete"
                          action="#{categoryHome.remove}"
                       immediate="true"
                        rendered="#{categoryHome.managed}"/> -->
 
-            <s:button id="cancelEdit"
-                   value="Cancel"
-             propagation="end"
-                    view="/Category.xhtml"
-                rendered="#{categoryHome.managed}"/>
+				<s:button id="cancelEdit" value="Cancel" propagation="end"
+					view="/Category.xhtml" rendered="#{categoryHome.managed}" />
 
-            <s:button id="cancelAdd"
-                   value="Cancel"
-             propagation="end"
-                    view="/#{empty categoryFrom ? 'CategoryList' : categoryFrom}.xhtml"
-                rendered="#{!categoryHome.managed}"/>
+				<s:button id="cancelAdd" value="Cancel" propagation="end"
+					view="/#{empty categoryFrom ? 'CategoryList' : categoryFrom}.xhtml"
+					rendered="#{!categoryHome.managed}" />
 
-        </div>
-    </h:form>
-
-</ui:define>
+			</div>
+		</h:form>
+	</ui:define>
 
 </ui:composition>

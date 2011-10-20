@@ -89,6 +89,11 @@ public class CategoryHome extends EntityHome<Category> implements DisplayMessage
 		this.selectedTags = selectedTags;
 	}
 	
+	public String getExclusionArray(final Integer id)
+	{
+		return "[]";
+	}
+	
 	private void updateTags()
 	{
 		final Category category = this.getInstance();
