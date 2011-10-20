@@ -98,7 +98,10 @@ public class UITagDataBase
 	{
 		try
 		{
-			this.newSort = Integer.parseInt(newSort);
+			if (newSort == null || newSort.trim().length() == 0)
+				this.newSort = null;
+			else
+				this.newSort = Integer.parseInt(newSort.trim());
 		}
 		catch (final Exception ex)
 		{
