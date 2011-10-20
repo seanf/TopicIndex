@@ -418,6 +418,13 @@
 						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</s:button>
+				
+				<s:button action="#{topicTagsList.downloadXML()}"
+					value="Download XML">
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
+					</c:forEach>
+				</s:button>
 			</s:div>
 
 			<div class="tableControl">
@@ -703,6 +710,13 @@
 
 				<s:button action="#{topicTagsList.downloadCSV()}"
 					value="Download CSV">
+					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
+						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
+					</c:forEach>
+				</s:button>
+				
+				<s:button action="#{topicTagsList.downloadXML()}"
+					value="Download XML">
 					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
 						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>

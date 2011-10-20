@@ -27,6 +27,8 @@
 				<s:button id="resetTop" value="Reset" includePageParams="false" />
 				<h:commandButton id="newTopicTop" value="Create New Topic"
 					action="#{customTagSearch.getCreateNewTopicUrl()}" />
+				<h:commandButton id="csvDownloadTop" value="Download CSV"
+					action="#{customTagSearch.downloadCSV()}" />
 				<h:commandButton id="xmlDownloadTop" value="Download XML"
 					action="#{customTagSearch.downloadXML()}" />
 				<h:commandButton id="docbookTop" value="Docbook"
@@ -133,6 +135,8 @@
 				<s:button id="reset" value="Reset" includePageParams="false" />
 				<h:commandButton id="newTopicBottom" value="Create New Topic"
 					action="#{customTagSearch.getCreateNewTopicUrl()}" />
+				<h:commandButton id="csvDownloadBottom" value="Download CSV"
+					action="#{customTagSearch.downloadCSV()}" />
 				<h:commandButton id="xmlDownload" value="Download XML"
 					action="#{customTagSearch.downloadXML()}" />
 				<h:commandButton id="docbookBottom" value="Docbook"

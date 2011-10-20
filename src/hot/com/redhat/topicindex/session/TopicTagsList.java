@@ -6,12 +6,15 @@ import static ch.lambdaj.Lambda.on;
 import static ch.lambdaj.collection.LambdaCollections.with;
 import static org.hamcrest.Matchers.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.ecs.commonutils.HTTPUtilities;
+import com.redhat.ecs.commonutils.MIMEUtilities;
+import com.redhat.ecs.commonutils.ZipUtilities;
 import com.redhat.topicindex.entity.Tag;
 import com.redhat.topicindex.entity.TagToCategory;
 import com.redhat.topicindex.entity.Topic;
@@ -201,6 +204,31 @@ public class TopicTagsList extends ExtendedTopicList
 		}
 
 		HTTPUtilities.writeOutContent(csv.getBytes(), "Topics.csv");
+	}
+
+	public void downloadXML()
+	{
+		final TopicTagsList cloneList = new TopicTagsList(-1, this.constructedEJBQL, this.topic);
+		final List<Topic> topicList = cloneList.getResultList();
+		
+		// build up the files that will make up the zip file
+		final HashMap<String, byte[]> files = new HashMap<String, byte[]>();
+
+		for (final Topic topic : topicList)
+			files.put(topic.getTopicId() + ".xml", topic.getTopicXML() == null ? "".getBytes() : topic.getTopicXML().getBytes());
+
+		byte[] zipFile = null;
+		try
+		{
+			zipFile = ZipUtilities.createZip(files);
+		}
+		catch (final Exception ex)
+		{
+			ExceptionUtilities.handleException(ex);
+			zipFile = null;
+		}
+
+		HTTPUtilities.writeOutContent(zipFile, "XML.zip", MIMEUtilities.ZIP_MIME_TYPE);
 	}
 
 	public String createPopulatedTopic()

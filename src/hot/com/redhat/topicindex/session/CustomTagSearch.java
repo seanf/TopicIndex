@@ -17,7 +17,6 @@ import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 
-
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.ecs.commonutils.HTTPUtilities;
 import com.redhat.ecs.commonutils.MIMEUtilities;
@@ -229,6 +228,22 @@ public class CustomTagSearch implements DisplayMessageInterface
 		HTTPUtilities.writeOutContent(zipFile, "XML.zip", MIMEUtilities.ZIP_MIME_TYPE);
 	}
 
+	public void downloadCSV()
+	{
+		String csv = Topic.getCSVHeaderRow();
+
+		final Filter filter = new Filter();
+		this.syncFilterWithUI(filter, false);
+
+		final List<Topic> topicList = EntityUtilities.getTopicsFromFilter(filter);
+
+		// loop through each topic
+		for (final Topic topic : topicList)
+			csv += "\n" + topic.getCSVRow();
+
+		HTTPUtilities.writeOutContent(csv.getBytes(), "Topics.csv");
+	}
+
 	/**
 	 * This function takes the tags that have been selected, topic field filters
 	 * and category boolean logic settings, and encapsulate this information in
@@ -277,13 +292,13 @@ public class CustomTagSearch implements DisplayMessageInterface
 		loadCategoryLogic(filter);
 		loadFilterFields(filter);
 	}
-	
+
 	public String loadFilterAndSearch()
 	{
 		loadFilter();
 		return doSearch();
 	}
-	
+
 	public void loadFilterAndDocbook()
 	{
 		this.loadFilter();
@@ -370,10 +385,12 @@ public class CustomTagSearch implements DisplayMessageInterface
 	 * This function takes the tag selections and uses these to populate a
 	 * Filter
 	 * 
-	 * @param filter The filter to sync with the tag selection
-	 * @param persist true if this filter is being saved to the db (i.e. the
-	 *            user is actually saving the filter), and false if it is not
-	 *            (like when the user is building the docbook zip file)
+	 * @param filter
+	 *            The filter to sync with the tag selection
+	 * @param persist
+	 *            true if this filter is being saved to the db (i.e. the user is
+	 *            actually saving the filter), and false if it is not (like when
+	 *            the user is building the docbook zip file)
 	 */
 	protected void syncFilterWithUI(final Filter filter, final boolean persist)
 	{
@@ -399,29 +416,29 @@ public class CustomTagSearch implements DisplayMessageInterface
 		{
 			final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 			Filter filter;
-	
+
 			// load the filter object if it exists
 			if (this.selectedFilter != null)
 				filter = entityManager.find(Filter.class, selectedFilter);
 			else
 				// get a reference to the Filter object
 				filter = new Filter();
-	
+
 			// set the name
 			filter.setFilterName(this.selectedFilterName);
-	
+
 			// populate the filter with the options that are selected in the ui
 			syncFilterWithUI(filter, true);
-	
+
 			// save the changes
 			entityManager.persist(filter);
 			this.selectedFilter = filter.getFilterId();
-	
+
 			getFilterList();
 		}
 		catch (final PersistenceException ex)
 		{
-			ExceptionUtilities.handleException(ex);	
+			ExceptionUtilities.handleException(ex);
 			if (ex.getCause() instanceof ConstraintViolationException)
 				this.setDisplayMessage("The filter requires a unique name");
 			else
