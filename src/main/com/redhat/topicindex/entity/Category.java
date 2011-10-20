@@ -183,7 +183,7 @@ public class Category implements java.io.Serializable, Comparable<Category>
 		for (final TagToCategory child : children)
 		{
 			this.getTagToCategories().remove(child);
-			childTag.getParentTagToTags().remove(child);
+			childTag.getTagToCategories().remove(child);
 		}
 
 		return children.size() != 0;
