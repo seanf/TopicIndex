@@ -57,23 +57,53 @@ public class EntityUtilities
 {
 	public static byte[] loadBlobConstant(final Integer id)
 	{
+		if (id == null)
+			return null;
+		
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 		final BlobConstants constant = entityManager.find(BlobConstants.class, id);
-		return constant == null ? null : constant.getConstantValue();
+		
+		if (constant == null)
+		{
+			System.out.println("Expected to find a record in the BlobConstants table with an ID of " + id);
+			return null;
+		}
+		
+		return constant.getConstantValue();
 	}
 
 	public static Integer loadIntegerConstant(final Integer id)
 	{
+		if (id == null)
+			return null;
+		
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 		final IntegerConstants constant = entityManager.find(IntegerConstants.class, id);
-		return constant == null ? null : constant.getConstantValue();
+		
+		if (constant == null)
+		{
+			System.out.println("Expected to find a record in the IntegerConstants table with an ID of " + id);
+			return null;
+		}
+		
+		return constant.getConstantValue();
 	}
 
 	public static String loadStringConstant(final Integer id)
 	{
+		if (id == null)
+			return null;
+		
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 		final StringConstants constant = entityManager.find(StringConstants.class, id);
-		return constant == null ? null : constant.getConstantValue();
+		
+		if (constant == null)
+		{
+			System.out.println("Expected to find a record in the StringConstants table with an ID of " + id);
+			return null;
+		}
+		
+		return constant.getConstantValue();
 	}
 	
 	static public void populateTopicTags(final Topic topic, final UIProjectData selectedTags)

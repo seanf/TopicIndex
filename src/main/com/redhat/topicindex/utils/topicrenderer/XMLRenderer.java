@@ -40,9 +40,12 @@ public class XMLRenderer
 		if (docbookFiles == null)
 		{
 			final byte[] docbookZip = EntityUtilities.loadBlobConstant(DOCBOOK_ZIP_ID);
-
-			/* load the xsl files from the docbook xsl package */
-			docbookFiles = ZipUtilities.mapZipFile(docbookZip, DOCBOOK_XSL_URL, "docbook-xsl-1.76.1/");
+			
+			if (docbookZip != null)
+			{
+				/* load the xsl files from the docbook xsl package */
+				docbookFiles = ZipUtilities.mapZipFile(docbookZip, DOCBOOK_XSL_URL, "docbook-xsl-1.76.1/");
+			}
 		}
 	}
 
