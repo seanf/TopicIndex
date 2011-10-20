@@ -544,7 +544,7 @@ public class EntityUtilities
 						 * match the sorting order for the tags in the category
 						 * with the newSort values for the UI tags
 						 */
-						
+
 						for (final TagToCategory tagToCategory : category.getTagToCategories())
 						{
 							if (tagData.getId().equals(tagToCategory.getTag().getTagId()))
@@ -1137,9 +1137,20 @@ public class EntityUtilities
 	{
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 
-		// loop through the list of tags selected via the checkboxes, and update
-		// their
-		// representation in the Filter
+		/*
+		 * loop through the list of tags selected via the checkboxes, and update
+		 * their representation in the Filter
+		 */
+
+		/*
+		 * We have to deal with the situation that can arise when a tag is in
+		 * two different projects or categories. The selectedFilterTags
+		 * collection will hold all the FilterTags that are created in response
+		 * to a tag being selected once. We can then reference this collection
+		 * to prevent the FilterTag from being removed in response to a tag not
+		 * being selected in another location.
+		 */
+		final List<FilterTag> selectedFilterTags = new ArrayList<FilterTag>();
 		for (final UIProjectCategoriesData project : selectedTags.getProjectCategories())
 		{
 			for (final UICategoryData category : project.getCategories())
@@ -1157,9 +1168,8 @@ public class EntityUtilities
 						{
 							if (filterTag.getTag().getTagId().equals(tag.getId()))
 							{
-								System.out.println("Updating tag state");
-
 								filterTag.setTagState(state);
+								selectedFilterTags.add(filterTag);
 								found = true;
 								break;
 							}
@@ -1170,6 +1180,7 @@ public class EntityUtilities
 							final Tag dbTag = entityManager.getReference(Tag.class, tag.getId());
 
 							final FilterTag filterTag = new FilterTag();
+							selectedFilterTags.add(filterTag);
 							filterTag.setFilter(filter);
 							filterTag.setTag(dbTag);
 							filterTag.setTagState(state);
@@ -1190,27 +1201,33 @@ public class EntityUtilities
 
 		for (final FilterTag filterTag : filter.getFilterTags())
 		{
-			boolean found = false;
-			for (final UIProjectCategoriesData project : selectedTags.getProjectCategories())
+			/* don't attempt to remove a FilterTag that was specifically added above */
+			if (!selectedFilterTags.contains(filterTag))
 			{
-				for (final UICategoryData category : project.getCategories())
+				boolean found = false;
+				for (final UIProjectCategoriesData project : selectedTags.getProjectCategories())
 				{
-					for (final UITagData tag : category.getTags())
+
+					for (final UICategoryData category : project.getCategories())
 					{
-						final boolean tagSelected = tag.isSelected();
-						if (!tagSelected && tag.getId().equals(filterTag.getTag().getTagId()))
+						for (final UITagData tag : category.getTags())
 						{
-							found = true;
-							break;
+							final boolean tagSelected = tag.isSelected();
+							if (!tagSelected && tag.getId().equals(filterTag.getTag().getTagId()))
+							{
+								found = true;
+								break;
+							}
 						}
 					}
 				}
-			}
 
-			// add to a temporary container so we don't modify the collection we
-			// are looping over
-			if (found)
-				removeTags.add(filterTag);
+				// add to a temporary container so we don't modify the
+				// collection we
+				// are looping over
+				if (found)
+					removeTags.add(filterTag);
+			}
 		}
 
 		// now clean out the obsolete tags
