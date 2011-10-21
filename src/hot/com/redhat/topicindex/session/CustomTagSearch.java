@@ -323,9 +323,10 @@ public class CustomTagSearch implements DisplayMessageInterface
 	{
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 
-		filter.syncFilterWithTags(selectedTags);
-		filter.syncFilterWithCategories(selectedTags);
-		filter.syncFilterWithFieldUIElements(topic);
+		filter.syncFilterWithTags(this.selectedTags);
+		filter.syncFilterWithCategories(this.selectedTags);
+		filter.syncFilterWithFieldUIElements(this.topic);
+		filter.syncWithDocbookOptions(this.docbookBuildingOptions);
 
 		if (persist)
 			entityManager.persist(filter);
