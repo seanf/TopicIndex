@@ -187,9 +187,9 @@ public class RelatedTopicTagsList extends ExtendedTopicList
 	protected String getSearchUrlVars(final String startRecord)
 	{
 		final Filter filter = new Filter();
-		EntityUtilities.syncFilterWithCategories(filter, selectedTags);
-		EntityUtilities.syncFilterWithFieldUIElements(filter, topic);
-		EntityUtilities.syncFilterWithTags(filter, selectedTags);
+		filter.syncFilterWithCategories(selectedTags);
+		filter.syncFilterWithFieldUIElements(topic);
+		filter.syncFilterWithTags(selectedTags);
 
 		final String params = filter.buildFilterUrlVars();
 		return "topicTopicId=" + topicTopicId + "&" + params;

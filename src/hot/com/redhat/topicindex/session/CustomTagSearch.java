@@ -263,9 +263,9 @@ public class CustomTagSearch implements DisplayMessageInterface
 		 * variable), and then pull out the URL variables.
 		 */
 		final Filter filter = new Filter();
-		EntityUtilities.syncFilterWithCategories(filter, selectedTags);
-		EntityUtilities.syncFilterWithFieldUIElements(filter, topic);
-		EntityUtilities.syncFilterWithTags(filter, selectedTags);
+		filter.syncFilterWithCategories(selectedTags);
+		filter.syncFilterWithFieldUIElements(topic);
+		filter.syncFilterWithTags(selectedTags);
 
 		final String params = filter.buildFilterUrlVars();
 		return url + "?" + params;
@@ -396,9 +396,9 @@ public class CustomTagSearch implements DisplayMessageInterface
 	{
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 
-		EntityUtilities.syncFilterWithTags(filter, selectedTags);
-		EntityUtilities.syncFilterWithCategories(filter, selectedTags);
-		EntityUtilities.syncFilterWithFieldUIElements(filter, topic);
+		filter.syncFilterWithTags(selectedTags);
+		filter.syncFilterWithCategories(selectedTags);
+		filter.syncFilterWithFieldUIElements(topic);
 
 		if (persist)
 			entityManager.persist(filter);
