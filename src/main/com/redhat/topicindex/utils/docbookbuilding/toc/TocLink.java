@@ -2,6 +2,7 @@ package com.redhat.topicindex.utils.docbookbuilding.toc;
 
 import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.docbookbuilding.DocbookBuildingOptions;
+import com.redhat.topicindex.utils.docbookbuilding.DocbookUtils;
 
 /**
 	This class represents a link to a topic in the toc
@@ -35,7 +36,7 @@ public class TocLink extends TocElement
 	{
 		super(docbookBuildingOptions, label, id, docbook);
 		this.pageName = Constants.TOPIC_XREF_PREFIX + id;
-		
+		this.docbook = docbook;		
 	}
 	
 	public TocLink()
@@ -48,6 +49,7 @@ public class TocLink extends TocElement
 	public void generateCode() 
 	{
 		this.eclipseXml = "<topic label=\"" + label + "\" href=\"" + pageName + ".html\"/>";
-		this.docbook = "<listitem><para><ulink url=\"" + pageName + ".html\">" + label + "</ulink></para></listitem>";
+		if (this.docbook == null || this.docbook.length() == 0)
+			this.docbook = DocbookUtils.buildULinkListItem(pageName + ".html", label);
 	}
 }

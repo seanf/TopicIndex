@@ -1397,7 +1397,7 @@ public class DocbookBuilder
 
 			final String homeLinkLabel = "HOME";
 			buildLandingPageTopic(CollectionUtilities.toArrayList(home), nextLandingPageId, homeLinkLabel, usedIds, true);
-			tocTopLevel.addChild(new TocLink(docbookBuildingOptions, homeLinkLabel, nextLandingPageId + ""));
+			tocTopLevel.addChild(new TocLink(docbookBuildingOptions, homeLinkLabel, nextLandingPageId + "", DocbookUtils.buildULinkListItem("index.html", homeLinkLabel)));
 
 			/*
 			 * decrement the nextLandingPageId counter, so the landing page

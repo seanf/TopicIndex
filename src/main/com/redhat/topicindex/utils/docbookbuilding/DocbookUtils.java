@@ -71,6 +71,11 @@ public class DocbookUtils
 		return retValue;
 	}
 	
+	public static String buildULinkListItem(final String url, final String label)
+	{
+		return "<listitem><para><ulink url=\"" + url + "\">" + label + "</ulink></para></listitem>";
+	}
+	
 	public static List<Element> buildEmphasisPrefixedXRef(final Document xmlDoc, final String prefix, final String xref)
 	{
 		final List<Element> retValue = new ArrayList<Element>();
