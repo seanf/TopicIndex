@@ -6,7 +6,7 @@ public class Constants
 	 * The Skynet build number, displayed on the top bar of all Skynet pages. Is
 	 * in the format yyyymmdd-hhmm
 	 */
-	public static final String BUILD = "20111021-1322";
+	public static final String BUILD = "20111021-1414";
 	
 	public static final String TOPIC_XREF_PREFIX = "TopicID";
 	
@@ -18,6 +18,7 @@ public class Constants
 	public static String DOCBOOK_BUILDING_OPTION_SUPPRESS_ERROR_PAGE = "Suppress Error Page";
 	public static String DOCBOOK_BUILDING_OPTION_TASK_AND_OVERVIEW_ONLY = "Task And Overview Only";
 	public static String DOCBOOK_BUILDING_OPTION_INSERT_SURVEY_LINK = "Insert Survey Link";
+	public static String DOCBOOK_BUILDING_OPTION_CVS_PKG = "publican.cfg cvs_pkg option";
 
 	/** The format of the date to be displayed by any date widget */
 	public static final String FILTER_DISPLAY_DATE_FORMAT = "dd MMM yyyy HH:mm";

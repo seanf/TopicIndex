@@ -1,21 +1,22 @@
-.listTable
-{
+.docBookOptions {
+	text-align: right;
+	vertical-align: top;
+}
+
+.listTable {
 	table-layout: fixed;
 }
 
-.longText
-{
+.longText {
 	word-wrap: break-word;
 }
 
-.relatedTopicLink
-{
+.relatedTopicLink {
 	white-space: nowrap;
 }
 
-.alignTop
-{
-	vertical-align:top;
+.alignTop {
+	vertical-align: top;
 }
 
 .linkButton {
@@ -24,58 +25,49 @@
 	color: blue;
 }
 
-.help 
-{
+.help {
 	float: right;
 	padding: 5px;
 }
 
-.taglist 
-{
+.taglist {
 	white-space: nowrap;
 }
 
-.disabled
-{
-	color: #888888;	
+.disabled {
+	color: #888888;
 }
 
-.normal_table
-{
-	font-family: arial, sans-serif;	
+.normal_table {
+	font-family: arial, sans-serif;
 }
 
-.normal_table td
-{
-	vertical-align:top; 
-	text-align:left;	
+.normal_table td {
+	vertical-align: top;
+	text-align: left;
 	padding: 5px;
 }
 
-.tableHeader2
-{
+.tableHeader2 {
 	font-weight: bold;
 	padding: 5px;
 }
 
-.searchform
-{
+.searchform {
 	margin-left: auto;
 	margin-right: auto;
 	width: 600px;
 }
 
-html 
-{
+html {
 	overflow-y: scroll;
 	height: 100%;
 }
 
-body 
-{
+body {
 	font-size: 12px;
 	margin: 0px;
-	font-family: arial, sans-serif;	
+	font-family: arial, sans-serif;
 	height: 100%;
 }
 
@@ -88,13 +80,13 @@ h1 {
 	margin-top: 0;
 }
 
-input[type=submit], input[type=button] {
+input[type=submit],input[type=button] {
 	font-size: 11px;
 	margin: 5px 5px 5px 0;
 	cursor: pointer;
 }
 
-input[type=text], input[type=password], textarea {
+input[type=text],input[type=password],textarea {
 	font-size: 12px;
 	padding-left: 1px;
 }
@@ -103,18 +95,16 @@ select {
 	font-size: 13px;
 }
 
-.tableControl 
-{
+.tableControl {
 	width: 25%;
 	text-align: right;
 	float: right;
 }
 
-.actionButtons
-{
+.actionButtons {
 	width: 100%;
 	float: left;
-	padding-left: 10px;	
+	padding-left: 10px;
 }
 
 .tableControl a {
@@ -135,6 +125,7 @@ select {
 	padding: 30px;
 	hieght: 100%;
 }
+
 .message {
 	padding: 5px;
 	list-style: none;
@@ -194,7 +185,7 @@ img.errors {
 	padding-right: 5px;
 }
 
-.errors input, .errors textarea, .errors select {
+.errors input,.errors textarea,.errors select {
 	border: 1px solid red !important;
 }
 
@@ -205,7 +196,7 @@ img.errors {
 
 .rich-stglpanel-body {
 	overflow: auto;
-} 
+}
 
 /* the specificity here is necessary to override the defaults */
 /*
@@ -213,13 +204,13 @@ img.errors {
 .rich-stglpanel .rich-stglpanel-header {
 	padding: 2px 3px;
 }*/
-
-.rich-panel input[type=submit], .rich-panel input[type=button],
-.rich-tabpanel input[type=submit], .rich-tabpanel input[type=button] {
+.rich-panel input[type=submit],.rich-panel input[type=button],.rich-tabpanel input[type=submit],.rich-tabpanel input[type=button]
+	{
 	margin-bottom: 10px;
 }
 
-.tableControl input[type=submit], .tableControl input[type=button], .tableControl select {
+.tableControl input[type=submit],.tableControl input[type=button],.tableControl select
+	{
 	margin: 5px 0 5px 5px;
 }
 
@@ -243,7 +234,7 @@ img.errors {
 	text-decoration: none;
 }
 
-.rich-toolbar-item a:hover, .rich-ddmenu-label-select {
+.rich-toolbar-item a:hover,.rich-ddmenu-label-select {
 	text-decoration: underline;
 }
 
@@ -286,13 +277,13 @@ td.action a {
 }
 
 table.radio {
-   border: 0;
+	border: 0;
 }
 
 table.radio td {
-   padding: 0 2px;
+	padding: 0 2px;
 }
 
 table.radio input[type=radio] {
-   vertical-align: bottom;
+	vertical-align: bottom;
 }

@@ -84,7 +84,7 @@
 					</c:choose>
 				</rich:tab>
 				<rich:tab label="Build Docbook">
-					<h:panelGrid columns="2">
+					<h:panelGrid columns="2" columnClasses="docBookOptions">
 						<h:selectBooleanCheckbox
 							value="#{customTagSearch.docbookBuildingOptions.publicanShowRemarks}" />
 						<h:outputText value="Show remarks" />
@@ -121,6 +121,11 @@
 							value="#{customTagSearch.docbookBuildingOptions.insertSurveyLink}" />
 						<h:outputText
 							value="Insert a link to the EAP6 survey in every topic." />
+
+						<h:inputText size="45"
+							value="#{customTagSearch.docbookBuildingOptions.cvsPkgOption}" />
+						<h:outputText
+							value="Defines the value of the csv_pkg option in the publican.cfg file." />
 					</h:panelGrid>
 
 				</rich:tab>

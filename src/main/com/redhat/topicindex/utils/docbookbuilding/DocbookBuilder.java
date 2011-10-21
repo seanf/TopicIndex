@@ -968,8 +968,17 @@ public class DocbookBuilder
 		files.put("Book/en-US/StartPage.xml", getStringBytes(startPage == null ? "" : startPage));
 
 		// fix the Publican CFG file
-		if (docbookBuildingOptions.getPublicanShowRemarks() && publicnCfgFixed != null)
-			publicnCfgFixed += "\nshow_remarks: 1";
+		if (publicnCfgFixed != null)
+		{
+			if (docbookBuildingOptions.getPublicanShowRemarks())
+			{
+				publicnCfgFixed += "\nshow_remarks: 1";
+			}
+
+			publicnCfgFixed += "\ncvs_pkg: " + docbookBuildingOptions.getCvsPkgOption();
+		}
+
+		// add the publican.cfg file
 		files.put("Book/publican.cfg", getStringBytes(publicnCfgFixed));
 
 		// add the files that are used to package up the RPM file
@@ -1230,7 +1239,7 @@ public class DocbookBuilder
 	private Topic buildLandingPageTopic(final List<Tag> templateTags, final Integer topicId, final String title, final List<String> usedIds, final boolean processedOnly)
 	{
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
-		
+
 		Topic template = null;
 
 		/* First, search the topicDatabase */

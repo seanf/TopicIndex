@@ -25,6 +25,7 @@ public class DocbookBuildingOptions
 	private Boolean suppressErrorsPage = false;
 	private Boolean taskAndOverviewOnly = true;
 	private Boolean insertSurveyLink = true;
+	private String cvsPkgOption = "JBoss_Enterprise_Application_Platform-6-web-__LANG__";
 
 	public void setProcessRelatedTopics(final Boolean processRelatedTopics)
 	{
@@ -118,6 +119,7 @@ public class DocbookBuildingOptions
 		retValue.add(Constants.DOCBOOK_BUILDING_OPTION_SHOW_REMARKS);
 		retValue.add(Constants.DOCBOOK_BUILDING_OPTION_SUPPRESS_ERROR_PAGE);
 		retValue.add(Constants.DOCBOOK_BUILDING_OPTION_TASK_AND_OVERVIEW_ONLY);
+		retValue.add(Constants.DOCBOOK_BUILDING_OPTION_CVS_PKG);
 
 		return retValue;
 	}
@@ -152,6 +154,9 @@ public class DocbookBuildingOptions
 
 		if (fixedFieldName.equalsIgnoreCase(Constants.DOCBOOK_BUILDING_OPTION_TASK_AND_OVERVIEW_ONLY))
 			return this.getTaskAndOverviewOnly() == null ? null : this.getTaskAndOverviewOnly().toString();
+
+		if (fixedFieldName.equalsIgnoreCase(Constants.DOCBOOK_BUILDING_OPTION_CVS_PKG))
+			return this.getCvsPkgOption() == null ? null : this.getCvsPkgOption();
 
 		return null;
 	}
@@ -188,17 +193,31 @@ public class DocbookBuildingOptions
 
 			if (fixedFieldName.equalsIgnoreCase(Constants.DOCBOOK_BUILDING_OPTION_TASK_AND_OVERVIEW_ONLY))
 				this.setTaskAndOverviewOnly(Boolean.parseBoolean(fieldValue));
+
+			if (fixedFieldName.equalsIgnoreCase(Constants.DOCBOOK_BUILDING_OPTION_CVS_PKG))
+				this.setCvsPkgOption(fieldValue);
+
 		}
 		catch (final Exception ex)
 		{
 			ExceptionUtilities.handleException(ex);
 		}
 	}
-	
+
 	public void syncWithFilter(final Filter filter)
 	{
 		for (final FilterOption option : filter.getFilterOptions())
 			this.setFieldValue(option.getFilterOptionName(), option.getFilterOptionValue());
+	}
+
+	public String getCvsPkgOption()
+	{
+		return cvsPkgOption;
+	}
+
+	public void setCvsPkgOption(final String cvsPkgOption)
+	{
+		this.cvsPkgOption = cvsPkgOption;
 	}
 
 }
