@@ -543,9 +543,10 @@ public class Filter implements java.io.Serializable
 			}
 		}
 
-		String filterFieldQueryBlock = "";
+		
 		
 		/* Do an initial loop over the FilterFields, looking for the field logic value */
+		/*String filterFieldQueryBlock = "";
 		String filterFieldsLogic = "AND";
 		for (final FilterField filterField : this.getFilterFields())
 		{
@@ -558,14 +559,21 @@ public class Filter implements java.io.Serializable
 
 		for (final FilterField filterField : this.getFilterFields())
 		{
-			if (filterFieldQueryBlock.length() != 0)
-				filterFieldQueryBlock += " " + filterFieldsLogic + " ";
+			String thisRestriction = "";
 
 			if (filterField.getField().equals(Constants.TOPIC_IDS_FILTER_VAR))
 			{
-				filterFieldQueryBlock += "topic.topicId in (" + filterField.getValue() + ")";
+				thisRestriction += "topic.topicId in (" + filterField.getValue() + ")";
 			}
-		}
+			
+			if (thisRestriction.length() != 0)
+			{
+				if (filterFieldQueryBlock.length() != 0)
+					filterFieldQueryBlock += " " + filterFieldsLogic + " ";
+					
+				filterFieldQueryBlock += thisRestriction;
+			}
+		}*/
 
 		String query = "";
 
@@ -581,8 +589,8 @@ public class Filter implements java.io.Serializable
 			if (orQueryBlock.length() != 0)
 				query += (query.length() != 0 ? " And " : "") + "(" + orQueryBlock + ")";
 			
-			if (filterFieldQueryBlock.length() != 0)
-				query += (query.length() != 0 ? " And " : "") + "(" + filterFieldQueryBlock + ")";
+			/*if (filterFieldQueryBlock.length() != 0)
+				query += (query.length() != 0 ? " And " : "") + "(" + filterFieldQueryBlock + ")";*/
 			
 			
 			// add the where clause
