@@ -560,7 +560,7 @@ public class DocbookBuilder
 							customInjections.put(comment, new InjectionListData(list, injectionPointType));
 						}
 
-						if (!foundSequenceID && !docbookBuildingOptions.isIgnoreMissingCustomInjections())
+						if (!foundSequenceID && !docbookBuildingOptions.getIgnoreMissingCustomInjections())
 						{
 							/*
 							 * the topic referenced in the custom injection
@@ -677,7 +677,7 @@ public class DocbookBuilder
 					 * don't add generic injection points when building a
 					 * narrative style
 					 */
-					if (!docbookBuildingOptions.isBuildNarrative())
+					if (!docbookBuildingOptions.getBuildNarrative())
 					{
 						/*
 						 * this collection will hold the lists of related topics
@@ -746,7 +746,7 @@ public class DocbookBuilder
 							}
 						}
 
-						if (genericInjectionErrors.length() != 0 && !docbookBuildingOptions.isIgnoreMissingCustomInjections())
+						if (genericInjectionErrors.length() != 0 && !docbookBuildingOptions.getIgnoreMissingCustomInjections())
 						{
 							errorDatabase.addError(topic, "Topic references Topic(s) " + genericInjectionErrors
 									+ ", but these topics were not matched by the filter. This might occur if you are building a narrative and the related topic was not listed in the Topic ID field, or you have not selected the 'Include all related topics' option.");
@@ -968,7 +968,7 @@ public class DocbookBuilder
 		files.put("Book/en-US/StartPage.xml", getStringBytes(startPage == null ? "" : startPage));
 
 		// fix the Publican CFG file
-		if (docbookBuildingOptions.isPublicanShowRemarks() && publicnCfgFixed != null)
+		if (docbookBuildingOptions.getPublicanShowRemarks() && publicnCfgFixed != null)
 			publicnCfgFixed += "\nshow_remarks: 1";
 		files.put("Book/publican.cfg", getStringBytes(publicnCfgFixed));
 
@@ -1004,7 +1004,7 @@ public class DocbookBuilder
 		 */
 		String bookXmlXiIncludes = "";
 
-		if (!docbookBuildingOptions.isSuppressErrorsPage())
+		if (!docbookBuildingOptions.getSuppressErrorsPage())
 		{
 			files.put("Book/en-US/Errors.xml", getStringBytes(compilerOutput == null ? "" : compilerOutput));
 			bookXmlXiIncludes += "	<xi:include href=\"Errors.xml\" xmlns:xi=\"http://www.w3.org/2001/XInclude\" />\n";
@@ -1014,7 +1014,7 @@ public class DocbookBuilder
 		 * only reference the Toc.xml file if we are not building a narrative
 		 * book
 		 */
-		if (!docbookBuildingOptions.isBuildNarrative())
+		if (!docbookBuildingOptions.getBuildNarrative())
 		{
 			bookXmlXiIncludes += "	<xi:include href=\"Toc.xml\" xmlns:xi=\"http://www.w3.org/2001/XInclude\" />";
 			bookXmlXiIncludes += "	<xi:include href=\"StartPage.xml\" xmlns:xi=\"http://www.w3.org/2001/XInclude\" />";
@@ -1196,7 +1196,7 @@ public class DocbookBuilder
 		 * the topic id filter field
 		 */
 		final List<Integer> buildOrder = new ArrayList<Integer>();
-		if (docbookBuildingOptions.isBuildNarrative())
+		if (docbookBuildingOptions.getBuildNarrative())
 		{
 			final FilterField topicIdField = selectFirst(filter.getFilterFields(), having(on(FilterField.class).getField(), equalTo(Constants.TOPIC_IDS_FILTER_VAR)));
 
@@ -1349,7 +1349,7 @@ public class DocbookBuilder
 			final List<Tag> topicTypes = new ArrayList<Tag>();
 			topicTypes.add(entityManager.find(Tag.class, Constants.TASK_TAG_ID));
 			topicTypes.add(entityManager.find(Tag.class, Constants.CONCEPTUALOVERVIEW_TAG_ID));
-			if (!docbookBuildingOptions.isTaskAndOverviewOnly())
+			if (!docbookBuildingOptions.getTaskAndOverviewOnly())
 			{
 				topicTypes.add(entityManager.find(Tag.class, Constants.CONCEPT_TAG_ID));
 				topicTypes.add(entityManager.find(Tag.class, Constants.REFERENCE_TAG_ID));
@@ -1530,7 +1530,7 @@ public class DocbookBuilder
 		String retValue = template;
 
 		// include a link to the error page if it has not been suppressed
-		if (docbookBuildingOptions.isSuppressErrorsPage())
+		if (docbookBuildingOptions.getSuppressErrorsPage())
 			retValue = retValue.replace(TOPIC_ERROR_LINK_MARKER, "");
 		else
 			retValue = retValue.replace(TOPIC_ERROR_LINK_MARKER, "<para>Please review the compiler error for <xref linkend=\"" + DocbookUtils.ERROR_XREF_ID_PREFIX + "#TOPICID#\"/> for more detailed information.</para>");
@@ -1841,7 +1841,7 @@ public class DocbookBuilder
 		}
 
 		// SURVEY LINK
-		if (docbookBuildingOptions.isInsertSurveyLink())
+		if (docbookBuildingOptions.getInsertSurveyLink())
 		{
 			final Element surveyPara = topic.getTempTopicXMLDoc().createElement("para");
 			surveyPara.setAttribute("role", ROLE_CREATE_BUG_PARA);
@@ -2074,7 +2074,7 @@ public class DocbookBuilder
 		 * don't process related topics when creating a narrative, or when
 		 * specifically instructed not to
 		 */
-		if (docbookBuildingOptions.isProcessRelatedTopics() && !docbookBuildingOptions.isBuildNarrative())
+		if (docbookBuildingOptions.getProcessRelatedTopics() && !docbookBuildingOptions.getBuildNarrative())
 		{
 			for (final TopicToTopic topicToTopic : topic.getParentTopicToTopics())
 			{

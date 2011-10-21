@@ -45,7 +45,7 @@ public class TocTopLevel extends TocFolderElement
 
 		/* wrap the whole thing up in a para/div */
 		final String idAttribute = docbookBuildingOptions != null
-				&& docbookBuildingOptions.isEnableDynamicTreeToc() ? AttributeBuilder.NAV_TOC_PARENT_ID : AttributeBuilder.NAV_DISABLED_TOC_PARENT_ID;
+				&& docbookBuildingOptions.getEnableDynamicTreeToc() ? AttributeBuilder.NAV_TOC_PARENT_ID : AttributeBuilder.NAV_DISABLED_TOC_PARENT_ID;
 		
 		this.docbook = DocbookUtils.wrapInPara(this.docbook, AttributeBuilder.NAV_TOC_PARENT_ROLE, idAttribute);
 

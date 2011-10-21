@@ -31,7 +31,7 @@ public class DocbookBuildingOptions
 		this.processRelatedTopics = processRelatedTopics;
 	}
 
-	public Boolean isProcessRelatedTopics()
+	public Boolean getProcessRelatedTopics()
 	{
 		return processRelatedTopics;
 	}
@@ -41,7 +41,7 @@ public class DocbookBuildingOptions
 		this.publicanShowRemarks = publicanShowRemarks;
 	}
 
-	public Boolean isPublicanShowRemarks()
+	public Boolean getPublicanShowRemarks()
 	{
 		return publicanShowRemarks;
 	}
@@ -51,12 +51,12 @@ public class DocbookBuildingOptions
 		this.enableDynamicTreeToc = enableDynamicTreeToc;
 	}
 
-	public Boolean isEnableDynamicTreeToc()
+	public Boolean getEnableDynamicTreeToc()
 	{
 		return enableDynamicTreeToc;
 	}
 
-	public Boolean isBuildNarrative()
+	public Boolean getBuildNarrative()
 	{
 		return buildNarrative;
 	}
@@ -66,7 +66,7 @@ public class DocbookBuildingOptions
 		this.buildNarrative = buildNarrative;
 	}
 
-	public Boolean isIgnoreMissingCustomInjections()
+	public Boolean getIgnoreMissingCustomInjections()
 	{
 		return ignoreMissingCustomInjections;
 	}
@@ -76,7 +76,7 @@ public class DocbookBuildingOptions
 		this.ignoreMissingCustomInjections = ignoreMissingCustomInjections;
 	}
 
-	public Boolean isSuppressErrorsPage()
+	public Boolean getSuppressErrorsPage()
 	{
 		return suppressErrorsPage;
 	}
@@ -86,7 +86,7 @@ public class DocbookBuildingOptions
 		this.suppressErrorsPage = suppressErrorsPage;
 	}
 
-	public Boolean isTaskAndOverviewOnly()
+	public Boolean getTaskAndOverviewOnly()
 	{
 		return taskAndOverviewOnly;
 	}
@@ -96,7 +96,7 @@ public class DocbookBuildingOptions
 		this.taskAndOverviewOnly = taskAndOverviewOnly;
 	}
 
-	public Boolean isInsertSurveyLink()
+	public Boolean getInsertSurveyLink()
 	{
 		return insertSurveyLink;
 	}
@@ -130,28 +130,28 @@ public class DocbookBuildingOptions
 		final String fixedFieldName = fieldName.trim();
 
 		if (fixedFieldName.equalsIgnoreCase(Constants.DOCBOOK_BUILDING_OPTION_BUILD_NARRATIVE))
-			return this.isBuildNarrative() == null ? null : this.isBuildNarrative().toString();
+			return this.getBuildNarrative() == null ? null : this.getBuildNarrative().toString();
 
 		if (fixedFieldName.equalsIgnoreCase(Constants.DOCBOOK_BUILDING_OPTION_ENABLE_DYNAMIC_TOC))
-			return this.isEnableDynamicTreeToc() == null ? null : this.isEnableDynamicTreeToc().toString();
+			return this.getEnableDynamicTreeToc() == null ? null : this.getEnableDynamicTreeToc().toString();
 
 		if (fixedFieldName.equalsIgnoreCase(Constants.DOCBOOK_BUILDING_OPTION_IGNORE_MISSING_CUSTOM_INJECTIONS))
-			return this.isIgnoreMissingCustomInjections() == null ? null : this.isIgnoreMissingCustomInjections().toString();
+			return this.getIgnoreMissingCustomInjections() == null ? null : this.getIgnoreMissingCustomInjections().toString();
 
 		if (fixedFieldName.equalsIgnoreCase(Constants.DOCBOOK_BUILDING_OPTION_INSERT_SURVEY_LINK))
-			return this.isInsertSurveyLink() == null ? null : this.isInsertSurveyLink().toString();
+			return this.getInsertSurveyLink() == null ? null : this.getInsertSurveyLink().toString();
 
 		if (fixedFieldName.equalsIgnoreCase(Constants.DOCBOOK_BUILDING_OPTION_PROCESS_RELATED_TOPICS))
-			return this.isProcessRelatedTopics() == null ? null : this.isProcessRelatedTopics().toString();
+			return this.getProcessRelatedTopics() == null ? null : this.getProcessRelatedTopics().toString();
 
 		if (fixedFieldName.equalsIgnoreCase(Constants.DOCBOOK_BUILDING_OPTION_SHOW_REMARKS))
-			return this.isPublicanShowRemarks() == null ? null : this.isPublicanShowRemarks().toString();
+			return this.getPublicanShowRemarks() == null ? null : this.getPublicanShowRemarks().toString();
 
 		if (fixedFieldName.equalsIgnoreCase(Constants.DOCBOOK_BUILDING_OPTION_SUPPRESS_ERROR_PAGE))
-			return this.isSuppressErrorsPage() == null ? null : this.isSuppressErrorsPage().toString();
+			return this.getSuppressErrorsPage() == null ? null : this.getSuppressErrorsPage().toString();
 
 		if (fixedFieldName.equalsIgnoreCase(Constants.DOCBOOK_BUILDING_OPTION_TASK_AND_OVERVIEW_ONLY))
-			return this.isTaskAndOverviewOnly() == null ? null : this.isTaskAndOverviewOnly().toString();
+			return this.getTaskAndOverviewOnly() == null ? null : this.getTaskAndOverviewOnly().toString();
 
 		return null;
 	}
