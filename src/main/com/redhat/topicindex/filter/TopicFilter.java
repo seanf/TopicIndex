@@ -10,6 +10,8 @@ import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 
 import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.entity.Filter;
+import com.redhat.topicindex.entity.FilterField;
 import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.EntityUtilities;
 
@@ -473,5 +475,26 @@ public class TopicFilter
 
 		return EntityUtilities.getTextSearchTopicMatch(this.topicTextSearch);
 	}
+	
+	public void syncWithFilter(final Filter filter)
+	{
+		for (final FilterField field : filter.getFilterFields())
+			this.setFieldValue(field.getField(), field.getValue());
+	}
+	
+	public void loadFilterFields(final Filter filter)
+	{
+		for (final String fieldName : TopicFilter.getFilterNames().keySet())
+			this.setFieldValue(fieldName, null);
+
+		for (final FilterField filterField : filter.getFilterFields())
+		{
+			final String field = filterField.getField();
+			final String value = filterField.getValue();
+
+			this.setFieldValue(field, value);
+		}
+	}
+
 
 }

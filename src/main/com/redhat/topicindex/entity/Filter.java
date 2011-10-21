@@ -35,6 +35,7 @@ import org.jboss.seam.Component;
 import com.redhat.ecs.commonutils.CollectionUtilities;
 import com.redhat.topicindex.filter.TopicFilter;
 import com.redhat.topicindex.utils.Constants;
+import com.redhat.topicindex.utils.docbookbuilding.DocbookBuildingOptions;
 import com.redhat.topicindex.utils.structures.tags.UICategoryData;
 import com.redhat.topicindex.utils.structures.tags.UIProjectCategoriesData;
 import com.redhat.topicindex.utils.structures.tags.UIProjectData;
@@ -58,6 +59,7 @@ public class Filter implements java.io.Serializable
 	private Set<FilterTag> filterTags = new HashSet<FilterTag>(0);
 	private Set<FilterCategory> filterCategories = new HashSet<FilterCategory>(0);
 	private Set<FilterField> filterFields = new HashSet<FilterField>(0);
+	private Set<FilterOption> filterOptions = new HashSet<FilterOption>(0);
 
 	public Filter()
 	{
@@ -146,6 +148,17 @@ public class Filter implements java.io.Serializable
 	public void setFilterFields(final Set<FilterField> filterFields)
 	{
 		this.filterFields = filterFields;
+	}
+	
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "filter", orphanRemoval = true, cascade = CascadeType.ALL)
+	public Set<FilterOption> getFilterOptions()
+	{
+		return filterOptions;
+	}
+
+	public void setFilterOptions(final Set<FilterOption> filterOptions)
+	{
+		this.filterOptions = filterOptions;
 	}
 
 	/**
@@ -839,6 +852,33 @@ public class Filter implements java.io.Serializable
 		filterCategory.setProject(project);
 		filterCategory.setCategory(category);
 		this.getFilterCategories().add(filterCategory);
+	}
+	
+	public void syncWithDocbookOptions(final DocbookBuildingOptions options)
+	{
+		final List<String> docbookOptions = DocbookBuildingOptions.getOptionNames();
+		for (final String option : docbookOptions)
+		{
+			boolean found = false;
+			for (final FilterOption filterOption : this.filterOptions)
+			{
+				if (filterOption.getFilterOptionName().equals(option))
+				{
+					found = true;
+					filterOption.setFilterOptionValue(options.getFieldValue(option));
+				}	
+			}
+			
+			if (!found)
+			{
+				final FilterOption filterOption = new FilterOption();
+				filterOption.setFilter(this);
+				filterOption.setFilterOptionName(option);
+				filterOption.setFilterOptionValue(options.getFieldValue(option));
+				this.filterOptions.add(filterOption);
+			}
+		}
+		
 	}
 
 }

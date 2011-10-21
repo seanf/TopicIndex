@@ -167,7 +167,7 @@ public class RelatedTopicTagsList extends ExtendedTopicList
 				Constants.CATEORY_EXTERNAL_LOGIC);		
 		
 		// preselect the tags on the web page that relate to the tags selected by the filter
-		EntityUtilities.populateTopicTags(selectedTags, filter, false);
+		selectedTags.populateTopicTags(filter, false);
 		
 		// sync up the filter field values
 		for (final FilterField field : filter.getFilterFields())

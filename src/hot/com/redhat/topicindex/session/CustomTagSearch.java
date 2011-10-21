@@ -160,11 +160,13 @@ public class CustomTagSearch implements DisplayMessageInterface
 
 		// preselect the tags on the web page that relate to the tags selected
 		// by the filter
-		EntityUtilities.populateTopicTags(selectedTags, filter, false);
+		selectedTags.populateTopicTags(filter, false);
 
 		// sync up the filter field values
-		for (final FilterField field : filter.getFilterFields())
-			this.topic.setFieldValue(field.getField(), field.getValue());
+		this.topic.syncWithFilter(filter);
+		
+		// sync up with the filter options values
+		this.docbookBuildingOptions.syncWithFilter(filter);
 
 		getFilterList();
 	}
@@ -288,9 +290,10 @@ public class CustomTagSearch implements DisplayMessageInterface
 
 		this.selectedFilterName = filter.getFilterName();
 
-		loadTagCheckboxes(filter);
-		loadCategoryLogic(filter);
-		loadFilterFields(filter);
+		this.selectedTags.loadTagCheckboxes(filter);
+		this.selectedTags.loadCategoryLogic(filter);
+		this.topic.loadFilterFields(filter);
+		this.docbookBuildingOptions.syncWithFilter(filter);
 	}
 
 	public String loadFilterAndSearch()
@@ -303,82 +306,6 @@ public class CustomTagSearch implements DisplayMessageInterface
 	{
 		this.loadFilter();
 		this.buildDocbook();
-	}
-
-	protected void loadTagCheckboxes(final Filter filter)
-	{
-		// sync the Filter with the gui checkboxes
-		for (final UIProjectCategoriesData project : selectedTags.getProjectCategories())
-		{
-			for (final UICategoryData category : project.getCategories())
-			{
-				for (final UITagData tag : category.getTags())
-				{
-					boolean found = false;
-					for (final FilterTag filterTag : filter.getFilterTags())
-					{
-						if (tag.getId().equals(filterTag.getTag().getTagId()))
-						{
-							tag.setSelected(true);
-							tag.setNotSelected(filterTag.getTagState() == Constants.NOT_MATCH_TAG_STATE);
-							found = true;
-							break;
-						}
-					}
-
-					if (!found)
-					{
-						tag.setSelected(false);
-						tag.setNotSelected(false);
-					}
-				}
-			}
-		}
-	}
-
-	protected void loadCategoryLogic(final Filter filter)
-	{
-		// sync the category logic states
-		for (final UIProjectCategoriesData project : selectedTags.getProjectCategories())
-		{
-			for (final UICategoryData category : project.getCategories())
-			{
-				for (final FilterCategory filterCategory : filter.getFilterCategories())
-				{
-					final Integer categoryId = filterCategory.getCategory().getCategoryId();
-
-					if (categoryId.equals(category.getId()))
-					{
-						final int catgeoryState = filterCategory.getCategoryState();
-
-						if (catgeoryState == Constants.CATEGORY_INTERNAL_AND_STATE)
-							category.setInternalLogic(Constants.AND_LOGIC);
-						if (catgeoryState == Constants.CATEGORY_INTERNAL_OR_STATE)
-							category.setInternalLogic(Constants.OR_LOGIC);
-
-						if (catgeoryState == Constants.CATEGORY_EXTERNAL_AND_STATE)
-							category.setExternalLogic(Constants.AND_LOGIC);
-						if (catgeoryState == Constants.CATEGORY_EXTERNAL_OR_STATE)
-							category.setExternalLogic(Constants.OR_LOGIC);
-					}
-				}
-
-			}
-		}
-	}
-
-	protected void loadFilterFields(final Filter filter)
-	{
-		for (final String fieldName : TopicFilter.getFilterNames().keySet())
-			topic.setFieldValue(fieldName, null);
-
-		for (final FilterField filterField : filter.getFilterFields())
-		{
-			final String field = filterField.getField();
-			final String value = filterField.getValue();
-
-			topic.setFieldValue(field, value);
-		}
 	}
 
 	/**
@@ -429,6 +356,9 @@ public class CustomTagSearch implements DisplayMessageInterface
 
 			// populate the filter with the options that are selected in the ui
 			syncFilterWithUI(filter, true);
+			
+			// populate the filter with the docbook building options
+			filter.syncWithDocbookOptions(this.docbookBuildingOptions);
 
 			// save the changes
 			entityManager.persist(filter);

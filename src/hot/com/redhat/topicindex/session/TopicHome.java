@@ -219,7 +219,7 @@ public class TopicHome extends VersionedEntityHome<Topic>
 	public void populateTags()
 	{
 		selectedTags = new UIProjectData();
-		EntityUtilities.populateTopicTags(this.getInstance(), selectedTags);
+		selectedTags.populateTopicTags(this.getInstance());
 		tagExclusions = EntityUtilities.populateExclusionTags();
 		EntityUtilities.populateMutuallyExclusiveCategories(selectedTags);
 	}

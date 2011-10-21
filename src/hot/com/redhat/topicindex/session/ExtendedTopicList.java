@@ -145,7 +145,7 @@ public class ExtendedTopicList extends TopicList
 
 		// populate the bulk tag database
 		selectedTags = new UIProjectData();
-		EntityUtilities.populateTopicTags(selectedTags);
+		selectedTags.populateTopicTags();
 
 		// if a query is not supplied, work it out from the url
 		if (constructedEJBQL == null)

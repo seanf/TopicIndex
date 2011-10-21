@@ -9,6 +9,15 @@ public class Constants
 	public static final String BUILD = "20111021-0853";
 	
 	public static final String TOPIC_XREF_PREFIX = "TopicID";
+	
+	public static String DOCBOOK_BUILDING_OPTION_PROCESS_RELATED_TOPICS = "Process Related Topics";
+	public static String DOCBOOK_BUILDING_OPTION_SHOW_REMARKS = "Show Remarks";
+	public static String DOCBOOK_BUILDING_OPTION_ENABLE_DYNAMIC_TOC = "Show Remarks";
+	public static String DOCBOOK_BUILDING_OPTION_BUILD_NARRATIVE = "Build Narrative";
+	public static String DOCBOOK_BUILDING_OPTION_IGNORE_MISSING_CUSTOM_INJECTIONS = "Ignore Missing Injections";
+	public static String DOCBOOK_BUILDING_OPTION_SUPPRESS_ERROR_PAGE = "Suppress Error Page";
+	public static String DOCBOOK_BUILDING_OPTION_TASK_AND_OVERVIEW_ONLY = "Task And Overview Only";
+	public static String DOCBOOK_BUILDING_OPTION_INSERT_SURVEY_LINK = "Insert Survey Link";
 
 	/** The format of the date to be displayed by any date widget */
 	public static final String FILTER_DISPLAY_DATE_FORMAT = "dd MMM yyyy HH:mm";
