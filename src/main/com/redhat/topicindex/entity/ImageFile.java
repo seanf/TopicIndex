@@ -161,14 +161,23 @@ public class ImageFile implements java.io.Serializable
 	{
 		try
 		{
-			final BufferedImage outImage = new BufferedImage(THUMBNAIL_SIZE, THUMBNAIL_SIZE, BufferedImage.TYPE_INT_RGB);
-			final Graphics2D g2d = outImage.createGraphics();
-
+			BufferedImage outImage = null;
+			
 			if (this.getMimeType().equals(SVG_MIME_TYPE))
 			{
-				final SVGIcon svgIcon = new SVGIcon(new ByteArrayInputStream(this.imageData), THUMBNAIL_SIZE, THUMBNAIL_SIZE);
+				SVGIcon svgIcon = null;
+				if (resize)
+					svgIcon = new SVGIcon(new ByteArrayInputStream(this.imageData), THUMBNAIL_SIZE, THUMBNAIL_SIZE);
+				else
+					svgIcon = new SVGIcon(new ByteArrayInputStream(this.imageData));
+				
+				
+				outImage = new BufferedImage(svgIcon.getIconWidth(), svgIcon.getIconHeight(), BufferedImage.TYPE_INT_RGB);
+				final Graphics2D g2d = outImage.createGraphics();
+				
 				svgIcon.setBackgroundColour(Color.WHITE);
 				svgIcon.paintIcon(null, g2d, 0, 0);
+				g2d.dispose();
 			}
 			else
 			{
@@ -186,6 +195,11 @@ public class ImageFile implements java.io.Serializable
 					final double widthScale = (double) THUMBNAIL_SIZE / (double) inImage.getWidth(null);
 					scale = Math.min(heightScale, widthScale);
 				}
+				
+				final int newWidth = (int) (imageIcon.getIconWidth() * scale);
+				final int newHeight = (int) (imageIcon.getIconHeight() * scale);
+				outImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
+				final Graphics2D g2d = outImage.createGraphics();
 
 				final AffineTransform tx = new AffineTransform();
 
@@ -193,10 +207,9 @@ public class ImageFile implements java.io.Serializable
 					tx.scale(scale, scale);
 
 				g2d.drawImage(inImage, tx, null);
+				g2d.dispose();
 			}
 			
-			g2d.dispose();
-
 			final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			ImageIO.write(outImage, "JPG", baos);
 			final byte[] bytesOut = baos.toByteArray();

@@ -79,6 +79,11 @@ public class SVGIcon extends UserAgentAdapter implements Icon
 	{
 		this(doc, 0, 0);
 	}
+	
+	public SVGIcon(final InputStream steam) throws TranscoderException
+	{
+		generateBufferedImage(new TranscoderInput(steam), 0, 0);
+	}
 
 	/**
 	 * Create a new SVGIcon object.
