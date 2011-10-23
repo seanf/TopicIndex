@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 import javax.imageio.ImageIO;
@@ -23,14 +24,23 @@ import org.apache.commons.codec.binary.Base64;
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
+import org.w3c.dom.Document;
 
 import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.ecs.commonutils.XMLUtilities;
+import com.redhat.topicindex.utils.SVGIcon;
 
 @Entity
 @Audited
 @Table(name = "ImageFile", catalog = "Skynet")
-public class ImageFile implements java.io.Serializable 
+public class ImageFile implements java.io.Serializable
 {
+	private static String SVG_MIME_TYPE = "image/svg+xml";
+	private static String JPG_MIME_TYPE = "image/jpeg";
+	private static String GIF_MIME_TYPE = "image/gif";
+	private static String PNG_MIME_TYPE = "image/png";
+
+	/** The dimensions of the generated thumbnail */
 	private static final int THUMBNAIL_SIZE = 64;
 	private static final long serialVersionUID = -3885332582642450795L;
 	private Integer imageFileId;
@@ -40,14 +50,11 @@ public class ImageFile implements java.io.Serializable
 	private byte[] imageDataBase64;
 	private String description;
 
-	public ImageFile() 
+	public ImageFile()
 	{
 	}
 
-	public ImageFile(
-			final Integer imageFileId, 
-			final String originalFileName, 
-			final byte[] imageData) 
+	public ImageFile(final Integer imageFileId, final String originalFileName, final byte[] imageData)
 	{
 		this.imageFileId = imageFileId;
 		this.originalFileName = originalFileName;
@@ -57,12 +64,12 @@ public class ImageFile implements java.io.Serializable
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
 	@Column(name = "ImageFileID", unique = true, nullable = false)
-	public Integer getImageFileId() 
+	public Integer getImageFileId()
 	{
 		return this.imageFileId;
 	}
 
-	public void setImageFileId(final Integer imageFileId) 
+	public void setImageFileId(final Integer imageFileId)
 	{
 		this.imageFileId = imageFileId;
 	}
@@ -70,28 +77,28 @@ public class ImageFile implements java.io.Serializable
 	@Column(name = "OriginalFileName", nullable = false, length = 512)
 	@NotNull
 	@Length(max = 512)
-	public String getOriginalFileName() 
+	public String getOriginalFileName()
 	{
 		return this.originalFileName;
 	}
 
-	public void setOriginalFileName(final String originalFileName) 
+	public void setOriginalFileName(final String originalFileName)
 	{
 		this.originalFileName = originalFileName;
 	}
-	
+
 	@Column(name = "ImageDataBase64", nullable = false)
 	@NotNull
-	public byte[] getImageDataBase64() 
+	public byte[] getImageDataBase64()
 	{
 		return this.imageDataBase64;
 	}
 
-	public void setImageDataBase64(final byte[] imageDataBase64) 
+	public void setImageDataBase64(final byte[] imageDataBase64)
 	{
 		this.imageDataBase64 = imageDataBase64;
 	}
-	
+
 	@Transient
 	public String getImageDataBase64String()
 	{
@@ -100,34 +107,34 @@ public class ImageFile implements java.io.Serializable
 
 	@Column(name = "ImageData", nullable = false)
 	@NotNull
-	public byte[] getImageData() 
+	public byte[] getImageData()
 	{
 		return this.imageData;
 	}
 
-	public void setImageData(final byte[] imageData) 
+	public void setImageData(final byte[] imageData)
 	{
 		this.imageData = imageData;
 	}
-	
+
 	@Column(name = "ThumbnailData", nullable = false)
 	@NotNull
-	public byte[] getThumbnailData() 
+	public byte[] getThumbnailData()
 	{
 		return this.thumbnail;
 	}
 
-	public void setThumbnailData(final byte[] thumbnail) 
+	public void setThumbnailData(final byte[] thumbnail)
 	{
 		this.thumbnail = thumbnail;
 	}
-	
+
 	@Transient
 	public String getThumbnailDataString()
 	{
 		return this.thumbnail == null ? "" : new String(this.thumbnail);
 	}
-	
+
 	@PrePersist
 	@PreUpdate
 	private void updateImageData()
@@ -135,97 +142,107 @@ public class ImageFile implements java.io.Serializable
 		this.thumbnail = createImage(true);
 		this.imageDataBase64 = createImage(false);
 	}
-	
-	//@Column(name = "Description", length = 65535)
-	@Column(name = "Description", columnDefinition="TEXT")
+
+	// @Column(name = "Description", length = 65535)
+	@Column(name = "Description", columnDefinition = "TEXT")
 	@Length(max = 65535)
-	public String getDescription() 
+	public String getDescription()
 	{
 		return this.description;
 	}
-	
+
 	public void setDescription(final String description)
 	{
 		this.description = description;
 	}
-	
-	private byte[] createImage(final boolean resize) 
+
+	private byte[] createImage(final boolean resize)
 	{
-	    try 
-	    {
-	        final ImageIcon imageIcon = new ImageIcon(this.imageData);
-	        final Image inImage = imageIcon.getImage();
-	        
-	        double scale = 1.0d;
-	        if (resize)
-	        {
-		        // the final image will be at most THUMBNAIL_SIZE pixels high and/or wide
-		        final double heightScale = (double) THUMBNAIL_SIZE / (double) inImage.getHeight(null);
-		        final double widthScale = (double) THUMBNAIL_SIZE / (double) inImage.getWidth(null);	        
-		        scale = Math.min(heightScale, widthScale);		       
-	        }
-	        
-	        final int scaledW = (int) (scale * inImage.getWidth(null));
-	        final int scaledH = (int) (scale * inImage.getHeight(null));
-	        
-	        final AffineTransform tx = new AffineTransform();
-	        final BufferedImage outImage = new BufferedImage(scaledW, scaledH, BufferedImage.TYPE_INT_RGB);
+		try
+		{
+			final BufferedImage outImage = new BufferedImage(THUMBNAIL_SIZE, THUMBNAIL_SIZE, BufferedImage.TYPE_INT_RGB);
+			final Graphics2D g2d = outImage.createGraphics();
 
-	        if (scale < 1.0d)
-	            tx.scale(scale, scale);
+			if (this.getMimeType().equals(SVG_MIME_TYPE))
+			{
+				final SVGIcon svgIcon = new SVGIcon(new ByteArrayInputStream(this.imageData), THUMBNAIL_SIZE, THUMBNAIL_SIZE);
+				svgIcon.paintIcon(null, g2d, 0, 0);
+			}
+			else
+			{
+				final ImageIcon imageIcon = new ImageIcon(this.imageData);
+				final Image inImage = imageIcon.getImage();
 
-	        final Graphics2D g2d = outImage.createGraphics();
-	        g2d.drawImage(inImage, tx, null);
-	        g2d.dispose();  
+				double scale = 1.0d;
+				if (resize)
+				{
+					/*
+					 * the final image will be at most THUMBNAIL_SIZE pixels
+					 * high and/or wide
+					 */
+					final double heightScale = (double) THUMBNAIL_SIZE / (double) inImage.getHeight(null);
+					final double widthScale = (double) THUMBNAIL_SIZE / (double) inImage.getWidth(null);
+					scale = Math.min(heightScale, widthScale);
+				}
 
-	        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	        ImageIO.write(outImage, "JPG", baos);
-	        final byte[] bytesOut = baos.toByteArray();
-	        
-	        return Base64.encodeBase64(bytesOut);
-	    } 
-	    catch (final Exception ex) 
-	    {
-	    	ExceptionUtilities.handleException(ex);
-	    }
-	    
-	    return null;
+				final AffineTransform tx = new AffineTransform();
+
+				if (scale < 1.0d)
+					tx.scale(scale, scale);
+
+				g2d.drawImage(inImage, tx, null);
+			}
+			
+			g2d.dispose();
+
+			final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ImageIO.write(outImage, "JPG", baos);
+			final byte[] bytesOut = baos.toByteArray();
+
+			return Base64.encodeBase64(bytesOut);
+
+		}
+		catch (final Exception ex)
+		{
+			ExceptionUtilities.handleException(ex);
+		}
+
+		return null;
 	}
 
 	@Transient
-	public String getDocbookFileName() 
+	public String getDocbookFileName()
 	{
 		if (this.originalFileName != null && this.imageFileId != null)
 		{
 			final int extensionIndex = this.originalFileName.lastIndexOf(".");
 			if (extensionIndex != -1)
-				return this.imageFileId +  this.originalFileName.substring(extensionIndex);
+				return this.imageFileId + this.originalFileName.substring(extensionIndex);
 		}
-		
+
 		return "";
 	}
-	
+
 	@Transient
-	public String getMimeType() 
+	public String getMimeType()
 	{
 		final int lastPeriodIndex = this.originalFileName.lastIndexOf(".");
 		if (lastPeriodIndex != -1 && lastPeriodIndex < this.originalFileName.length() - 1)
 		{
 			final String extension = this.originalFileName.substring(lastPeriodIndex + 1);
 			if (extension.equalsIgnoreCase("JPG"))
-				return "image/jpeg";
+				return JPG_MIME_TYPE;
 			if (extension.equalsIgnoreCase("GIF"))
-				return "image/gif";
+				return GIF_MIME_TYPE;
 			if (extension.equalsIgnoreCase("PNG"))
-				return "image/png";
+				return PNG_MIME_TYPE;
 			if (extension.equalsIgnoreCase("SVG"))
-				return "image/svg+xml";
+				return SVG_MIME_TYPE;
 		}
-			
-			
+
 		return "application/octet-stream";
 	}
-	
+
 	@Transient
 	public String getImageDataString()
 	{
