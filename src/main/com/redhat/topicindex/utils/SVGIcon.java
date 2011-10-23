@@ -1,5 +1,6 @@
 package com.redhat.topicindex.utils;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -28,17 +29,19 @@ public class SVGIcon extends UserAgentAdapter implements Icon
 	/**
 	 * The BufferedImage generated from the SVG document.
 	 */
-	protected BufferedImage bufferedImage;
+	private BufferedImage bufferedImage;
 
 	/**
 	 * The width of the rendered image.
 	 */
-	protected int width;
+	private int width;
 
 	/**
 	 * The height of the rendered image.
 	 */
-	protected int height;
+	private int height;
+	
+	private Color backgroundColour;
 
 	/**
 	 * Create a new SVGIcon object.
@@ -203,7 +206,10 @@ public class SVGIcon extends UserAgentAdapter implements Icon
 	 */
 	public void paintIcon(Component c, Graphics g, int x, int y)
 	{
-		g.drawImage(bufferedImage, x, y, null);
+		if (backgroundColour == null)
+			g.drawImage(bufferedImage, x, y, null);
+		else
+			g.drawImage(bufferedImage, x, y, backgroundColour, null);
 	}
 
 	// UserAgent /////////////////////////////////////////////////////////////
@@ -214,5 +220,15 @@ public class SVGIcon extends UserAgentAdapter implements Icon
 	public Dimension2D getViewportSize()
 	{
 		return new Dimension(width, height);
+	}
+
+	public Color getBackgroundColour()
+	{
+		return backgroundColour;
+	}
+
+	public void setBackgroundColour(Color backgroundColour)
+	{
+		this.backgroundColour = backgroundColour;
 	}
 }

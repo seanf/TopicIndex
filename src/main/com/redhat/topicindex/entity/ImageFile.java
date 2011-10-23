@@ -2,6 +2,7 @@ package com.redhat.topicindex.entity;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.AffineTransform;
@@ -166,6 +167,7 @@ public class ImageFile implements java.io.Serializable
 			if (this.getMimeType().equals(SVG_MIME_TYPE))
 			{
 				final SVGIcon svgIcon = new SVGIcon(new ByteArrayInputStream(this.imageData), THUMBNAIL_SIZE, THUMBNAIL_SIZE);
+				svgIcon.setBackgroundColour(Color.WHITE);
 				svgIcon.paintIcon(null, g2d, 0, 0);
 			}
 			else
