@@ -983,7 +983,17 @@ public class DocbookBuilder
 
 		// add the files that are used to package up the RPM file
 		files.put("Book/package.sh", getStringBytes(LineEndFormatter.convertToLinuxLineEndings(package_sh)));
-		files.put("Book/packager/en-US/Makefile", getStringBytes(makefile));
+		
+		// the make file is built up from options supplied from the user
+		String makefileFixed = makefile;
+		makefileFixed = "RELEASE = " + docbookBuildingOptions.getMakefileReleaseOption() + "\n" + makefileFixed;
+		makefileFixed = "VERSION = " + docbookBuildingOptions.getMakefileVersionOption() + "\n" + makefileFixed;
+		makefileFixed = "BOOKS = " + docbookBuildingOptions.getMakefileBooksOption() + "\n" + makefileFixed;
+		makefileFixed = "LANG = " + docbookBuildingOptions.getMakefileLangOption() + "\n" + makefileFixed;
+		makefileFixed = "PROD_VERSION = " + docbookBuildingOptions.getMakefileProdVersionOption() + "\n" + makefileFixed;
+		makefileFixed = "PRODUCT = " + docbookBuildingOptions.getMakefileProductOption() + "\n" + makefileFixed;
+		files.put("Book/packager/en-US/Makefile", getStringBytes(makefileFixed));
+		
 		files.put("Book/packager/en-US/spec.in", getStringBytes(spec_in));
 
 		// replace the date marker in the Book.XML file

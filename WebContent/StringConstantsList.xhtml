@@ -15,12 +15,12 @@
         <rich:simpleTogglePanel label="StringConstants Search Filter" switchType="ajax">
 
             <s:decorate template="layout/display.xhtml">
-                <ui:define name="label">Constant name</ui:define>
+                <ui:define name="label">Constant Name</ui:define>
                 <h:inputText id="constantName" value="#{stringConstantsList.stringConstants.constantName}"/>
             </s:decorate>
 
             <s:decorate template="layout/display.xhtml">
-                <ui:define name="label">Constant value</ui:define>
+                <ui:define name="label">Constant Value</ui:define>
                 <h:inputText id="constantValue" value="#{stringConstantsList.stringConstants.constantValue}"/>
             </s:decorate>
 
@@ -93,17 +93,7 @@
                     <ui:param name="propertyPath" value="stringConstants.constantName"/>
                 </ui:include>
             </f:facet>
-            <h:outputText value="#{_stringConstants.constantName}"/>
-        </rich:column>
-        <rich:column styleClass="longText">
-            <f:facet name="header">
-                <ui:include src="layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{stringConstantsList}"/>
-                    <ui:param name="propertyLabel" value="Constant value"/>
-                    <ui:param name="propertyPath" value="stringConstants.constantValue"/>
-                </ui:include>
-            </f:facet>
-            <h:outputText value="#{_stringConstants.constantValue}"/>
+            <h:outputText value="#{_stringConstants.constantName}" title="#{stringConstantsList}"/>
         </rich:column>
         
     </rich:dataTable>
