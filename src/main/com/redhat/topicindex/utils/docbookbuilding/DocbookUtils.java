@@ -389,7 +389,7 @@ public class DocbookUtils
 			parent.appendChild(insert);
 	}
 	
-	public static Node createRelatedTopicLink(final Document xmlDoc, final String xref, final Node parent)
+	public static Node createRelatedTopicXRef(final Document xmlDoc, final String xref, final Node parent)
 	{
 		final Element listItem = xmlDoc.createElement("listitem");
 		if (parent != null)
@@ -405,9 +405,9 @@ public class DocbookUtils
 		return listItem;
 	}
 	
-	public static Node createRelatedTopicLink(final Document xmlDoc, final String xref)
+	public static Node createRelatedTopicXRef(final Document xmlDoc, final String xref)
 	{
-		return createRelatedTopicLink(xmlDoc, xref, null);
+		return createRelatedTopicXRef(xmlDoc, xref, null);
 	}
 	
 	public static Node createRelatedTopicULink(final Document xmlDoc, final String url, final String title, final Node parent)

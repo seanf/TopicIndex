@@ -732,6 +732,16 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		validateTags();
 		validateRelationships();
 		renderXML();
+
+		/*
+		 * Because of the ability to inject topic contents into other topics, we
+		 * need rerender all topics that have an incoming relationship.
+		 */
+		for (final Topic relatedTopic : this.getIncomingRelatedTopicsArray())
+			relatedTopic.renderXML();
+
+		for (final Topic relatedTopic : this.getTwoWayRelatedTopicsArray())
+			relatedTopic.renderXML();
 	}
 
 	private void renderXML()
@@ -754,12 +764,12 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 				topicTypeTagDetails.add(Pair.newPair(Constants.CONCEPTUALOVERVIEW_TAG_ID, Constants.CONCEPTUALOVERVIEW_TAG_NAME));
 
 				final ArrayList<Integer> customInjectionIds = new ArrayList<Integer>();
-				XMLPreProcessor.processInternalInjections(this, customInjectionIds, doc);
-				XMLPreProcessor.processInternalGenericInjections(this, doc, customInjectionIds, topicTypeTagDetails);
+				XMLPreProcessor.processInjections(true, this, customInjectionIds, doc, null);
+				XMLPreProcessor.processGenericInjections(true, this, doc, customInjectionIds, topicTypeTagDetails);
 				XMLPreProcessor.processInternalImageFiles(doc);
-				
-				XMLPreProcessor.processTopicContentFragments(this, doc);
-				XMLPreProcessor.processTopicTitleFragments(this, doc);
+
+				XMLPreProcessor.processTopicContentFragments(this, doc, null);
+				XMLPreProcessor.processTopicTitleFragments(this, doc, null);
 
 				/* render the topic html */
 				final String processedXML = XMLUtilities.convertDocumentToString(doc, XML_ENCODING);
@@ -1180,7 +1190,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 			entityManager.flush();
 		}
 	}
-	
+
 	@Transient
 	public Topic getRelatedTopicByID(final Integer id)
 	{

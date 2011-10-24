@@ -136,7 +136,7 @@ public class XMLPreProcessor
 	"(?<" + TOPICIDS_RE_NAMED_GROUP + ">(" + TOPIC_ID_RE + "))" +
 	/* xml comment end */
 	"\\s*";
-	
+
 	/** A regular expression that matches an Inject Content Fragment */
 	private static final String INJECT_TITLE_FRAGMENT_RE =
 	/* start xml comment and 'Inject:' surrounded by optional white space */
@@ -188,7 +188,7 @@ public class XMLPreProcessor
 		return retValue;
 	}
 
-	public static void processInternalInjections(final Topic topic, final ArrayList<Integer> customInjectionIds, final Document xmlDocument)
+	public static String processInjections(final boolean internal, final Topic topic, final ArrayList<Integer> customInjectionIds, final Document xmlDocument, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		/*
 		 * this collection keeps a track of the injection point markers and the
@@ -196,11 +196,25 @@ public class XMLPreProcessor
 		 */
 		final HashMap<Node, InjectionListData> customInjections = new HashMap<Node, InjectionListData>();
 
-		processInternalInjections(topic, customInjectionIds, customInjections, ORDEREDLIST_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_SEQUENCE_RE, null);
-		processInternalInjections(topic, customInjectionIds, customInjections, XREF_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_SINGLE_RE, null);
-		processInternalInjections(topic, customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_LIST_RE, null);
-		processInternalInjections(topic, customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, xmlDocument, CUSTOM_ALPHA_SORT_INJECTION_LIST_RE, new TopicTitleSorter());
-		processInternalInjections(topic, customInjectionIds, customInjections, LIST_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_LISTITEMS_RE, null);
+		final List<Integer> errorTopics = new ArrayList<Integer>();
+
+		errorTopics.addAll(processInjections(internal, topic, customInjectionIds, customInjections, ORDEREDLIST_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_SEQUENCE_RE, null, docbookBuildingOptions));
+		errorTopics.addAll(processInjections(internal, topic, customInjectionIds, customInjections, XREF_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_SINGLE_RE, null, docbookBuildingOptions));
+		errorTopics.addAll(processInjections(internal, topic, customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_LIST_RE, null, docbookBuildingOptions));
+		errorTopics.addAll(processInjections(internal, topic, customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, xmlDocument, CUSTOM_ALPHA_SORT_INJECTION_LIST_RE, new TopicTitleSorter(), docbookBuildingOptions));
+		errorTopics.addAll(processInjections(internal, topic, customInjectionIds, customInjections, LIST_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_LISTITEMS_RE, null, docbookBuildingOptions));
+		
+		if (errorTopics.size() != 0)
+		{
+			String errorList = "";
+			for (final Integer topicId : errorTopics)
+			{
+				if (errorList.length() != 0)
+					errorList += ", ";
+				errorList += topicId.toString();				
+			}
+			return errorList;
+		}
 
 		/* now make the custom injection point substitutions */
 		for (final Node customInjectionCommentNode : customInjections.keySet())
@@ -241,13 +255,17 @@ public class XMLPreProcessor
 				customInjectionCommentNode.getParentNode().removeChild(customInjectionCommentNode);
 			}
 		}
+		
+		return "";
 	}
 
-	public static void processInternalInjections(final Topic topic, final ArrayList<Integer> customInjectionIds, final HashMap<Node, InjectionListData> customInjections, final int injectionPointType, final Document xmlDocument, final String regularExpression,
-			final ExternalListSort<Integer, Topic, InjectionTopicData> sortComparator)
+	public static List<Integer> processInjections(final boolean internal, final Topic topic, final ArrayList<Integer> customInjectionIds, final HashMap<Node, InjectionListData> customInjections, final int injectionPointType, final Document xmlDocument, final String regularExpression,
+			final ExternalListSort<Integer, Topic, InjectionTopicData> sortComparator, final DocbookBuildingOptions docbookBuildingOptions)
 	{
+		final List<Integer> retValue = new ArrayList<Integer>();
+
 		if (xmlDocument == null)
-			return;
+			return retValue;
 
 		/* loop over all of the comments in the document */
 		for (final Node comment : XMLUtilities.getComments(xmlDocument))
@@ -334,11 +352,17 @@ public class XMLPreProcessor
 							final String url = getURLToInternalTopic(relatedTopic.getTopicId());
 							if (sequenceID.optional)
 							{
-								list.add(DocbookUtils.buildEmphasisPrefixedULink(xmlDocument, OPTIONAL_LIST_PREFIX, url, relatedTopic.getTopicTitle()));
+								if (internal)
+									list.add(DocbookUtils.buildEmphasisPrefixedULink(xmlDocument, OPTIONAL_LIST_PREFIX, url, relatedTopic.getTopicTitle()));
+								else
+									list.add(DocbookUtils.buildEmphasisPrefixedXRef(xmlDocument, OPTIONAL_LIST_PREFIX, relatedTopic.getXRefID()));
 							}
 							else
 							{
-								list.add(DocbookUtils.buildULink(xmlDocument, url, relatedTopic.getTopicTitle()));
+								if (internal)
+									list.add(DocbookUtils.buildULink(xmlDocument, url, relatedTopic.getTopicTitle()));
+								else
+									list.add(DocbookUtils.buildXRef(xmlDocument, relatedTopic.getXRefID()));
 							}
 
 							/*
@@ -347,14 +371,24 @@ public class XMLPreProcessor
 							 */
 							customInjections.put(comment, new InjectionListData(list, injectionPointType));
 						}
+						else if (docbookBuildingOptions != null && !docbookBuildingOptions.getIgnoreMissingCustomInjections())
+						{
+							retValue.add(sequenceID.topicId);
+						}
 					}
 				}
 			}
 		}
+
+		return retValue;
 	}
 
-	public static void processInternalGenericInjections(final Topic topic, final Document doc, final ArrayList<Integer> customInjectionIds, final List<Pair<Integer, String>> topicTypeTagIDs)
+	public static void processGenericInjections(final boolean internal, final Topic topic, final Document xmlDocument, final ArrayList<Integer> customInjectionIds, final List<Pair<Integer, String>> topicTypeTagIDs)
 	{
+
+		if (xmlDocument == null)
+			return;
+
 		/*
 		 * this collection will hold the lists of related topics
 		 */
@@ -388,7 +422,7 @@ public class XMLPreProcessor
 
 		}
 
-		insertGenericInjectionLinks(doc, relatedLists);
+		insertGenericInjectionLinks(internal, xmlDocument, relatedLists);
 	}
 
 	/**
@@ -397,7 +431,7 @@ public class XMLPreProcessor
 	 * and the topic type tags that are associated with them and injects them
 	 * into the xml document.
 	 */
-	private static void insertGenericInjectionLinks(final Document xmlDoc, final GenericInjectionPointDatabase relatedLists)
+	private static void insertGenericInjectionLinks(final boolean internal, final Document xmlDoc, final GenericInjectionPointDatabase relatedLists)
 	{
 		/* all related topics are placed before the first simplesect */
 		final NodeList nodes = xmlDoc.getDocumentElement().getChildNodes();
@@ -428,7 +462,12 @@ public class XMLPreProcessor
 					Collections.sort(relatedTopics, new TopicTitleComparator());
 
 					for (final Topic relatedTopic : relatedTopics)
-						DocbookUtils.createRelatedTopicULink(xmlDoc, getURLToInternalTopic(relatedTopic.getTopicId()), relatedTopic.getTopicTitle(), itemizedlist);
+					{
+						if (internal)
+							DocbookUtils.createRelatedTopicULink(xmlDoc, getURLToInternalTopic(relatedTopic.getTopicId()), relatedTopic.getTopicTitle(), itemizedlist);
+						else
+							DocbookUtils.createRelatedTopicXRef(xmlDoc, relatedTopic.getXRefID(), itemizedlist);
+					}
 
 					if (simplesectNode != null)
 						xmlDoc.getDocumentElement().insertBefore(itemizedlist, simplesectNode);
@@ -473,10 +512,12 @@ public class XMLPreProcessor
 		}
 	}
 
-	public static void processTopicContentFragments(final Topic topic, final Document xmlDocument)
+	public static String processTopicContentFragments(final Topic topic, final Document xmlDocument, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		if (xmlDocument == null)
-			return;
+			return "";
+
+		String injectionErrors = "";
 
 		final Map<Node, ArrayList<Node>> replacements = new HashMap<Node, ArrayList<Node>>();
 
@@ -553,6 +594,10 @@ public class XMLPreProcessor
 								}
 							}
 						}
+						else if (docbookBuildingOptions != null && !docbookBuildingOptions.getIgnoreMissingCustomInjections())
+						{
+							injectionErrors += reMatch + ", ";
+						}
 					}
 					catch (final Exception ex)
 					{
@@ -561,6 +606,9 @@ public class XMLPreProcessor
 				}
 			}
 		}
+
+		if (injectionErrors.length() != 0)
+			return injectionErrors;
 
 		/*
 		 * The replacements map now has a keyset of the comments mapped to a
@@ -574,6 +622,8 @@ public class XMLPreProcessor
 				comment.getParentNode().insertBefore(replacementNode, comment);
 			comment.getParentNode().removeChild(comment);
 		}
+
+		return "";
 	}
 
 	private static void removeNoInjectElements(final Node parent)
@@ -615,10 +665,12 @@ public class XMLPreProcessor
 		}
 	}
 
-	public static void processTopicTitleFragments(final Topic topic, final Document xmlDocument)
+	public static String processTopicTitleFragments(final Topic topic, final Document xmlDocument, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		if (xmlDocument == null)
-			return;
+			return "";
+
+		String injectionErrors = "";
 
 		final Map<Node, Node> replacements = new HashMap<Node, Node>();
 
@@ -662,6 +714,10 @@ public class XMLPreProcessor
 							titleNode.setTextContent(relatedTopic.getTopicTitle());
 							replacements.put(comment, titleNode);
 						}
+						else if (docbookBuildingOptions != null && !docbookBuildingOptions.getIgnoreMissingCustomInjections())
+						{
+							injectionErrors += reMatch + ", ";
+						}
 					}
 					catch (final Exception ex)
 					{
@@ -671,6 +727,9 @@ public class XMLPreProcessor
 			}
 		}
 
+		if (injectionErrors.length() != 0)
+			return injectionErrors;
+
 		/* swap the comment nodes with the new title nodes */
 		for (final Node comment : replacements.keySet())
 		{
@@ -678,5 +737,7 @@ public class XMLPreProcessor
 			comment.getParentNode().insertBefore(title, comment);
 			comment.getParentNode().removeChild(comment);
 		}
+
+		return "";
 	}
 }

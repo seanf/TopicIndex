@@ -33,6 +33,7 @@ import ch.lambdaj.function.matcher.LambdaJMatcher;
 
 import com.google.code.regexp.NamedMatcher;
 import com.google.code.regexp.NamedPattern;
+import com.redhat.ecs.commonstructures.Pair;
 import com.redhat.ecs.commonutils.CollectionUtilities;
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.ecs.commonutils.HTTPUtilities;
@@ -95,8 +96,6 @@ public class DocbookBuilder
 	private static final Integer ERROR_TOPIC_ID = 7;
 	/** The StringConstantsID that represents the error topic xml template */
 	private static final Integer ERRORTAGS_TOPIC_ID = 8;
-	/** The StringConstantsID that represents the error topic xml template */
-	private static final Integer MISSING_TOPIC_ID = 9;
 	/** The StringConstantsID that represents the Makefile file */
 	private static final Integer MAKEFILE_ID = 16;
 	/** The StringConstantsID that represents the spec.in file */
@@ -125,14 +124,6 @@ public class DocbookBuilder
 	private static final Integer PLUGIN_XML_ID = 25;
 	private static final Integer ECLIPSE_PACKAGE_SH_ID = 26;
 	private static final Integer PUBLICAN_ECLIPSE_CFG_ID = 27;
-	private static final Integer NARRATIVE_PUBLICAN_CFG_ID = 28;
-	private static final Integer LANDING_PAGE_TEMPLATE_XML_ID = 29;
-
-	/**
-	 * The IntegerConstantsID that represents a tag that hides a topic from the
-	 * navigation pages
-	 */
-	private static final Integer INVISIBLE_TAG_ID = 1;
 
 	/**
 	 * The contents of the Revision_History.xml template, as pulled from the
@@ -189,7 +180,6 @@ public class DocbookBuilder
 	private String treeviewMinJs;
 	private String treeviewCss;
 	private String jqueryMinJs;
-	private String landingPageTemplateXml;
 	private byte[] treeviewSpriteGif;
 	private byte[] treeviewLoadingGif;
 	private byte[] check1Gif;
@@ -199,8 +189,6 @@ public class DocbookBuilder
 	private String pluginXml;
 	private String eclisePackageSh;
 	private String publicanEclipseCfg;
-
-	private Integer invisibleTagID;
 
 	/** A marker to replace with the date in a string */
 	private static final String DATE_YYMMDD_TEXT_MARKER = "#YYMMDD#";
@@ -243,117 +231,6 @@ public class DocbookBuilder
 	 * specific data
 	 */
 	private static final String TOPIC_TEXT_MARKER = "#TOPICTEXT#";
-	/**
-	 * Identifies the beginning of the string that references an image in
-	 * docbook
-	 */
-	private static final String IMAGE_START = "<imagedata fileref=\"";
-	/** Identifies the end of the string that references an image in docbook */
-	private static final String IMAGE_END = "\"";
-
-	/*
-	 * These constants define the docbook tags that are used to wrap up xrefs in
-	 * custom injection points
-	 */
-
-	/**
-	 * Used to identify that an <orderedlist> should be generated for the
-	 * injection point
-	 */
-	private static final int ORDEREDLIST_INJECTION_POINT = 1;
-	/**
-	 * Used to identify that an <itemizedlist> should be generated for the
-	 * injection point
-	 */
-	private static final int ITEMIZEDLIST_INJECTION_POINT = 2;
-	/**
-	 * Used to identify that an <xref> should be generated for the injection
-	 * point
-	 */
-	private static final int XREF_INJECTION_POINT = 3;
-	/**
-	 * Used to identify that an <xref> should be generated for the injection
-	 * point
-	 */
-	private static final int LIST_INJECTION_POINT = 4;
-
-	/*
-	 * These regular expressions define the format of the custom injection
-	 * points
-	 */
-
-	/** Identifies a named regular expression group */
-	private static final String TOPICIDS_RE_NAMED_GROUP = "TopicIDs";
-	/** This text identifies an option task in a list */
-	private static final String OPTIONAL_MARKER = "OPT:";
-	/** The text to be prefixed to a list item if a topic is optional */
-	private static final String OPTIONAL_LIST_PREFIX = "Optional: ";
-	/** A regular expression that identifies a topic id */
-	private static final String TOPIC_ID_RE = "(" + OPTIONAL_MARKER + "\\s*)?\\d+";
-
-	/**
-	 * A regular expression that matches an InjectSequence custom injection
-	 * point
-	 */
-	private static final String CUSTOM_INJECTION_SEQUENCE_RE =
-	/*
-	 * start xml comment and 'InjectSequence:' surrounded by optional white
-	 * space
-	 */
-	"\\s*InjectSequence:\\s*" +
-	/*
-	 * an optional comma separated list of digit blocks, and at least one digit
-	 * block with an optional comma
-	 */
-	"(?<" + TOPICIDS_RE_NAMED_GROUP + ">(\\s*" + TOPIC_ID_RE + "\\s*,)*(\\s*" + TOPIC_ID_RE + ",?))" +
-	/* xml comment end */
-	"\\s*";
-
-	/** A regular expression that matches an InjectList custom injection point */
-	private static final String CUSTOM_INJECTION_LIST_RE =
-	/* start xml comment and 'InjectList:' surrounded by optional white space */
-	"\\s*InjectList:\\s*" +
-	/*
-	 * an optional comma separated list of digit blocks, and at least one digit
-	 * block with an optional comma
-	 */
-	"(?<" + TOPICIDS_RE_NAMED_GROUP + ">(\\s*" + TOPIC_ID_RE + "\\s*,)*(\\s*" + TOPIC_ID_RE + ",?))" +
-	/* xml comment end */
-	"\\s*";
-
-	private static final String CUSTOM_INJECTION_LISTITEMS_RE =
-	/* start xml comment and 'InjectList:' surrounded by optional white space */
-	"\\s*InjectListItems:\\s*" +
-	/*
-	 * an optional comma separated list of digit blocks, and at least one digit
-	 * block with an optional comma
-	 */
-	"(?<" + TOPICIDS_RE_NAMED_GROUP + ">(\\s*" + TOPIC_ID_RE + "\\s*,)*(\\s*" + TOPIC_ID_RE + ",?))" +
-	/* xml comment end */
-	"\\s*";
-
-	private static final String CUSTOM_ALPHA_SORT_INJECTION_LIST_RE =
-	/*
-	 * start xml comment and 'InjectListAlphaSort:' surrounded by optional white
-	 * space
-	 */
-	"\\s*InjectListAlphaSort:\\s*" +
-	/*
-	 * an optional comma separated list of digit blocks, and at least one digit
-	 * block with an optional comma
-	 */
-	"(?<" + TOPICIDS_RE_NAMED_GROUP + ">(\\s*" + TOPIC_ID_RE + "\\s*,)*(\\s*" + TOPIC_ID_RE + ",?))" +
-	/* xml comment end */
-	"\\s*";
-
-	/** A regular expression that matches an Inject custom injection point */
-	private static final String CUSTOM_INJECTION_SINGLE_RE =
-	/* start xml comment and 'Inject:' surrounded by optional white space */
-	"\\s*Inject:\\s*" +
-	/* one digit block */
-	"(?<" + TOPICIDS_RE_NAMED_GROUP + ">(" + TOPIC_ID_RE + "))" +
-	/* xml comment end */
-	"\\s*";
 
 	/**
 	 * The Docbook role (which becomes a CSS class) for the Skynet build version
@@ -367,8 +244,6 @@ public class DocbookBuilder
 	private static final String ROLE_VIEW_IN_SKYNET_PARA = "RoleViewInSkyNetPara";
 	/** The Docbook role (which becomes a CSS class) for the bug link para */
 	private static final String ROLE_CREATE_BUG_PARA = "RoleCreateBugPara";
-	/** The Docbook role (which becomes a CSS class) for the survey link para */
-	private static final String ROLE_SURVEY_PARA = "RoleCreateBugPara";
 
 	/** A collection of topics that will go into the docbook build */
 	private final TocTopicDatabase topicDatabase = new TocTopicDatabase();
@@ -384,42 +259,6 @@ public class DocbookBuilder
 	 * included in the docbook zip file
 	 */
 	private ArrayList<TopicImageData> imageLocations = new ArrayList<TopicImageData>();
-
-	/**
-	 * Takes a comma separated list of ints, and returns an array of Integers.
-	 * This is used when processing custom injection points.
-	 */
-	private List<InjectionTopicData> processTopicIdList(final String list)
-	{
-		/* find the individual topic ids */
-		final String[] topicIDs = list.split(",");
-
-		List<InjectionTopicData> retValue = new ArrayList<InjectionTopicData>(topicIDs.length);
-
-		/* clean the topic ids */
-		for (int i = 0; i < topicIDs.length; ++i)
-		{
-			final String topicId = topicIDs[i].replaceAll(OPTIONAL_MARKER, "").trim();
-			final boolean optional = topicIDs[i].indexOf(OPTIONAL_MARKER) != -1;
-
-			try
-			{
-				final InjectionTopicData topicData = new InjectionTopicData(Integer.parseInt(topicId), optional);
-				retValue.add(topicData);
-			}
-			catch (final Exception ex)
-			{
-				/*
-				 * these lists are discovered by a regular expression so we
-				 * shouldn't have any trouble here with Integer.parse
-				 */
-				ExceptionUtilities.handleException(ex);
-				retValue.add(new InjectionTopicData(-1, false));
-			}
-		}
-
-		return retValue;
-	}
 
 	private List<Node> getImages(final Node node)
 	{
@@ -442,154 +281,15 @@ public class DocbookBuilder
 	}
 
 	/**
-	 * Searches the given XML for an injection point, as defined by the
-	 * regularExpression parameter. Those topics listed in the injection point
-	 * are processed, and the injection point marker (i.e. the xml comment) is
-	 * replaced with a list of xrefs.
-	 * 
-	 * @return a list of topics that were injected but not related
-	 */
-	private String processCustomInjectionPoints(final ArrayList<Integer> customInjectionIds, final HashMap<Node, InjectionListData> customInjections, final int injectionPointType, final Integer topidID, final Topic topicData, final String regularExpression,
-			final ExternalListSort<Integer, Topic, InjectionTopicData> sortComparator, final DocbookBuildingOptions docbookBuildingOptions)
-	{
-		final Document xmlDocument = topicData.getTempTopicXMLDoc();
-
-		String injectionErrors = "";
-
-		/* loop over all of the comments in the document */
-		for (final Node comment : XMLUtilities.getComments(xmlDocument))
-		{
-			final String commentContent = comment.getNodeValue();
-
-			/* compile the regular expression */
-			final NamedPattern injectionSequencePattern = NamedPattern.compile(regularExpression);
-			/* find any matches */
-			final NamedMatcher injectionSequencematcher = injectionSequencePattern.matcher(commentContent);
-
-			/* loop over the regular expression matches */
-			while (injectionSequencematcher.find())
-			{
-				/*
-				 * get the list of topics from the named group in the regular
-				 * expression match
-				 */
-				final String reMatch = injectionSequencematcher.group(TOPICIDS_RE_NAMED_GROUP);
-
-				/* make sure we actually found a matching named group */
-				if (reMatch != null)
-				{
-					/* get the sequence of ids */
-					final List<InjectionTopicData> sequenceIDs = processTopicIdList(reMatch);
-
-					/* sort the InjectionTopicData list of required */
-					if (sortComparator != null)
-						sortComparator.sort(topicDatabase.getTopics(), sequenceIDs);
-
-					/* loop over all the topic ids in the injection point */
-					for (final InjectionTopicData sequenceID : sequenceIDs)
-					{
-						/*
-						 * right now it is possible to list a topic in an
-						 * injection point without it being related in the
-						 * database. if that is the case, we will report an
-						 * error
-						 */
-						boolean foundSequenceID = false;
-
-						/*
-						 * look for the topic mentioned in the injection point
-						 * in the list of related topics
-						 */
-
-						if (topicData.isRelatedTo(sequenceID.topicId) && topicDatabase.containsTopic(sequenceID.topicId))
-						{
-							/*
-							 * this injected topic is also related, so we don't
-							 * need to generate an error
-							 */
-							foundSequenceID = true;
-
-							/*
-							 * topics that are injected into custom injection
-							 * points are excluded from the generic related
-							 * topic lists at the beginning and end of a topic.
-							 * adding the topic id here means that when it comes
-							 * time to generate the generic related topic lists,
-							 * we can skip this topic
-							 */
-							customInjectionIds.add(sequenceID.topicId);
-
-							/*
-							 * we have found the related topic, so build our
-							 * list
-							 */
-							List<List<Element>> list = new ArrayList<List<Element>>();
-
-							/*
-							 * each related topic is added to a string, which is
-							 * stored in the customInjections collection. the
-							 * customInjections key is the custom injection text
-							 * from the source xml. this allows us to match the
-							 * xrefs we are generating for the related topic
-							 * with the text in the xml file that these xrefs
-							 * will eventually replace
-							 */
-							if (customInjections.containsKey(comment))
-								list = customInjections.get(comment).listItems;
-
-							/*
-							 * Pull the topic out of either the main or the
-							 * reference database
-							 */
-							final Topic relatedTopic = topicDatabase.getTopic(sequenceID.topicId);
-
-							/* wrap the xref up in a listitem */
-							if (sequenceID.optional)
-							{
-								list.add(DocbookUtils.buildEmphasisPrefixedXRef(xmlDocument, OPTIONAL_LIST_PREFIX, relatedTopic.getXRefID()));
-							}
-							else
-							{
-								list.add(DocbookUtils.buildXRef(xmlDocument, relatedTopic.getXRefID()));
-							}
-
-							/*
-							 * save the changes back into the customInjections
-							 * collection
-							 */
-							customInjections.put(comment, new InjectionListData(list, injectionPointType));
-						}
-
-						if (!foundSequenceID && !docbookBuildingOptions.getIgnoreMissingCustomInjections())
-						{
-							/*
-							 * the topic referenced in the custom injection
-							 * point was not related in the database, so report
-							 * an error
-							 */
-							injectionErrors += sequenceID.topicId + ", ";
-						}
-					}
-				}
-			}
-		}
-
-		return injectionErrors;
-
-	}
-
-	/**
 	 * This function takes the list of topics and their related topics and
 	 * injects xrefs
 	 */
-	private void processInjections(final List<TagToCategory> topicTypeTagIDs, final String searchTagsUrl, final int roleCategoryID, final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
+	private void processInjections(final List<Pair<Integer, String>> topicTypeTagDetails, final String searchTagsUrl, final int roleCategoryID, final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		System.out.println("Processing injection points");
 
 		for (final Topic topic : topicDatabase.getTopics())
 		{
-			final Integer topicID = topic.getTopicId();
-
 			/*
 			 * don't bother processing injection points for invalid topics
 			 */
@@ -602,25 +302,13 @@ public class DocbookBuilder
 				 * so we don't then inject them again
 				 */
 				final ArrayList<Integer> customInjectionIds = new ArrayList<Integer>();
-
-				/*
-				 * this collection keeps a track of the injection point markers
-				 * and the docbook lists that we will be replacing them with
-				 */
-				final HashMap<Node, InjectionListData> customInjections = new HashMap<Node, InjectionListData>();
-
-				String injectionErrors = processCustomInjectionPoints(customInjectionIds, customInjections, ORDEREDLIST_INJECTION_POINT, topicID, topic, CUSTOM_INJECTION_SEQUENCE_RE, null, docbookBuildingOptions);
-				injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, XREF_INJECTION_POINT, topicID, topic, CUSTOM_INJECTION_SINGLE_RE, null, docbookBuildingOptions);
-				injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, topicID, topic, CUSTOM_INJECTION_LIST_RE, null, docbookBuildingOptions);
-				injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, topicID, topic, CUSTOM_ALPHA_SORT_INJECTION_LIST_RE, new TopicTitleSorter(), docbookBuildingOptions);
-				injectionErrors += processCustomInjectionPoints(customInjectionIds, customInjections, LIST_INJECTION_POINT, topicID, topic, CUSTOM_INJECTION_LISTITEMS_RE, null, docbookBuildingOptions);
+				
+				final String injectionErrors = XMLPreProcessor.processInjections(false, topic, customInjectionIds, topic.getTempTopicXMLDoc(), docbookBuildingOptions);
 
 				if (injectionErrors.length() != 0)
 				{
 					populateIdXMLDataFromDB(errorTopic, topic, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
 
-					/* remove the last ", " from the error string */
-					injectionErrors = injectionErrors.substring(0, injectionErrors.length() - 2);
 					errorDatabase
 							.addError(
 									topic,
@@ -630,133 +318,8 @@ public class DocbookBuilder
 				}
 				else
 				{
-					/* now make the custom injection point substitutions */
-					for (final Node customInjectionCommentNode : customInjections.keySet())
-					{
-						final InjectionListData injectionListData = customInjections.get(customInjectionCommentNode);
-						List<Element> list = null;
-
-						/*
-						 * this may not be true if we are not building all
-						 * related topics
-						 */
-						if (injectionListData.listItems.size() != 0)
-						{
-							if (injectionListData.listType == ORDEREDLIST_INJECTION_POINT)
-							{
-								list = DocbookUtils.wrapOrderedListItemsInPara(topic.getTempTopicXMLDoc(), injectionListData.listItems);
-							}
-							else if (injectionListData.listType == XREF_INJECTION_POINT)
-							{
-								list = injectionListData.listItems.get(0);
-							}
-							else if (injectionListData.listType == ITEMIZEDLIST_INJECTION_POINT)
-							{
-								list = DocbookUtils.wrapItemizedListItemsInPara(topic.getTempTopicXMLDoc(), injectionListData.listItems);
-							}
-							else if (injectionListData.listType == LIST_INJECTION_POINT)
-							{
-								list = DocbookUtils.wrapItemsInListItems(topic.getTempTopicXMLDoc(), injectionListData.listItems);
-							}
-						}
-
-						if (list != null)
-						{
-							for (final Element element : list)
-							{
-								customInjectionCommentNode.getParentNode().insertBefore(element, customInjectionCommentNode);
-							}
-
-							customInjectionCommentNode.getParentNode().removeChild(customInjectionCommentNode);
-						}
-					}
-
-					/***************** PROCESS GENERIC INJECTION POINTS *****************/
-
-					/*
-					 * don't add generic injection points when building a
-					 * narrative style
-					 */
-					if (!docbookBuildingOptions.getBuildNarrative())
-					{
-						/*
-						 * this collection will hold the lists of related topics
-						 */
-						final HashMap<Tag, ArrayList<Topic>> relatedLists = new HashMap<Tag, ArrayList<Topic>>();
-
-						String genericInjectionErrors = "";
-
-						/* wrap each related topic in a listitem tag */
-						for (final Topic relatedTopic : topic.getOutgoingTopicsArray())
-						{
-							/*
-							 * make sure the related topic is in our list of
-							 * topics
-							 */
-							if (!topicDatabase.containsTopic(relatedTopic))
-							{
-								if (genericInjectionErrors.length() != 0)
-									genericInjectionErrors += ", ";
-								genericInjectionErrors += relatedTopic.getTopicId();
-							}
-							else
-							{
-								/*
-								 * don't process those topics that were injected
-								 * into custom injection points
-								 */
-								if (!customInjectionIds.contains(relatedTopic.getTopicId()))
-								{
-									// loop through the topic type tags
-									for (final TagToCategory primaryTopicTypeTag : topicTypeTagIDs)
-									{
-										final Integer primaryTopicTypeTagId = primaryTopicTypeTag.getTag().getTagId();
-
-										/*
-										 * see if we have processed a related
-										 * topic with one of the topic type tags
-										 * this may never be true if not
-										 * processing all related topics
-										 */
-										if (relatedTopic.isTaggedWith(primaryTopicTypeTagId))
-										{
-											/*
-											 * at this point we have found a
-											 * topic that is related, has not
-											 * been included in any custom
-											 * injection points, and has been
-											 * processed
-											 */
-
-											if (!relatedLists.containsKey(primaryTopicTypeTag.getTag()))
-												relatedLists.put(primaryTopicTypeTag.getTag(), new ArrayList<Topic>());
-
-											/*
-											 * add the related topic to the
-											 * relatedLists collection against
-											 * the topic type tag that has been
-											 * assigned to the related topic
-											 */
-											relatedLists.get(primaryTopicTypeTag.getTag()).add(relatedTopic);
-
-											break;
-										}
-									}
-								}
-							}
-						}
-
-						if (genericInjectionErrors.length() != 0 && !docbookBuildingOptions.getIgnoreMissingCustomInjections())
-						{
-							errorDatabase.addError(topic, "Topic references Topic(s) " + genericInjectionErrors
-									+ ", but these topics were not matched by the filter. This might occur if you are building a narrative and the related topic was not listed in the Topic ID field, or you have not selected the 'Include all related topics' option.");
-						}
-						else
-						{
-							insertGenericInjectionLinks(topic.getTempTopicXMLDoc(), relatedLists);
-						}
-					}
-
+					XMLPreProcessor.processGenericInjections(false, topic, topic.getTempTopicXMLDoc(), customInjectionIds, topicTypeTagDetails);
+					
 					/*
 					 * make sure the xml is valid after all of our modifications
 					 */
@@ -767,53 +330,42 @@ public class DocbookBuilder
 
 		System.out.println("Processing injection points 100% done");
 	}
-
+	
 	/**
-	 * The generic injection points are placed in well defined locations within
-	 * a topics xml structure. This function takes the list of related topics
-	 * and the topic type tags that are associated with them and injects them
-	 * into the xml document.
+	 * This function takes the list of topics and their related topics and
+	 * injects xrefs
 	 */
-	private void insertGenericInjectionLinks(final Document xmlDoc, final Map<Tag, ArrayList<Topic>> relatedLists)
+	private void processFragmentInjections(final String searchTagsUrl, final int roleCategoryID, final List<TagToCategory> tagToCategories, final DocbookBuildingOptions docbookBuildingOptions)
 	{
-		/* all related topics are placed before the first simplesect */
-		final NodeList nodes = xmlDoc.getDocumentElement().getChildNodes();
-		Node simplesectNode = null;
-		for (int i = 0; i < nodes.getLength(); ++i)
-		{
-			final Node node = nodes.item(i);
-			if (node.getNodeType() == 1 && node.getNodeName().equals("simplesect"))
-			{
-				simplesectNode = node;
-				break;
-			}
-		}
+		System.out.println("Processing topic fragment injections");
 
-		/*
-		 * place the topics at the end of the topic. They will appear in the
-		 * reverse order as the call to toArrayList()
-		 */
-		for (final Integer topTag : CollectionUtilities.toArrayList(Constants.REFERENCE_TAG_ID, Constants.TASK_TAG_ID, Constants.CONCEPT_TAG_ID, Constants.CONCEPTUALOVERVIEW_TAG_ID))
+		for (final Topic topic : topicDatabase.getTopics())
 		{
-			for (final Tag tag : relatedLists.keySet())
+			/*
+			 * don't bother processing injection points for invalid topics
+			 */
+			if (!topic.isTempInvalidTopic())
 			{
-				if (tag.getTagId() == topTag)
+				final String contentFragmentInjectionErrors = XMLPreProcessor.processTopicContentFragments(topic, topic.getTempTopicXMLDoc(), docbookBuildingOptions);
+				final String titleFramgmentInjectionErrors = XMLPreProcessor.processTopicTitleFragments(topic, topic.getTempTopicXMLDoc(), docbookBuildingOptions);
+
+				if (contentFragmentInjectionErrors.length() != 0 || titleFramgmentInjectionErrors.length() != 0)
 				{
-					final Node itemizedlist = DocbookUtils.createRelatedTopicItemizedList(xmlDoc, "Related " + tag.getTagName() + "s");
+					populateIdXMLDataFromDB(errorTopic, topic, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
 
-					final ArrayList<Topic> relatedTopics = relatedLists.get(tag);
-					Collections.sort(relatedTopics, new TopicTitleComparator());
-
-					for (final Topic relatedTopic : relatedTopics)
-						DocbookUtils.createRelatedTopicLink(xmlDoc, relatedTopic.getXRefID(), itemizedlist);
-
-					if (simplesectNode != null)
-						xmlDoc.getDocumentElement().insertBefore(itemizedlist, simplesectNode);
-					else
-						xmlDoc.getDocumentElement().appendChild(itemizedlist);
+					/* remove the last ", " from the error string */
+					final String injectionErrors = contentFragmentInjectionErrors + (contentFragmentInjectionErrors.length() != 0 ? ", " : "") + titleFramgmentInjectionErrors;
+					errorDatabase
+							.addError(
+									topic,
+									"Topic references Topic(s) "
+											+ injectionErrors
+											+ " in a topic fragment injection point, but this topic has either not been related in the database, or was not matched by the filter. The later might occur if you are building a narrative and the injected topic was not listed in the Topic ID field, or you have not selected the 'Include all related topics' option.");
 				}
 			}
 		}
+
+		System.out.println("Processing topic fragment injections 100% done");
 	}
 
 	private byte[] getStringBytes(final String input)
@@ -1120,15 +672,12 @@ public class DocbookBuilder
 		treeviewMinJs = EntityUtilities.loadStringConstant(TREEVIEW_MIN_JS_ID);
 		treeviewCss = EntityUtilities.loadStringConstant(TREEVIEW_CSS_ID);
 		jqueryMinJs = EntityUtilities.loadStringConstant(JQUERY_MIN_JS_ID);
-		landingPageTemplateXml = EntityUtilities.loadStringConstant(LANDING_PAGE_TEMPLATE_XML_ID);
 
 		treeviewSpriteGif = EntityUtilities.loadBlobConstant(TREEVIEW_SPRITE_GIF_ID);
 		treeviewLoadingGif = EntityUtilities.loadBlobConstant(TREEVIEW_LOADING_GIF_ID);
 		check1Gif = EntityUtilities.loadBlobConstant(CHECK1_GIF_ID);
 		check2Gif = EntityUtilities.loadBlobConstant(CHECK2_GIF_ID);
 		failpenguinPng = EntityUtilities.loadBlobConstant(FAILPENGUIN_PNG_ID);
-
-		invisibleTagID = EntityUtilities.loadIntegerConstant(INVISIBLE_TAG_ID);
 
 		pluginXml = EntityUtilities.loadStringConstant(PLUGIN_XML_ID);
 		eclisePackageSh = EntityUtilities.loadStringConstant(ECLIPSE_PACKAGE_SH_ID);
@@ -1161,6 +710,12 @@ public class DocbookBuilder
 		final List<TagToCategory> technologyCommonNameTagIDs = getTagToCatgeories(Constants.TECHNOLOGY_CATEGORY_ID, tagToCategories);
 		technologyCommonNameTagIDs.addAll(getTagToCatgeories(Constants.COMMON_NAME_CATEGORY_ID, tagToCategories));
 		final List<TagToCategory> concernTagIDs = getTagToCatgeories(Constants.CONCERN_CATEGORY_ID, tagToCategories);
+		
+		final List<Pair<Integer, String>> topicTypeTagDetails = new ArrayList<Pair<Integer, String>>();
+		topicTypeTagDetails.add(Pair.newPair(Constants.TASK_TAG_ID, Constants.TASK_TAG_NAME));
+		topicTypeTagDetails.add(Pair.newPair(Constants.REFERENCE_TAG_ID, Constants.REFERENCE_TAG_NAME));
+		topicTypeTagDetails.add(Pair.newPair(Constants.CONCEPT_TAG_ID, Constants.CONCEPT_TAG_NAME));
+		topicTypeTagDetails.add(Pair.newPair(Constants.CONCEPTUALOVERVIEW_TAG_ID, Constants.CONCEPTUALOVERVIEW_TAG_NAME));
 
 		/*
 		 * All topics require a topic type, and only one can be assigned
@@ -1208,7 +763,12 @@ public class DocbookBuilder
 		 * take the information gathered by the processTopic() function, and use
 		 * it to dynamically inject xrefs
 		 */
-		processInjections(topicTypeTagIDs, searchTagsUrl, Constants.LIFECYCLE_CATEGORY_ID, tagToCategories, docbookBuildingOptions);
+		processInjections(topicTypeTagDetails, searchTagsUrl, Constants.LIFECYCLE_CATEGORY_ID, tagToCategories, docbookBuildingOptions);
+		
+		/*
+		 * inject the topic fragments
+		 */
+		processFragmentInjections(searchTagsUrl, Constants.LIFECYCLE_CATEGORY_ID, tagToCategories, docbookBuildingOptions);
 
 		/*
 		 * go through and sort the topicList collection into the same order as
@@ -1508,7 +1068,7 @@ public class DocbookBuilder
 						 */
 						final List<Node> listitems = new ArrayList<Node>();
 						for (final Topic matchingTopic : matchingTopics)
-							listitems.add(DocbookUtils.createRelatedTopicLink(landingPage.getTempTopicXMLDoc(), matchingTopic.getXRefID()));
+							listitems.add(DocbookUtils.createRelatedTopicXRef(landingPage.getTempTopicXMLDoc(), matchingTopic.getXRefID()));
 						final Node itemizedlist = DocbookUtils.wrapListItems(landingPage.getTempTopicXMLDoc(), listitems);
 						landingPage.getTempTopicXMLDoc().getDocumentElement().appendChild(itemizedlist);
 
