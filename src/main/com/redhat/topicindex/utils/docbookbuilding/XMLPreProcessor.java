@@ -675,7 +675,7 @@ public class XMLPreProcessor
 		for (final Node comment : replacements.keySet())
 		{
 			final Node title = replacements.get(comment);
-			comment.getParentNode().insertBefore(comment, title);
+			comment.getParentNode().insertBefore(title, comment);
 			comment.getParentNode().removeChild(comment);
 		}
 	}
