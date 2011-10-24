@@ -764,8 +764,8 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 				topicTypeTagDetails.add(Pair.newPair(Constants.CONCEPTUALOVERVIEW_TAG_ID, Constants.CONCEPTUALOVERVIEW_TAG_NAME));
 
 				final ArrayList<Integer> customInjectionIds = new ArrayList<Integer>();
-				XMLPreProcessor.processInjections(true, this, customInjectionIds, doc, null);
-				XMLPreProcessor.processGenericInjections(true, this, doc, customInjectionIds, topicTypeTagDetails);
+				XMLPreProcessor.processInjections(true, this, customInjectionIds, doc, null, null);
+				XMLPreProcessor.processGenericInjections(true, this, doc, customInjectionIds, topicTypeTagDetails, null);
 				XMLPreProcessor.processInternalImageFiles(doc);
 
 				XMLPreProcessor.processTopicContentFragments(this, doc, null);

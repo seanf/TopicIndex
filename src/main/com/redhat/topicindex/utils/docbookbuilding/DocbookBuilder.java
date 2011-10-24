@@ -302,10 +302,10 @@ public class DocbookBuilder
 				 * so we don't then inject them again
 				 */
 				final ArrayList<Integer> customInjectionIds = new ArrayList<Integer>();
-				
-				final String injectionErrors = XMLPreProcessor.processInjections(false, topic, customInjectionIds, topic.getTempTopicXMLDoc(), docbookBuildingOptions);
 
-				if (injectionErrors.length() != 0)
+				final String customInjectionErrors = XMLPreProcessor.processInjections(false, topic, customInjectionIds, topic.getTempTopicXMLDoc(), topicDatabase, docbookBuildingOptions);
+
+				if (customInjectionErrors.length() != 0)
 				{
 					populateIdXMLDataFromDB(errorTopic, topic, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
 
@@ -313,24 +313,35 @@ public class DocbookBuilder
 							.addError(
 									topic,
 									"Topic references Topic(s) "
-											+ injectionErrors
-											+ " in a custom injection point, but this topic has either not been related in the database, or was not matched by the filter. The later might occur if you are building a narrative and the injected topic was not listed in the Topic ID field, or you have not selected the 'Include all related topics' option.");
+											+ customInjectionErrors
+											+ " in a custom injection point, but these topic(s) have either not been related in the database, or was not matched by the filter. The later might occur if you are building a narrative and the injected topic was not listed in the Topic ID field, or you have not selected the 'Include all related topics' option.");
 				}
 				else
 				{
-					XMLPreProcessor.processGenericInjections(false, topic, topic.getTempTopicXMLDoc(), customInjectionIds, topicTypeTagDetails);
-					
-					/*
-					 * make sure the xml is valid after all of our modifications
-					 */
-					postValidateTopicDocbook(topic, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
+					final String genericInjectionErrors = XMLPreProcessor.processGenericInjections(false, topic, topic.getTempTopicXMLDoc(), customInjectionIds, topicTypeTagDetails, topicDatabase);
+
+					if (genericInjectionErrors.length() != 0)
+					{
+						populateIdXMLDataFromDB(errorTopic, topic, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
+
+						errorDatabase.addError(topic, "Topic relates to Topic(s) " + genericInjectionErrors
+								+ ", but these topic(s) were not matched by the filter. The later might occur if you are building a narrative and the injected topic was not listed in the Topic ID field, or you have not selected the 'Include all related topics' option.");
+					}
+					else
+					{
+						/*
+						 * make sure the xml is valid after all of our
+						 * modifications
+						 */
+						postValidateTopicDocbook(topic, searchTagsUrl, roleCategoryID, tagToCategories, docbookBuildingOptions);
+					}
 				}
 			}
 		}
 
 		System.out.println("Processing injection points 100% done");
 	}
-	
+
 	/**
 	 * This function takes the list of topics and their related topics and
 	 * injects xrefs
@@ -535,7 +546,7 @@ public class DocbookBuilder
 
 		// add the files that are used to package up the RPM file
 		files.put("Book/package.sh", getStringBytes(LineEndFormatter.convertToLinuxLineEndings(package_sh)));
-		
+
 		// the make file is built up from options supplied from the user
 		String makefileFixed = makefile;
 		makefileFixed = "RELEASE = " + docbookBuildingOptions.getMakefileReleaseOption() + "\n" + makefileFixed;
@@ -545,7 +556,7 @@ public class DocbookBuilder
 		makefileFixed = "PROD_VERSION = " + docbookBuildingOptions.getMakefileProdVersionOption() + "\n" + makefileFixed;
 		makefileFixed = "PRODUCT = " + docbookBuildingOptions.getMakefileProductOption() + "\n" + makefileFixed;
 		files.put("Book/packager/en-US/Makefile", getStringBytes(makefileFixed));
-		
+
 		files.put("Book/packager/en-US/spec.in", getStringBytes(spec_in));
 
 		// replace the date marker in the Book.XML file
@@ -710,7 +721,7 @@ public class DocbookBuilder
 		final List<TagToCategory> technologyCommonNameTagIDs = getTagToCatgeories(Constants.TECHNOLOGY_CATEGORY_ID, tagToCategories);
 		technologyCommonNameTagIDs.addAll(getTagToCatgeories(Constants.COMMON_NAME_CATEGORY_ID, tagToCategories));
 		final List<TagToCategory> concernTagIDs = getTagToCatgeories(Constants.CONCERN_CATEGORY_ID, tagToCategories);
-		
+
 		final List<Pair<Integer, String>> topicTypeTagDetails = new ArrayList<Pair<Integer, String>>();
 		topicTypeTagDetails.add(Pair.newPair(Constants.TASK_TAG_ID, Constants.TASK_TAG_NAME));
 		topicTypeTagDetails.add(Pair.newPair(Constants.REFERENCE_TAG_ID, Constants.REFERENCE_TAG_NAME));
@@ -764,7 +775,7 @@ public class DocbookBuilder
 		 * it to dynamically inject xrefs
 		 */
 		processInjections(topicTypeTagDetails, searchTagsUrl, Constants.LIFECYCLE_CATEGORY_ID, tagToCategories, docbookBuildingOptions);
-		
+
 		/*
 		 * inject the topic fragments
 		 */

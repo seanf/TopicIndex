@@ -188,7 +188,7 @@ public class XMLPreProcessor
 		return retValue;
 	}
 
-	public static String processInjections(final boolean internal, final Topic topic, final ArrayList<Integer> customInjectionIds, final Document xmlDocument, final DocbookBuildingOptions docbookBuildingOptions)
+	public static String processInjections(final boolean internal, final Topic topic, final ArrayList<Integer> customInjectionIds, final Document xmlDocument, final TocTopicDatabase database, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		/*
 		 * this collection keeps a track of the injection point markers and the
@@ -198,12 +198,12 @@ public class XMLPreProcessor
 
 		final List<Integer> errorTopics = new ArrayList<Integer>();
 
-		errorTopics.addAll(processInjections(internal, topic, customInjectionIds, customInjections, ORDEREDLIST_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_SEQUENCE_RE, null, docbookBuildingOptions));
-		errorTopics.addAll(processInjections(internal, topic, customInjectionIds, customInjections, XREF_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_SINGLE_RE, null, docbookBuildingOptions));
-		errorTopics.addAll(processInjections(internal, topic, customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_LIST_RE, null, docbookBuildingOptions));
-		errorTopics.addAll(processInjections(internal, topic, customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, xmlDocument, CUSTOM_ALPHA_SORT_INJECTION_LIST_RE, new TopicTitleSorter(), docbookBuildingOptions));
-		errorTopics.addAll(processInjections(internal, topic, customInjectionIds, customInjections, LIST_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_LISTITEMS_RE, null, docbookBuildingOptions));
-		
+		errorTopics.addAll(processInjections(internal, topic, customInjectionIds, customInjections, ORDEREDLIST_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_SEQUENCE_RE, null, database, docbookBuildingOptions));
+		errorTopics.addAll(processInjections(internal, topic, customInjectionIds, customInjections, XREF_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_SINGLE_RE, null, database, docbookBuildingOptions));
+		errorTopics.addAll(processInjections(internal, topic, customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_LIST_RE, null, database, docbookBuildingOptions));
+		errorTopics.addAll(processInjections(internal, topic, customInjectionIds, customInjections, ITEMIZEDLIST_INJECTION_POINT, xmlDocument, CUSTOM_ALPHA_SORT_INJECTION_LIST_RE, new TopicTitleSorter(), database, docbookBuildingOptions));
+		errorTopics.addAll(processInjections(internal, topic, customInjectionIds, customInjections, LIST_INJECTION_POINT, xmlDocument, CUSTOM_INJECTION_LISTITEMS_RE, null, database, docbookBuildingOptions));
+
 		if (errorTopics.size() != 0)
 		{
 			String errorList = "";
@@ -211,7 +211,7 @@ public class XMLPreProcessor
 			{
 				if (errorList.length() != 0)
 					errorList += ", ";
-				errorList += topicId.toString();				
+				errorList += topicId.toString();
 			}
 			return errorList;
 		}
@@ -255,12 +255,12 @@ public class XMLPreProcessor
 				customInjectionCommentNode.getParentNode().removeChild(customInjectionCommentNode);
 			}
 		}
-		
+
 		return "";
 	}
 
 	public static List<Integer> processInjections(final boolean internal, final Topic topic, final ArrayList<Integer> customInjectionIds, final HashMap<Node, InjectionListData> customInjections, final int injectionPointType, final Document xmlDocument, final String regularExpression,
-			final ExternalListSort<Integer, Topic, InjectionTopicData> sortComparator, final DocbookBuildingOptions docbookBuildingOptions)
+			final ExternalListSort<Integer, Topic, InjectionTopicData> sortComparator, final TocTopicDatabase database, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		final List<Integer> retValue = new ArrayList<Integer>();
 
@@ -297,8 +297,12 @@ public class XMLPreProcessor
 					 * convenience
 					 */
 					final List<Topic> relatedTopics = topic.getOutgoingTopicsArray();
-					final TocTopicDatabase referencedTopicsDatabase = new TocTopicDatabase();
-					referencedTopicsDatabase.setTopics(relatedTopics);
+					TocTopicDatabase referencedTopicsDatabase = database;
+					if (referencedTopicsDatabase == null)
+					{
+						referencedTopicsDatabase = new TocTopicDatabase();
+						referencedTopicsDatabase.setTopics(relatedTopics);
+					}
 
 					/* sort the InjectionTopicData list of required */
 					if (sortComparator != null)
@@ -383,11 +387,11 @@ public class XMLPreProcessor
 		return retValue;
 	}
 
-	public static void processGenericInjections(final boolean internal, final Topic topic, final Document xmlDocument, final ArrayList<Integer> customInjectionIds, final List<Pair<Integer, String>> topicTypeTagIDs)
+	public static String processGenericInjections(final boolean internal, final Topic topic, final Document xmlDocument, final ArrayList<Integer> customInjectionIds, final List<Pair<Integer, String>> topicTypeTagIDs, final TocTopicDatabase database)
 	{
 
 		if (xmlDocument == null)
-			return;
+			return "";
 
 		/*
 		 * this collection will hold the lists of related topics
@@ -422,7 +426,21 @@ public class XMLPreProcessor
 
 		}
 
-		insertGenericInjectionLinks(internal, xmlDocument, relatedLists);
+		final List<Integer> errors = insertGenericInjectionLinks(internal, xmlDocument, relatedLists, database);
+		
+		if (errors.size() != 0)
+		{
+			String retValue = "";
+			for (final Integer error : errors)
+			{
+				if (retValue.length() != 0)
+					retValue += ", ";
+				retValue += error.toString();
+			}
+			return retValue;
+		}
+		
+		return "";
 	}
 
 	/**
@@ -431,8 +449,10 @@ public class XMLPreProcessor
 	 * and the topic type tags that are associated with them and injects them
 	 * into the xml document.
 	 */
-	private static void insertGenericInjectionLinks(final boolean internal, final Document xmlDoc, final GenericInjectionPointDatabase relatedLists)
+	private static List<Integer> insertGenericInjectionLinks(final boolean internal, final Document xmlDoc, final GenericInjectionPointDatabase relatedLists, final TocTopicDatabase database)
 	{
+		final List<Integer> retValue = new ArrayList<Integer>();
+		
 		/* all related topics are placed before the first simplesect */
 		final NodeList nodes = xmlDoc.getDocumentElement().getChildNodes();
 		Node simplesectNode = null;
@@ -463,10 +483,19 @@ public class XMLPreProcessor
 
 					for (final Topic relatedTopic : relatedTopics)
 					{
-						if (internal)
-							DocbookUtils.createRelatedTopicULink(xmlDoc, getURLToInternalTopic(relatedTopic.getTopicId()), relatedTopic.getTopicTitle(), itemizedlist);
+						final Integer relatedTopicId = relatedTopic.getTopicId();
+						
+						if (database != null && database.getTopic(relatedTopicId) == null)
+						{
+							retValue.add(relatedTopicId);
+						}
 						else
-							DocbookUtils.createRelatedTopicXRef(xmlDoc, relatedTopic.getXRefID(), itemizedlist);
+						{					
+							if (internal)
+								DocbookUtils.createRelatedTopicULink(xmlDoc, getURLToInternalTopic(relatedTopic.getTopicId()), relatedTopic.getTopicTitle(), itemizedlist);
+							else
+								DocbookUtils.createRelatedTopicXRef(xmlDoc, relatedTopic.getXRefID(), itemizedlist);
+						}
 					}
 
 					if (simplesectNode != null)
@@ -476,6 +505,8 @@ public class XMLPreProcessor
 				}
 			}
 		}
+		
+		return retValue;
 	}
 
 	private static String getURLToInternalTopic(final Integer topicId)
