@@ -486,9 +486,10 @@ public class XMLPreProcessor
 						final Integer relatedTopicId = relatedTopic.getTopicId();
 						
 						/* see if the related topic has not been included by the filter, and if we are not ignoring such errors */ 
-						if ((database != null && database.getTopic(relatedTopicId) == null) && (docbookBuildingOptions != null && !docbookBuildingOptions.getIgnoreMissingCustomInjections()))
+						if ((database != null && database.getTopic(relatedTopicId) == null))
 						{
-							retValue.add(relatedTopicId);
+							if ((docbookBuildingOptions != null && !docbookBuildingOptions.getIgnoreMissingCustomInjections()))
+								retValue.add(relatedTopicId);
 						}
 						else
 						{					
