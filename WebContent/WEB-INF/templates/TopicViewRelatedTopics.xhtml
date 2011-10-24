@@ -87,7 +87,7 @@
 				<h:outputText
 					style="border: 0; background: transparent; color: green;"
 					value="#{relatedTopic.topicId}"
-					title="#{relatedTopic.topicTitle} &#13;#{relatedTopic.getTagsList(false)}" />
+					title="[#{relatedTopic.topicTitle}] #{relatedTopic.getCommaSeparatedTagList()}" />
 				<br />
 			</a4j:repeat>
 		</rich:column>
@@ -102,7 +102,7 @@
 				<h:outputText
 					style="border: 0; background: transparent; color: blue;"
 					value="#{relatedTopic.topicId}"
-					title="#{relatedTopic.topicTitle}&#13;#{relatedTopic.getTagsList(false)}" />
+					title="[#{relatedTopic.topicTitle}] #{relatedTopic.getCommaSeparatedTagList()}" />
 				<br />
 			</a4j:repeat>
 		</rich:column>
@@ -118,7 +118,7 @@
 				<h:outputText
 					style="border: 0; background: transparent; color: red;"
 					value="#{relatedTopic.topicId}"
-					title="#{relatedTopic.topicTitle}&#13;#{relatedTopic.getTagsList(false)}" />
+					title="[#{relatedTopic.topicTitle}] #{relatedTopic.getCommaSeparatedTagList()}" />
 				<br />
 			</a4j:repeat>
 		</rich:column>
