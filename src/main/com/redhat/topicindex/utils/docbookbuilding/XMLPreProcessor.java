@@ -387,7 +387,7 @@ public class XMLPreProcessor
 		return retValue;
 	}
 
-	public static String processGenericInjections(final boolean internal, final Topic topic, final Document xmlDocument, final ArrayList<Integer> customInjectionIds, final List<Pair<Integer, String>> topicTypeTagIDs, final TocTopicDatabase database)
+	public static String processGenericInjections(final boolean internal, final Topic topic, final Document xmlDocument, final ArrayList<Integer> customInjectionIds, final List<Pair<Integer, String>> topicTypeTagIDs, final TocTopicDatabase database, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 
 		if (xmlDocument == null)
@@ -426,7 +426,7 @@ public class XMLPreProcessor
 
 		}
 
-		final List<Integer> errors = insertGenericInjectionLinks(internal, xmlDocument, relatedLists, database);
+		final List<Integer> errors = insertGenericInjectionLinks(internal, xmlDocument, relatedLists, database, docbookBuildingOptions);
 		
 		if (errors.size() != 0)
 		{
@@ -449,7 +449,7 @@ public class XMLPreProcessor
 	 * and the topic type tags that are associated with them and injects them
 	 * into the xml document.
 	 */
-	private static List<Integer> insertGenericInjectionLinks(final boolean internal, final Document xmlDoc, final GenericInjectionPointDatabase relatedLists, final TocTopicDatabase database)
+	private static List<Integer> insertGenericInjectionLinks(final boolean internal, final Document xmlDoc, final GenericInjectionPointDatabase relatedLists, final TocTopicDatabase database, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		final List<Integer> retValue = new ArrayList<Integer>();
 		
@@ -485,7 +485,8 @@ public class XMLPreProcessor
 					{
 						final Integer relatedTopicId = relatedTopic.getTopicId();
 						
-						if (database != null && database.getTopic(relatedTopicId) == null)
+						/* see if the related topic has not been included by the filter, and if we are not ignoring such errors */ 
+						if ((database != null && database.getTopic(relatedTopicId) == null) && (docbookBuildingOptions != null && !docbookBuildingOptions.getIgnoreMissingCustomInjections()))
 						{
 							retValue.add(relatedTopicId);
 						}

@@ -318,7 +318,7 @@ public class DocbookBuilder
 				}
 				else
 				{
-					final String genericInjectionErrors = XMLPreProcessor.processGenericInjections(false, topic, topic.getTempTopicXMLDoc(), customInjectionIds, topicTypeTagDetails, topicDatabase);
+					final String genericInjectionErrors = XMLPreProcessor.processGenericInjections(false, topic, topic.getTempTopicXMLDoc(), customInjectionIds, topicTypeTagDetails, topicDatabase, docbookBuildingOptions);
 
 					if (genericInjectionErrors.length() != 0)
 					{
