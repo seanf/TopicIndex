@@ -11,11 +11,11 @@
 	<ui:define name="body">
 	
 		<script
-			src="#{facesContext.externalContext.requestContextPath}/codemirror.js"></script>
+			src="#{facesContext.externalContext.requestContextPath}/scripts/codemirror.js"></script>
 		<script
-			src="#{facesContext.externalContext.requestContextPath}/xml.js"></script>
+			src="#{facesContext.externalContext.requestContextPath}/scripts/xml.js"></script>
 		<script
-			src="#{facesContext.externalContext.requestContextPath}/skynet-codemirror.js"></script>
+			src="#{facesContext.externalContext.requestContextPath}/scripts/skynet-codemirror.js"></script>
 		<script type="text/javascript">
 			window.onload = function() {
 				initializeCodeMirror("#{rich:clientId('constantValue')}", true);
