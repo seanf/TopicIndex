@@ -13,7 +13,7 @@
 		<h:form id="integerConstantsSearch" styleClass="edit">
 
 			<rich:simpleTogglePanel label="IntegerConstants Search Filter"
-				switchType="ajax">
+				switchType="client" opened="false">
 
 				<s:decorate template="layout/display.xhtml">
 					<ui:define name="label">Constant name</ui:define>
@@ -30,16 +30,17 @@
 						<f:selectItem itemLabel="Any" itemValue="or" />
 					</h:selectOneRadio>
 				</s:decorate>
-
-			</rich:simpleTogglePanel>
-
-			<div class="actionButtons">
+				
+							<div class="actionButtons">
 				<h:commandButton id="search" value="Search"
 					action="/IntegerConstantsList.xhtml" />
 				<s:button id="reset" value="Reset" includePageParams="false" />
 			</div>
 
+			</rich:simpleTogglePanel>
 		</h:form>
+		
+		<br/><br/>
 
 		<rich:panel>
 			<f:facet name="header">IntegerConstants Search Results (#{empty integerConstantsList.resultList ? 0 : (integerConstantsList.paginated ? integerConstantsList.resultCount : integerConstantsList.resultList.size)})</f:facet>

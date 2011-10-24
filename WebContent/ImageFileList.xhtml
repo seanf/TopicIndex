@@ -12,7 +12,7 @@
 
     <h:form id="imageFileSearch" styleClass="edit">
 
-        <rich:simpleTogglePanel label="ImageFile Search Filter" switchType="ajax">
+        <rich:simpleTogglePanel label="ImageFile Search Filter" switchType="client" opened="false">
 
             <s:decorate template="layout/display.xhtml">
                 <ui:define name="label">Original file name</ui:define>
@@ -26,13 +26,15 @@
                     <f:selectItem itemLabel="Any" itemValue="or"/>
                 </h:selectOneRadio>
             </s:decorate>
-
-        </rich:simpleTogglePanel>
-
-        <div class="actionButtons">
+            
+            <div class="actionButtons">
             <h:commandButton id="search" value="Search" action="/ImageFileList.xhtml"/>
             <s:button id="reset" value="Reset" includePageParams="false"/>
         </div>
+
+        </rich:simpleTogglePanel>
+
+        
         
         <br/><br/>
 

@@ -12,7 +12,7 @@
 
     <h:form id="projectSearch" styleClass="edit">
 
-        <rich:simpleTogglePanel label="Project Search Filter" switchType="ajax">
+        <rich:simpleTogglePanel label="Project Search Filter" switchType="client" opened="false">
 
             <s:decorate template="layout/display.xhtml">
                 <ui:define name="label">Project Name</ui:define>
@@ -31,13 +31,15 @@
                     <f:selectItem itemLabel="Any" itemValue="or"/>
                 </h:selectOneRadio>
             </s:decorate>
-
-        </rich:simpleTogglePanel>
-
-        <div class="actionButtons">
+            
+            <div class="actionButtons">
             <h:commandButton id="search" value="Search" action="/ProjectList.xhtml"/>
             <s:button id="reset" value="Reset" includePageParams="false"/>
         </div>
+
+        </rich:simpleTogglePanel>
+
+        
         
         <br/><br/>
 
