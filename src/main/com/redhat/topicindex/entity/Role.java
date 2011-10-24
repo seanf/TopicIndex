@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import static javax.persistence.GenerationType.IDENTITY;
@@ -121,6 +122,63 @@ public class Role implements java.io.Serializable
 	public void setParentRoleToRole(final Set<RoleToRole> parentRoleToRole)
 	{
 		this.parentRoleToRole = parentRoleToRole;
+	}
+	
+	public boolean hasUser(final User user)
+	{
+		return hasUser(user.getUserId());
+	}
+	
+	public boolean hasUser(final Integer user)
+	{
+		for (final UserRole userRole : this.userRoles)
+		{
+			if (userRole.getUser().getUserId().equals(user))
+				return true;
+		}
+
+		return false;
+	}
+
+	public void addUser(final User user)
+	{
+		if (!hasUser(user))
+		{
+			final UserRole userRole = new UserRole(user, this);
+			this.getUserRoles().add(userRole);
+			user.getUserRoles().add(userRole);
+		}
+	}
+
+	public void removeUser(final User user)
+	{
+		removeUser(user.getUserId());
+	}
+
+	public void removeUser(final Integer userId)
+	{
+		for (final UserRole userRole : this.userRoles)
+		{
+			if (userRole.getUser().getUserId().equals(userId))
+			{
+				this.getUserRoles().remove(userRole);
+				userRole.getUser().getUserRoles().remove(userRole);
+				break;
+			}
+		}
+	}
+	
+	@Transient
+	public String getUsersCommaSeperatedList()
+	{
+		String retValue = "";
+		for (final UserRole role : this.userRoles)
+		{
+			if (retValue.length() != 0)
+				retValue += ", ";
+			retValue += role.getUser().getUserName();			
+		}
+		return retValue;
 	}
 
 }

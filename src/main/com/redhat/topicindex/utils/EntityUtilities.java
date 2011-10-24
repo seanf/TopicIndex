@@ -48,6 +48,7 @@ import com.redhat.topicindex.entity.User;
 import com.redhat.topicindex.filter.TopicFilter;
 import com.redhat.topicindex.sort.RoleNameComparator;
 import com.redhat.topicindex.sort.TopicTagCategoryDataNameSorter;
+import com.redhat.topicindex.sort.UserNameComparator;
 import com.redhat.topicindex.utils.structures.roles.UIRoleUserData;
 import com.redhat.topicindex.utils.structures.tags.UIProjectTagData;
 import com.redhat.topicindex.utils.structures.tags.UITagProjectData;
@@ -238,6 +239,14 @@ public class EntityUtilities
 		final com.redhat.topicindex.entity.Role role = entityManager.find(com.redhat.topicindex.entity.Role.class, roleId);
 		return role;
 	}
+	
+	public static User getUserFromId(final Integer userId)
+	{
+		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+		final User user = entityManager.find(User.class, userId);
+		return user;
+	}
+
 
 	static public List<UIRoleUserData> getUserRoles(final User user)
 	{
@@ -251,6 +260,24 @@ public class EntityUtilities
 		{
 			final boolean selected = user.isInRole(role);
 			final UIRoleUserData roleUserData = new UIRoleUserData(role.getRoleId(), role.getRoleName(), selected);
+			retValue.add(roleUserData);			
+		}
+		
+		return retValue;
+	}
+	
+	static public List<UIRoleUserData> getRoleUsers(final com.redhat.topicindex.entity.Role role)
+	{
+		final List<UIRoleUserData> retValue = new ArrayList<UIRoleUserData>();
+		
+		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+		final List<User> userList = entityManager.createQuery(User.SELECT_ALL_QUERY).getResultList();
+		Collections.sort(userList, new UserNameComparator());
+		
+		for (final User user : userList)
+		{
+			final boolean selected = role.hasUser(user);
+			final UIRoleUserData roleUserData = new UIRoleUserData(user.getUserId(), user.getUserName(), selected);
 			retValue.add(roleUserData);			
 		}
 		
