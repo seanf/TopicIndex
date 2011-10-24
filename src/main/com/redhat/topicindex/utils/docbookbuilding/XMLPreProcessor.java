@@ -136,6 +136,15 @@ public class XMLPreProcessor
 	"(?<" + TOPICIDS_RE_NAMED_GROUP + ">(" + TOPIC_ID_RE + "))" +
 	/* xml comment end */
 	"\\s*";
+	
+	/** A regular expression that matches an Inject Content Fragment */
+	private static final String INJECT_TITLE_FRAGMENT_RE =
+	/* start xml comment and 'Inject:' surrounded by optional white space */
+	"\\s*InjectTitle:\\s*" +
+	/* one digit block */
+	"(?<" + TOPICIDS_RE_NAMED_GROUP + ">(" + TOPIC_ID_RE + "))" +
+	/* xml comment end */
+	"\\s*";
 
 	/**
 	 * The noinject value for the role attribute indicates that an element
@@ -619,7 +628,7 @@ public class XMLPreProcessor
 			final String commentContent = comment.getNodeValue();
 
 			/* compile the regular expression */
-			final NamedPattern injectionSequencePattern = NamedPattern.compile(INJECT_CONTENT_FRAGMENT_RE);
+			final NamedPattern injectionSequencePattern = NamedPattern.compile(INJECT_TITLE_FRAGMENT_RE);
 			/* find any matches */
 			final NamedMatcher injectionSequencematcher = injectionSequencePattern.matcher(commentContent);
 
