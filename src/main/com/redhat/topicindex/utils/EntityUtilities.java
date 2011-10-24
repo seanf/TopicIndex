@@ -44,8 +44,11 @@ import com.redhat.topicindex.entity.Tag;
 import com.redhat.topicindex.entity.TagToCategory;
 import com.redhat.topicindex.entity.TagToProject;
 import com.redhat.topicindex.entity.Topic;
+import com.redhat.topicindex.entity.User;
 import com.redhat.topicindex.filter.TopicFilter;
+import com.redhat.topicindex.sort.RoleNameComparator;
 import com.redhat.topicindex.sort.TopicTagCategoryDataNameSorter;
+import com.redhat.topicindex.utils.structures.roles.UIRoleUserData;
 import com.redhat.topicindex.utils.structures.tags.UIProjectTagData;
 import com.redhat.topicindex.utils.structures.tags.UITagProjectData;
 import com.redhat.topicindex.utils.structures.tags.UICategoryData;
@@ -228,7 +231,32 @@ public class EntityUtilities
 		final Tag tag = entityManager.find(Tag.class, tagId);
 		return tag;
 	}
+	
+	public static com.redhat.topicindex.entity.Role getRoleFromId(final Integer roleId)
+	{
+		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+		final com.redhat.topicindex.entity.Role role = entityManager.find(com.redhat.topicindex.entity.Role.class, roleId);
+		return role;
+	}
 
+	static public List<UIRoleUserData> getUserRoles(final User user)
+	{
+		final List<UIRoleUserData> retValue = new ArrayList<UIRoleUserData>();
+		
+		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+		final List<com.redhat.topicindex.entity.Role> roleList = entityManager.createQuery(com.redhat.topicindex.entity.Role.SELECT_ALL_QUERY).getResultList();
+		Collections.sort(roleList, new RoleNameComparator());
+		
+		for (final com.redhat.topicindex.entity.Role role : roleList)
+		{
+			final boolean selected = user.isInRole(role);
+			final UIRoleUserData roleUserData = new UIRoleUserData(role.getRoleId(), role.getRoleName(), selected);
+			retValue.add(roleUserData);			
+		}
+		
+		return retValue;
+	}
+	
 	/**
 	 * This function is used to populate the data structures that display the
 	 * categories that a tag can and does belong to.

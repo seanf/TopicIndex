@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 
 import com.redhat.ecs.commonutils.ExceptionUtilities;
@@ -18,11 +17,9 @@ import com.redhat.topicindex.utils.EntityUtilities;
 import com.redhat.topicindex.utils.structures.tags.UIProjectData;
 import com.redhat.topicindex.utils.structures.tags.UITagProjectData;
 import com.redhat.topicindex.utils.structures.tags.UICategoryData;
-import com.redhat.topicindex.utils.structures.tags.UITagData;
-import com.redhat.topicindex.utils.structures.tags.UIProjectCategoriesData;
+
 
 import org.hibernate.exception.ConstraintViolationException;
-import org.jboss.seam.Component;
 import org.jboss.seam.annotations.Name;
 
 @Name("tagHome")

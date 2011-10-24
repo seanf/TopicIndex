@@ -1,6 +1,6 @@
 package com.redhat.topicindex.entity;
-// Generated Aug 8, 2011 9:37:09 AM by Hibernate Tools 3.4.0.CR1
 
+// Generated Aug 8, 2011 9:37:09 AM by Hibernate Tools 3.4.0.CR1
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -20,57 +20,61 @@ import org.hibernate.validator.NotNull;
  */
 @Entity
 @Audited
-@Table(name="UserRole", catalog="Skynet"
-)
-public class UserRole  implements java.io.Serializable 
+@Table(name = "UserRole", catalog = "Skynet")
+public class UserRole implements java.io.Serializable
 {
 
 	private static final long serialVersionUID = 5397193862244957553L;
 	private Integer userRoleId;
-    private User user;
-    private Role role;
+	private User user;
+	private Role role;
 
-    public UserRole() {
-    }
+	public UserRole()
+	{
+	}
 
-    public UserRole(User user, Role role) {
-       this.user = user;
-       this.role = role;
-    }
-   
-     @Id @GeneratedValue(strategy=IDENTITY)
+	public UserRole(final User user, final Role role)
+	{
+		this.user = user;
+		this.role = role;
+	}
 
-    
-    @Column(name="UserRoleID", unique=true, nullable=false)
-    public Integer getUserRoleId() {
-        return this.userRoleId;
-    }
-    
-    public void setUserRoleId(Integer userRoleId) {
-        this.userRoleId = userRoleId;
-    }
+	@Id
+	@GeneratedValue(strategy = IDENTITY)
+	@Column(name = "UserRoleID", unique = true, nullable = false)
+	public Integer getUserRoleId()
+	{
+		return this.userRoleId;
+	}
 
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="UserNameID", nullable=false)
-    @NotNull
-    public User getUser() {
-        return this.user;
-    }
-    
-    public void setUser(User user) {
-        this.user = user;
-    }
+	public void setUserRoleId(Integer userRoleId)
+	{
+		this.userRoleId = userRoleId;
+	}
 
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="RoleNameID", nullable=false)
-    @NotNull
-    public Role getRole() {
-        return this.role;
-    }
-    
-    public void setRole(Role role) {
-        this.role = role;
-    }
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "UserNameID", nullable = false)
+	@NotNull
+	public User getUser()
+	{
+		return this.user;
+	}
+
+	public void setUser(final User user)
+	{
+		this.user = user;
+	}
+
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "RoleNameID", nullable = false)
+	@NotNull
+	public Role getRole()
+	{
+		return this.role;
+	}
+
+	public void setRole(final Role role)
+	{
+		this.role = role;
+	}
 }
-
-

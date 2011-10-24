@@ -11,7 +11,7 @@ public class RoleList extends EntityQuery<Role>
 	/** Serializable version identifier */
 	private static final long serialVersionUID = 8874402340457479545L;
 
-	private static final String EJBQL = "select role from Role role";
+	
 
 	private static final String[] RESTRICTIONS = {
 			"lower(role.roleName) like lower(concat(#{roleList.role.roleName},'%'))",
@@ -20,7 +20,7 @@ public class RoleList extends EntityQuery<Role>
 	private Role role = new Role();
 
 	public RoleList() {
-		setEjbql(EJBQL);
+		setEjbql(Role.SELECT_ALL_QUERY);
 		setRestrictionExpressionStrings(Arrays.asList(RESTRICTIONS));
 		setMaxResults(25);
 	}

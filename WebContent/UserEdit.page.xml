@@ -8,6 +8,7 @@
    <begin-conversation join="true" flush-mode="MANUAL"/>
 
    <action execute="#{userHome.wire}"/>
+   <action execute="#{userHome.populate}"/>
 
    <param name="userFrom"/>
    <param name="userUserId" value="#{userHome.userUserId}"/>
