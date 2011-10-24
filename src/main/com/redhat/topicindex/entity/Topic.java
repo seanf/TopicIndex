@@ -757,6 +757,9 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 				XMLPreProcessor.processInternalInjections(this, customInjectionIds, doc);
 				XMLPreProcessor.processInternalGenericInjections(this, doc, customInjectionIds, topicTypeTagDetails);
 				XMLPreProcessor.processInternalImageFiles(doc);
+				
+				XMLPreProcessor.processTopicContentFragments(this, doc);
+				XMLPreProcessor.processTopicTitleFragments(this, doc);
 
 				/* render the topic html */
 				final String processedXML = XMLUtilities.convertDocumentToString(doc, XML_ENCODING);
@@ -1176,5 +1179,14 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 			entityManager.persist(this);
 			entityManager.flush();
 		}
+	}
+	
+	@Transient
+	public Topic getRelatedTopicByID(final Integer id)
+	{
+		for (final Topic topic : this.getOutgoingTopicsArray())
+			if (topic.getTopicId().equals(id))
+				return topic;
+		return null;
 	}
 }

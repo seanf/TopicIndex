@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -59,7 +60,10 @@ public class XMLPreProcessor
 	/** The text to be prefixed to a list item if a topic is optional */
 	private static final String OPTIONAL_LIST_PREFIX = "Optional: ";
 	/** A regular expression that identifies a topic id */
-	private static final String TOPIC_ID_RE = "(" + OPTIONAL_MARKER + "\\s*)?\\d+";
+	private static final String OPTIONAL_TOPIC_ID_RE = "(" + OPTIONAL_MARKER + "\\s*)?\\d+";
+	/** A regular expression that identifies a topic id */
+	private static final String TOPIC_ID_RE = "\\d+";
+
 	/**
 	 * A regular expression that matches an InjectSequence custom injection
 	 * point
@@ -74,7 +78,7 @@ public class XMLPreProcessor
 	 * an optional comma separated list of digit blocks, and at least one digit
 	 * block with an optional comma
 	 */
-	"(?<" + TOPICIDS_RE_NAMED_GROUP + ">(\\s*" + TOPIC_ID_RE + "\\s*,)*(\\s*" + TOPIC_ID_RE + ",?))" +
+	"(?<" + TOPICIDS_RE_NAMED_GROUP + ">(\\s*" + OPTIONAL_TOPIC_ID_RE + "\\s*,)*(\\s*" + OPTIONAL_TOPIC_ID_RE + ",?))" +
 	/* xml comment end */
 	"\\s*";
 
@@ -86,7 +90,7 @@ public class XMLPreProcessor
 	 * an optional comma separated list of digit blocks, and at least one digit
 	 * block with an optional comma
 	 */
-	"(?<" + TOPICIDS_RE_NAMED_GROUP + ">(\\s*" + TOPIC_ID_RE + "\\s*,)*(\\s*" + TOPIC_ID_RE + ",?))" +
+	"(?<" + TOPICIDS_RE_NAMED_GROUP + ">(\\s*" + OPTIONAL_TOPIC_ID_RE + "\\s*,)*(\\s*" + OPTIONAL_TOPIC_ID_RE + ",?))" +
 	/* xml comment end */
 	"\\s*";
 
@@ -97,7 +101,7 @@ public class XMLPreProcessor
 	 * an optional comma separated list of digit blocks, and at least one digit
 	 * block with an optional comma
 	 */
-	"(?<" + TOPICIDS_RE_NAMED_GROUP + ">(\\s*" + TOPIC_ID_RE + "\\s*,)*(\\s*" + TOPIC_ID_RE + ",?))" +
+	"(?<" + TOPICIDS_RE_NAMED_GROUP + ">(\\s*" + OPTIONAL_TOPIC_ID_RE + "\\s*,)*(\\s*" + OPTIONAL_TOPIC_ID_RE + ",?))" +
 	/* xml comment end */
 	"\\s*";
 
@@ -111,7 +115,7 @@ public class XMLPreProcessor
 	 * an optional comma separated list of digit blocks, and at least one digit
 	 * block with an optional comma
 	 */
-	"(?<" + TOPICIDS_RE_NAMED_GROUP + ">(\\s*" + TOPIC_ID_RE + "\\s*,)*(\\s*" + TOPIC_ID_RE + ",?))" +
+	"(?<" + TOPICIDS_RE_NAMED_GROUP + ">(\\s*" + OPTIONAL_TOPIC_ID_RE + "\\s*,)*(\\s*" + OPTIONAL_TOPIC_ID_RE + ",?))" +
 	/* xml comment end */
 	"\\s*";
 
@@ -120,9 +124,24 @@ public class XMLPreProcessor
 	/* start xml comment and 'Inject:' surrounded by optional white space */
 	"\\s*Inject:\\s*" +
 	/* one digit block */
+	"(?<" + TOPICIDS_RE_NAMED_GROUP + ">(" + OPTIONAL_TOPIC_ID_RE + "))" +
+	/* xml comment end */
+	"\\s*";
+
+	/** A regular expression that matches an Inject Content Fragment */
+	private static final String INJECT_CONTENT_FRAGMENT_RE =
+	/* start xml comment and 'Inject:' surrounded by optional white space */
+	"\\s*InjectText:\\s*" +
+	/* one digit block */
 	"(?<" + TOPICIDS_RE_NAMED_GROUP + ">(" + TOPIC_ID_RE + "))" +
 	/* xml comment end */
 	"\\s*";
+
+	/**
+	 * The noinject value for the role attribute indicates that an element
+	 * should not be included in the Topic Fragment
+	 */
+	private static final String NO_INJECT_ROLE = "noinject";
 
 	/**
 	 * Takes a comma separated list of ints, and returns an array of Integers.
@@ -442,6 +461,210 @@ public class XMLPreProcessor
 
 				filerefAttribute.setTextContent("ImageFileDisplay.seam?imageFileId=" + imageId);
 			}
+		}
+	}
+
+	public static void processTopicContentFragments(final Topic topic, final Document xmlDocument)
+	{
+		if (xmlDocument == null)
+			return;
+
+		final Map<Node, ArrayList<Node>> replacements = new HashMap<Node, ArrayList<Node>>();
+
+		/* loop over all of the comments in the document */
+		for (final Node comment : XMLUtilities.getComments(xmlDocument))
+		{
+			final String commentContent = comment.getNodeValue();
+
+			/* compile the regular expression */
+			final NamedPattern injectionSequencePattern = NamedPattern.compile(INJECT_CONTENT_FRAGMENT_RE);
+			/* find any matches */
+			final NamedMatcher injectionSequencematcher = injectionSequencePattern.matcher(commentContent);
+
+			/* loop over the regular expression matches */
+			while (injectionSequencematcher.find())
+			{
+				/*
+				 * get the list of topics from the named group in the regular
+				 * expression match
+				 */
+				final String reMatch = injectionSequencematcher.group(TOPICIDS_RE_NAMED_GROUP);
+
+				/* make sure we actually found a matching named group */
+				if (reMatch != null)
+				{
+					try
+					{
+						if (!replacements.containsKey(comment))
+							replacements.put(comment, new ArrayList<Node>());
+
+						final Integer topicID = Integer.parseInt(reMatch);
+
+						/*
+						 * make sure the topic we are trying to inject has been
+						 * related
+						 */
+						if (topic.isRelatedTo(topicID))
+						{
+							final Topic relatedTopic = topic.getRelatedTopicByID(topicID);
+							final Document relatedTopicXML = XMLUtilities.convertStringToDocument(relatedTopic.getTopicXML());
+							if (relatedTopicXML != null)
+							{
+								final Node relatedTopicDocumentElement = relatedTopicXML.getDocumentElement();
+								final Node importedXML = xmlDocument.importNode(relatedTopicDocumentElement, true);
+
+								/* ignore the section title */
+								final NodeList sectionChildren = importedXML.getChildNodes();
+								for (int i = 0; i < sectionChildren.getLength(); ++i)
+								{
+									final Node node = sectionChildren.item(i);
+									if (node.getNodeName().equals("title"))
+									{
+										importedXML.removeChild(node);
+										break;
+									}
+								}
+
+								/* remove all with a role="noinject" attribute */
+								removeNoInjectElements(importedXML);
+
+								/*
+								 * importedXML is a now section with no title,
+								 * and no child elements with the noinject value
+								 * on the role attribute. We now add its
+								 * children to the Array in the replacements
+								 * Map.
+								 */
+
+								final NodeList remainingChildren = importedXML.getChildNodes();
+								for (int i = 0; i < remainingChildren.getLength(); ++i)
+								{
+									final Node child = remainingChildren.item(i);
+									replacements.get(comment).add(child);
+								}
+							}
+						}
+					}
+					catch (final Exception ex)
+					{
+						ExceptionUtilities.handleException(ex);
+					}
+				}
+			}
+		}
+
+		/*
+		 * The replacements map now has a keyset of the comments mapped to a
+		 * collection of nodes that the comment will be replaced with
+		 */
+
+		for (final Node comment : replacements.keySet())
+		{
+			final ArrayList<Node> replacementNodes = replacements.get(comment);
+			for (final Node replacementNode : replacementNodes)
+				comment.getParentNode().insertBefore(replacementNode, comment);
+			comment.getParentNode().removeChild(comment);
+		}
+	}
+
+	private static void removeNoInjectElements(final Node parent)
+	{
+		final NodeList childrenNodes = parent.getChildNodes();
+		final ArrayList<Node> removeNodes = new ArrayList<Node>();
+
+		for (int i = 0; i < childrenNodes.getLength(); ++i)
+		{
+			final Node node = childrenNodes.item(i);
+			final NamedNodeMap attributes = node.getAttributes();
+			final Node roleAttribute = attributes.getNamedItem("role");
+			if (roleAttribute != null)
+			{
+				final String[] roles = roleAttribute.getTextContent().split(",");
+				for (final String role : roles)
+				{
+					if (role.equals(NO_INJECT_ROLE))
+					{
+						removeNodes.add(node);
+						break;
+					}
+				}
+			}
+		}
+
+		for (final Node removeNode : removeNodes)
+			parent.removeChild(removeNode);
+
+		final NodeList remainingChildrenNodes = parent.getChildNodes();
+
+		for (int i = 0; i < remainingChildrenNodes.getLength(); ++i)
+		{
+			final Node child = remainingChildrenNodes.item(i);
+			removeNoInjectElements(child);
+		}
+	}
+
+	public static void processTopicTitleFragments(final Topic topic, final Document xmlDocument)
+	{
+		if (xmlDocument == null)
+			return;
+
+		final Map<Node, Node> replacements = new HashMap<Node, Node>();
+
+		/* loop over all of the comments in the document */
+		for (final Node comment : XMLUtilities.getComments(xmlDocument))
+		{
+			final String commentContent = comment.getNodeValue();
+
+			/* compile the regular expression */
+			final NamedPattern injectionSequencePattern = NamedPattern.compile(INJECT_CONTENT_FRAGMENT_RE);
+			/* find any matches */
+			final NamedMatcher injectionSequencematcher = injectionSequencePattern.matcher(commentContent);
+
+			/* loop over the regular expression matches */
+			while (injectionSequencematcher.find())
+			{
+				/*
+				 * get the list of topics from the named group in the regular
+				 * expression match
+				 */
+				final String reMatch = injectionSequencematcher.group(TOPICIDS_RE_NAMED_GROUP);
+
+				/* make sure we actually found a matching named group */
+				if (reMatch != null)
+				{
+					try
+					{
+						if (!replacements.containsKey(comment))
+							replacements.put(comment, null);
+
+						final Integer topicID = Integer.parseInt(reMatch);
+
+						/*
+						 * make sure the topic we are trying to inject has been
+						 * related
+						 */
+						if (topic.isRelatedTo(topicID))
+						{
+							final Topic relatedTopic = topic.getRelatedTopicByID(topicID);
+							final Element titleNode = xmlDocument.createElement("title");
+							titleNode.setTextContent(relatedTopic.getTopicTitle());
+							replacements.put(comment, titleNode);
+						}
+					}
+					catch (final Exception ex)
+					{
+						ExceptionUtilities.handleException(ex);
+					}
+				}
+			}
+		}
+
+		/* swap the comment nodes with the new title nodes */
+		for (final Node comment : replacements.keySet())
+		{
+			final Node title = replacements.get(comment);
+			comment.getParentNode().insertBefore(comment, title);
+			comment.getParentNode().removeChild(comment);
 		}
 	}
 }
