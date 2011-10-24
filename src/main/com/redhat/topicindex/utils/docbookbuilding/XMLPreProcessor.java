@@ -576,16 +576,19 @@ public class XMLPreProcessor
 		{
 			final Node node = childrenNodes.item(i);
 			final NamedNodeMap attributes = node.getAttributes();
-			final Node roleAttribute = attributes.getNamedItem("role");
-			if (roleAttribute != null)
+			if (attributes != null)
 			{
-				final String[] roles = roleAttribute.getTextContent().split(",");
-				for (final String role : roles)
+				final Node roleAttribute = attributes.getNamedItem("role");
+				if (roleAttribute != null)
 				{
-					if (role.equals(NO_INJECT_ROLE))
+					final String[] roles = roleAttribute.getTextContent().split(",");
+					for (final String role : roles)
 					{
-						removeNodes.add(node);
-						break;
+						if (role.equals(NO_INJECT_ROLE))
+						{
+							removeNodes.add(node);
+							break;
+						}
 					}
 				}
 			}
