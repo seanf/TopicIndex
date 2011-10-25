@@ -50,6 +50,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.redhat.ecs.commonstructures.Pair;
+import com.redhat.ecs.commonthread.WorkQueue;
 import com.redhat.ecs.commonutils.DocBookUtilities;
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.ecs.commonutils.XMLUtilities;
@@ -60,6 +61,7 @@ import com.redhat.topicindex.sort.TopicToTopicTopicIDSort;
 import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.EntityQueries;
 import com.redhat.topicindex.utils.EntityUtilities;
+import com.redhat.topicindex.utils.TopicRenderer;
 import com.redhat.topicindex.utils.XMLValidator;
 import com.redhat.topicindex.utils.docbookbuilding.XMLPreProcessor;
 import com.redhat.topicindex.utils.structures.NameIDSortMap;
@@ -738,13 +740,13 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		 * need rerender all topics that have an incoming relationship.
 		 */
 		for (final Topic relatedTopic : this.getIncomingRelatedTopicsArray())
-			relatedTopic.renderXML();
+			WorkQueue.getInstance().execute(new TopicRenderer(relatedTopic.getTopicId()));
 
 		for (final Topic relatedTopic : this.getTwoWayRelatedTopicsArray())
-			relatedTopic.renderXML();
+			WorkQueue.getInstance().execute(new TopicRenderer(relatedTopic.getTopicId()));
 	}
 
-	private void renderXML()
+	public void renderXML()
 	{
 		System.out.println("Topic.renderXML() ID: " + this.topicId);
 
