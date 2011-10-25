@@ -393,6 +393,8 @@ public class XMLPreProcessor
 		if (xmlDocument == null)
 			return "";
 
+		final List<Integer> errors = new ArrayList<Integer>();
+
 		/*
 		 * this collection will hold the lists of related topics
 		 */
@@ -401,33 +403,41 @@ public class XMLPreProcessor
 		/* wrap each related topic in a listitem tag */
 		for (final Topic relatedTopic : topic.getOutgoingTopicsArray())
 		{
-			/*
-			 * don't process those topics that were injected into custom
-			 * injection points
-			 */
-			if (!customInjectionIds.contains(relatedTopic.getTopicId()))
+			/* make sure the topic is available to be linked to */
+			if (database != null && database.getTopic(relatedTopic.getTopicId()) == null)
 			{
-				// loop through the topic type tags
-				for (final Pair<Integer, String> primaryTopicTypeTag : topicTypeTagIDs)
+				if ((docbookBuildingOptions != null && !docbookBuildingOptions.getIgnoreMissingCustomInjections()))
+					errors.add(relatedTopic.getTopicId());
+			}
+			else
+			{
+				/*
+				 * don't process those topics that were injected into custom
+				 * injection points
+				 */
+				if (!customInjectionIds.contains(relatedTopic.getTopicId()))
 				{
-					/*
-					 * see if we have processed a related topic with one of the
-					 * topic type tags this may never be true if not processing
-					 * all related topics
-					 */
-					if (relatedTopic.isTaggedWith(primaryTopicTypeTag.getFirst()))
+					// loop through the topic type tags
+					for (final Pair<Integer, String> primaryTopicTypeTag : topicTypeTagIDs)
 					{
-						relatedLists.addInjectionTopic(primaryTopicTypeTag, relatedTopic);
+						/*
+						 * see if we have processed a related topic with one of
+						 * the topic type tags this may never be true if not
+						 * processing all related topics
+						 */
+						if (relatedTopic.isTaggedWith(primaryTopicTypeTag.getFirst()))
+						{
+							relatedLists.addInjectionTopic(primaryTopicTypeTag, relatedTopic);
 
-						break;
+							break;
+						}
 					}
 				}
 			}
-
 		}
 
-		final List<Integer> errors = insertGenericInjectionLinks(internal, xmlDocument, relatedLists, database, docbookBuildingOptions);
-		
+		insertGenericInjectionLinks(internal, xmlDocument, relatedLists, database, docbookBuildingOptions);
+
 		if (errors.size() != 0)
 		{
 			String retValue = "";
@@ -439,7 +449,7 @@ public class XMLPreProcessor
 			}
 			return retValue;
 		}
-		
+
 		return "";
 	}
 
@@ -449,10 +459,8 @@ public class XMLPreProcessor
 	 * and the topic type tags that are associated with them and injects them
 	 * into the xml document.
 	 */
-	private static List<Integer> insertGenericInjectionLinks(final boolean internal, final Document xmlDoc, final GenericInjectionPointDatabase relatedLists, final TocTopicDatabase database, final DocbookBuildingOptions docbookBuildingOptions)
+	private static void insertGenericInjectionLinks(final boolean internal, final Document xmlDoc, final GenericInjectionPointDatabase relatedLists, final TocTopicDatabase database, final DocbookBuildingOptions docbookBuildingOptions)
 	{
-		final List<Integer> retValue = new ArrayList<Integer>();
-		
 		/* all related topics are placed before the first simplesect */
 		final NodeList nodes = xmlDoc.getDocumentElement().getChildNodes();
 		Node simplesectNode = null;
@@ -476,39 +484,32 @@ public class XMLPreProcessor
 			{
 				if (genericInjectionPoint.getCategoryIDAndName().getFirst() == topTag)
 				{
-					final Node itemizedlist = DocbookUtils.createRelatedTopicItemizedList(xmlDoc, "Related " + genericInjectionPoint.getCategoryIDAndName().getSecond() + "s");
-
 					final List<Topic> relatedTopics = genericInjectionPoint.getTopics();
-					Collections.sort(relatedTopics, new TopicTitleComparator());
 
-					for (final Topic relatedTopic : relatedTopics)
+					/* don't add an empty list */
+					if (relatedTopics.size() != 0)
 					{
-						final Integer relatedTopicId = relatedTopic.getTopicId();
-						
-						/* see if the related topic has not been included by the filter, and if we are not ignoring such errors */ 
-						if ((database != null && database.getTopic(relatedTopicId) == null))
+						final Node itemizedlist = DocbookUtils.createRelatedTopicItemizedList(xmlDoc, "Related " + genericInjectionPoint.getCategoryIDAndName().getSecond() + "s");
+
+						Collections.sort(relatedTopics, new TopicTitleComparator());
+
+						for (final Topic relatedTopic : relatedTopics)
 						{
-							if ((docbookBuildingOptions != null && !docbookBuildingOptions.getIgnoreMissingCustomInjections()))
-								retValue.add(relatedTopicId);
-						}
-						else
-						{					
 							if (internal)
 								DocbookUtils.createRelatedTopicULink(xmlDoc, getURLToInternalTopic(relatedTopic.getTopicId()), relatedTopic.getTopicTitle(), itemizedlist);
 							else
 								DocbookUtils.createRelatedTopicXRef(xmlDoc, relatedTopic.getXRefID(), itemizedlist);
-						}
-					}
 
-					if (simplesectNode != null)
-						xmlDoc.getDocumentElement().insertBefore(itemizedlist, simplesectNode);
-					else
-						xmlDoc.getDocumentElement().appendChild(itemizedlist);
+						}
+
+						if (simplesectNode != null)
+							xmlDoc.getDocumentElement().insertBefore(itemizedlist, simplesectNode);
+						else
+							xmlDoc.getDocumentElement().appendChild(itemizedlist);
+					}
 				}
 			}
 		}
-		
-		return retValue;
 	}
 
 	private static String getURLToInternalTopic(final Integer topicId)
