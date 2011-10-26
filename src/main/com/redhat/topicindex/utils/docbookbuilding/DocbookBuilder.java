@@ -1548,36 +1548,30 @@ public class DocbookBuilder
 		 * this topic
 		 */
 		final List<Tag> topicTags = topic.getTags();
-		final List<Pair<Integer, Integer>> matchedTags = new ArrayList<Pair<Integer, Integer>>();
-		for (final Tag tag1 : topicTags)
+		for (int i = 0; i < topicTags.size(); ++i)
 		{
+			final Tag tag1 = topicTags.get(i);
 			final Integer tag1ID = tag1.getTagId();
-			for (final Tag tag2 : topicTags)
+			
+			for (int j = i + 1; j < topicTags.size(); ++j)
 			{
+				final Tag tag2 = topicTags.get(j);
 				final Integer tag2ID = tag2.getTagId();
-				
-				final Pair<Integer, Integer> pair1 = new Pair<Integer, Integer>(tag1ID, tag2ID);
-				final Pair<Integer, Integer> pair2 = new Pair<Integer, Integer>(tag2ID, tag1ID);
-				
-				if (!matchedTags.contains(pair1) && !matchedTags.contains(pair2))
+
+				final List<Integer> matchingTags = CollectionUtilities.toArrayList(Constants.TAG_DESCRIPTION_TAG_ID, tag1ID, tag2ID);
+				final List<Integer> excludeTags = new ArrayList<Integer>();
+				final List<Topic> landingPage = topicDatabase.getMatchingTopicsFromInteger(matchingTags, excludeTags, true, true);
+
+				if (landingPage.size() == 1)
 				{
-					final List<Integer> matchingTags = CollectionUtilities.toArrayList(Constants.TAG_DESCRIPTION_TAG_ID, tag1.getTagId(), tag2.getTagId());
-					final List<Integer> excludeTags = new ArrayList<Integer>();
-					final List<Topic> landingPage = topicDatabase.getMatchingTopicsFromInteger(matchingTags, excludeTags, true, true);
+					final Text delimiter = xmlDocument.createTextNode(" : ");
+					breadCrumbPara.appendChild(delimiter);
 
-					if (landingPage.size() == 1)
-					{
-						matchedTags.add(pair1);
-						matchedTags.add(pair2);
-
-						final Text delimiter = xmlDocument.createTextNode(" : ");
-						breadCrumbPara.appendChild(delimiter);
-
-						final Element landingPageXRef = xmlDocument.createElement("xref");
-						landingPageXRef.setAttribute("linkend", landingPage.get(0).getXRefID());
-						breadCrumbPara.appendChild(landingPageXRef);
-					}
+					final Element landingPageXRef = xmlDocument.createElement("xref");
+					landingPageXRef.setAttribute("linkend", landingPage.get(0).getXRefID());
+					breadCrumbPara.appendChild(landingPageXRef);
 				}
+
 			}
 		}
 	}
