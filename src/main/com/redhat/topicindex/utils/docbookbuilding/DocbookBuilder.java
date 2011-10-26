@@ -662,7 +662,7 @@ public class DocbookBuilder
 	private void loadConstantsFromDB()
 	{
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
-		
+
 		revisionHistoryXml = EntityUtilities.loadStringConstant(entityManager, REVISION_HISTORY_XML_ID);
 		bookXml = EntityUtilities.loadStringConstant(entityManager, BOOK_XML_ID);
 		publicanCfg = EntityUtilities.loadStringConstant(entityManager, PUBLICAN_CFG_ID);
@@ -771,7 +771,7 @@ public class DocbookBuilder
 		 * add a collection of tag description topics
 		 */
 		final TocTopLevel retValue = buildTOCAndLandingPages(usedIds, docbookBuildingOptions);
-		
+
 		/* add the bread crumbs to the topics */
 		final List<Topic> normalTopics = topicDatabase.getNonLandingPageTopics();
 		for (final Topic topic : normalTopics)
@@ -867,7 +867,7 @@ public class DocbookBuilder
 		final Topic landingPage = new Topic();
 		landingPage.setTopicId(topicId);
 		landingPage.setTopicTitle(title);
-		
+
 		for (final Tag tag : templateTags)
 			landingPage.addTag(tag.getTagId());
 
@@ -1492,7 +1492,7 @@ public class DocbookBuilder
 		businessRulesWorkingMemory.insert(new DroolsEvent("CalculateRelativePriority"));
 		businessRulesWorkingMemory.fireAllRules();
 	}
-	
+
 	private void processTopicBreadCrumbs(final Topic topic)
 	{
 		assert topic != null : "The topic parameter can not be null";
@@ -1519,8 +1519,8 @@ public class DocbookBuilder
 				insertBefore = title.getNextSibling();
 			}
 			/*
-			 * If the first child is not a section title, we will insert the bread crumb
-			 * before it
+			 * If the first child is not a section title, we will insert the
+			 * bread crumb before it
 			 */
 			else
 			{
@@ -1531,8 +1531,8 @@ public class DocbookBuilder
 		final Element breadCrumbPara = xmlDocument.createElement("para");
 
 		/*
-		 * If insertBefore == null, it means the document is empty, or the
-		 * title has no sibling, so we just append to the document.
+		 * If insertBefore == null, it means the document is empty, or the title
+		 * has no sibling, so we just append to the document.
 		 */
 		if (insertBefore == null)
 			docElement.appendChild(breadCrumbPara);
@@ -1548,22 +1548,35 @@ public class DocbookBuilder
 		 * this topic
 		 */
 		final List<Tag> topicTags = topic.getTags();
+		final List<Pair<Integer, Integer>> matchedTags = new ArrayList<Pair<Integer, Integer>>();
 		for (final Tag tag1 : topicTags)
 		{
+			final Integer tag1ID = tag1.getTagId();
 			for (final Tag tag2 : topicTags)
 			{
-				final List<Integer> matchingTags = CollectionUtilities.toArrayList(Constants.TAG_DESCRIPTION_TAG_ID, tag1.getTagId(), tag2.getTagId());
-				final List<Integer> excludeTags = new ArrayList<Integer>();
-				final List<Topic> landingPage = topicDatabase.getMatchingTopicsFromInteger(matchingTags, excludeTags, true, true);
-
-				if (landingPage.size() == 1)
+				final Integer tag2ID = tag2.getTagId();
+				
+				final Pair<Integer, Integer> pair1 = new Pair<Integer, Integer>(tag1ID, tag2ID);
+				final Pair<Integer, Integer> pair2 = new Pair<Integer, Integer>(tag2ID, tag1ID);
+				
+				if (!matchedTags.contains(pair1) && !matchedTags.contains(pair2))
 				{
-					final Text delimiter = xmlDocument.createTextNode(" : ");
-					breadCrumbPara.appendChild(delimiter);
+					final List<Integer> matchingTags = CollectionUtilities.toArrayList(Constants.TAG_DESCRIPTION_TAG_ID, tag1.getTagId(), tag2.getTagId());
+					final List<Integer> excludeTags = new ArrayList<Integer>();
+					final List<Topic> landingPage = topicDatabase.getMatchingTopicsFromInteger(matchingTags, excludeTags, true, true);
 
-					final Element landingPageXRef = xmlDocument.createElement("xref");
-					landingPageXRef.setAttribute("linkend", landingPage.get(0).getXRefID());
-					breadCrumbPara.appendChild(landingPageXRef);
+					if (landingPage.size() == 1)
+					{
+						matchedTags.add(pair1);
+						matchedTags.add(pair2);
+
+						final Text delimiter = xmlDocument.createTextNode(" : ");
+						breadCrumbPara.appendChild(delimiter);
+
+						final Element landingPageXRef = xmlDocument.createElement("xref");
+						landingPageXRef.setAttribute("linkend", landingPage.get(0).getXRefID());
+						breadCrumbPara.appendChild(landingPageXRef);
+					}
 				}
 			}
 		}
@@ -1743,7 +1756,7 @@ public class DocbookBuilder
 		processTopicDraftWarning(topic);
 		processTopicAdditionalInfo(topic, searchTagsUrl, docbookBuildingOptions);
 		processTopicFixImages(topic);
-		
+
 		/********** PROCESS RELATED TOPICS **********/
 
 		/*
