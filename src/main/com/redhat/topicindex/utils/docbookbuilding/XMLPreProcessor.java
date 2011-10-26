@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -773,5 +774,21 @@ public class XMLPreProcessor
 		}
 
 		return "";
+	}
+	
+	public static String processDocumentType(final String xml)
+	{
+		if (XMLUtilities.findDocumentType(xml) == null)
+		{
+			final String preamble = XMLUtilities.findPreamble(xml);
+			final String fixedPreamble = preamble == null ? "" : preamble + "\n";
+			final String fixedXML = preamble == null ? xml : xml.replace(preamble, "");
+			
+			return fixedPreamble + 
+				"<!DOCTYPE section PUBLIC \"-//OASIS//DTD DocBook XML V4.5//EN\" \"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd\" []>\n" +
+				fixedXML;
+		}
+		
+		return xml;
 	}
 }

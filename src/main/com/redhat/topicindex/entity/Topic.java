@@ -796,7 +796,8 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 
 				/* render the topic html */
 				final String processedXML = XMLUtilities.convertDocumentToString(doc, XML_ENCODING);
-				this.setTopicRendered(XMLRenderer.transformDocbook(entityManager, processedXML));
+				final String processedXMLWithDocType = XMLPreProcessor.processDocumentType(processedXML);
+				this.setTopicRendered(XMLRenderer.transformDocbook(entityManager, processedXMLWithDocType));
 			}
 		}
 		catch (final Exception ex)

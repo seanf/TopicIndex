@@ -30,7 +30,7 @@ public class DocbookUtils
 	
 	public static String addXMLBoilerplate(final String xml)
 	{
-		return "<?xml version='1.0' encoding='utf-8' ?>\n" +
+		return "<?xml version='1.0' encoding='UTF-8' ?>\n" +
 		"<!DOCTYPE chapter PUBLIC \"-//OASIS//DTD DocBook XML V4.5//EN\" \"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd\" [\n" +
 		"<!ENTITY % BOOK_ENTITIES SYSTEM \"Book.ent\">\n" +
 		"%BOOK_ENTITIES;\n" +
