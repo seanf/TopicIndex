@@ -23,7 +23,7 @@ public class TocTopicDatabase
 		if (!containsTopic(topic))
 			topics.add(topic);
 	}
-	
+
 	public boolean containsTopic(final Topic topic)
 	{
 		return topics.contains(topic);
@@ -47,37 +47,41 @@ public class TocTopicDatabase
 	{
 		return getMatchingTopicsFromTag(tag).size() != 0;
 	}
-	
+
 	public boolean containsTopicsWithTag(final Integer tag)
 	{
 		return getMatchingTopicsFromInteger(tag).size() != 0;
 	}
-	
+
 	public List<Tag> getTagsFromCategories(final List<Integer> categoryIds)
 	{
 		final List<Tag> retValue = new ArrayList<Tag>();
-		
+
 		for (final Topic topic : topics)
 		{
 			CollectionUtilities.addAllThatDontExist(topic.getTagsInCategoriesByID(categoryIds), retValue);
 		}
-		
+
 		return retValue;
 	}
 
-	public List<Topic> getMatchingTopicsFromInteger(final List<Integer> matchingTags, final List<Integer> excludeTags, final boolean haveOnlyMatchingTags)
+	public List<Topic> getMatchingTopicsFromInteger(final List<Integer> matchingTags, final List<Integer> excludeTags, final boolean haveOnlyMatchingTags, final boolean landingPagesOnly)
 	{
-		if (matchingTags == null || excludeTags == null)
-			return null;
+		assert matchingTags != null : "The matchingTags parameter can not be null";
+		assert excludeTags != null : "The excludeTags parameter can not be null";
 
 		final List<Topic> topicList = new ArrayList<Topic>();
 
 		for (final Topic topic : topics)
 		{
+			/* landing pages ahev negative topic ids */
+			if (landingPagesOnly && topic.getTopicId() >= 0)
+				continue;
+			
 			/* check to see if the topic has only the matching tags */
 			if (haveOnlyMatchingTags && topic.getTopicToTags().size() != matchingTags.size())
 				continue;
-
+		
 			/* check for matching tags */
 			boolean foundMatchingTag = true;
 			for (final Integer matchingTag : matchingTags)
@@ -85,7 +89,7 @@ public class TocTopicDatabase
 				if (!topic.isTaggedWith(matchingTag))
 				{
 					foundMatchingTag = false;
-					break;					
+					break;
 				}
 			}
 			if (!foundMatchingTag)
@@ -106,13 +110,17 @@ public class TocTopicDatabase
 
 			topicList.add(topic);
 		}
+		
+		/* post conditions */
+		if (landingPagesOnly)
+			assert (topicList.size() == 0 || topicList.size() == 1) : "Found 2 or more landing pages, when 0 or 1 was expected";
 
 		return topicList;
 	}
 
 	public List<Topic> getMatchingTopicsFromInteger(final Integer matchingTag, final List<Integer> excludeTags, final boolean haveOnlyMatchingTags)
 	{
-		return getMatchingTopicsFromInteger(CollectionUtilities.toArrayList(matchingTag), excludeTags, haveOnlyMatchingTags);
+		return getMatchingTopicsFromInteger(CollectionUtilities.toArrayList(matchingTag), excludeTags, haveOnlyMatchingTags, false);
 	}
 
 	public List<Topic> getMatchingTopicsFromInteger(final Integer matchingTag, final Integer excludeTag, final boolean haveOnlyMatchingTags)
@@ -122,12 +130,12 @@ public class TocTopicDatabase
 
 	public List<Topic> getMatchingTopicsFromInteger(final List<Integer> matchingTags, final Integer excludeTag, final boolean haveOnlyMatchingTags)
 	{
-		return getMatchingTopicsFromInteger(matchingTags, CollectionUtilities.toArrayList(excludeTag), haveOnlyMatchingTags);
+		return getMatchingTopicsFromInteger(matchingTags, CollectionUtilities.toArrayList(excludeTag), haveOnlyMatchingTags, false);
 	}
 
 	public List<Topic> getMatchingTopicsFromInteger(final List<Integer> matchingTags, final List<Integer> excludeTags)
 	{
-		return getMatchingTopicsFromInteger(matchingTags, excludeTags, false);
+		return getMatchingTopicsFromInteger(matchingTags, excludeTags, false, false);
 	}
 
 	public List<Topic> getMatchingTopicsFromInteger(final Integer matchingTag, final List<Integer> excludeTags)
@@ -152,12 +160,21 @@ public class TocTopicDatabase
 
 	public List<Topic> getMatchingTopicsFromInteger(final List<Integer> matchingTags)
 	{
-		return getMatchingTopicsFromInteger(matchingTags, new ArrayList<Integer>(), false);
+		return getMatchingTopicsFromInteger(matchingTags, new ArrayList<Integer>(), false, false);
 	}
 
 	public List<Topic> getTopics()
 	{
 		return topics;
+	}
+	
+	public List<Topic> getNonLandingPageTopics()
+	{
+		final List<Topic> retValue = new ArrayList<Topic>();
+		for (final Topic topic : topics)
+			if (topic.getTopicId() >= 0)
+				retValue.add(topic);		
+		return retValue;
 	}
 
 	public void setTopics(List<Topic> topics)
@@ -167,7 +184,7 @@ public class TocTopicDatabase
 
 	public List<Topic> getMatchingTopicsFromTopicToTag(final List<TopicToTag> matchingTags, final List<TopicToTag> excludeTags)
 	{
-		return getMatchingTopicsFromInteger(convertToIntegerArray(matchingTags), convertToIntegerArray(excludeTags), false);
+		return getMatchingTopicsFromInteger(convertToIntegerArray(matchingTags), convertToIntegerArray(excludeTags), false, false);
 	}
 
 	public List<Topic> getMatchingTopicsFromTopicToTag(final TopicToTag matchingTag, final List<TopicToTag> excludeTags)
@@ -205,7 +222,7 @@ public class TocTopicDatabase
 
 	public List<Topic> getMatchingTopicsFromTagToCategory(final List<TagToCategory> matchingTags, final List<TagToCategory> excludeTags)
 	{
-		return getMatchingTopicsFromInteger(convertToTagArrayFromTagToCategory(matchingTags), convertToTagArrayFromTagToCategory(excludeTags), false);
+		return getMatchingTopicsFromInteger(convertToTagArrayFromTagToCategory(matchingTags), convertToTagArrayFromTagToCategory(excludeTags), false, false);
 	}
 
 	public List<Topic> getMatchingTopicsFromTagToCategory(final TagToCategory matchingTag, final List<TagToCategory> excludeTags)
@@ -242,7 +259,7 @@ public class TocTopicDatabase
 
 	public List<Topic> getMatchingTopicsFromTagToCategory(final List<TagToCategory> matchingTags)
 	{
-		return getMatchingTopicsFromInteger(convertToTagArrayFromTagToCategory(matchingTags), new ArrayList<Integer>(), false);
+		return getMatchingTopicsFromInteger(convertToTagArrayFromTagToCategory(matchingTags), new ArrayList<Integer>(), false, false);
 	}
 
 	private List<Integer> convertToTagArrayFromTagToCategory(final List<TagToCategory> collection)
@@ -257,10 +274,10 @@ public class TocTopicDatabase
 		}
 		return retValue;
 	}
-	
+
 	public List<Topic> getMatchingTopicsFromTag(final List<Tag> matchingTags, final List<Tag> excludeTags)
 	{
-		return getMatchingTopicsFromInteger(convertTagArrayToIntegerArray(matchingTags), convertTagArrayToIntegerArray(excludeTags), false);
+		return getMatchingTopicsFromInteger(convertTagArrayToIntegerArray(matchingTags), convertTagArrayToIntegerArray(excludeTags), false, false);
 	}
 
 	public List<Topic> getMatchingTopicsFromTag(final Tag matchingTag, final List<Tag> excludeTags)
@@ -270,7 +287,7 @@ public class TocTopicDatabase
 
 		return getMatchingTopicsFromInteger(matchingTag.getTagId(), convertTagArrayToIntegerArray(excludeTags), false);
 	}
-	
+
 	public List<Topic> getMatchingTopicsFromTag(final Tag matchingTag, final Tag excludeTag)
 	{
 		if (matchingTag == null || excludeTag == null)
@@ -286,7 +303,7 @@ public class TocTopicDatabase
 
 		return getMatchingTopicsFromInteger(convertTagArrayToIntegerArray(matchingTags), excludeTag.getTagId(), false);
 	}
-	
+
 	public List<Topic> getMatchingTopicsFromTag(final Tag matchingTag)
 	{
 		if (matchingTag == null)
@@ -294,10 +311,10 @@ public class TocTopicDatabase
 
 		return getMatchingTopicsFromInteger(matchingTag.getTagId(), new ArrayList<Integer>(), false);
 	}
-	
+
 	public List<Topic> getMatchingTopicsFromTag(final List<Tag> matchingTags)
 	{
-		return getMatchingTopicsFromInteger(convertTagArrayToIntegerArray(matchingTags), new ArrayList<Integer>(), false);
+		return getMatchingTopicsFromInteger(convertTagArrayToIntegerArray(matchingTags), new ArrayList<Integer>(), false, false);
 	}
 
 	private List<Integer> convertTagArrayToIntegerArray(final List<Tag> tags)

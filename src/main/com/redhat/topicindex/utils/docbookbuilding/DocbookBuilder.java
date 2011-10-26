@@ -771,6 +771,11 @@ public class DocbookBuilder
 		 * add a collection of tag description topics
 		 */
 		final TocTopLevel retValue = buildTOCAndLandingPages(usedIds, docbookBuildingOptions);
+		
+		/* add the bread crumbs to the topics */
+		final List<Topic> normalTopics = topicDatabase.getNonLandingPageTopics();
+		for (final Topic topic : normalTopics)
+			processTopicBreadCrumbs(topic);
 
 		/*
 		 * take the information gathered by the processTopic() function, and use
@@ -862,6 +867,9 @@ public class DocbookBuilder
 		final Topic landingPage = new Topic();
 		landingPage.setTopicId(topicId);
 		landingPage.setTopicTitle(title);
+		
+		for (final Tag tag : templateTags)
+			landingPage.addTag(tag.getTagId());
 
 		/*
 		 * Apply the xml from the template topic, or a generic template if not
@@ -1484,6 +1492,82 @@ public class DocbookBuilder
 		businessRulesWorkingMemory.insert(new DroolsEvent("CalculateRelativePriority"));
 		businessRulesWorkingMemory.fireAllRules();
 	}
+	
+	private void processTopicBreadCrumbs(final Topic topic)
+	{
+		assert topic != null : "The topic parameter can not be null";
+		assert topic.getTempTopicXMLDoc() != null : "topic.getTempTopicXMLDoc() can not be null";
+
+		final Document xmlDocument = topic.getTempTopicXMLDoc();
+		final Node docElement = xmlDocument.getDocumentElement();
+
+		assert docElement != null : "xmlDocument.getDocumentElement() should not be null";
+
+		final List<Node> titleNodes = XMLUtilities.getNodes(docElement, "title");
+		final Node title = titleNodes.size() != 0 ? titleNodes.get(0) : null;
+
+		Node insertBefore = null;
+
+		if (title != null)
+		{
+			/*
+			 * We expect the first child of the document element to be a title,
+			 * and the bread crumb will be inserted after the title.
+			 */
+			if (title.getParentNode() == docElement)
+			{
+				insertBefore = title.getNextSibling();
+			}
+			/*
+			 * If the first child is not a section title, we will insert the bread crumb
+			 * before it
+			 */
+			else
+			{
+				insertBefore = docElement.getFirstChild();
+			}
+		}
+
+		final Element breadCrumbPara = xmlDocument.createElement("para");
+
+		/*
+		 * If insertBefore == null, it means the document is empty, or the
+		 * title has no sibling, so we just append to the document.
+		 */
+		if (insertBefore == null)
+			docElement.appendChild(breadCrumbPara);
+		else
+			docElement.insertBefore(breadCrumbPara, insertBefore);
+
+		final Element homeLink = xmlDocument.createElement("xref");
+		homeLink.setAttribute("linkend", Constants.TOPIC_XREF_PREFIX + Constants.HOME_LANDING_PAGE_TOPIC_ID);
+		breadCrumbPara.appendChild(homeLink);
+
+		/*
+		 * find the landing pages that match the combination of tags present in
+		 * this topic
+		 */
+		final List<Tag> topicTags = topic.getTags();
+		for (final Tag tag1 : topicTags)
+		{
+			for (final Tag tag2 : topicTags)
+			{
+				final List<Integer> matchingTags = CollectionUtilities.toArrayList(Constants.TAG_DESCRIPTION_TAG_ID, tag1.getTagId(), tag2.getTagId());
+				final List<Integer> excludeTags = new ArrayList<Integer>();
+				final List<Topic> landingPage = topicDatabase.getMatchingTopicsFromInteger(matchingTags, excludeTags, true, true);
+
+				if (landingPage.size() == 1)
+				{
+					final Text delimiter = xmlDocument.createTextNode(" : ");
+					breadCrumbPara.appendChild(delimiter);
+
+					final Element landingPageXRef = xmlDocument.createElement("xref");
+					landingPageXRef.setAttribute("linkend", landingPage.get(0).getXRefID());
+					breadCrumbPara.appendChild(landingPageXRef);
+				}
+			}
+		}
+	}
 
 	/**
 	 * Fix image location references so publican will compile them
@@ -1659,7 +1743,7 @@ public class DocbookBuilder
 		processTopicDraftWarning(topic);
 		processTopicAdditionalInfo(topic, searchTagsUrl, docbookBuildingOptions);
 		processTopicFixImages(topic);
-
+		
 		/********** PROCESS RELATED TOPICS **********/
 
 		/*

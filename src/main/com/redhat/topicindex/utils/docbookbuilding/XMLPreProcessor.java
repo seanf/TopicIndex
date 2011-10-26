@@ -12,6 +12,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 
 import com.google.code.regexp.NamedMatcher;
 import com.google.code.regexp.NamedPattern;
@@ -19,6 +20,7 @@ import com.redhat.ecs.commonstructures.Pair;
 import com.redhat.ecs.commonutils.CollectionUtilities;
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.ecs.commonutils.XMLUtilities;
+import com.redhat.topicindex.entity.Tag;
 import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.sort.ExternalListSort;
 import com.redhat.topicindex.sort.TopicTitleComparator;
@@ -775,20 +777,22 @@ public class XMLPreProcessor
 
 		return "";
 	}
-	
+
 	public static String processDocumentType(final String xml)
 	{
+		assert xml != null : "The xml parameter can not be null";
+
 		if (XMLUtilities.findDocumentType(xml) == null)
 		{
 			final String preamble = XMLUtilities.findPreamble(xml);
 			final String fixedPreamble = preamble == null ? "" : preamble + "\n";
 			final String fixedXML = preamble == null ? xml : xml.replace(preamble, "");
-			
-			return fixedPreamble + 
-				"<!DOCTYPE section PUBLIC \"-//OASIS//DTD DocBook XML V4.5//EN\" \"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd\" []>\n" +
-				fixedXML;
+
+			return fixedPreamble + "<!DOCTYPE section PUBLIC \"-//OASIS//DTD DocBook XML V4.5//EN\" \"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd\" []>\n" + fixedXML;
 		}
-		
+
 		return xml;
 	}
+
+	
 }
