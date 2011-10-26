@@ -19,6 +19,9 @@ import javax.persistence.Table;
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.NotNull;
 
+import com.redhat.ecs.commonthread.WorkQueue;
+import com.redhat.topicindex.utils.TopicRenderer;
+
 @Audited
 @Entity
 @Table(name = "TopicToTopic", catalog = "Skynet", uniqueConstraints = @UniqueConstraint(columnNames =
@@ -89,7 +92,7 @@ public class TopicToTopic implements java.io.Serializable
 	{
 		if (this.mainTopic != null)
 		{
-			mainTopic.reRenderTopic();
+			WorkQueue.getInstance().execute(TopicRenderer.createNewInstance(mainTopic.getTopicId()));
 		}
 	}
 

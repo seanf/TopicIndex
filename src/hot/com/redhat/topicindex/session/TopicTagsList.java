@@ -380,6 +380,7 @@ public class TopicTagsList extends ExtendedTopicList
 				otherTopic.addRelationshipTo(actionTopic);
 
 				entityManager.persist(actionTopic);
+				entityManager.persist(otherTopic);
 				entityManager.flush();
 			}
 		}
@@ -462,6 +463,7 @@ public class TopicTagsList extends ExtendedTopicList
 				otherTopic.removeRelationshipTo(actionTopic);
 
 				entityManager.persist(actionTopic);
+				entityManager.persist(otherTopic);
 				entityManager.flush();
 			}
 		}
