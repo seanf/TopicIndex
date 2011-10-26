@@ -5,6 +5,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.PostPersist;
+import javax.persistence.PostRemove;
+import javax.persistence.PrePersist;
+import javax.persistence.PreRemove;
+import javax.persistence.PreUpdate;
 import javax.persistence.UniqueConstraint;
 
 import static javax.persistence.GenerationType.IDENTITY;
@@ -16,18 +21,20 @@ import org.hibernate.validator.NotNull;
 
 @Audited
 @Entity
-@Table(name = "TopicToTopic", catalog = "Skynet", uniqueConstraints = @UniqueConstraint(columnNames = {"MainTopicID", "RelatedTopicID"}))
-public class TopicToTopic implements java.io.Serializable 
+@Table(name = "TopicToTopic", catalog = "Skynet", uniqueConstraints = @UniqueConstraint(columnNames =
+{ "MainTopicID", "RelatedTopicID" }))
+public class TopicToTopic implements java.io.Serializable
 {
 	private static final long serialVersionUID = -589601408520832737L;
 	private Integer topicToTopicId;
 	private Topic mainTopic;
 	private Topic relatedTopic;
 
-	public TopicToTopic() {
+	public TopicToTopic()
+	{
 	}
 
-	public TopicToTopic(final Topic mainTopic, final Topic relatedTopic) 
+	public TopicToTopic(final Topic mainTopic, final Topic relatedTopic)
 	{
 		this.mainTopic = mainTopic;
 		this.relatedTopic = relatedTopic;
@@ -41,7 +48,7 @@ public class TopicToTopic implements java.io.Serializable
 		return this.topicToTopicId;
 	}
 
-	public void setTopicToTopicId(final Integer topicToTopicId) 
+	public void setTopicToTopicId(final Integer topicToTopicId)
 	{
 		this.topicToTopicId = topicToTopicId;
 	}
@@ -49,12 +56,12 @@ public class TopicToTopic implements java.io.Serializable
 	@ManyToOne
 	@JoinColumn(name = "MainTopicID", nullable = false)
 	@NotNull
-	public Topic getMainTopic() 
+	public Topic getMainTopic()
 	{
 		return this.mainTopic;
 	}
 
-	public void setMainTopic(final Topic mainTopic) 
+	public void setMainTopic(final Topic mainTopic)
 	{
 		this.mainTopic = mainTopic;
 	}
@@ -62,14 +69,28 @@ public class TopicToTopic implements java.io.Serializable
 	@ManyToOne
 	@JoinColumn(name = "RelatedTopicID", nullable = false)
 	@NotNull
-	public Topic getRelatedTopic() 
+	public Topic getRelatedTopic()
 	{
 		return this.relatedTopic;
 	}
 
-	public void setRelatedTopic(final Topic relatedTopic) 
+	public void setRelatedTopic(final Topic relatedTopic)
 	{
 		this.relatedTopic = relatedTopic;
+	}
+
+	/**
+	 * When a TopicToTopic mapping is created or destroyed, we rerender the main
+	 * topic to update the generic injection lists.
+	 */
+	@PostPersist
+	@PostRemove
+	private void reRender()
+	{
+		if (this.mainTopic != null)
+		{
+			mainTopic.reRenderTopic();
+		}
 	}
 
 }

@@ -3,12 +3,8 @@ package com.redhat.topicindex.utils;
 import javax.naming.InitialContext;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.transaction.SystemException;
-import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 
-import org.jboss.seam.Component;
-import org.jboss.seam.contexts.Lifecycle;
 
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.topicindex.entity.Topic;
@@ -19,6 +15,23 @@ public class TopicRenderer implements Runnable
 	private EntityManagerFactory entityManagerFactory = null;
 	private TransactionManager transactionManager = null;
 
+	public static TopicRenderer createNewInstance(final Integer topicId)
+	{
+		try
+		{
+			final InitialContext initCtx = new InitialContext();
+			final EntityManagerFactory entityManagerFactory = (EntityManagerFactory) initCtx.lookup("java:jboss/EntityManagerFactory");
+			final TransactionManager transactionManager = (TransactionManager) initCtx.lookup("java:jboss/TransactionManager");
+			return new TopicRenderer(topicId, entityManagerFactory, transactionManager);
+		}
+		catch (final Exception ex)
+		{
+			ExceptionUtilities.handleException(ex);
+		}
+		
+		return null;
+	}
+	
 	public TopicRenderer(final Integer topicId, final EntityManagerFactory entityManagerFactory, final TransactionManager transactionManager)
 	{
 		this.topicId = topicId;
@@ -28,12 +41,14 @@ public class TopicRenderer implements Runnable
 
 	@Override
 	public void run()
-	{
+	{		
+		EntityManager entityManager = null;
+		
 		try
 		{
 			transactionManager.begin();
 						
-			final EntityManager entityManager = this.entityManagerFactory.createEntityManager();
+			entityManager = this.entityManagerFactory.createEntityManager();
 			final Topic topic = entityManager.find(Topic.class, this.topicId);
 			
 			if (topic != null)
@@ -58,6 +73,11 @@ public class TopicRenderer implements Runnable
 			{
 				ExceptionUtilities.handleException(ex2);
 			}
+		}
+		finally
+		{
+			if (entityManager != null)
+				entityManager.close();
 		}
 	}
 }

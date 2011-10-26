@@ -599,29 +599,19 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	{
 		for (final TopicToTopic topicToTopic : this.getParentTopicToTopics())
 		{
-			if (topicToTopic.getRelatedTopic().topicId.equals(relatedTopicId))
+			final Topic relatedTopic = topicToTopic.getRelatedTopic();
+			
+			if (relatedTopic.getTopicId().equals(relatedTopicId))
 			{
-				this.getParentTopicToTopics().remove(topicToTopic);
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	public boolean removeRelationshipTo(final Topic relatedTopic)
-	{
-		for (final TopicToTopic topicToTopic : this.getParentTopicToTopics())
-		{
-			if (topicToTopic.getRelatedTopic().equals(relatedTopic))
-			{
+				/* remove the relationship from this topic */
 				this.getParentTopicToTopics().remove(topicToTopic);
 
-				for (final TopicToTopic childTopicToTopic : topicToTopic.getRelatedTopic().getChildTopicToTopics())
+				/* now remove the relationship from the other topic */	
+				for (final TopicToTopic childTopicToTopic : relatedTopic.getChildTopicToTopics())
 				{
 					if (childTopicToTopic.getMainTopic().equals(this))
 					{
-						topicToTopic.getRelatedTopic().getChildTopicToTopics().remove(childTopicToTopic);
+						relatedTopic.getChildTopicToTopics().remove(childTopicToTopic);
 						break;
 					}
 				}
@@ -633,12 +623,18 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		return false;
 	}
 
+	public boolean removeRelationshipTo(final Topic relatedTopic)
+	{
+		return removeRelationshipTo(relatedTopic.getTopicId());
+	}
+
 	public boolean addRelationshipTo(final Topic relatedTopic)
 	{
 		if (!this.isRelatedTo(relatedTopic))
 		{
 			final TopicToTopic topicToTopic = new TopicToTopic(this, relatedTopic);
 			this.getParentTopicToTopics().add(topicToTopic);
+			relatedTopic.getChildTopicToTopics().add(topicToTopic);
 			return true;
 		}
 
@@ -714,7 +710,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		this.parentTopicToTopics = parentTopicToTopics;
 	}
 
-	@OneToMany(fetch = FetchType.EAGER, mappedBy = "relatedTopic", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "relatedTopic")
 	public Set<TopicToTopic> getChildTopicToTopics()
 	{
 		return childTopicToTopics;
@@ -749,15 +745,10 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	{
 		if (!isRerenderRelatedTopics())
 			return;
-		
+
 		try
 		{
-			final InitialContext initCtx = new InitialContext();
-
-			final EntityManagerFactory entityManagerFactory = (EntityManagerFactory) initCtx.lookup("java:jboss/EntityManagerFactory");
-			final TransactionManager transactionManager = (TransactionManager) initCtx.lookup("java:jboss/TransactionManager");
-
-			WorkQueue.getInstance().execute(new TopicRenderer(this.getTopicId(), entityManagerFactory, transactionManager));
+			WorkQueue.getInstance().execute(TopicRenderer.createNewInstance(this.getTopicId()));
 
 			/*
 			 * Because of the ability to inject topic contents into other
@@ -765,10 +756,10 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 			 * relationship.
 			 */
 			for (final Topic relatedTopic : this.getIncomingRelatedTopicsArray())
-				WorkQueue.getInstance().execute(new TopicRenderer(relatedTopic.getTopicId(), entityManagerFactory, transactionManager));
+				WorkQueue.getInstance().execute(TopicRenderer.createNewInstance(relatedTopic.getTopicId()));
 
 			for (final Topic relatedTopic : this.getTwoWayRelatedTopicsArray())
-				WorkQueue.getInstance().execute(new TopicRenderer(relatedTopic.getTopicId(), entityManagerFactory, transactionManager));
+				WorkQueue.getInstance().execute(TopicRenderer.createNewInstance(relatedTopic.getTopicId()));
 		}
 		catch (final Exception ex)
 		{
@@ -1208,18 +1199,22 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		return getTagsInCategoriesByID(catgeoriesByID);
 	}
 
+	/**
+	 * This function forces this topic to be rerendered, without updating any
+	 * related topics.
+	 */
 	public void reRenderTopic()
 	{
-		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
-
-		final String topicXML = this.getTopicXML();
-
-		if (!(topicXML == null || topicXML.trim().length() == 0))
+		try
 		{
-			final String renderedTopic = this.getTopicRendered();
-			this.setTopicRendered(renderedTopic == null ? "" : null);
-			entityManager.persist(this);
-			entityManager.flush();
+			WorkQueue.runAndWait(TopicRenderer.createNewInstance(this.getTopicId()));
+
+			final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+			entityManager.refresh(this);
+		}
+		catch (final Exception ex)
+		{
+			ExceptionUtilities.handleException(ex);
 		}
 	}
 

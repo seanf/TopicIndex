@@ -331,14 +331,14 @@ public class TopicTagsList extends ExtendedTopicList
 				if (to)
 				{
 					topic.removeRelationshipTo(otherTopic);
+					entityManager.persist(topic);
 				}
 				else
 				{
 					otherTopic.removeRelationshipTo(topic);
+					entityManager.persist(otherTopic);
 				}
 
-				entityManager.persist(topic);
-				entityManager.persist(otherTopic);
 				entityManager.flush();
 			}
 			catch (final EntityNotFoundException ex)
@@ -376,10 +376,10 @@ public class TopicTagsList extends ExtendedTopicList
 				final Topic actionTopic = entityManager.find(Topic.class, actionTopicID);
 				final Topic otherTopic = entityManager.find(Topic.class, otherTopicId);
 
-				otherTopic.addRelationshipTo(actionTopic);
 				actionTopic.addRelationshipTo(otherTopic);
+				otherTopic.addRelationshipTo(actionTopic);
 
-				entityManager.persist(otherTopic);
+				entityManager.persist(actionTopic);
 				entityManager.flush();
 			}
 		}
@@ -462,7 +462,6 @@ public class TopicTagsList extends ExtendedTopicList
 				otherTopic.removeRelationshipTo(actionTopic);
 
 				entityManager.persist(actionTopic);
-				entityManager.persist(otherTopic);
 				entityManager.flush();
 			}
 		}
