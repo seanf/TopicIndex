@@ -661,38 +661,40 @@ public class DocbookBuilder
 	 */
 	private void loadConstantsFromDB()
 	{
-		revisionHistoryXml = EntityUtilities.loadStringConstant(REVISION_HISTORY_XML_ID);
-		bookXml = EntityUtilities.loadStringConstant(BOOK_XML_ID);
-		publicanCfg = EntityUtilities.loadStringConstant(PUBLICAN_CFG_ID);
-		authorGroupXml = EntityUtilities.loadStringConstant(AUTHOR_GROUP_XML_ID);
-		bookInfoXml = EntityUtilities.loadStringConstant(BOOK_INFO_XML_ID);
-		bookEnt = EntityUtilities.loadStringConstant(BOOK_ENT_ID);
-		iconSvg = EntityUtilities.loadStringConstant(ICON_SVG_ID);
+		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+		
+		revisionHistoryXml = EntityUtilities.loadStringConstant(entityManager, REVISION_HISTORY_XML_ID);
+		bookXml = EntityUtilities.loadStringConstant(entityManager, BOOK_XML_ID);
+		publicanCfg = EntityUtilities.loadStringConstant(entityManager, PUBLICAN_CFG_ID);
+		authorGroupXml = EntityUtilities.loadStringConstant(entityManager, AUTHOR_GROUP_XML_ID);
+		bookInfoXml = EntityUtilities.loadStringConstant(entityManager, BOOK_INFO_XML_ID);
+		bookEnt = EntityUtilities.loadStringConstant(entityManager, BOOK_ENT_ID);
+		iconSvg = EntityUtilities.loadStringConstant(entityManager, ICON_SVG_ID);
 
-		errorTopic = EntityUtilities.loadStringConstant(ERROR_TOPIC_ID);
-		errorTagsTopic = EntityUtilities.loadStringConstant(ERRORTAGS_TOPIC_ID);
+		errorTopic = EntityUtilities.loadStringConstant(entityManager, ERROR_TOPIC_ID);
+		errorTagsTopic = EntityUtilities.loadStringConstant(entityManager, ERRORTAGS_TOPIC_ID);
 
-		makefile = EntityUtilities.loadStringConstant(MAKEFILE_ID);
-		spec_in = EntityUtilities.loadStringConstant(SPEC_IN_ID);
-		package_sh = EntityUtilities.loadStringConstant(PACKAGE_SH_ID);
+		makefile = EntityUtilities.loadStringConstant(entityManager, MAKEFILE_ID);
+		spec_in = EntityUtilities.loadStringConstant(entityManager, SPEC_IN_ID);
+		package_sh = EntityUtilities.loadStringConstant(entityManager, PACKAGE_SH_ID);
 
-		startPage = EntityUtilities.loadStringConstant(START_PAGE_ID);
-		jbossSvg = EntityUtilities.loadStringConstant(JBOSS_SVG_ID);
+		startPage = EntityUtilities.loadStringConstant(entityManager, START_PAGE_ID);
+		jbossSvg = EntityUtilities.loadStringConstant(entityManager, JBOSS_SVG_ID);
 
-		yahooDomEventJs = EntityUtilities.loadStringConstant(YAHOO_DOM_EVENT_JS_ID);
-		treeviewMinJs = EntityUtilities.loadStringConstant(TREEVIEW_MIN_JS_ID);
-		treeviewCss = EntityUtilities.loadStringConstant(TREEVIEW_CSS_ID);
-		jqueryMinJs = EntityUtilities.loadStringConstant(JQUERY_MIN_JS_ID);
+		yahooDomEventJs = EntityUtilities.loadStringConstant(entityManager, YAHOO_DOM_EVENT_JS_ID);
+		treeviewMinJs = EntityUtilities.loadStringConstant(entityManager, TREEVIEW_MIN_JS_ID);
+		treeviewCss = EntityUtilities.loadStringConstant(entityManager, TREEVIEW_CSS_ID);
+		jqueryMinJs = EntityUtilities.loadStringConstant(entityManager, JQUERY_MIN_JS_ID);
 
-		treeviewSpriteGif = EntityUtilities.loadBlobConstant(TREEVIEW_SPRITE_GIF_ID);
-		treeviewLoadingGif = EntityUtilities.loadBlobConstant(TREEVIEW_LOADING_GIF_ID);
-		check1Gif = EntityUtilities.loadBlobConstant(CHECK1_GIF_ID);
-		check2Gif = EntityUtilities.loadBlobConstant(CHECK2_GIF_ID);
-		failpenguinPng = EntityUtilities.loadBlobConstant(FAILPENGUIN_PNG_ID);
+		treeviewSpriteGif = EntityUtilities.loadBlobConstant(entityManager, TREEVIEW_SPRITE_GIF_ID);
+		treeviewLoadingGif = EntityUtilities.loadBlobConstant(entityManager, TREEVIEW_LOADING_GIF_ID);
+		check1Gif = EntityUtilities.loadBlobConstant(entityManager, CHECK1_GIF_ID);
+		check2Gif = EntityUtilities.loadBlobConstant(entityManager, CHECK2_GIF_ID);
+		failpenguinPng = EntityUtilities.loadBlobConstant(entityManager, FAILPENGUIN_PNG_ID);
 
-		pluginXml = EntityUtilities.loadStringConstant(PLUGIN_XML_ID);
-		eclisePackageSh = EntityUtilities.loadStringConstant(ECLIPSE_PACKAGE_SH_ID);
-		publicanEclipseCfg = EntityUtilities.loadStringConstant(PUBLICAN_ECLIPSE_CFG_ID);
+		pluginXml = EntityUtilities.loadStringConstant(entityManager, PLUGIN_XML_ID);
+		eclisePackageSh = EntityUtilities.loadStringConstant(entityManager, ECLIPSE_PACKAGE_SH_ID);
+		publicanEclipseCfg = EntityUtilities.loadStringConstant(entityManager, PUBLICAN_ECLIPSE_CFG_ID);
 	}
 
 	@SuppressWarnings("unchecked")

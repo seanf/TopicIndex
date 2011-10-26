@@ -59,12 +59,11 @@ import com.redhat.topicindex.utils.structures.tags.UIProjectData;
 
 public class EntityUtilities
 {
-	public static byte[] loadBlobConstant(final Integer id)
+	public static byte[] loadBlobConstant(final EntityManager entityManager, final Integer id)
 	{
 		if (id == null)
 			return null;
 
-		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 		final BlobConstants constant = entityManager.find(BlobConstants.class, id);
 
 		if (constant == null)
@@ -76,12 +75,12 @@ public class EntityUtilities
 		return constant.getConstantValue();
 	}
 
-	public static Integer loadIntegerConstant(final Integer id)
+	public static Integer loadIntegerConstant(final EntityManager entityManager, final Integer id)
 	{
 		if (id == null)
 			return null;
 
-		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+		
 		final IntegerConstants constant = entityManager.find(IntegerConstants.class, id);
 
 		if (constant == null)
@@ -93,12 +92,11 @@ public class EntityUtilities
 		return constant.getConstantValue();
 	}
 
-	public static String loadStringConstant(final Integer id)
+	public static String loadStringConstant(final EntityManager entityManager, final Integer id)
 	{
 		if (id == null)
 			return null;
 
-		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 		final StringConstants constant = entityManager.find(StringConstants.class, id);
 
 		if (constant == null)

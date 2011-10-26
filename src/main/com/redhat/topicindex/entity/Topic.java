@@ -17,10 +17,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 
+import javax.naming.InitialContext;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -31,6 +33,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+import javax.transaction.TransactionManager;
 
 import net.htmlparser.jericho.Source;
 
@@ -90,6 +93,12 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	/** The encoding of the XML, used when converting a DOM object to a string */
 	private static final String XML_ENCODING = "UTF-8";
 	private static final long serialVersionUID = 5580473587657911655L;
+
+	/**
+	 * If this value is false, when this entity is saved it will not trigger a
+	 * rerender of the any related topics
+	 */
+	private boolean rerenderRelatedTopics = true;
 
 	@Transient
 	public static String getCSVHeaderRow()
@@ -733,20 +742,41 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		syncXML();
 		validateTags();
 		validateRelationships();
-		renderXML();
-
-		/*
-		 * Because of the ability to inject topic contents into other topics, we
-		 * need rerender all topics that have an incoming relationship.
-		 */
-		for (final Topic relatedTopic : this.getIncomingRelatedTopicsArray())
-			WorkQueue.getInstance().execute(new TopicRenderer(relatedTopic.getTopicId()));
-
-		for (final Topic relatedTopic : this.getTwoWayRelatedTopicsArray())
-			WorkQueue.getInstance().execute(new TopicRenderer(relatedTopic.getTopicId()));
+		renderTopics();
 	}
 
-	public void renderXML()
+	private void renderTopics()
+	{
+		if (!isRerenderRelatedTopics())
+			return;
+		
+		try
+		{
+			final InitialContext initCtx = new InitialContext();
+
+			final EntityManagerFactory entityManagerFactory = (EntityManagerFactory) initCtx.lookup("java:jboss/EntityManagerFactory");
+			final TransactionManager transactionManager = (TransactionManager) initCtx.lookup("java:jboss/TransactionManager");
+
+			WorkQueue.getInstance().execute(new TopicRenderer(this.getTopicId(), entityManagerFactory, transactionManager));
+
+			/*
+			 * Because of the ability to inject topic contents into other
+			 * topics, we need rerender all topics that have an incoming
+			 * relationship.
+			 */
+			for (final Topic relatedTopic : this.getIncomingRelatedTopicsArray())
+				WorkQueue.getInstance().execute(new TopicRenderer(relatedTopic.getTopicId(), entityManagerFactory, transactionManager));
+
+			for (final Topic relatedTopic : this.getTwoWayRelatedTopicsArray())
+				WorkQueue.getInstance().execute(new TopicRenderer(relatedTopic.getTopicId(), entityManagerFactory, transactionManager));
+		}
+		catch (final Exception ex)
+		{
+			ExceptionUtilities.handleException(ex);
+		}
+	}
+
+	public void renderXML(final EntityManager entityManager)
 	{
 		System.out.println("Topic.renderXML() ID: " + this.topicId);
 
@@ -775,7 +805,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 
 				/* render the topic html */
 				final String processedXML = XMLUtilities.convertDocumentToString(doc, XML_ENCODING);
-				this.setTopicRendered(XMLRenderer.transformDocbook(processedXML));
+				this.setTopicRendered(XMLRenderer.transformDocbook(entityManager, processedXML));
 			}
 		}
 		catch (final Exception ex)
@@ -1200,5 +1230,16 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 			if (topic.getTopicId().equals(id))
 				return topic;
 		return null;
+	}
+
+	@Transient
+	public boolean isRerenderRelatedTopics()
+	{
+		return rerenderRelatedTopics;
+	}
+
+	public void setRerenderRelatedTopics(boolean rerenderRelatedTopics)
+	{
+		this.rerenderRelatedTopics = rerenderRelatedTopics;
 	}
 }
