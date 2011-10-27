@@ -4,6 +4,7 @@ import javax.persistence.EntityManager;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -35,12 +36,12 @@ public class RESTv1
 		return null;
 	}
 	
-	private <T> Response getResource(final Class<T> type, final RestRepresentation<T> restRepresentation, final Object id, final String mimeType, final String baseUri)
+	private <T> Response getResource(final Class<T> type, final BaseRestV1<T> restRepresentation, final Object id, final String mimeType, final String baseUri, final String expand)
 	{
-		return getResource(type, restRepresentation, id, mimeType, baseUri, null);
+		return getResource(type, restRepresentation, id, mimeType, baseUri, expand, null);
 	}
 	
-	private <T> Response getResource(final Class<T> type, final RestRepresentation<T> restRepresentation, final Object id, final String mimeType, final String baseUri, final String fileName)
+	private <T> Response getResource(final Class<T> type, final BaseRestV1<T> restRepresentation, final Object id, final String mimeType, final String baseUri, final String expand, final String fileName)
 	{
 		assert type != null : "The type parameter can not be null";
 		assert id != null : "The id parameter can not be null";
@@ -56,7 +57,7 @@ public class RESTv1
 			/* create a pretty printing Gson object */
 			final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			/* create the REST representation of the topic */
-			restRepresentation.initialize(entity, this.getBaseUrl(), baseUri);
+			restRepresentation.initialize(entity, this.getBaseUrl(), baseUri, expand);
 			/* Convert the REST representation to a JSON string */
 			final String json = gson.toJson(restRepresentation);
 			/* build a response */
@@ -73,11 +74,11 @@ public class RESTv1
 	
 	@GET
 	@Path("/topic/get/{topicId}")
-	public Response getTopic(@PathParam("topicId") final Integer id)
+	public Response getTopic(@PathParam("topicId") final Integer id, @QueryParam("expand") final String expand)
 	{
 		assert id != null : "The id parameter can not be null";
 						
-		return getResource(Topic.class, new TopicV1(), id, "application/json", "topic");
+		return getResource(Topic.class, new TopicV1(), id, "application/json", "topic", expand);
 	}
 	
 	@GET

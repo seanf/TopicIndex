@@ -1,11 +1,14 @@
 package com.redhat.topicindex.rest;
 
-public class BaseRestV1
+public abstract class BaseRestV1<T>
 {	
 	private String selfLink = null;
 	private String editLink = null;
 	private String deleteLink = null;
 	private String addLink = null;
+	private String[] expand = null;
+	
+	protected abstract void initialize(final T entity, final String baseUrl, final String restBasePath, final String expand);
 	
 	protected void initialize(final String baseUrl, final String restBasePath, final Object id)
 	{
@@ -53,5 +56,15 @@ public class BaseRestV1
 	protected void setAddLink(final String addLink)
 	{
 		this.addLink = addLink;
+	}
+
+	public String[] getExpand()
+	{
+		return expand;
+	}
+
+	public void setExpand(String[] expand)
+	{
+		this.expand = expand;
 	}
 }
