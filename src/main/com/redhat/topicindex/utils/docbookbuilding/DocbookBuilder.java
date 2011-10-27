@@ -5,8 +5,7 @@ import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
 import static ch.lambdaj.Lambda.selectFirst;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.hasItem;
+
 
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -15,7 +14,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 import java.util.Map.Entry;
 
 import javax.persistence.EntityManager;
@@ -29,10 +28,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
-import ch.lambdaj.function.matcher.LambdaJMatcher;
-
-import com.google.code.regexp.NamedMatcher;
-import com.google.code.regexp.NamedPattern;
 import com.redhat.ecs.commonstructures.Pair;
 import com.redhat.ecs.commonutils.CollectionUtilities;
 import com.redhat.ecs.commonutils.ExceptionUtilities;
@@ -40,25 +35,18 @@ import com.redhat.ecs.commonutils.HTTPUtilities;
 import com.redhat.ecs.commonutils.MIMEUtilities;
 import com.redhat.ecs.commonutils.XMLUtilities;
 import com.redhat.ecs.commonutils.ZipUtilities;
-import com.redhat.topicindex.entity.BlobConstants;
-import com.redhat.topicindex.entity.Category;
 import com.redhat.topicindex.entity.Filter;
 import com.redhat.topicindex.entity.FilterField;
 import com.redhat.topicindex.entity.FilterTag;
 import com.redhat.topicindex.entity.ImageFile;
-import com.redhat.topicindex.entity.IntegerConstants;
-import com.redhat.topicindex.entity.StringConstants;
 import com.redhat.topicindex.entity.Tag;
 import com.redhat.topicindex.entity.TagToCategory;
 import com.redhat.topicindex.entity.TagToTag;
 import com.redhat.topicindex.entity.Topic;
-import com.redhat.topicindex.entity.TopicToTag;
 import com.redhat.topicindex.entity.TopicToTopic;
-import com.redhat.topicindex.sort.ExternalListSort;
 import com.redhat.topicindex.sort.TagToCategorySortingComparator;
 import com.redhat.topicindex.sort.TocElementLabelComparator;
 import com.redhat.topicindex.sort.TopicTitleComparator;
-import com.redhat.topicindex.sort.TopicTitleSorter;
 import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.EntityUtilities;
 import com.redhat.topicindex.utils.LineEndFormatter;
@@ -498,7 +486,7 @@ public class DocbookBuilder
 	 * compilation process and packages them up with some static Docbook Strings
 	 * to produce a ZIP file that is sent to the user
 	 */
-	private void buildZipFile(final List<TagToCategory> topicTypeTagIDs, final List<TagToCategory> tagToCategories, final List<String> usedIds, final TocTopLevel tocTopLevel, final DocbookBuildingOptions docbookBuildingOptions)
+	private byte[] buildZipFile(final List<TagToCategory> topicTypeTagIDs, final List<TagToCategory> tagToCategories, final List<String> usedIds, final TocTopLevel tocTopLevel, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 
 		/* build up the files that will make up the zip file */
@@ -634,7 +622,7 @@ public class DocbookBuilder
 			ExceptionUtilities.handleException(ex);
 		}
 
-		HTTPUtilities.writeOutContent(zipFile, "Book.zip", MIMEUtilities.ZIP_MIME_TYPE);
+		return zipFile;
 	}
 
 	/**
@@ -642,7 +630,7 @@ public class DocbookBuilder
 	 * user and processes them to validate the xml in the topic SVN repo,
 	 * process the related topics and fix up image paths
 	 */
-	private void processTopics(final WorkingMemory businessRulesWorkingMemory, final Filter filter, final ArrayList<List<TagToCategory>> mandatoryExclusiveTagCollections, final ArrayList<List<TagToCategory>> mandatoryTagCollections, final int roleCategoryID, final String searchTagsUrl,
+	private void processTopics(final Filter filter, final ArrayList<List<TagToCategory>> mandatoryExclusiveTagCollections, final ArrayList<List<TagToCategory>> mandatoryTagCollections, final int roleCategoryID, final String searchTagsUrl,
 			final List<TagToCategory> tagToCategories, final List<String> usedIds, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		final List<Topic> topicList = EntityUtilities.getTopicsFromFilter(filter);
@@ -652,7 +640,7 @@ public class DocbookBuilder
 		 * related topics etc
 		 */
 		for (final Topic topic : topicList)
-			processTopic(businessRulesWorkingMemory, topic, mandatoryExclusiveTagCollections, mandatoryTagCollections, roleCategoryID, searchTagsUrl, tagToCategories, usedIds, docbookBuildingOptions);
+			processTopic(topic, mandatoryExclusiveTagCollections, mandatoryTagCollections, roleCategoryID, searchTagsUrl, tagToCategories, usedIds, docbookBuildingOptions);
 
 	}
 
@@ -705,9 +693,8 @@ public class DocbookBuilder
 		return tagToCategories;
 	}
 
-	public void buildDocbookZipFile(final Filter filter, final WorkingMemory businessRulesWorkingMemory, final DocbookBuildingOptions docbookBuildingOptions)
+	public byte[] buildDocbookZipFile(final Filter filter, final DocbookBuildingOptions docbookBuildingOptions)
 	{
-		reloadSystemPreferences(businessRulesWorkingMemory);
 		loadConstantsFromDB();
 
 		final List<TagToCategory> tagToCategories = getTagToCategories();
@@ -765,7 +752,7 @@ public class DocbookBuilder
 		 * build an initial list of "root" topics from the search page to be
 		 * processed
 		 */
-		processTopics(businessRulesWorkingMemory, filter, mandatoryExclusiveTags, mandatoryTags, Constants.LIFECYCLE_CATEGORY_ID, searchTagsUrl, tagToCategories, usedIds, docbookBuildingOptions);
+		processTopics(filter, mandatoryExclusiveTags, mandatoryTags, Constants.LIFECYCLE_CATEGORY_ID, searchTagsUrl, tagToCategories, usedIds, docbookBuildingOptions);
 
 		/*
 		 * add a collection of tag description topics
@@ -821,7 +808,7 @@ public class DocbookBuilder
 		}
 
 		// now build the publican zip file that will be sent to the user
-		buildZipFile(topicTypeTagIDs, tagToCategories, usedIds, retValue, docbookBuildingOptions);
+		return buildZipFile(topicTypeTagIDs, tagToCategories, usedIds, retValue, docbookBuildingOptions);
 	}
 
 	private Topic buildLandingPageTopic(final List<Tag> templateTags, final Integer topicId, final String title, final List<String> usedIds, final boolean processedOnly)
@@ -1690,7 +1677,7 @@ public class DocbookBuilder
 	 * the search list is processed, its xml retrieved and validated, related
 	 * topics noted and recursively processed, and image locations fixed up
 	 */
-	private void processTopic(final WorkingMemory businessRulesWorkingMemory, final Topic topic, final ArrayList<List<TagToCategory>> mandatoryExclusiveTagCollections, final ArrayList<List<TagToCategory>> mandatoryTagCollections, final int roleCategoryID, final String searchTagsUrl,
+	private void processTopic(final Topic topic, final ArrayList<List<TagToCategory>> mandatoryExclusiveTagCollections, final ArrayList<List<TagToCategory>> mandatoryTagCollections, final int roleCategoryID, final String searchTagsUrl,
 			final List<TagToCategory> tagToCategories, final List<String> usedIds, final DocbookBuildingOptions docbookBuildingOptions)
 	{
 		/* we have already processed this topic, don't do it again */
@@ -1745,7 +1732,7 @@ public class DocbookBuilder
 		 */
 
 		processTopicID(topic);
-		processTopicCalculatePriority(topic, businessRulesWorkingMemory);
+		//processTopicCalculatePriority(topic, businessRulesWorkingMemory);
 		processTopicLifecycleRole(topic, roleCategoryID, tagToCategories);
 		processTopicDraftWarning(topic);
 		processTopicAdditionalInfo(topic, searchTagsUrl, docbookBuildingOptions);
@@ -1761,7 +1748,7 @@ public class DocbookBuilder
 		{
 			for (final TopicToTopic topicToTopic : topic.getParentTopicToTopics())
 			{
-				processTopic(businessRulesWorkingMemory, topicToTopic.getRelatedTopic(), mandatoryExclusiveTagCollections, mandatoryTagCollections, roleCategoryID, searchTagsUrl, tagToCategories, usedIds, docbookBuildingOptions);
+				processTopic(topicToTopic.getRelatedTopic(), mandatoryExclusiveTagCollections, mandatoryTagCollections, roleCategoryID, searchTagsUrl, tagToCategories, usedIds, docbookBuildingOptions);
 			}
 		}
 

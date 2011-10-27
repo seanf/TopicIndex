@@ -22,18 +22,12 @@ import com.redhat.ecs.commonutils.HTTPUtilities;
 import com.redhat.ecs.commonutils.MIMEUtilities;
 import com.redhat.ecs.commonutils.ZipUtilities;
 import com.redhat.topicindex.entity.Filter;
-import com.redhat.topicindex.entity.FilterCategory;
-import com.redhat.topicindex.entity.FilterField;
-import com.redhat.topicindex.entity.FilterTag;
 import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.filter.TopicFilter;
 import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.EntityUtilities;
 import com.redhat.topicindex.utils.docbookbuilding.DocbookBuilder;
 import com.redhat.topicindex.utils.docbookbuilding.DocbookBuildingOptions;
-import com.redhat.topicindex.utils.structures.tags.UICategoryData;
-import com.redhat.topicindex.utils.structures.tags.UITagData;
-import com.redhat.topicindex.utils.structures.tags.UIProjectCategoriesData;
 import com.redhat.topicindex.utils.structures.tags.UIProjectData;
 
 /**
@@ -200,7 +194,8 @@ public class CustomTagSearch implements DisplayMessageInterface
 		this.syncFilterWithUI(filter, false);
 
 		final DocbookBuilder builder = new DocbookBuilder();
-		builder.buildDocbookZipFile(filter, businessRulesWorkingMemory, docbookBuildingOptions);
+		final byte[] zipFile = builder.buildDocbookZipFile(filter, docbookBuildingOptions);
+		HTTPUtilities.writeOutContent(zipFile, "Book.zip", MIMEUtilities.ZIP_MIME_TYPE);
 	}
 
 	public void downloadXML()

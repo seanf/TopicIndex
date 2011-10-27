@@ -57,7 +57,7 @@
 						value="#{customTagSearch.selectedFilter}">
 						<f:selectItem itemLabel="[Unload Filter]" itemValue="" />
 						<c:forEach items="#{customTagSearch.filters}" var="filter">
-							<f:selectItem itemLabel="#{filter.filterName}"
+							<f:selectItem itemLabel="[#{filter.filterId}] #{filter.filterName}"
 								itemValue="#{filter.filterId}" />
 						</c:forEach>
 					</h:selectOneMenu>
