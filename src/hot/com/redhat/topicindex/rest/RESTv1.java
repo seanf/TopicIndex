@@ -35,19 +35,25 @@ public class RESTv1
 		return null;
 	}
 	
-	private <T> Response getResource(final Class<T> type, final RestRepresentation<T> restRepresentation, final Object id, final String mimeType, final String fileName, final String baseUri)
+	private <T> Response getResource(final Class<T> type, final RestRepresentation<T> restRepresentation, final Object id, final String mimeType, final String baseUri)
+	{
+		return getResource(type, restRepresentation, id, mimeType, baseUri, null);
+	}
+	
+	private <T> Response getResource(final Class<T> type, final RestRepresentation<T> restRepresentation, final Object id, final String mimeType, final String baseUri, final String fileName)
 	{
 		assert type != null : "The type parameter can not be null";
 		assert id != null : "The id parameter can not be null";
 		assert mimeType != null : "The mimeType parameter can not be null";
 		assert restRepresentation != null : "The restRepresentation parameter can not be null";
+		assert baseUri != null : "The restRepresentation parameter can not be null";
 		
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 		final T entity = entityManager.find(type, id);
 		
 		if (entity != null)
 		{
-			/* create a prety printing Gson object */
+			/* create a pretty printing Gson object */
 			final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			/* create the REST representation of the topic */
 			restRepresentation.initialize(entity, this.getBaseUrl(), baseUri);
@@ -55,7 +61,9 @@ public class RESTv1
 			final String json = gson.toJson(restRepresentation);
 			/* build a response */
 			final ResponseBuilder response = Response.ok(json, mimeType);
-			response.header("Content-Disposition", "attachment; filename=" + fileName);
+			/* set the optional file name */
+			if (fileName != null)
+				response.header("Content-Disposition", "attachment; filename=" + fileName);
 			return response.build();
 		}
 		
@@ -69,7 +77,7 @@ public class RESTv1
 	{
 		assert id != null : "The id parameter can not be null";
 						
-		return getResource(Topic.class, new TopicV1(), id, "application/json", "Topic" + id + ".json", "topic");
+		return getResource(Topic.class, new TopicV1(), id, "application/json", "topic");
 	}
 	
 	@GET
