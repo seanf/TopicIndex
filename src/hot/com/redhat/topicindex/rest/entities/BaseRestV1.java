@@ -10,15 +10,15 @@ public abstract class BaseRestV1<T>
 	private String addLink = null;
 	private String[] expand = null;
 	
-	public void initialize(final T entity, final String baseUrl, final String restBasePath, final String expand)
+	public void initialize(final T entity, final String baseUrl, final String expand)
 	{
 		/* account for the fact that expand could be null */
 		final String fixedExpand = expand != null ? "" : expand;
 		
-		this.initialize(entity, baseUrl, restBasePath, new ExpandData(fixedExpand));
+		this.initialize(entity, baseUrl, new ExpandData(fixedExpand));
 	}
 	
-	public abstract void initialize(final T entity, final String baseUrl, final String restBasePath, final ExpandData expand);
+	public abstract void initialize(final T entity, final String baseUrl, final ExpandData expand);
 	
 	protected void setLinks(final String baseUrl, final String restBasePath, final Object id)
 	{

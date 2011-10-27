@@ -24,7 +24,14 @@ import com.redhat.topicindex.utils.docbookbuilding.DocbookBuildingOptions;
 @Path("/1")
 public class RESTv1
 {
+	public static final String TOPICS_EXPANSION_NAME = "topics";
 	public static final String TAGS_EXPANSION_NAME = "tags";
+	public static final String CATEGORIES_EXPANSION_NAME = "categories";
+	
+	public static final String TOPIC_URL_NAME = "topic";
+	public static final String TAG_URL_NAME = "tag";
+	public static final String CATEGORY_URL_NAME = "category";
+	
 	@Context UriInfo uriInfo;
 	
 	private String getBaseUrl()
@@ -37,18 +44,17 @@ public class RESTv1
 		return null;
 	}
 	
-	private <T> Response getResource(final Class<T> type, final BaseRestV1<T> restRepresentation, final Object id, final String mimeType, final String baseUri, final String expand)
+	private <T> Response getResource(final Class<T> type, final BaseRestV1<T> restRepresentation, final Object id, final String mimeType, final String expand)
 	{
-		return getResource(type, restRepresentation, id, mimeType, baseUri, expand, null);
+		return getResource(type, restRepresentation, id, mimeType, expand, null);
 	}
 	
-	private <T> Response getResource(final Class<T> type, final BaseRestV1<T> restRepresentation, final Object id, final String mimeType, final String baseUri, final String expand, final String fileName)
+	private <T> Response getResource(final Class<T> type, final BaseRestV1<T> restRepresentation, final Object id, final String mimeType, final String expand, final String fileName)
 	{
 		assert type != null : "The type parameter can not be null";
 		assert id != null : "The id parameter can not be null";
 		assert mimeType != null : "The mimeType parameter can not be null";
 		assert restRepresentation != null : "The restRepresentation parameter can not be null";
-		assert baseUri != null : "The restRepresentation parameter can not be null";
 		
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 		final T entity = entityManager.find(type, id);
@@ -58,7 +64,7 @@ public class RESTv1
 			/* create a pretty printing Gson object */
 			final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			/* create the REST representation of the topic */
-			restRepresentation.initialize(entity, this.getBaseUrl(), baseUri, expand);
+			restRepresentation.initialize(entity, this.getBaseUrl(), expand);
 			/* Convert the REST representation to a JSON string */
 			final String json = gson.toJson(restRepresentation);
 			/* build a response */
@@ -79,7 +85,7 @@ public class RESTv1
 	{
 		assert id != null : "The id parameter can not be null";
 						
-		return getResource(Topic.class, new TopicV1(), id, "application/json", "topic", expand);
+		return getResource(Topic.class, new TopicV1(), id, "application/json", expand);
 	}
 	
 	@GET
