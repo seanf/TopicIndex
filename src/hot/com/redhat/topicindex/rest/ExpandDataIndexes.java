@@ -1,5 +1,8 @@
 package com.redhat.topicindex.rest;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.google.code.regexp.NamedMatcher;
 import com.google.code.regexp.NamedPattern;
 import com.redhat.ecs.commonutils.ExceptionUtilities;
@@ -35,12 +38,12 @@ public class ExpandDataIndexes
 	public ExpandDataIndexes(final String expand)
 	{
 		/* compile the regular expression */
-		final NamedPattern sequencePattern = NamedPattern.compile(EXPAND_DATA_INDEXES_RE);
+		final Pattern sequencePattern = Pattern.compile(EXPAND_DATA_INDEXES_RE);
 		/* find any matches */
-		final NamedMatcher sequenceMatcher = sequencePattern.matcher(expand);
+		final Matcher sequenceMatcher = sequencePattern.matcher(expand);
 
 		/* loop over the regular expression matches */
-		while (sequenceMatcher.find())
+		if (sequenceMatcher.matches())
 		{
 			valid = true;
 
