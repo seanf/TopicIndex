@@ -1,4 +1,6 @@
-package com.redhat.topicindex.rest;
+package com.redhat.topicindex.rest.entities;
+
+import com.redhat.topicindex.rest.ExpandData;
 
 public abstract class BaseRestV1<T>
 {	

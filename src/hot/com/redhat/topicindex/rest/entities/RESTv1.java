@@ -1,4 +1,4 @@
-package com.redhat.topicindex.rest;
+package com.redhat.topicindex.rest.entities;
 
 import javax.persistence.EntityManager;
 import javax.ws.rs.GET;
@@ -24,6 +24,7 @@ import com.redhat.topicindex.utils.docbookbuilding.DocbookBuildingOptions;
 @Path("/1")
 public class RESTv1
 {
+	public static final String TAGS_EXPANSION_NAME = "tags";
 	@Context UriInfo uriInfo;
 	
 	private String getBaseUrl()
@@ -73,7 +74,7 @@ public class RESTv1
 	}
 	
 	@GET
-	@Path("/topic/get/{topicId}")
+	@Path("/topic/get/json/{topicId}")
 	public Response getTopic(@PathParam("topicId") final Integer id, @QueryParam("expand") final String expand)
 	{
 		assert id != null : "The id parameter can not be null";
@@ -82,7 +83,7 @@ public class RESTv1
 	}
 	
 	@GET
-	@Path("/filter/{filterId}/docbookZip")
+	@Path("/filter/get/zip/{filterId}/docbookZip")
 	public Response getFilterDocbookZip(@PathParam("filterId") final Integer id)
 	{
 		assert id != null : "The id parameter can not be null";

@@ -1,6 +1,10 @@
-package com.redhat.topicindex.rest;
+package com.redhat.topicindex.rest.collections;
 
-public class BaseRestCollectionV1<T>
+import java.util.List;
+
+import com.redhat.topicindex.rest.ExpandData;
+
+public abstract class BaseRestCollectionV1<T, U>
 {
 	private int size = 0;
 	private String expand = null;
@@ -35,5 +39,11 @@ public class BaseRestCollectionV1<T>
 	{
 		this.items = items;
 	}
-
+	
+	public void initialize(final List<U> entities)
+	{
+		initialize(entities, null, null);
+	}
+	
+	public abstract void initialize(final List<U> entities, final ExpandData expand, final String baseUrl);
 }

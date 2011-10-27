@@ -1,6 +1,7 @@
-package com.redhat.topicindex.rest;
+package com.redhat.topicindex.rest.entities;
 
 import com.redhat.topicindex.entity.Tag;
+import com.redhat.topicindex.rest.ExpandData;
 
 public class TagV1 extends BaseRestV1<Tag> 
 {
