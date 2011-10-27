@@ -9,12 +9,12 @@ public class TagV1 extends BaseRestV1<Tag>
 	private String description = null;
 	
 	@Override
-	protected void initialize(final Tag entity, final String baseUrl, final String restBasePath, final String expand)
+	public void initialize(final Tag entity, final String baseUrl, final String restBasePath, final ExpandData expand)
 	{
 		this.id = entity.getTagId();
 		this.name = entity.getTagName();
 		this.description = entity.getTagDescription();
 		
-		super.initialize(baseUrl, restBasePath, expand);
+		super.setLinks(baseUrl, restBasePath, this.id);
 	}
 }
