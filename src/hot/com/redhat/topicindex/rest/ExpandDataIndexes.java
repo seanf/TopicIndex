@@ -47,7 +47,7 @@ public class ExpandDataIndexes
 			/* get the components of the regular expression */
 			expandLevel = sequenceMatcher.group(EXPAND_LEVEL_NAMED_GROUP);
 			final String colon = sequenceMatcher.group(COLON_NAMED_GROUP);
-			final String startIndexMatch = sequenceMatcher.group(END_INDEX_NAMED_GROUP);
+			final String startIndexMatch = sequenceMatcher.group(START_INDEX_NAMED_GROUP);
 			final String endIndexMatch = sequenceMatcher.group(END_INDEX_NAMED_GROUP);
 
 			/* deal with no brackets at all like: tags*/
