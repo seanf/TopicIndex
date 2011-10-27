@@ -78,7 +78,7 @@ public class ExpandData
 
 	public boolean contains(final String topLevel)
 	{
-		return getSubExpandIndexes(topLevel) != null;
+		return getExpandDataIndexes(topLevel) != null;
 	}
 	
 	public ArrayList<ExpandDataIndexes> getSubExpandIndexes(final String topLevel)
@@ -89,6 +89,18 @@ public class ExpandData
 		for (final ExpandDataIndexes index : expandOptions.keySet())
 			if (index.getExpandLevel().equals(topLevel))
 				return expandOptions.get(index);
+
+		return null;
+	}
+	
+	public ExpandDataIndexes getExpandDataIndexes(final String topLevel)
+	{
+		assert topLevel != null : "The topLevel instance variable can not be null";
+		assert expandOptions != null : "The expandOptions instance variable can not be null";
+
+		for (final ExpandDataIndexes index : expandOptions.keySet())
+			if (index.getExpandLevel().equals(topLevel))
+				return index;
 
 		return null;
 	}

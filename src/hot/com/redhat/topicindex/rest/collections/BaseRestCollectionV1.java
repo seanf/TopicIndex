@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.topicindex.rest.ExpandData;
+import com.redhat.topicindex.rest.ExpandDataIndexes;
 import com.redhat.topicindex.rest.RESTv1;
 import com.redhat.topicindex.rest.entities.BaseRestV1;
 
@@ -62,12 +63,17 @@ public class BaseRestCollectionV1<T extends BaseRestV1<U>, U>
 			{
 				assert baseUrl != null : "Parameter baseUrl can not be null if parameter expand is not null";
 
+				final ExpandDataIndexes indexes = expand.getExpandDataIndexes(expandName);
 				final ExpandData secondLevelExpandData = expand.getNextLevel(expandName);
+								
+				final int start = indexes.isImpliedStartAtBegining() ? 0 : indexes.getStartIndex();
+				final int end = indexes.isImpliedFinishAtEnd() ? entities.size() - 1 : indexes.getEndIndex();
 				
 				final List<T> restEntityArray = new ArrayList<T>();
-
-				for (final U dbEntity : entities)
+				
+				for (int i = start; i <= end; ++i)
 				{
+					final U dbEntity = entities.get(i);
 					final T restEntity = classType.newInstance();
 					restEntity.initialize(dbEntity, baseUrl, secondLevelExpandData);
 					restEntityArray.add(restEntity);

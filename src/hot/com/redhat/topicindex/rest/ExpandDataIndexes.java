@@ -24,14 +24,14 @@ public class ExpandDataIndexes
 			return startIndex;
 		return Math.min(startIndex, endIndex);
 	}
-	
+
 	public Integer getEndIndex()
 	{
 		if (startIndex == null || endIndex == null)
 			return endIndex;
 		return Math.max(startIndex, endIndex);
 	}
-	
+
 	public ExpandDataIndexes(final String expand)
 	{
 		/* compile the regular expression */
@@ -50,13 +50,24 @@ public class ExpandDataIndexes
 			final String startIndexMatch = sequenceMatcher.group(END_INDEX_NAMED_GROUP);
 			final String endIndexMatch = sequenceMatcher.group(END_INDEX_NAMED_GROUP);
 
-			/* deal with input like tags[1:] */
-			if (startIndexMatch != null && colon != null && endIndexMatch == null)
+			/* deal with no brackets at all like: tags*/
+			if (startIndexMatch == null && colon == null && endIndexMatch == null)
+			{
 				impliedFinishAtEnd = true;
-
-			/* deal with input like tags[:1] */
-			if (startIndexMatch == null && colon != null && endIndexMatch != null)
 				impliedStartAtBegining = true;
+			}
+
+			/* deal with input like: tags[1:] */
+			else if (startIndexMatch != null && colon != null && endIndexMatch == null)
+			{
+				impliedFinishAtEnd = true;
+			}
+
+			/* deal with input like: tags[:1] */
+			else if (startIndexMatch == null && colon != null && endIndexMatch != null)
+			{
+				impliedStartAtBegining = true;
+			}
 
 			if (startIndexMatch != null)
 			{
@@ -69,7 +80,7 @@ public class ExpandDataIndexes
 					ExceptionUtilities.handleException(ex);
 				}
 			}
-			
+
 			if (endIndexMatch != null)
 			{
 				try
