@@ -932,8 +932,11 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	public List<Tag> getTags()
 	{
 		final List<Tag> retValue = new ArrayList<Tag>();
-		for (final TopicToTag tag : this.topicToTags)
-			retValue.add(tag.getTag());
+		for (final TopicToTag topicToTag : this.topicToTags)
+		{
+			final Tag tag = topicToTag.getTag();
+			retValue.add(tag);
+		}
 
 		return retValue;
 	}
@@ -942,8 +945,11 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	public List<Integer> getTagIDs()
 	{
 		final List<Integer> retValue = new ArrayList<Integer>();
-		for (final TopicToTag tag : this.topicToTags)
-			retValue.add(tag.getTag().getTagId());
+		for (final TopicToTag topicToTag : this.topicToTags)
+		{
+			final Integer tagId = topicToTag.getTag().getTagId();
+			retValue.add(tagId);
+		}
 
 		return retValue;
 	}
