@@ -11,6 +11,8 @@ public class Constants
 	public static final String TOPIC_XREF_PREFIX = "TopicID";
 	public static final int HOME_LANDING_PAGE_TOPIC_ID = -1;
 	
+	public static final String BASE_REST_PATH = "/seam/resource/rest";
+	
 
 
 	/** The format of the date to be displayed by any date widget */
