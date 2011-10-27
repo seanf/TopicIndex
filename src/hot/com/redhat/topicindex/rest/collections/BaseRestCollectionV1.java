@@ -80,7 +80,7 @@ public class BaseRestCollectionV1<T extends BaseRestV1<U>, U>
 					}
 				}
 
-				int end = 0;
+				int end = entities.size() - 1;
 				if (!indexes.isImpliedFinishAtEnd())
 				{
 					final int endIndex = indexes.getEndIndex();
