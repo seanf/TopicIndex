@@ -53,8 +53,6 @@ public class BaseRestCollectionV1<T extends BaseRestV1<U>, U>
 	{
 		assert entities != null : "Parameter entities can not be null";
 
-		final ExpandData secondLevelExpandData = expand.getNextLevel(expandName);
-		
 		this.setSize(entities.size());
 		this.setExpand(expandName);
 
@@ -64,6 +62,8 @@ public class BaseRestCollectionV1<T extends BaseRestV1<U>, U>
 			{
 				assert baseUrl != null : "Parameter baseUrl can not be null if parameter expand is not null";
 
+				final ExpandData secondLevelExpandData = expand.getNextLevel(expandName);
+				
 				final List<T> restEntityArray = new ArrayList<T>();
 
 				for (final U dbEntity : entities)
