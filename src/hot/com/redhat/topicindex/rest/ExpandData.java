@@ -10,6 +10,11 @@ public class ExpandData
 {
 	private Map<String, ArrayList<String>> expandOptions = new HashMap<String, ArrayList<String>>();
 	
+	public ExpandData()
+	{
+		
+	}
+	
 	public ExpandData(final String topLevel, final ArrayList<String> subLevels)
 	{
 		assert topLevel != null : "The topLevel parameter can not be null";
@@ -49,11 +54,14 @@ public class ExpandData
 		assert expandSubElements != null : "Expected expandSubElements to not be null";
 		
 		if (expandSubElements.size() == 0)
-			return null;
-		
-		final String newTopLevelExpand = expandSubElements.remove(0);
-		
-		return new ExpandData(newTopLevelExpand, expandSubElements);		
+		{
+			return new ExpandData();
+		}
+		else
+		{
+			final String newTopLevelExpand = expandSubElements.remove(0);		
+			return new ExpandData(newTopLevelExpand, expandSubElements);
+		}
 	}
 	
 	public boolean contains(final String topLevelExpand)
