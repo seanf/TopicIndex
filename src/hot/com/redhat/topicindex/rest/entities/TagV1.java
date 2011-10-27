@@ -11,7 +11,7 @@ public class TagV1 extends BaseRestV1<Tag>
 	private Integer id = null;
 	private String name = null;
 	private String description = null;
-	private BaseRestCollectionV1<CategoryV1, Category> tags = new BaseRestCollectionV1<CategoryV1, Category>();
+	private BaseRestCollectionV1<CategoryV1, Category> categories = new BaseRestCollectionV1<CategoryV1, Category>();
 	
 	@Override
 	public void initialize(final Tag entity, final String baseUrl, final ExpandData expand)
@@ -24,11 +24,11 @@ public class TagV1 extends BaseRestV1<Tag>
 		if (expand.contains(RESTv1.CATEGORIES_EXPANSION_NAME))
 		{
 			final ExpandData secondLevelExpandData = expand.getNextLevel(RESTv1.CATEGORIES_EXPANSION_NAME);
-			tags.initialize(CategoryV1.class, entity.getCategories(), RESTv1.CATEGORIES_EXPANSION_NAME, secondLevelExpandData, baseUrl);
+			categories.initialize(CategoryV1.class, entity.getCategories(), RESTv1.CATEGORIES_EXPANSION_NAME, secondLevelExpandData, baseUrl);
 		}
 		else
 		{
-			tags.initialize(CategoryV1.class, entity.getCategories(), RESTv1.CATEGORIES_EXPANSION_NAME);
+			categories.initialize(CategoryV1.class, entity.getCategories(), RESTv1.CATEGORIES_EXPANSION_NAME);
 		}
 		
 		super.setLinks(baseUrl, RESTv1.TAG_URL_NAME, this.id);
