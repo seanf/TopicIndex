@@ -10,7 +10,7 @@ public class ExpandDataIndexes
 	private static final String END_INDEX_NAMED_GROUP = "endIndex";
 	private static final String COLON_NAMED_GROUP = "colon";
 	private static final String EXPAND_LEVEL_NAMED_GROUP = "expandLevel";
-	private static final String EXPAND_DATA_INDEXES_RE = "^(?<" + EXPAND_LEVEL_NAMED_GROUP + ">\\w+)(\\[(?<" + START_INDEX_NAMED_GROUP + ">-?\\d+)?(?<" + COLON_NAMED_GROUP + ">:)?(<" + END_INDEX_NAMED_GROUP + ">-?\\d+)?\\])?$";
+	private static final String EXPAND_DATA_INDEXES_RE = "^(?<" + EXPAND_LEVEL_NAMED_GROUP + ">\\w+)(\\[(?<" + START_INDEX_NAMED_GROUP + ">-?\\d+)?(?<" + COLON_NAMED_GROUP + ">:)?(?<" + END_INDEX_NAMED_GROUP + ">-?\\d+)?\\])?$";
 	private String expandLevel = null;
 	private Integer startIndex = null;
 	private Integer endIndex = null;
