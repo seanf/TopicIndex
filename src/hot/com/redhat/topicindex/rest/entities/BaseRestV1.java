@@ -13,7 +13,7 @@ public abstract class BaseRestV1<T>
 	public void initialize(final T entity, final String baseUrl, final String expand)
 	{
 		/* account for the fact that expand could be null */
-		final String fixedExpand = expand != null ? "" : expand;
+		final String fixedExpand = expand == null ? "" : expand;
 		
 		this.initialize(entity, baseUrl, new ExpandData(fixedExpand));
 	}
