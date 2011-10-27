@@ -6,6 +6,7 @@ import com.redhat.topicindex.entity.Tag;
 import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.entity.TopicToTag;
 import com.redhat.topicindex.rest.ExpandData;
+import com.redhat.topicindex.rest.RESTv1;
 import com.redhat.topicindex.rest.collections.BaseRestCollectionV1;
 
 /**
@@ -13,7 +14,6 @@ import com.redhat.topicindex.rest.collections.BaseRestCollectionV1;
  */
 public class TopicV1 extends BaseRestV1<Topic>
 {
-	
 	private Integer id = null;
 	private String title = null;
 	private String description = null;

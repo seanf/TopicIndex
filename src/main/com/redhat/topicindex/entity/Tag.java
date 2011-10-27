@@ -177,6 +177,15 @@ public class Tag implements java.io.Serializable
 		}
 		return categoriesList;
 	}
+	
+	@Transient
+	public List<Category> getCategories()
+	{
+		final List<Category> retValue = new ArrayList<Category>();
+		for (final TagToCategory category : this.getTagToCategories())
+			retValue.add(category.getCategory());
+		return retValue;
+	}
 
 	@Transient
 	public String getChildrenList()

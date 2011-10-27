@@ -1,4 +1,4 @@
-package com.redhat.topicindex.rest.entities;
+package com.redhat.topicindex.rest;
 
 import javax.persistence.EntityManager;
 import javax.ws.rs.GET;
@@ -17,6 +17,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.redhat.topicindex.entity.Filter;
 import com.redhat.topicindex.entity.Topic;
+import com.redhat.topicindex.rest.entities.BaseRestV1;
+import com.redhat.topicindex.rest.entities.TopicV1;
 import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.docbookbuilding.DocbookBuilder;
 import com.redhat.topicindex.utils.docbookbuilding.DocbookBuildingOptions;

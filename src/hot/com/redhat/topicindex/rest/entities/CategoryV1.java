@@ -3,6 +3,7 @@ package com.redhat.topicindex.rest.entities;
 import com.redhat.topicindex.entity.Category;
 import com.redhat.topicindex.entity.Tag;
 import com.redhat.topicindex.rest.ExpandData;
+import com.redhat.topicindex.rest.RESTv1;
 import com.redhat.topicindex.rest.collections.BaseRestCollectionV1;
 
 public class CategoryV1 extends BaseRestV1<Category>
@@ -25,16 +26,16 @@ public class CategoryV1 extends BaseRestV1<Category>
 		this.description = entity.getCategoryDescription();
 		this.mutuallyExclusive = entity.isMutuallyExclusive();
 		this.sort = entity.getCategorySort();
-		this.setExpand(new String[]	{ RESTv1.CATEGORIES_EXPANSION_NAME });
+		this.setExpand(new String[]	{ RESTv1.TAGS_EXPANSION_NAME });
 		
-		if (expand.contains(RESTv1.CATEGORIES_EXPANSION_NAME))
+		if (expand.contains(RESTv1.TAGS_EXPANSION_NAME))
 		{
-			final ExpandData secondLevelExpandData = expand.getNextLevel(RESTv1.CATEGORIES_EXPANSION_NAME);
-			tags.initialize(TagV1.class, entity.getTags(), RESTv1.CATEGORIES_EXPANSION_NAME, secondLevelExpandData, baseUrl);
+			final ExpandData secondLevelExpandData = expand.getNextLevel(RESTv1.TAGS_EXPANSION_NAME);
+			tags.initialize(TagV1.class, entity.getTags(), RESTv1.TAGS_EXPANSION_NAME, secondLevelExpandData, baseUrl);
 		}
 		else
 		{
-			tags.initialize(TagV1.class, entity.getTags(), RESTv1.CATEGORIES_EXPANSION_NAME);
+			tags.initialize(TagV1.class, entity.getTags(), RESTv1.TAGS_EXPANSION_NAME);
 		}
 		
 		super.setLinks(baseUrl, RESTv1.CATEGORY_URL_NAME, this.id);
