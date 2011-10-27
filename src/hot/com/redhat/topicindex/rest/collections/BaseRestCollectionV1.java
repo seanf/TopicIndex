@@ -66,12 +66,40 @@ public class BaseRestCollectionV1<T extends BaseRestV1<U>, U>
 				final ExpandDataIndexes indexes = expand.getExpandDataIndexes(expandName);
 				final ExpandData secondLevelExpandData = expand.getNextLevel(expandName);
 								
-				final int start = indexes.isImpliedStartAtBegining() ? 0 : indexes.getStartIndex();
-				final int end = indexes.isImpliedFinishAtEnd() ? entities.size() - 1 : indexes.getEndIndex();
+				int start = 0;
+				if (!indexes.isImpliedStartAtBegining())
+				{
+					final int startIndex = indexes.getStartIndex();
+					if (startIndex < 0)
+					{
+						start = Math.max(0, entities.size() - startIndex);
+					}
+					else
+					{
+						start = Math.min(startIndex, entities.size() - 1);
+					}
+				}
+
+				int end = 0;
+				if (!indexes.isImpliedFinishAtEnd())
+				{
+					final int endIndex = indexes.getEndIndex();
+					if (endIndex < 0)
+					{
+						end = Math.max(0, entities.size() - endIndex);
+					}
+					else
+					{
+						end = Math.min(endIndex, entities.size() - 1);
+					}
+				}
+				
+				final int fixedStart = Math.min(start, end);
+				final int fixedEnd = Math.max(start, end);
 				
 				final List<T> restEntityArray = new ArrayList<T>();
 				
-				for (int i = start; i <= end; ++i)
+				for (int i = fixedStart; i <= fixedEnd; ++i)
 				{
 					final U dbEntity = entities.get(i);
 					final T restEntity = classType.newInstance();
