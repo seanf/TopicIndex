@@ -23,8 +23,7 @@ public class TagV1 extends BaseRestV1<Tag>
 		
 		if (expand.contains(RESTv1.CATEGORIES_EXPANSION_NAME))
 		{
-			final ExpandData secondLevelExpandData = expand.getNextLevel(RESTv1.CATEGORIES_EXPANSION_NAME);
-			categories.initialize(CategoryV1.class, entity.getCategories(), RESTv1.CATEGORIES_EXPANSION_NAME, secondLevelExpandData, baseUrl);
+			categories.initialize(CategoryV1.class, entity.getCategories(), RESTv1.CATEGORIES_EXPANSION_NAME, expand, baseUrl);
 		}
 		else
 		{
