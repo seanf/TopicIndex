@@ -17,8 +17,10 @@ public class ExpandDataIndexes
 	private String expandLevel = null;
 	private Integer startIndex = null;
 	private Integer endIndex = null;
-	private boolean impliedStartAtBegining = false;
-	private boolean impliedFinishAtEnd = false;
+	private boolean definedStartAtBegining = false;
+	private boolean definedFinshAtEnd = false;
+	private boolean startAtBegining = false;
+	private boolean finishAtEnd = false;
 	private boolean valid = false;
 
 	public Integer getStartIndex()
@@ -56,20 +58,26 @@ public class ExpandDataIndexes
 			/* deal with no brackets at all like: tags*/
 			if (startIndexMatch == null && colon == null && endIndexMatch == null)
 			{
-				impliedFinishAtEnd = true;
-				impliedStartAtBegining = true;
+				/* we have not specifically defined the start at the beginning or finish at the ending */
+				definedFinshAtEnd = false;
+				definedStartAtBegining = false;
+				/* but the overall effect is that we will start at the begining and finish at the end */ 
+				startAtBegining = true;
+				finishAtEnd = true;
 			}
 
 			/* deal with input like: tags[1:] */
 			else if (startIndexMatch != null && colon != null && endIndexMatch == null)
 			{
-				impliedFinishAtEnd = true;
+				definedFinshAtEnd = true;
+				startAtBegining = true;
 			}
 
 			/* deal with input like: tags[:1] */
 			else if (startIndexMatch == null && colon != null && endIndexMatch != null)
 			{
-				impliedStartAtBegining = true;
+				definedStartAtBegining = true;
+				finishAtEnd = true;
 			}
 
 			if (startIndexMatch != null)
@@ -109,24 +117,24 @@ public class ExpandDataIndexes
 		this.valid = valid;
 	}
 
-	public boolean isImpliedStartAtBegining()
+	public boolean isDefinedStartAtBegining()
 	{
-		return impliedStartAtBegining;
+		return definedStartAtBegining;
 	}
 
-	public void setImpliedStartAtBegining(boolean impliedStartAtBegining)
+	public void setDefinedStartAtBegining(boolean definedStartAtBegining)
 	{
-		this.impliedStartAtBegining = impliedStartAtBegining;
+		this.definedStartAtBegining = definedStartAtBegining;
 	}
 
-	public boolean isImpliedFinishAtEnd()
+	public boolean isDefinedFinshAtEnd()
 	{
-		return impliedFinishAtEnd;
+		return definedFinshAtEnd;
 	}
 
-	public void setImpliedFinishAtEnd(boolean impliedFinishAtEnd)
+	public void setDefinedFinshAtEnd(boolean definedFinshAtEnd)
 	{
-		this.impliedFinishAtEnd = impliedFinishAtEnd;
+		this.definedFinshAtEnd = definedFinshAtEnd;
 	}
 
 	public String getExpandLevel()
@@ -137,5 +145,25 @@ public class ExpandDataIndexes
 	public void setExpandLevel(String expandLevel)
 	{
 		this.expandLevel = expandLevel;
+	}
+
+	public boolean isStartAtBegining()
+	{
+		return startAtBegining;
+	}
+
+	public void setStartAtBegining(boolean startAtBegining)
+	{
+		this.startAtBegining = startAtBegining;
+	}
+
+	public boolean isFinishAtEnd()
+	{
+		return finishAtEnd;
+	}
+
+	public void setFinshAtEnd(boolean finishAtEnd)
+	{
+		this.finishAtEnd = finishAtEnd;
 	}
 }

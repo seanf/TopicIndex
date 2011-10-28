@@ -11,16 +11,18 @@ import com.redhat.topicindex.rest.entities.BaseRestV1;
 
 public class BaseRestCollectionV1<T extends BaseRestV1<U>, U>
 {
-	private int size = 0;
+	private Integer size = 0;
 	private String expand = null;
 	private List<T> items = null;
+	private Integer startIndex = null;
+	private Integer endIndex = null;
 
-	public int getSize()
+	public Integer getSize()
 	{
 		return size;
 	}
 
-	public void setSize(final int size)
+	public void setSize(final Integer size)
 	{
 		this.size = size;
 	}
@@ -67,7 +69,7 @@ public class BaseRestCollectionV1<T extends BaseRestV1<U>, U>
 				final ExpandData secondLevelExpandData = expand.getNextLevel(expandName);
 								
 				int start = 0;
-				if (!indexes.isImpliedStartAtBegining())
+				if (!indexes.isStartAtBegining())
 				{
 					final int startIndex = indexes.getStartIndex();
 					if (startIndex < 0)
@@ -81,7 +83,7 @@ public class BaseRestCollectionV1<T extends BaseRestV1<U>, U>
 				}
 
 				int end = entities.size() - 1;
-				if (!indexes.isImpliedFinishAtEnd())
+				if (!indexes.isFinishAtEnd())
 				{
 					final int endIndex = indexes.getEndIndex();
 					if (endIndex < 0)
@@ -97,13 +99,19 @@ public class BaseRestCollectionV1<T extends BaseRestV1<U>, U>
 				final int fixedStart = Math.min(start, end);
 				final int fixedEnd = Math.max(start, end);
 				
+				if (indexes.isDefinedStartAtBegining())
+					this.startIndex = fixedStart;
+				
+				if (indexes.isDefinedFinshAtEnd())
+					this.endIndex = fixedEnd;
+				
 				final List<T> restEntityArray = new ArrayList<T>();
 				
 				for (int i = fixedStart; i <= fixedEnd; ++i)
 				{
 					final U dbEntity = entities.get(i);
 					final T restEntity = classType.newInstance();
-					restEntity.initialize(dbEntity, baseUrl, secondLevelExpandData, i);
+					restEntity.initialize(dbEntity, baseUrl, secondLevelExpandData);
 					restEntityArray.add(restEntity);
 				}
 
