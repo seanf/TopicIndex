@@ -15,9 +15,15 @@ import org.jboss.seam.Component;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.redhat.topicindex.entity.Category;
 import com.redhat.topicindex.entity.Filter;
+import com.redhat.topicindex.entity.Project;
+import com.redhat.topicindex.entity.Tag;
 import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.rest.entities.BaseRestV1;
+import com.redhat.topicindex.rest.entities.CategoryV1;
+import com.redhat.topicindex.rest.entities.ProjectV1;
+import com.redhat.topicindex.rest.entities.TagV1;
 import com.redhat.topicindex.rest.entities.TopicV1;
 import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.docbookbuilding.DocbookBuilder;
@@ -82,12 +88,39 @@ public class RESTv1
 	}
 	
 	@GET
-	@Path("/topic/get/json/{topicId}")
-	public Response getTopic(@PathParam("topicId") final Integer id, @QueryParam("expand") final String expand)
+	@Path("/topic/get/json/{id}")
+	public Response getTopic(@PathParam("id") final Integer id, @QueryParam("expand") final String expand)
 	{
 		assert id != null : "The id parameter can not be null";
 						
 		return getResource(Topic.class, new TopicV1(), id, "application/json", expand);
+	}
+	
+	@GET
+	@Path("/tag/get/json/{id}")
+	public Response getTag(@PathParam("id") final Integer id, @QueryParam("expand") final String expand)
+	{
+		assert id != null : "The id parameter can not be null";
+						
+		return getResource(Tag.class, new TagV1(), id, "application/json", expand);
+	}
+	
+	@GET
+	@Path("/category/get/json/{id}")
+	public Response getCategory(@PathParam("id") final Integer id, @QueryParam("expand") final String expand)
+	{
+		assert id != null : "The id parameter can not be null";
+						
+		return getResource(Category.class, new CategoryV1(), id, "application/json", expand);
+	}
+	
+	@GET
+	@Path("/project/get/json/{id}")
+	public Response getProject(@PathParam("id") final Integer id, @QueryParam("expand") final String expand)
+	{
+		assert id != null : "The id parameter can not be null";
+						
+		return getResource(Project.class, new ProjectV1(), id, "application/json", expand);
 	}
 	
 	@GET
