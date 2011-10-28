@@ -13,8 +13,8 @@ public class BaseRestCollectionV1<T extends BaseRestV1<U>, U>
 {
 	private Integer size = 0;
 	private String expand = null;
-	private Integer startIndex = null;
-	private Integer endIndex = null;
+	private Integer startExpandIndex = null;
+	private Integer endExpandIndex = null;
 	private List<T> items = null;
 	
 	public Integer getSize()
@@ -100,10 +100,10 @@ public class BaseRestCollectionV1<T extends BaseRestV1<U>, U>
 				final int fixedEnd = Math.max(start, end);
 				
 				if (indexes.isDefinedStart())
-					this.startIndex = fixedStart;
+					this.startExpandIndex = fixedStart;
 				
 				if (indexes.isDefinedFinsh())
-					this.endIndex = fixedEnd;
+					this.endExpandIndex = fixedEnd;
 				
 				final List<T> restEntityArray = new ArrayList<T>();
 				
