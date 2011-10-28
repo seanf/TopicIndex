@@ -58,6 +58,6 @@ public class TopicV1 extends BaseRestV1<Topic>
 		else
 			twoWayRelationships.initialize(TopicV1.class, entity.getIncomingRelatedTopicsArray(), RESTv1.TOPIC_TWO_WAY_RELATIONSHIPS_EXPANSION_NAME, dataType);
 
-		super.setLinks(baseUrl, RESTv1.TOPIC_URL_NAME + "/" + dataType, this.id);
+		super.setLinks(baseUrl, RESTv1.TOPIC_URL_NAME, dataType, this.id);
 	}
 }

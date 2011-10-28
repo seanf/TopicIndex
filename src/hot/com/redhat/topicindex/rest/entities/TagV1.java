@@ -30,6 +30,6 @@ public class TagV1 extends BaseRestV1<Tag>
 			categories.initialize(CategoryV1.class, entity.getCategories(), RESTv1.CATEGORIES_EXPANSION_NAME, dataType);
 		}
 		
-		super.setLinks(baseUrl, RESTv1.TAG_URL_NAME + "/" + dataType, this.id);
+		super.setLinks(baseUrl, RESTv1.TAG_URL_NAME, dataType, this.id);
 	}
 }

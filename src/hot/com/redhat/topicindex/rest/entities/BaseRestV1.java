@@ -21,12 +21,12 @@ public abstract class BaseRestV1<T>
 	
 	public abstract void initialize(final T entity, final String baseUrl, final String dataType, final ExpandData expand);
 	
-	protected void setLinks(final String baseUrl, final String restBasePath, final Object id)
+	protected void setLinks(final String baseUrl, final String restBasePath, final String dataType, final Object id)
 	{
-		this.setSelfLink(baseUrl + "/" + restBasePath + "/get/" + id);
-		this.setDeleteLink(baseUrl + "/" + restBasePath + "/delete/" + id);
-		this.setAddLink(baseUrl + "/" + restBasePath + "/post/" + id);
-		this.setEditLink(baseUrl + "/" + restBasePath + "/put/" + id);
+		this.setSelfLink(baseUrl + "/" + restBasePath + "/get/" + dataType + "/" + id);
+		this.setDeleteLink(baseUrl + "/" + restBasePath + "/delete/" + dataType + "/" + id);
+		this.setAddLink(baseUrl + "/" + restBasePath + "/post/" + dataType + "/" + id);
+		this.setEditLink(baseUrl + "/" + restBasePath + "/put/" + dataType + "/" + id);
 	}
 	
 	public String getSelfLink()

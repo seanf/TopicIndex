@@ -34,7 +34,7 @@ public class ProjectV1 extends BaseRestV1<Project>
 			tags.initialize(TagV1.class, entity.getTags(), RESTv1.TAGS_EXPANSION_NAME, dataType);
 		}
 
-		super.setLinks(baseUrl, RESTv1.TOPIC_URL_NAME + "/" + dataType, this.id);
+		super.setLinks(baseUrl, RESTv1.TOPIC_URL_NAME, dataType, this.id);
 	}
 
 }
