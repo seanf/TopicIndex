@@ -13,10 +13,10 @@ public class BaseRestCollectionV1<T extends BaseRestV1<U>, U>
 {
 	private Integer size = 0;
 	private String expand = null;
-	private List<T> items = null;
 	private Integer startIndex = null;
 	private Integer endIndex = null;
-
+	private List<T> items = null;
+	
 	public Integer getSize()
 	{
 		return size;
