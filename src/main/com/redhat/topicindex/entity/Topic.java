@@ -57,6 +57,7 @@ import com.redhat.ecs.commonutils.XMLUtilities;
 import com.redhat.topicindex.sort.TagIDComparator;
 import com.redhat.topicindex.sort.TagNameComparator;
 import com.redhat.topicindex.sort.TagToCategorySortingComparator;
+import com.redhat.topicindex.sort.TopicIDComparator;
 import com.redhat.topicindex.sort.TopicToTagTagIDSort;
 import com.redhat.topicindex.sort.TopicToTopicTopicIDSort;
 import com.redhat.topicindex.utils.Constants;
@@ -234,6 +235,9 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 			if (!topicToTopic.getRelatedTopic().isRelatedTo(this))
 				retValue.add(topicToTopic.getRelatedTopic());
 		}
+		
+		Collections.sort(retValue, new TopicIDComparator());
+		
 		return retValue;
 	}
 
@@ -244,6 +248,9 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		for (final TopicToTopic topicToTopic : this.getParentTopicToTopics())
 			if (topicToTopic.getRelatedTopic().isRelatedTo(this))
 				retValue.add(topicToTopic.getRelatedTopic());
+		
+		Collections.sort(retValue, new TopicIDComparator());
+		
 		return retValue;
 	}
 
@@ -254,6 +261,9 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		for (final TopicToTopic topicToTopic : this.getChildTopicToTopics())
 			if (!this.isRelatedTo(topicToTopic.getMainTopic()))
 				retValue.add(topicToTopic.getMainTopic());
+		
+		Collections.sort(retValue, new TopicIDComparator());
+		
 		return retValue;
 	}
 

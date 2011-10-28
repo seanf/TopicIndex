@@ -35,6 +35,9 @@ public class RESTv1
 	public static final String TOPICS_EXPANSION_NAME = "topics";
 	public static final String TAGS_EXPANSION_NAME = "tags";
 	public static final String CATEGORIES_EXPANSION_NAME = "categories";
+	public static final String TOPIC_INCOMING_RELATIONSHIPS_EXPANSION_NAME = "incomingRelationships";
+	public static final String TOPIC_OUTGOING_RELATIONSHIPS_EXPANSION_NAME = "outgoingRelationships";
+	public static final String TOPIC_TWO_WAY_RELATIONSHIPS_EXPANSION_NAME = "twoWayRelationships";
 	
 	public static final String TOPIC_URL_NAME = "topic";
 	public static final String TAG_URL_NAME = "tag";
