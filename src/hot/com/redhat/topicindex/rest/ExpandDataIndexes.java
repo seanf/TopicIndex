@@ -15,26 +15,26 @@ public class ExpandDataIndexes
 	private static final String EXPAND_LEVEL_NAMED_GROUP = "expandLevel";
 	private static final String EXPAND_DATA_INDEXES_RE = "^(?<" + EXPAND_LEVEL_NAMED_GROUP + ">\\w+)(\\[(?<" + START_INDEX_NAMED_GROUP + ">-?\\d+)?(?<" + COLON_NAMED_GROUP + ">:)?(?<" + END_INDEX_NAMED_GROUP + ">-?\\d+)?\\])?$";
 	private String expandLevel = null;
-	private Integer startIndex = null;
-	private Integer endIndex = null;
-	private boolean definedStart = false;
-	private boolean definedFinsh = false;
+	private Integer startExpandedIndex = null;
+	private Integer endExpandedIndex = null;
+	private boolean definedStart = true;
+	private boolean definedFinsh = true;
 	private boolean startAtBegining = false;
 	private boolean finishAtEnd = false;
 	private boolean valid = false;
 
 	public Integer getStartIndex()
 	{
-		if (startIndex == null || endIndex == null)
-			return startIndex;
-		return Math.min(startIndex, endIndex);
+		if (startExpandedIndex == null || endExpandedIndex == null)
+			return startExpandedIndex;
+		return Math.min(startExpandedIndex, endExpandedIndex);
 	}
 
 	public Integer getEndIndex()
 	{
-		if (startIndex == null || endIndex == null)
-			return endIndex;
-		return Math.max(startIndex, endIndex);
+		if (startExpandedIndex == null || endExpandedIndex == null)
+			return endExpandedIndex;
+		return Math.max(startExpandedIndex, endExpandedIndex);
 	}
 
 	public ExpandDataIndexes(final String expand)
@@ -69,24 +69,26 @@ public class ExpandDataIndexes
 			/* deal with input like: tags[1:] */
 			else if (startIndexMatch != null && colon != null && endIndexMatch == null)
 			{				
-				definedFinsh = true;
 				finishAtEnd = true;
 			}
 
 			/* deal with input like: tags[:1] */
 			else if (startIndexMatch == null && colon != null && endIndexMatch != null)
 			{				
-				definedStart = true;
 				startAtBegining = true;
 			}
-
+			
 			if (startIndexMatch != null)
 			{
-				definedStart = true;
-				
 				try
 				{
-					startIndex = Integer.parseInt(startIndexMatch);
+					startExpandedIndex = Integer.parseInt(startIndexMatch);
+					
+					/* deal with input like: tags[1] */
+					if (colon == null && endIndexMatch == null)
+					{
+						endExpandedIndex = startExpandedIndex;
+					}
 				}
 				catch (final Exception ex)
 				{
@@ -96,11 +98,9 @@ public class ExpandDataIndexes
 
 			if (endIndexMatch != null)
 			{
-				definedFinsh = true;
-				
 				try
 				{
-					endIndex = Integer.parseInt(endIndexMatch);
+					endExpandedIndex = Integer.parseInt(endIndexMatch);
 				}
 				catch (final Exception ex)
 				{
