@@ -69,12 +69,14 @@ public class ExpandDataIndexes
 			/* deal with input like: tags[1:] */
 			else if (startIndexMatch != null && colon != null && endIndexMatch == null)
 			{				
+				definedFinsh = true;
 				startAtBegining = true;
 			}
 
 			/* deal with input like: tags[:1] */
 			else if (startIndexMatch == null && colon != null && endIndexMatch != null)
 			{				
+				definedStart = true;
 				finishAtEnd = true;
 			}
 
