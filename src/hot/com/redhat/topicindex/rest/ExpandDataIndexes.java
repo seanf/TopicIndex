@@ -70,14 +70,14 @@ public class ExpandDataIndexes
 			else if (startIndexMatch != null && colon != null && endIndexMatch == null)
 			{				
 				definedFinsh = true;
-				startAtBegining = true;
+				finishAtEnd = true;
 			}
 
 			/* deal with input like: tags[:1] */
 			else if (startIndexMatch == null && colon != null && endIndexMatch != null)
 			{				
 				definedStart = true;
-				finishAtEnd = true;
+				startAtBegining = true;
 			}
 
 			if (startIndexMatch != null)
