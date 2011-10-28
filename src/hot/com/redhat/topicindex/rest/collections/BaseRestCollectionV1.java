@@ -47,12 +47,12 @@ public class BaseRestCollectionV1<T extends BaseRestV1<U>, U>
 		this.items = items;
 	}
 
-	public void initialize(final Class<T> classType, final List<U> entities, final String expandName)
+	public void initialize(final Class<T> classType, final List<U> entities, final String expandName, final String dataType)
 	{
-		initialize(classType, entities, expandName, null, null);
+		initialize(classType, entities, expandName, dataType, null, null);
 	}
 
-	public void initialize(final Class<T> classType, final List<U> entities, final String expandName, final ExpandData expand, final String baseUrl)
+	public void initialize(final Class<T> classType, final List<U> entities, final String expandName, final String dataType, final ExpandData expand, final String baseUrl)
 	{
 		assert entities != null : "Parameter entities can not be null";
 
@@ -111,7 +111,7 @@ public class BaseRestCollectionV1<T extends BaseRestV1<U>, U>
 				{
 					final U dbEntity = entities.get(i);
 					final T restEntity = classType.newInstance();
-					restEntity.initialize(dbEntity, baseUrl, secondLevelExpandData);
+					restEntity.initialize(dbEntity, baseUrl, dataType, secondLevelExpandData);
 					restEntityArray.add(restEntity);
 				}
 

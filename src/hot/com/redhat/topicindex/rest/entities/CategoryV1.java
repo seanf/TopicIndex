@@ -16,7 +16,7 @@ public class CategoryV1 extends BaseRestV1<Category>
 	private BaseRestCollectionV1<TagV1, Tag> tags = new BaseRestCollectionV1<TagV1, Tag>();
 	
 	@Override
-	public void initialize(final Category entity, final String baseUrl, final ExpandData expand)
+	public void initialize(final Category entity, final String baseUrl, final String dataType, final ExpandData expand)
 	{
 		assert entity != null : "Parameter topic can not be null";
 		assert baseUrl != null : "Parameter baseUrl can not be null";
@@ -30,14 +30,14 @@ public class CategoryV1 extends BaseRestV1<Category>
 		
 		if (expand.contains(RESTv1.TAGS_EXPANSION_NAME))
 		{
-			tags.initialize(TagV1.class, entity.getTags(), RESTv1.TAGS_EXPANSION_NAME, expand, baseUrl);
+			tags.initialize(TagV1.class, entity.getTags(), RESTv1.TAGS_EXPANSION_NAME, dataType, expand, baseUrl);
 		}
 		else
 		{
-			tags.initialize(TagV1.class, entity.getTags(), RESTv1.TAGS_EXPANSION_NAME);
+			tags.initialize(TagV1.class, entity.getTags(), RESTv1.TAGS_EXPANSION_NAME, dataType);
 		}
 		
-		super.setLinks(baseUrl, RESTv1.CATEGORY_URL_NAME, this.id);
+		super.setLinks(baseUrl, RESTv1.CATEGORY_URL_NAME + "/" + dataType, this.id);
 	}
 	
 }

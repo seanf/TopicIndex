@@ -25,7 +25,7 @@ public class TopicV1 extends BaseRestV1<Topic>
 	private BaseRestCollectionV1<TopicV1, Topic> twoWayRelationships = new BaseRestCollectionV1<TopicV1, Topic>();
 
 	@Override
-	public void initialize(final Topic entity, final String baseUrl, final ExpandData expand)
+	public void initialize(final Topic entity, final String baseUrl, final String dataType, final ExpandData expand)
 	{
 		assert entity != null : "Parameter topic can not be null";
 		assert baseUrl != null : "Parameter baseUrl can not be null";
@@ -39,25 +39,25 @@ public class TopicV1 extends BaseRestV1<Topic>
 		{ RESTv1.TAGS_EXPANSION_NAME, RESTv1.TOPIC_INCOMING_RELATIONSHIPS_EXPANSION_NAME, RESTv1.TOPIC_OUTGOING_RELATIONSHIPS_EXPANSION_NAME, RESTv1.TOPIC_TWO_WAY_RELATIONSHIPS_EXPANSION_NAME });
 
 		if (expand.contains(RESTv1.TAGS_EXPANSION_NAME))
-			tags.initialize(TagV1.class, entity.getTags(), RESTv1.TAGS_EXPANSION_NAME, expand, baseUrl);
+			tags.initialize(TagV1.class, entity.getTags(), RESTv1.TAGS_EXPANSION_NAME, dataType, expand, baseUrl);
 		else
-			tags.initialize(TagV1.class, entity.getTags(), RESTv1.TAGS_EXPANSION_NAME);
+			tags.initialize(TagV1.class, entity.getTags(), RESTv1.TAGS_EXPANSION_NAME, dataType);
 
 		if (expand.contains(RESTv1.TOPIC_OUTGOING_RELATIONSHIPS_EXPANSION_NAME))
-			outgoingRelationships.initialize(TopicV1.class, entity.getOutgoingTopicsArray(), RESTv1.TOPIC_OUTGOING_RELATIONSHIPS_EXPANSION_NAME, expand, baseUrl);
+			outgoingRelationships.initialize(TopicV1.class, entity.getOutgoingTopicsArray(), RESTv1.TOPIC_OUTGOING_RELATIONSHIPS_EXPANSION_NAME, dataType, expand, baseUrl);
 		else
-			outgoingRelationships.initialize(TopicV1.class, entity.getOutgoingTopicsArray(), RESTv1.TOPIC_OUTGOING_RELATIONSHIPS_EXPANSION_NAME);
+			outgoingRelationships.initialize(TopicV1.class, entity.getOutgoingTopicsArray(), RESTv1.TOPIC_OUTGOING_RELATIONSHIPS_EXPANSION_NAME, dataType);
 		
 		if (expand.contains(RESTv1.TOPIC_INCOMING_RELATIONSHIPS_EXPANSION_NAME))
-			incomingRelationships.initialize(TopicV1.class, entity.getIncomingRelatedTopicsArray(), RESTv1.TOPIC_INCOMING_RELATIONSHIPS_EXPANSION_NAME, expand, baseUrl);
+			incomingRelationships.initialize(TopicV1.class, entity.getIncomingRelatedTopicsArray(), RESTv1.TOPIC_INCOMING_RELATIONSHIPS_EXPANSION_NAME, dataType, expand, baseUrl);
 		else
-			incomingRelationships.initialize(TopicV1.class, entity.getIncomingRelatedTopicsArray(), RESTv1.TOPIC_INCOMING_RELATIONSHIPS_EXPANSION_NAME);
+			incomingRelationships.initialize(TopicV1.class, entity.getIncomingRelatedTopicsArray(), RESTv1.TOPIC_INCOMING_RELATIONSHIPS_EXPANSION_NAME, dataType);
 		
 		if (expand.contains(RESTv1.TOPIC_TWO_WAY_RELATIONSHIPS_EXPANSION_NAME))
-			twoWayRelationships.initialize(TopicV1.class, entity.getIncomingRelatedTopicsArray(), RESTv1.TOPIC_TWO_WAY_RELATIONSHIPS_EXPANSION_NAME, expand, baseUrl);
+			twoWayRelationships.initialize(TopicV1.class, entity.getIncomingRelatedTopicsArray(), RESTv1.TOPIC_TWO_WAY_RELATIONSHIPS_EXPANSION_NAME, dataType, expand, baseUrl);
 		else
-			twoWayRelationships.initialize(TopicV1.class, entity.getIncomingRelatedTopicsArray(), RESTv1.TOPIC_TWO_WAY_RELATIONSHIPS_EXPANSION_NAME);
+			twoWayRelationships.initialize(TopicV1.class, entity.getIncomingRelatedTopicsArray(), RESTv1.TOPIC_TWO_WAY_RELATIONSHIPS_EXPANSION_NAME, dataType);
 
-		super.setLinks(baseUrl, RESTv1.TOPIC_URL_NAME, this.id);
+		super.setLinks(baseUrl, RESTv1.TOPIC_URL_NAME + "/" + dataType, this.id);
 	}
 }

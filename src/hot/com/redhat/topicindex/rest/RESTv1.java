@@ -43,6 +43,8 @@ public class RESTv1
 	public static final String TAG_URL_NAME = "tag";
 	public static final String CATEGORY_URL_NAME = "category";
 	
+	public static final String JSON_URL = "json";
+	
 	@Context UriInfo uriInfo;
 	
 	private String getBaseUrl()
@@ -75,7 +77,7 @@ public class RESTv1
 			/* create a pretty printing Gson object */
 			final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			/* create the REST representation of the topic */
-			restRepresentation.initialize(entity, this.getBaseUrl(), expand);
+			restRepresentation.initialize(entity, this.getBaseUrl(), JSON_URL, expand);
 			/* Convert the REST representation to a JSON string */
 			final String json = gson.toJson(restRepresentation);
 			/* build a response */
