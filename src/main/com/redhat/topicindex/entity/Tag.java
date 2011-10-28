@@ -37,6 +37,9 @@ import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
 import org.jboss.seam.Component;
 
+import com.redhat.topicindex.sort.CategoryIDComparator;
+import com.redhat.topicindex.sort.TagIDComparator;
+
 @Entity
 @Audited
 @Table(name = "Tag", catalog = "Skynet", uniqueConstraints = @UniqueConstraint(columnNames = {"TagName" })) 
@@ -184,6 +187,9 @@ public class Tag implements java.io.Serializable
 		final List<Category> retValue = new ArrayList<Category>();
 		for (final TagToCategory category : this.getTagToCategories())
 			retValue.add(category.getCategory());
+		
+		Collections.sort(retValue, new CategoryIDComparator());
+		
 		return retValue;
 	}
 

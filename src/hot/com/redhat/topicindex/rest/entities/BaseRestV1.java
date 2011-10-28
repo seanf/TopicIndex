@@ -8,6 +8,7 @@ public abstract class BaseRestV1<T>
 	private String editLink = null;
 	private String deleteLink = null;
 	private String addLink = null;
+	private Integer index = null;
 	private String[] expand = null;
 	
 	public void initialize(final T entity, final String baseUrl, final String expand)
@@ -16,6 +17,12 @@ public abstract class BaseRestV1<T>
 		final String fixedExpand = expand == null ? "" : expand;
 		
 		this.initialize(entity, baseUrl, new ExpandData(fixedExpand));
+	}
+	
+	public void initialize(final T entity, final String baseUrl, final ExpandData expand, final Integer index)
+	{
+		this.index = index;
+		this.initialize(entity, baseUrl, expand);
 	}
 	
 	public abstract void initialize(final T entity, final String baseUrl, final ExpandData expand);
@@ -73,8 +80,18 @@ public abstract class BaseRestV1<T>
 		return expand;
 	}
 
-	public void setExpand(String[] expand)
+	public void setExpand(final String[] expand)
 	{
 		this.expand = expand;
+	}
+
+	public Integer getIndex()
+	{
+		return index;
+	}
+
+	public void setIndex(final Integer index)
+	{
+		this.index = index;
 	}
 }

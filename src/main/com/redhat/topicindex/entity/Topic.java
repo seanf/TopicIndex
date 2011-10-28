@@ -54,6 +54,7 @@ import com.redhat.ecs.commonthread.WorkQueue;
 import com.redhat.ecs.commonutils.DocBookUtilities;
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.ecs.commonutils.XMLUtilities;
+import com.redhat.topicindex.sort.TagIDComparator;
 import com.redhat.topicindex.sort.TagNameComparator;
 import com.redhat.topicindex.sort.TagToCategorySortingComparator;
 import com.redhat.topicindex.sort.TopicToTagTagIDSort;
@@ -934,6 +935,8 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 			final Tag tag = topicToTag.getTag();
 			retValue.add(tag);
 		}
+		
+		Collections.sort(retValue, new TagIDComparator());
 
 		return retValue;
 	}

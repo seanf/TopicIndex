@@ -4,7 +4,7 @@ import java.util.Comparator;
 
 import com.redhat.topicindex.entity.Tag;
 
-public class TagNameComparator implements Comparator<Tag>
+public class TagIDComparator implements Comparator<Tag>
 {
 	public int compare(final Tag o1, final Tag o2) 
 	{
@@ -15,14 +15,14 @@ public class TagNameComparator implements Comparator<Tag>
 		if (o2 == null)
 			return 1;
 		
-		if (o1.getTagName() == null && o2.getTagName() == null)
+		if (o1.getTagId() == null && o2.getTagId() == null)
 			return 0;
-		if (o1.getTagName() == null)
+		if (o1.getTagId() == null)
 			return -1;
-		if (o2.getTagName() == null)
+		if (o2.getTagId() == null)
 			return 1;
 		
-		return o1.getTagName().compareTo(o2.getTagName());
+		return o1.getTagId().compareTo(o2.getTagId());
 	}
 
 }

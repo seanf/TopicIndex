@@ -103,7 +103,7 @@ public class BaseRestCollectionV1<T extends BaseRestV1<U>, U>
 				{
 					final U dbEntity = entities.get(i);
 					final T restEntity = classType.newInstance();
-					restEntity.initialize(dbEntity, baseUrl, secondLevelExpandData);
+					restEntity.initialize(dbEntity, baseUrl, secondLevelExpandData, i);
 					restEntityArray.add(restEntity);
 				}
 

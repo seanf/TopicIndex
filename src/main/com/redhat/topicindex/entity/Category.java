@@ -29,6 +29,7 @@ import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
 
 import com.redhat.ecs.commonutils.CollectionUtilities;
+import com.redhat.topicindex.sort.TagIDComparator;
 import com.redhat.topicindex.sort.TagToCategorySortingComparator;
 
 @Entity
@@ -159,6 +160,8 @@ public class Category implements java.io.Serializable, Comparable<Category>
 		final List<Tag> retValue = new ArrayList<Tag>();
 		for (final TagToCategory tag : this.tagToCategories)
 			retValue.add(tag.getTag());
+		
+		Collections.sort(retValue, new TagIDComparator());
 
 		return retValue;
 	}

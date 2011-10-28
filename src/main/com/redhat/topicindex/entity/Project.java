@@ -23,6 +23,7 @@ import org.hibernate.envers.Audited;
 import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
 
+import com.redhat.topicindex.sort.TagIDComparator;
 import com.redhat.topicindex.utils.structures.NameIDSortMap;
 
 @Audited
@@ -177,6 +178,8 @@ public class Project implements java.io.Serializable
     	final List<Tag> retValue = new ArrayList<Tag>();
     	for (final TagToProject tag : this.tagToProjects)
     		retValue.add(tag.getTag());
+    	
+    	Collections.sort(retValue, new TagIDComparator());
     	
     	return retValue;
     }
