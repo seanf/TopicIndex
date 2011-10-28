@@ -17,8 +17,8 @@ public class ExpandDataIndexes
 	private String expandLevel = null;
 	private Integer startIndex = null;
 	private Integer endIndex = null;
-	private boolean definedStartAtBegining = false;
-	private boolean definedFinshAtEnd = false;
+	private boolean definedStart = false;
+	private boolean definedFinsh = false;
 	private boolean startAtBegining = false;
 	private boolean finishAtEnd = false;
 	private boolean valid = false;
@@ -59,8 +59,8 @@ public class ExpandDataIndexes
 			if (startIndexMatch == null && colon == null && endIndexMatch == null)
 			{
 				/* we have not specifically defined the start at the beginning or finish at the ending */
-				definedFinshAtEnd = false;
-				definedStartAtBegining = false;
+				definedFinsh = false;
+				definedStart = false;
 				/* but the overall effect is that we will start at the begining and finish at the end */ 
 				startAtBegining = true;
 				finishAtEnd = true;
@@ -68,20 +68,20 @@ public class ExpandDataIndexes
 
 			/* deal with input like: tags[1:] */
 			else if (startIndexMatch != null && colon != null && endIndexMatch == null)
-			{
-				definedFinshAtEnd = true;
+			{				
 				startAtBegining = true;
 			}
 
 			/* deal with input like: tags[:1] */
 			else if (startIndexMatch == null && colon != null && endIndexMatch != null)
-			{
-				definedStartAtBegining = true;
+			{				
 				finishAtEnd = true;
 			}
 
 			if (startIndexMatch != null)
 			{
+				definedStart = true;
+				
 				try
 				{
 					startIndex = Integer.parseInt(startIndexMatch);
@@ -94,6 +94,8 @@ public class ExpandDataIndexes
 
 			if (endIndexMatch != null)
 			{
+				definedFinsh = true;
+				
 				try
 				{
 					endIndex = Integer.parseInt(endIndexMatch);
@@ -117,24 +119,24 @@ public class ExpandDataIndexes
 		this.valid = valid;
 	}
 
-	public boolean isDefinedStartAtBegining()
+	public boolean isDefinedStart()
 	{
-		return definedStartAtBegining;
+		return definedStart;
 	}
 
-	public void setDefinedStartAtBegining(boolean definedStartAtBegining)
+	public void setDefinedStart(boolean definedStart)
 	{
-		this.definedStartAtBegining = definedStartAtBegining;
+		this.definedStart = definedStart;
 	}
 
-	public boolean isDefinedFinshAtEnd()
+	public boolean isDefinedFinsh()
 	{
-		return definedFinshAtEnd;
+		return definedFinsh;
 	}
 
-	public void setDefinedFinshAtEnd(boolean definedFinshAtEnd)
+	public void setDefinedFinsh(boolean definedFinsh)
 	{
-		this.definedFinshAtEnd = definedFinshAtEnd;
+		this.definedFinsh = definedFinsh;
 	}
 
 	public String getExpandLevel()

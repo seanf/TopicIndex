@@ -99,10 +99,10 @@ public class BaseRestCollectionV1<T extends BaseRestV1<U>, U>
 				final int fixedStart = Math.min(start, end);
 				final int fixedEnd = Math.max(start, end);
 				
-				if (indexes.isDefinedStartAtBegining())
+				if (indexes.isDefinedStart())
 					this.startIndex = fixedStart;
 				
-				if (indexes.isDefinedFinshAtEnd())
+				if (indexes.isDefinedFinsh())
 					this.endIndex = fixedEnd;
 				
 				final List<T> restEntityArray = new ArrayList<T>();
