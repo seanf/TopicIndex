@@ -23,10 +23,10 @@ public abstract class BaseRestV1<T>
 	
 	protected void setLinks(final String baseUrl, final String restBasePath, final String dataType, final Object id)
 	{
-		this.setSelfLink(baseUrl + "/" + restBasePath + "/get/" + dataType + "/" + id);
-		this.setDeleteLink(baseUrl + "/" + restBasePath + "/delete/" + dataType + "/" + id);
-		this.setAddLink(baseUrl + "/" + restBasePath + "/post/" + dataType + "/" + id);
-		this.setEditLink(baseUrl + "/" + restBasePath + "/put/" + dataType + "/" + id);
+		this.setSelfLink(baseUrl + "/1/" + restBasePath + "/get/" + dataType + "/" + id);
+		this.setDeleteLink(baseUrl + "/1/" + restBasePath + "/delete/" + dataType + "/" + id);
+		this.setAddLink(baseUrl + "/1/" + restBasePath + "/post/" + dataType + "/" + id);
+		this.setEditLink(baseUrl + "/1/" + restBasePath + "/put/" + dataType + "/" + id);
 	}
 	
 	public String getSelfLink()
