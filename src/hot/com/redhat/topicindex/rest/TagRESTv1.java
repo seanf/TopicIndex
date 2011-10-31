@@ -8,6 +8,7 @@ import javax.ws.rs.core.Response;
 
 import com.redhat.topicindex.entity.Tag;
 import com.redhat.topicindex.rest.entities.TagV1;
+import com.redhat.topicindex.rest.factory.TagV1Factory;
 
 @Path("/1")
 public class TagRESTv1 extends RESTv1
@@ -18,6 +19,6 @@ public class TagRESTv1 extends RESTv1
 	{
 		assert id != null : "The id parameter can not be null";
 						
-		return getResource(Tag.class, new TagV1(), id, "application/json", expand);
+		return getResource(Tag.class, new TagV1Factory(), id, "application/json", expand);
 	}
 }

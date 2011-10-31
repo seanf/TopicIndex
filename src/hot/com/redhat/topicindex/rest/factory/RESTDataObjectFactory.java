@@ -6,4 +6,5 @@ public interface RESTDataObjectFactory<T, U>
 {
 	public T create(final U entity, final String baseUrl, final String dataType, final String expand);
 	public T create(final U entity, final String baseUrl, final String dataType, final ExpandData expand);
+	public void sync(final U entity, final T dataObject);
 }

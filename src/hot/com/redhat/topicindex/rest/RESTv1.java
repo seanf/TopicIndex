@@ -57,9 +57,9 @@ public class RESTv1
 		return null;
 	}
 	
-	protected <T> Response getResource(final Class<T> type, final BaseRestV1<T> restRepresentation, final Object id, final String mimeType, final String expand)
+	protected <T, U> Response getResource(final Class<U> type, final RESTDataObjectFactory<T, U> dataObjectFactory, final Object id, final String mimeType, final String expand)
 	{
-		return getResource(type, restRepresentation, id, mimeType, expand, null);
+		return getResource(type, dataObjectFactory, id, mimeType, expand, null);
 	}
 	
 	protected <T, U> Response getResource(final Class<U> type, final RESTDataObjectFactory<T, U> dataObjectFactory, final Object id, final String mimeType, final String expand, final String fileName)

@@ -13,6 +13,7 @@ import org.jboss.seam.Component;
 import com.google.gson.Gson;
 import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.rest.entities.TopicV1;
+import com.redhat.topicindex.rest.factory.TopicV1Factory;
 import com.redhat.topicindex.rest.sharedinterface.TopicRESTInterfaceV1;
 
 @Path("/1")
@@ -24,7 +25,7 @@ public class TopicRESTv1 extends RESTv1 implements TopicRESTInterfaceV1
 	{
 		assert id != null : "The id parameter can not be null";
 
-		return getResource(Topic.class, new TopicV1(), id, "application/json", expand);
+		return getResource(Topic.class, new TopicV1Factory(), id, "application/json", expand);
 	}
 
 	@PUT
@@ -77,7 +78,7 @@ public class TopicRESTv1 extends RESTv1 implements TopicRESTInterfaceV1
 		
 		try
 		{
-			topicV1.sync(entity);
+			new TopicV1Factory().sync(entity, topicV1);
 			entityManager.persist(entity);
 			entityManager.flush();
 		}

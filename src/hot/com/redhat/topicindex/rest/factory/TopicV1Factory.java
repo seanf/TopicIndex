@@ -59,5 +59,10 @@ public class TopicV1Factory implements RESTDataObjectFactory<TopicV1, Topic>
 		return this.create(entity, baseUrl, dataType, new ExpandData(fixedExpand));
 	}
 
-
+	@Override
+	public void sync(Topic entity, TopicV1 dataObject)
+	{
+		// TODO Auto-generated method stub
+		
+	}
 }
