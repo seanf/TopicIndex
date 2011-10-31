@@ -1,13 +1,35 @@
 package com.redhat.topicindex.rest.entities;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class BaseRestV1
-{	
+{
+	/**
+	 * Maintains a list of the database fields that have been specifically set
+	 * on this object. This allows us to distinguish them from those that are
+	 * just null by default
+	 */
+	private List<String> configuredParameters = null;
 	private String selfLink = null;
 	private String editLink = null;
 	private String deleteLink = null;
 	private String addLink = null;
 	private String[] expand = null;
+
+	protected void setParamaterToConfigured(final String paramater)
+	{
+		if (configuredParameters == null)
+			configuredParameters = new ArrayList<String>();
+		if (!configuredParameters.contains(paramater))
+			configuredParameters.add(paramater);
+	}
 	
+	public boolean isParameterSet(final String parameter)
+	{
+		return configuredParameters != null && configuredParameters.contains(parameter);
+	}
+
 	public void setLinks(final String baseUrl, final String restBasePath, final String dataType, final Object id)
 	{
 		this.setSelfLink(baseUrl + "/1/" + restBasePath + "/get/" + dataType + "/" + id);
@@ -15,7 +37,7 @@ public abstract class BaseRestV1
 		this.setAddLink(baseUrl + "/1/" + restBasePath + "/post/" + dataType + "/" + id);
 		this.setEditLink(baseUrl + "/1/" + restBasePath + "/put/" + dataType + "/" + id);
 	}
-	
+
 	public String getSelfLink()
 	{
 		return selfLink;

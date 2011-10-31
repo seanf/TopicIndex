@@ -60,9 +60,9 @@ public class TopicV1Factory implements RESTDataObjectFactory<TopicV1, Topic>
 	}
 
 	@Override
-	public void sync(Topic entity, TopicV1 dataObject)
+	public void sync(final Topic entity, final TopicV1 dataObject)
 	{
-		// TODO Auto-generated method stub
-		
+		if (dataObject.isParameterSet(TopicV1.TITLE_NAME))
+			entity.setTopicTitle(dataObject.getTitle());		
 	}
 }

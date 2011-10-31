@@ -7,9 +7,19 @@ import com.redhat.topicindex.rest.collections.BaseRestCollectionV1;
  */
 public class TopicV1 extends BaseRestV1
 {
+	public static final String ID_NAME = "id";
+	public static final String TITLE_NAME = "title";
+	public static final String DESCRIPTION_NAME = "description";
+	public static final String XML_NAME = "xml";
+	public static final String HTML_NAME = "html";
+	public static final String TAGS_NAME = "tags";
+	public static final String OUTGOING_NAME = "outgoingRelationships";
+	public static final String INCOMING_NAME = "incomingRelationships";
+	public static final String TWO_WAY_NAME = "twoWayRelationships";
+	
 	private Integer id = null;
 	private String title = null;
-	private String description = null;
+	private String description = null;	
 	private String xml = null;
 	private String html = null;
 	private BaseRestCollectionV1<TagV1> tags = null;
@@ -22,9 +32,10 @@ public class TopicV1 extends BaseRestV1
 		return id;
 	}
 
-	public void setId(Integer id)
+	public void setId(final Integer id)
 	{
 		this.id = id;
+		setParamaterToConfigured(ID_NAME);
 	}
 
 	public String getTitle()
@@ -32,9 +43,10 @@ public class TopicV1 extends BaseRestV1
 		return title;
 	}
 
-	public void setTitle(String title)
+	public void setTitle(final String title)
 	{
 		this.title = title;
+		setParamaterToConfigured(TITLE_NAME);
 	}
 
 	public String getDescription()
@@ -42,9 +54,10 @@ public class TopicV1 extends BaseRestV1
 		return description;
 	}
 
-	public void setDescription(String description)
+	public void setDescription(final String description)
 	{
 		this.description = description;
+		setParamaterToConfigured(DESCRIPTION_NAME);
 	}
 
 	public String getXml()
@@ -52,9 +65,10 @@ public class TopicV1 extends BaseRestV1
 		return xml;
 	}
 
-	public void setXml(String xml)
+	public void setXml(final String xml)
 	{
 		this.xml = xml;
+		setParamaterToConfigured(XML_NAME);
 	}
 
 	public String getHtml()
@@ -62,9 +76,10 @@ public class TopicV1 extends BaseRestV1
 		return html;
 	}
 
-	public void setHtml(String html)
+	public void setHtml(final String html)
 	{
 		this.html = html;
+		setParamaterToConfigured(HTML_NAME);
 	}
 
 	public BaseRestCollectionV1<TagV1> getTags()
@@ -72,9 +87,10 @@ public class TopicV1 extends BaseRestV1
 		return tags;
 	}
 
-	public void setTags(BaseRestCollectionV1<TagV1> tags)
+	public void setTags(final BaseRestCollectionV1<TagV1> tags)
 	{
 		this.tags = tags;
+		setParamaterToConfigured(TAGS_NAME);
 	}
 
 	public BaseRestCollectionV1<TopicV1> getOutgoingRelationships()
@@ -85,6 +101,7 @@ public class TopicV1 extends BaseRestV1
 	public void setOutgoingRelationships(final BaseRestCollectionV1<TopicV1> outgoingRelationships)
 	{
 		this.outgoingRelationships = outgoingRelationships;
+		setParamaterToConfigured(OUTGOING_NAME);
 	}
 
 	public BaseRestCollectionV1<TopicV1> getIncomingRelationships()
@@ -95,6 +112,7 @@ public class TopicV1 extends BaseRestV1
 	public void setIncomingRelationships(final BaseRestCollectionV1<TopicV1> incomingRelationships)
 	{
 		this.incomingRelationships = incomingRelationships;
+		setParamaterToConfigured(INCOMING_NAME);		
 	}
 
 	public BaseRestCollectionV1<TopicV1> getTwoWayRelationships()
@@ -105,5 +123,6 @@ public class TopicV1 extends BaseRestV1
 	public void setTwoWayRelationships(final BaseRestCollectionV1<TopicV1> twoWayRelationships)
 	{
 		this.twoWayRelationships = twoWayRelationships;
+		setParamaterToConfigured(TWO_WAY_NAME);
 	}
 }
