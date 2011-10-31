@@ -11,6 +11,8 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
+        <javaElement handleIdentifier="=TopicIndex/src\/hot&lt;com.redhat.topicindex.rest.collections"/>
+        <javaElement handleIdentifier="=TopicIndex/src\/hot&lt;com.redhat.topicindex.rest.entities"/>
         <javaElement handleIdentifier="=TopicIndex/src\/hot&lt;com.redhat.topicindex.rest.sharedinterface"/>
     </selectedElements>
 </jardesc>

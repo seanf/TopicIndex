@@ -1,6 +1,7 @@
 package com.redhat.topicindex.rest;
 
 import javax.persistence.EntityManager;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -30,6 +31,7 @@ public class TopicRESTv1 extends RESTv1 implements TopicRESTInterfaceV1
 
 	@PUT
 	@Path("/topic/put/json/{id}")
+	@Consumes({"application/json", "text/plain"})
 	public Response updateTopic(@PathParam("id") final Integer id, final String json)
 	{
 		assert id != null : "The id parameter can not be null";
