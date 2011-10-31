@@ -1,8 +1,6 @@
 package com.redhat.topicindex.rest.entities;
 
-import com.redhat.topicindex.rest.ExpandData;
-
-public abstract class BaseRestV1<T>
+public abstract class BaseRestV1
 {	
 	private String selfLink = null;
 	private String editLink = null;
@@ -10,19 +8,7 @@ public abstract class BaseRestV1<T>
 	private String addLink = null;
 	private String[] expand = null;
 	
-	public void initialize(final T entity, final String baseUrl, final String dataType, final String expand)
-	{
-		/* account for the fact that expand could be null */
-		final String fixedExpand = expand == null ? "" : expand;
-		
-		this.initialize(entity, baseUrl, dataType, new ExpandData(fixedExpand));
-	}
-	
-	public abstract void initialize(final T entity, final String baseUrl, final String dataType, final ExpandData expand);
-	
-	public abstract void sync(final T entity);
-	
-	protected void setLinks(final String baseUrl, final String restBasePath, final String dataType, final Object id)
+	public void setLinks(final String baseUrl, final String restBasePath, final String dataType, final Object id)
 	{
 		this.setSelfLink(baseUrl + "/1/" + restBasePath + "/get/" + dataType + "/" + id);
 		this.setDeleteLink(baseUrl + "/1/" + restBasePath + "/delete/" + dataType + "/" + id);
@@ -60,12 +46,12 @@ public abstract class BaseRestV1<T>
 		this.deleteLink = deleteLink;
 	}
 
-	protected String getAddLink()
+	public String getAddLink()
 	{
 		return addLink;
 	}
 
-	protected void setAddLink(final String addLink)
+	public void setAddLink(final String addLink)
 	{
 		this.addLink = addLink;
 	}

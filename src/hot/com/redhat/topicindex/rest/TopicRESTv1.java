@@ -13,9 +13,10 @@ import org.jboss.seam.Component;
 import com.google.gson.Gson;
 import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.rest.entities.TopicV1;
+import com.redhat.topicindex.rest.sharedinterface.TopicRESTInterfaceV1;
 
 @Path("/1")
-public class TopicRESTv1 extends RESTv1
+public class TopicRESTv1 extends RESTv1 implements TopicRESTInterfaceV1 
 {
 	@GET
 	@Path("/topic/get/json/{id}")

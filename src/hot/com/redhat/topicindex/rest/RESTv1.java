@@ -25,6 +25,7 @@ import com.redhat.topicindex.rest.entities.CategoryV1;
 import com.redhat.topicindex.rest.entities.ProjectV1;
 import com.redhat.topicindex.rest.entities.TagV1;
 import com.redhat.topicindex.rest.entities.TopicV1;
+import com.redhat.topicindex.rest.factory.RESTDataObjectFactory;
 import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.docbookbuilding.DocbookBuilder;
 import com.redhat.topicindex.utils.docbookbuilding.DocbookBuildingOptions;
@@ -61,22 +62,22 @@ public class RESTv1
 		return getResource(type, restRepresentation, id, mimeType, expand, null);
 	}
 	
-	protected <T> Response getResource(final Class<T> type, final BaseRestV1<T> restRepresentation, final Object id, final String mimeType, final String expand, final String fileName)
+	protected <T, U> Response getResource(final Class<U> type, final RESTDataObjectFactory<T, U> dataObjectFactory, final Object id, final String mimeType, final String expand, final String fileName)
 	{
 		assert type != null : "The type parameter can not be null";
 		assert id != null : "The id parameter can not be null";
 		assert mimeType != null : "The mimeType parameter can not be null";
-		assert restRepresentation != null : "The restRepresentation parameter can not be null";
+		assert dataObjectFactory != null : "The dataObjectFactory parameter can not be null";
 		
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
-		final T entity = entityManager.find(type, id);
+		final U entity = entityManager.find(type, id);
 		
 		if (entity != null)
 		{
 			/* create a pretty printing Gson object */
 			final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			/* create the REST representation of the topic */
-			restRepresentation.initialize(entity, this.getBaseUrl(), JSON_URL, expand);
+			final T restRepresentation = dataObjectFactory.create(entity, this.getBaseUrl(), JSON_URL, expand);
 			/* Convert the REST representation to a JSON string */
 			final String json = gson.toJson(restRepresentation);
 			/* build a response */
