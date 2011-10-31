@@ -45,9 +45,9 @@ public class RESTv1
 	
 	public static final String JSON_URL = "json";
 	
-	@Context UriInfo uriInfo;
+	private @Context UriInfo uriInfo;
 	
-	private String getBaseUrl()
+	protected String getBaseUrl()
 	{
 		final String fullPath = uriInfo.getAbsolutePath().toString();
 		final int index = fullPath.indexOf(Constants.BASE_REST_PATH);
@@ -57,12 +57,12 @@ public class RESTv1
 		return null;
 	}
 	
-	private <T> Response getResource(final Class<T> type, final BaseRestV1<T> restRepresentation, final Object id, final String mimeType, final String expand)
+	protected <T> Response getResource(final Class<T> type, final BaseRestV1<T> restRepresentation, final Object id, final String mimeType, final String expand)
 	{
 		return getResource(type, restRepresentation, id, mimeType, expand, null);
 	}
 	
-	private <T> Response getResource(final Class<T> type, final BaseRestV1<T> restRepresentation, final Object id, final String mimeType, final String expand, final String fileName)
+	protected <T> Response getResource(final Class<T> type, final BaseRestV1<T> restRepresentation, final Object id, final String mimeType, final String expand, final String fileName)
 	{
 		assert type != null : "The type parameter can not be null";
 		assert id != null : "The id parameter can not be null";
@@ -90,68 +90,5 @@ public class RESTv1
 		
 		/* topic was not found, so return a 404 error */
 		throw new WebApplicationException(404);		
-	}
-	
-	@GET
-	@Path("/topic/get/json/{id}")
-	public Response getTopic(@PathParam("id") final Integer id, @QueryParam("expand") final String expand)
-	{
-		assert id != null : "The id parameter can not be null";
-						
-		return getResource(Topic.class, new TopicV1(), id, "application/json", expand);
-	}
-	
-	@GET
-	@Path("/tag/get/json/{id}")
-	public Response getTag(@PathParam("id") final Integer id, @QueryParam("expand") final String expand)
-	{
-		assert id != null : "The id parameter can not be null";
-						
-		return getResource(Tag.class, new TagV1(), id, "application/json", expand);
-	}
-	
-	@GET
-	@Path("/category/get/json/{id}")
-	public Response getCategory(@PathParam("id") final Integer id, @QueryParam("expand") final String expand)
-	{
-		assert id != null : "The id parameter can not be null";
-						
-		return getResource(Category.class, new CategoryV1(), id, "application/json", expand);
-	}
-	
-	@GET
-	@Path("/project/get/json/{id}")
-	public Response getProject(@PathParam("id") final Integer id, @QueryParam("expand") final String expand)
-	{
-		assert id != null : "The id parameter can not be null";
-						
-		return getResource(Project.class, new ProjectV1(), id, "application/json", expand);
-	}
-	
-	@GET
-	@Path("/filter/get/zip/{filterId}/docbookZip")
-	public Response getFilterDocbookZip(@PathParam("filterId") final Integer id)
-	{
-		assert id != null : "The id parameter can not be null";
-		
-		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
-		final Filter entity = entityManager.find(Filter.class, id);
-		
-		if (entity != null)
-		{
-			final DocbookBuildingOptions docbookBuildingOptions = new DocbookBuildingOptions();
-			docbookBuildingOptions.syncWithFilter(entity);
-			
-			final DocbookBuilder builder = new DocbookBuilder();
-			final byte[] zipFile = builder.buildDocbookZipFile(entity, docbookBuildingOptions);
-						
-			/* build a response */
-			final ResponseBuilder response = Response.ok(zipFile, "application/zip");
-			response.header("Content-Disposition", "attachment; filename=Book.zip");
-			return response.build();
-		}
-		
-		/* topic was not found, so return a 404 error */
-		throw new WebApplicationException(404);
 	}
 }
