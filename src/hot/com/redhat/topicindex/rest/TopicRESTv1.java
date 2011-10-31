@@ -18,7 +18,7 @@ import com.redhat.topicindex.rest.factory.TopicV1Factory;
 import com.redhat.topicindex.rest.sharedinterface.TopicRESTInterfaceV1;
 
 @Path("/1")
-public class TopicRESTv1 extends RESTv1 implements TopicRESTInterfaceV1 
+public class TopicRESTv1 extends RESTv1 implements TopicRESTInterfaceV1
 {
 	@GET
 	@Path("/topic/get/json/{id}")
@@ -31,7 +31,8 @@ public class TopicRESTv1 extends RESTv1 implements TopicRESTInterfaceV1
 
 	@PUT
 	@Path("/topic/put/json/{id}")
-	@Consumes({"application/json", "text/plain"})
+	@Consumes(
+	{ "application/json", "text/plain" })
 	public Response updateTopic(@PathParam("id") final Integer id, final String json)
 	{
 		assert id != null : "The id parameter can not be null";
@@ -40,7 +41,7 @@ public class TopicRESTv1 extends RESTv1 implements TopicRESTInterfaceV1
 		Topic entity = null;
 		TopicV1 topicV1 = null;
 		EntityManager entityManager = null;
-		
+
 		try
 		{
 			entityManager = (EntityManager) Component.getInstance("entityManager");
@@ -51,45 +52,53 @@ public class TopicRESTv1 extends RESTv1 implements TopicRESTInterfaceV1
 		{
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
-		
-		try
-		{
-			entity = entityManager.find(Topic.class, id);
-			if (entity == null)
-				return Response.status(Response.Status.NOT_FOUND).build();
-		}
-		catch (final Exception ex)
-		{
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-		}
-		
-		try
-		{
-			topicV1 = new Gson().fromJson(json, TopicV1.class);
-			if (topicV1 == null)
-				return Response.status(Response.Status.BAD_REQUEST).build();
-		}
-		catch (final Exception ex)
-		{
-			return Response.status(Response.Status.BAD_REQUEST).build();
-		}
-		
-		assert entityManager != null : "entityManager should nto be null";
-		assert entity != null : "entity should nto be null";
-		assert topicV1 != null : "topicV1 should nto be null";
-		
-		try
-		{
-			new TopicV1Factory().sync(entity, topicV1);
-			entityManager.persist(entity);
-			entityManager.flush();
-		}
-		catch (final Exception ex)
-		{
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-		}
-		
-		return Response.ok().build();
 
+		try
+		{
+			try
+			{
+				entity = entityManager.find(Topic.class, id);
+				if (entity == null)
+					return Response.status(Response.Status.NOT_FOUND).build();
+			}
+			catch (final Exception ex)
+			{
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			}
+
+			try
+			{
+				topicV1 = new Gson().fromJson(json, TopicV1.class);
+				if (topicV1 == null)
+					return Response.status(Response.Status.BAD_REQUEST).build();
+			}
+			catch (final Exception ex)
+			{
+				return Response.status(Response.Status.BAD_REQUEST).build();
+			}
+
+			assert entityManager != null : "entityManager should nto be null";
+			assert entity != null : "entity should nto be null";
+			assert topicV1 != null : "topicV1 should nto be null";
+
+			try
+			{
+				new TopicV1Factory().sync(entity, topicV1);
+				entityManager.getTransaction().begin();
+				entityManager.persist(entity);
+				entityManager.getTransaction().commit();
+			}
+			catch (final Exception ex)
+			{
+				entityManager.getTransaction().rollback();
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			}
+
+			return Response.ok().build();
+		}
+		finally
+		{
+			entityManager.close();
+		}
 	}
 }
