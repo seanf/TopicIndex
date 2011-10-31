@@ -48,6 +48,19 @@ public class TopicRESTv1 extends RESTv1 implements TopicRESTInterfaceV1
 
 		try
 		{
+			final InitialContext initCtx = new InitialContext();
+			transactionManager = (TransactionManager) initCtx.lookup("java:jboss/TransactionManager");
+			if (transactionManager == null)
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
+		catch (final Exception ex)
+		{
+			ExceptionUtilities.handleException(ex);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
+		
+		try
+		{
 			entityManager = (EntityManager) Component.getInstance("entityManager");
 			if (entityManager == null)
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -60,21 +73,13 @@ public class TopicRESTv1 extends RESTv1 implements TopicRESTInterfaceV1
 
 		try
 		{
-			final InitialContext initCtx = new InitialContext();
-			transactionManager = (TransactionManager) initCtx.lookup("java:jboss/TransactionManager");
-			if (transactionManager == null)
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-		}
-		catch (final Exception ex)
-		{
-			ExceptionUtilities.handleException(ex);
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-		}
-
-		try
-		{
+			assert transactionManager != null : "transactionManager should not be null";
+			assert entityManager != null : "entityManager should not be null";
+			
+			transactionManager.begin();
+			
 			try
-			{
+			{				
 				entity = entityManager.find(Topic.class, id);
 				if (entity == null)
 					return Response.status(Response.Status.NOT_FOUND).build();
@@ -97,36 +102,20 @@ public class TopicRESTv1 extends RESTv1 implements TopicRESTInterfaceV1
 				return Response.status(Response.Status.BAD_REQUEST).build();
 			}
 
-			assert transactionManager != null : "transactionManager should not be null";
-			assert entityManager != null : "entityManager should not be null";
 			assert entity != null : "entity should not be null";
 			assert topicV1 != null : "topicV1 should not be null";
 
-			try
-			{
-				new TopicV1Factory().sync(entity, topicV1);
-				transactionManager.begin();
-				entityManager.persist(entity);
-				transactionManager.commit();
-			}
-			catch (final Exception ex)
-			{
-				try
-				{
-					transactionManager.rollback();
-				}
-				catch (final Exception ex2)
-				{
-					ExceptionUtilities.handleException(ex2);
-				}
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-			}
+			new TopicV1Factory().sync(entity, topicV1);				
+			entityManager.persist(entity);
+			entityManager.flush();
+			transactionManager.commit();
 
 			return Response.ok().build();
 		}
-		finally
+		catch (final Exception ex)
 		{
-			entityManager.close();
+			ExceptionUtilities.handleException(ex);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
 	}
 }
