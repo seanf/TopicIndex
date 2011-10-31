@@ -7,7 +7,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import com.redhat.topicindex.entity.Project;
-import com.redhat.topicindex.rest.entities.ProjectV1;
+import com.redhat.topicindex.rest.factory.ProjectV1Factory;
 
 @Path("/1")
 public class ProjectRESTv1 extends RESTv1
@@ -18,6 +18,6 @@ public class ProjectRESTv1 extends RESTv1
 	{
 		assert id != null : "The id parameter can not be null";
 						
-		return getResource(Project.class, new ProjectV1(), id, "application/json", expand);
+		return getResource(Project.class, new ProjectV1Factory(), id, "application/json", expand);
 	}
 }
