@@ -1,6 +1,8 @@
 package com.redhat.topicindex.rest;
 
+import javax.naming.InitialContext;
 import javax.persistence.EntityManager;
+import javax.transaction.TransactionManager;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -12,6 +14,7 @@ import javax.ws.rs.core.Response;
 import org.jboss.seam.Component;
 
 import com.google.gson.Gson;
+import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.rest.entities.TopicV1;
 import com.redhat.topicindex.rest.factory.TopicV1Factory;
@@ -41,6 +44,7 @@ public class TopicRESTv1 extends RESTv1 implements TopicRESTInterfaceV1
 		Topic entity = null;
 		TopicV1 topicV1 = null;
 		EntityManager entityManager = null;
+		TransactionManager transactionManager = null;
 
 		try
 		{
@@ -50,6 +54,20 @@ public class TopicRESTv1 extends RESTv1 implements TopicRESTInterfaceV1
 		}
 		catch (final Exception ex)
 		{
+			ExceptionUtilities.handleException(ex);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
+
+		try
+		{
+			final InitialContext initCtx = new InitialContext();
+			transactionManager = (TransactionManager) initCtx.lookup("java:jboss/TransactionManager");
+			if (transactionManager == null)
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
+		catch (final Exception ex)
+		{
+			ExceptionUtilities.handleException(ex);
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
 
@@ -63,6 +81,7 @@ public class TopicRESTv1 extends RESTv1 implements TopicRESTInterfaceV1
 			}
 			catch (final Exception ex)
 			{
+				ExceptionUtilities.handleException(ex);
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 			}
 
@@ -74,23 +93,32 @@ public class TopicRESTv1 extends RESTv1 implements TopicRESTInterfaceV1
 			}
 			catch (final Exception ex)
 			{
+				ExceptionUtilities.handleException(ex);
 				return Response.status(Response.Status.BAD_REQUEST).build();
 			}
 
-			assert entityManager != null : "entityManager should nto be null";
-			assert entity != null : "entity should nto be null";
-			assert topicV1 != null : "topicV1 should nto be null";
+			assert transactionManager != null : "transactionManager should not be null";
+			assert entityManager != null : "entityManager should not be null";
+			assert entity != null : "entity should not be null";
+			assert topicV1 != null : "topicV1 should not be null";
 
 			try
 			{
 				new TopicV1Factory().sync(entity, topicV1);
-				entityManager.getTransaction().begin();
+				transactionManager.begin();
 				entityManager.persist(entity);
-				entityManager.getTransaction().commit();
+				transactionManager.commit();
 			}
 			catch (final Exception ex)
 			{
-				entityManager.getTransaction().rollback();
+				try
+				{
+					transactionManager.rollback();
+				}
+				catch (final Exception ex2)
+				{
+					ExceptionUtilities.handleException(ex2);
+				}
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 			}
 
