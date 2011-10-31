@@ -1,10 +1,7 @@
 package com.redhat.topicindex.rest.entities;
 
-import java.util.Set;
-
 import com.redhat.topicindex.entity.Tag;
 import com.redhat.topicindex.entity.Topic;
-import com.redhat.topicindex.entity.TopicToTag;
 import com.redhat.topicindex.rest.ExpandData;
 import com.redhat.topicindex.rest.RESTv1;
 import com.redhat.topicindex.rest.collections.BaseRestCollectionV1;
@@ -59,5 +56,16 @@ public class TopicV1 extends BaseRestV1<Topic>
 			twoWayRelationships.initialize(TopicV1.class, entity.getIncomingRelatedTopicsArray(), RESTv1.TOPIC_TWO_WAY_RELATIONSHIPS_EXPANSION_NAME, dataType);
 
 		super.setLinks(baseUrl, RESTv1.TOPIC_URL_NAME, dataType, this.id);
+	}
+
+	@Override
+	public void sync(final Topic entity)
+	{
+		assert entity != null : "The entity parameter can not be null";
+		
+		entity.setTopicTitle(this.title);
+		entity.setTopicText(this.description);
+		entity.setTopicXML(this.xml);
+		entity.setTopicRendered(this.html);
 	}
 }

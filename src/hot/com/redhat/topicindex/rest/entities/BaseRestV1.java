@@ -1,6 +1,5 @@
 package com.redhat.topicindex.rest.entities;
 
-import com.redhat.topicindex.entity.Category;
 import com.redhat.topicindex.rest.ExpandData;
 
 public abstract class BaseRestV1<T>
@@ -20,6 +19,8 @@ public abstract class BaseRestV1<T>
 	}
 	
 	public abstract void initialize(final T entity, final String baseUrl, final String dataType, final ExpandData expand);
+	
+	public abstract void sync(final T entity);
 	
 	protected void setLinks(final String baseUrl, final String restBasePath, final String dataType, final Object id)
 	{

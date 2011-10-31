@@ -32,4 +32,11 @@ public class TagV1 extends BaseRestV1<Tag>
 		
 		super.setLinks(baseUrl, RESTv1.TAG_URL_NAME, dataType, this.id);
 	}
+
+	@Override
+	public void sync(final Tag entity)
+	{
+		// TODO Auto-generated method stub
+		
+	}
 }

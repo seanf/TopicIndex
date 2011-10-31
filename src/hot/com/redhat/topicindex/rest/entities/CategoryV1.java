@@ -39,5 +39,12 @@ public class CategoryV1 extends BaseRestV1<Category>
 		
 		super.setLinks(baseUrl, RESTv1.CATEGORY_URL_NAME, dataType, this.id);
 	}
+
+	@Override
+	public void sync(final Category entity)
+	{
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

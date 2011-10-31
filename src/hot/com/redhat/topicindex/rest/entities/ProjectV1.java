@@ -37,4 +37,11 @@ public class ProjectV1 extends BaseRestV1<Project>
 		super.setLinks(baseUrl, RESTv1.TOPIC_URL_NAME, dataType, this.id);
 	}
 
+	@Override
+	public void sync(final Project entity)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
 }
