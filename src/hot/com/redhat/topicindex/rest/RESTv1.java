@@ -29,7 +29,6 @@ import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.docbookbuilding.DocbookBuilder;
 import com.redhat.topicindex.utils.docbookbuilding.DocbookBuildingOptions;
 
-@Path("/1")
 public class RESTv1
 {
 	public static final String TOPICS_EXPANSION_NAME = "topics";

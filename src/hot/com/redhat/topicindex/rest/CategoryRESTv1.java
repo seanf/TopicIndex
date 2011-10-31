@@ -9,6 +9,7 @@ import javax.ws.rs.core.Response;
 import com.redhat.topicindex.entity.Category;
 import com.redhat.topicindex.rest.entities.CategoryV1;
 
+@Path("/1")
 public class CategoryRESTv1 extends RESTv1
 {
 	@GET

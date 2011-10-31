@@ -9,6 +9,7 @@ import javax.ws.rs.core.Response;
 import com.redhat.topicindex.entity.Tag;
 import com.redhat.topicindex.rest.entities.TagV1;
 
+@Path("/1")
 public class TagRESTv1 extends RESTv1
 {
 	@GET

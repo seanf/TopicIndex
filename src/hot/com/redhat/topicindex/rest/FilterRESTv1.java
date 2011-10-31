@@ -14,6 +14,7 @@ import com.redhat.topicindex.entity.Filter;
 import com.redhat.topicindex.utils.docbookbuilding.DocbookBuilder;
 import com.redhat.topicindex.utils.docbookbuilding.DocbookBuildingOptions;
 
+@Path("/1")
 public class FilterRESTv1 extends RESTv1
 {
 	@GET
