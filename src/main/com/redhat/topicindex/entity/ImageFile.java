@@ -25,10 +25,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
-import org.w3c.dom.Document;
 
 import com.redhat.ecs.commonutils.ExceptionUtilities;
-import com.redhat.ecs.commonutils.XMLUtilities;
 import com.redhat.topicindex.utils.SVGIcon;
 
 @Entity

@@ -6,10 +6,8 @@ import javax.persistence.EntityManager;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
-import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.web.RequestParameter;
 
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.topicindex.entity.ImageFile;

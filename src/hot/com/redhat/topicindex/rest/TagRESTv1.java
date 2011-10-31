@@ -7,7 +7,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import com.redhat.topicindex.entity.Tag;
-import com.redhat.topicindex.rest.entities.TagV1;
 import com.redhat.topicindex.rest.factory.TagV1Factory;
 
 @Path("/1")

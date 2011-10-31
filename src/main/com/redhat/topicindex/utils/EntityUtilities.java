@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
@@ -29,7 +28,6 @@ import org.jboss.seam.security.Role;
 import org.joda.time.format.ISODateTimeFormat;
 import org.jsoup.Jsoup;
 
-import com.redhat.ecs.commonutils.CollectionUtilities;
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.topicindex.entity.BlobConstants;
 import com.redhat.topicindex.entity.Category;

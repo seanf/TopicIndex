@@ -3,7 +3,6 @@ package com.redhat.topicindex.sort;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.utils.docbookbuilding.InjectionTopicData;

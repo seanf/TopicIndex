@@ -31,8 +31,6 @@ import org.w3c.dom.Text;
 import com.redhat.ecs.commonstructures.Pair;
 import com.redhat.ecs.commonutils.CollectionUtilities;
 import com.redhat.ecs.commonutils.ExceptionUtilities;
-import com.redhat.ecs.commonutils.HTTPUtilities;
-import com.redhat.ecs.commonutils.MIMEUtilities;
 import com.redhat.ecs.commonutils.XMLUtilities;
 import com.redhat.ecs.commonutils.ZipUtilities;
 import com.redhat.topicindex.entity.Filter;

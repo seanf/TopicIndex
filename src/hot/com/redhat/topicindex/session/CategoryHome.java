@@ -1,11 +1,5 @@
 package com.redhat.topicindex.session;
 
-import static ch.lambdaj.Lambda.filter;
-import static ch.lambdaj.Lambda.having;
-import static ch.lambdaj.Lambda.on;
-import static org.hamcrest.Matchers.equalTo;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -15,11 +9,8 @@ import com.redhat.ecs.commonstructures.Pair;
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.topicindex.entity.*;
 import com.redhat.topicindex.utils.EntityUtilities;
-import com.redhat.topicindex.utils.structures.tags.UICategoryData;
-import com.redhat.topicindex.utils.structures.tags.UIProjectCategoriesData;
 import com.redhat.topicindex.utils.structures.tags.UIProjectData;
 import com.redhat.topicindex.utils.structures.tags.UITagData;
-import com.redhat.topicindex.utils.structures.tags.UITagProjectData;
 
 import org.hibernate.exception.ConstraintViolationException;
 import org.jboss.seam.annotations.Name;

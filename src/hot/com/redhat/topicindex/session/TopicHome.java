@@ -29,12 +29,9 @@ import com.redhat.topicindex.utils.structures.tags.UIProjectCategoriesData;
 
 import org.drools.WorkingMemory;
 import org.jboss.seam.Component;
-import org.jboss.seam.annotations.Factory;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.contexts.Contexts;
-import org.jboss.seam.core.Expressions;
-import org.jboss.seam.core.Expressions.ValueExpression;
 import org.jboss.seam.security.AuthorizationException;
 import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.NotLoggedInException;

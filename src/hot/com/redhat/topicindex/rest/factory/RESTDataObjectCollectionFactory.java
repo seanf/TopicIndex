@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.redhat.ecs.commonutils.ExceptionUtilities;
-import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.rest.ExpandData;
 import com.redhat.topicindex.rest.ExpandDataIndexes;
 import com.redhat.topicindex.rest.collections.BaseRestCollectionV1;
-import com.redhat.topicindex.rest.entities.TopicV1;
 
 public class RESTDataObjectCollectionFactory<T, U>
 {

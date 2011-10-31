@@ -1,10 +1,6 @@
 package com.redhat.topicindex.rest;
 
 import javax.persistence.EntityManager;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -15,20 +11,8 @@ import org.jboss.seam.Component;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.redhat.topicindex.entity.Category;
-import com.redhat.topicindex.entity.Filter;
-import com.redhat.topicindex.entity.Project;
-import com.redhat.topicindex.entity.Tag;
-import com.redhat.topicindex.entity.Topic;
-import com.redhat.topicindex.rest.entities.BaseRestV1;
-import com.redhat.topicindex.rest.entities.CategoryV1;
-import com.redhat.topicindex.rest.entities.ProjectV1;
-import com.redhat.topicindex.rest.entities.TagV1;
-import com.redhat.topicindex.rest.entities.TopicV1;
 import com.redhat.topicindex.rest.factory.RESTDataObjectFactory;
 import com.redhat.topicindex.utils.Constants;
-import com.redhat.topicindex.utils.docbookbuilding.DocbookBuilder;
-import com.redhat.topicindex.utils.docbookbuilding.DocbookBuildingOptions;
 
 public class RESTv1
 {

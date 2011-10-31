@@ -7,12 +7,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
 
 import com.google.code.regexp.NamedMatcher;
 import com.google.code.regexp.NamedPattern;
@@ -20,7 +18,6 @@ import com.redhat.ecs.commonstructures.Pair;
 import com.redhat.ecs.commonutils.CollectionUtilities;
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.ecs.commonutils.XMLUtilities;
-import com.redhat.topicindex.entity.Tag;
 import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.sort.ExternalListSort;
 import com.redhat.topicindex.sort.TopicTitleComparator;

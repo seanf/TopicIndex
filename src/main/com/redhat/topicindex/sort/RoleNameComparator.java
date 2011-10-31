@@ -3,7 +3,6 @@ package com.redhat.topicindex.sort;
 import java.util.Comparator;
 
 import com.redhat.topicindex.entity.Role;
-import com.redhat.topicindex.entity.Tag;
 
 public class RoleNameComparator implements Comparator<Role>
 {

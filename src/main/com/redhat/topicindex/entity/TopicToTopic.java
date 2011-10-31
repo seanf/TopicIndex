@@ -7,9 +7,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.PostPersist;
 import javax.persistence.PostRemove;
-import javax.persistence.PrePersist;
-import javax.persistence.PreRemove;
-import javax.persistence.PreUpdate;
 import javax.persistence.UniqueConstraint;
 
 import static javax.persistence.GenerationType.IDENTITY;

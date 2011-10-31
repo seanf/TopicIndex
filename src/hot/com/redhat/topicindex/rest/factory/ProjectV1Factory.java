@@ -2,12 +2,10 @@ package com.redhat.topicindex.rest.factory;
 
 import com.redhat.topicindex.entity.Project;
 import com.redhat.topicindex.entity.Tag;
-import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.rest.ExpandData;
 import com.redhat.topicindex.rest.RESTv1;
 import com.redhat.topicindex.rest.entities.ProjectV1;
 import com.redhat.topicindex.rest.entities.TagV1;
-import com.redhat.topicindex.rest.entities.TopicV1;
 
 public class ProjectV1Factory implements RESTDataObjectFactory<ProjectV1, Project>
 {

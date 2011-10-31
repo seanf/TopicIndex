@@ -3,8 +3,7 @@ package com.redhat.topicindex.rest;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.google.code.regexp.NamedMatcher;
-import com.google.code.regexp.NamedPattern;
+
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 
 public class ExpandDataIndexes

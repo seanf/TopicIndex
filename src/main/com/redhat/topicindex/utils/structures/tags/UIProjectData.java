@@ -1,10 +1,5 @@
 package com.redhat.topicindex.utils.structures.tags;
 
-import static ch.lambdaj.Lambda.filter;
-import static ch.lambdaj.Lambda.having;
-import static ch.lambdaj.Lambda.on;
-import static org.hamcrest.Matchers.equalTo;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,7 +20,6 @@ import com.redhat.topicindex.entity.Project;
 import com.redhat.topicindex.entity.Tag;
 import com.redhat.topicindex.entity.TagToCategory;
 import com.redhat.topicindex.entity.TagToProject;
-import com.redhat.topicindex.entity.TagToTag;
 import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.EntityUtilities;

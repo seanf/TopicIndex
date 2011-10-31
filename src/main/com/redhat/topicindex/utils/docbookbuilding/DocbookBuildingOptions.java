@@ -1,15 +1,11 @@
 package com.redhat.topicindex.utils.docbookbuilding;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.topicindex.entity.Filter;
-import com.redhat.topicindex.entity.FilterField;
 import com.redhat.topicindex.entity.FilterOption;
-import com.redhat.topicindex.utils.Constants;
 
 /**
  * This class contains the options associated with building the docbook zip

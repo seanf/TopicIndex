@@ -38,7 +38,6 @@ import org.hibernate.validator.NotNull;
 import org.jboss.seam.Component;
 
 import com.redhat.topicindex.sort.CategoryIDComparator;
-import com.redhat.topicindex.sort.TagIDComparator;
 
 @Entity
 @Audited
