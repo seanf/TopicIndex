@@ -37,4 +37,5 @@ Dependencies: org.antlr,
  org.codehaus.jackson.jackson-core-asl,
  org.codehaus.jackson.jackson-mapper-asl,
  org.jboss.logging,
- javax.ws.rs.api
+ javax.ws.rs.api,
+ org.jboss.resteasy.resteasy-jaxrs

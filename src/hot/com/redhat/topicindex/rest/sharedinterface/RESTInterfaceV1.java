@@ -8,8 +8,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
-import com.redhat.topicindex.rest.entities.TopicV1;
-
 @Path("/1")
 public interface RESTInterfaceV1<T>
 {

@@ -5,24 +5,14 @@ import javax.naming.NamingException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.transaction.TransactionManager;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.jboss.resteasy.spi.BadRequestException;
 import org.jboss.resteasy.spi.Failure;
 import org.jboss.resteasy.spi.InternalServerErrorException;
-import org.jboss.seam.Component;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.redhat.ecs.commonutils.ExceptionUtilities;
-import com.redhat.topicindex.entity.Topic;
-import com.redhat.topicindex.rest.entities.TopicV1;
 import com.redhat.topicindex.rest.factory.RESTDataObjectFactory;
-import com.redhat.topicindex.rest.factory.TopicV1Factory;
 import com.redhat.topicindex.utils.Constants;
 
 public class RESTv1
