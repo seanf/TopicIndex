@@ -7,10 +7,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
 
 import com.redhat.topicindex.rest.entities.TopicV1;
-import com.redhat.topicindex.rest.marshal.Pretty;
 
 @Path("/1")
 public interface TopicRESTInterfaceV1<T>
@@ -19,7 +17,6 @@ public interface TopicRESTInterfaceV1<T>
 	@Path("/topic/get/json/{id}")	
 	@Produces("application/json")
 	@Consumes({"*"})
-	@Pretty
 	public T getJSONTopic(@PathParam("id") final Integer id, @QueryParam("expand") final String expand);
 	
 	@GET
@@ -32,4 +29,9 @@ public interface TopicRESTInterfaceV1<T>
 	@Path("/topic/put/json/{id}")
 	@Consumes({"application/json"})
 	public void updateJSONTopic(@PathParam("id") final Integer id, final T dataObject);
+	
+	@PUT
+	@Path("/topic/put/xml/{id}")
+	@Consumes({"application/xml"})
+	public void updateXMLTopic(@PathParam("id") final Integer id, final TopicV1 dataObject);
 }

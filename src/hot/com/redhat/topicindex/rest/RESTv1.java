@@ -12,6 +12,7 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.jboss.resteasy.spi.BadRequestException;
+import org.jboss.resteasy.spi.Failure;
 import org.jboss.resteasy.spi.InternalServerErrorException;
 import org.jboss.seam.Component;
 
@@ -21,6 +22,7 @@ import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.rest.entities.TopicV1;
 import com.redhat.topicindex.rest.factory.RESTDataObjectFactory;
+import com.redhat.topicindex.rest.factory.TopicV1Factory;
 import com.redhat.topicindex.utils.Constants;
 
 public class RESTv1
@@ -50,6 +52,75 @@ public class RESTv1
 			return fullPath.substring(0, index + Constants.BASE_REST_PATH.length());
 
 		return null;
+	}
+	
+	protected <T, U> void updateEntity(final Class<U> type, final T dataObject, final RESTDataObjectFactory<T, U> factory, final Object id)
+	{
+		assert id != null : "The id parameter can not be null";
+		assert dataObject != null : "The dataObject parameter can not be null";
+
+		TransactionManager transactionManager = null;
+		EntityManager entityManager = null;
+		
+		try
+		{
+			final InitialContext initCtx = new InitialContext();
+
+			final EntityManagerFactory entityManagerFactory = (EntityManagerFactory) initCtx.lookup("java:jboss/EntityManagerFactory");
+			if (entityManagerFactory == null)
+				throw new InternalServerErrorException("Could not find the EntityManagerFactory");
+
+			transactionManager = (TransactionManager) initCtx.lookup("java:jboss/TransactionManager");
+			if (transactionManager == null)
+				throw new InternalServerErrorException("Could not find the TransactionManager");
+			
+			assert transactionManager != null : "transactionManager should not be null";
+			assert entityManagerFactory != null : "entityManagerFactory should not be null";
+
+			transactionManager.begin();
+
+			entityManager = entityManagerFactory.createEntityManager();
+			if (entityManager == null)
+				throw new InternalServerErrorException("Could not create an EntityManager");
+
+			assert entityManager != null : "entityManager should not be null";
+
+			final U entity = entityManager.find(type, id);
+			if (entity == null)
+				throw new BadRequestException("No entity was found with the primary key " + id);
+
+			assert entity != null : "entity should not be null";
+
+			factory.sync(entity, dataObject);
+			entityManager.persist(entity);
+			entityManager.flush();
+			transactionManager.commit();
+		}
+		catch (final Failure ex)
+		{
+			ExceptionUtilities.handleException(ex);
+			throw ex;
+		}
+		catch (final Exception ex)
+		{
+			ExceptionUtilities.handleException(ex);
+			
+			try
+			{
+				transactionManager.rollback();
+			}
+			catch (final Exception ex2)
+			{
+				ExceptionUtilities.handleException(ex2);
+			}
+
+			throw new InternalServerErrorException("There was an error saving the entity");
+		}
+		finally
+		{
+			if (entityManager != null)
+				entityManager.close();
+		}
 	}
 
 	protected <T, U> T getJSONResource(final Class<U> type, final RESTDataObjectFactory<T, U> dataObjectFactory, final Object id, final String expand)
