@@ -11,24 +11,24 @@ import javax.ws.rs.QueryParam;
 import com.redhat.topicindex.rest.entities.TopicV1;
 
 @Path("/1")
-public interface TopicRESTInterfaceV1<T>
+public interface TopicRESTInterfaceV1
 {
 	@GET
 	@Path("/topic/get/json/{id}")	
 	@Produces("application/json")
 	@Consumes({"*"})
-	public T getJSONTopic(@PathParam("id") final Integer id, @QueryParam("expand") final String expand);
+	public TopicV1 getJSONTopic(@PathParam("id") final Integer id, @QueryParam("expand") final String expand);
 	
 	@GET
 	@Path("/topic/get/xml/{id}")
 	@Produces("application/xml")
 	@Consumes({"*"})
-	public T getXMLTopic(@PathParam("id") final Integer id, @QueryParam("expand") final String expand);
+	public TopicV1 getXMLTopic(@PathParam("id") final Integer id, @QueryParam("expand") final String expand);
 	
 	@PUT
 	@Path("/topic/put/json/{id}")
 	@Consumes({"application/json"})
-	public void updateJSONTopic(@PathParam("id") final Integer id, final T dataObject);
+	public void updateJSONTopic(@PathParam("id") final Integer id, final TopicV1 dataObject);
 	
 	@PUT
 	@Path("/topic/put/xml/{id}")

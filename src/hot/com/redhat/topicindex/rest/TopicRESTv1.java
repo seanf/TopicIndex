@@ -14,7 +14,7 @@ import com.redhat.topicindex.rest.factory.TopicV1Factory;
 import com.redhat.topicindex.rest.sharedinterface.TopicRESTInterfaceV1;
 
 @Path("/1")
-public class TopicRESTv1 extends RESTv1 implements TopicRESTInterfaceV1<TopicV1>
+public class TopicRESTv1 extends RESTv1 implements TopicRESTInterfaceV1
 {
 	@GET
 	@Path("/topic/get/json/{id}")	
