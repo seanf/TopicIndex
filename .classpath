@@ -15,7 +15,8 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Hibernate Search 3.4.1"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/MySQL Connector"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Xalan 2.7.1"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Jav Servlet"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/RESTEasy"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Java Servlet"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/RESTeasy"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/AS7 JAX-RS"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
