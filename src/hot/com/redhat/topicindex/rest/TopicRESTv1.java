@@ -11,10 +11,10 @@ import javax.ws.rs.QueryParam;
 import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.rest.entities.TopicV1;
 import com.redhat.topicindex.rest.factory.TopicV1Factory;
-import com.redhat.topicindex.rest.sharedinterface.TopicRESTInterfaceV1;
+import com.redhat.topicindex.rest.sharedinterface.RESTInterfaceV1;
 
 @Path("/1")
-public class TopicRESTv1 extends RESTv1 implements TopicRESTInterfaceV1
+public class TopicRESTv1 extends RESTv1 implements RESTInterfaceV1<TopicV1>
 {
 	@GET
 	@Path("/topic/get/json/{id}")	
