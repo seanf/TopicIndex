@@ -8,15 +8,17 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import com.redhat.topicindex.rest.entities.TopicV1;
+
 @Path("/1")
-public interface TopicRESTInterfaceV1
+public interface TopicRESTInterfaceV1<T>
 {
 	@GET
 	@Path("/topic/get/json/{id}")	
-	public Response getTopic(@PathParam("id") final Integer id, @QueryParam("expand") final String expand);
+	public T getJSONTopic(@PathParam("id") final Integer id, @QueryParam("expand") final String expand);
 	
 	@PUT
 	@Path("/topic/put/json/{id}")
 	@Consumes({"application/json", "text/plain"})
-	public Response updateTopic(@PathParam("id") final Integer id, final String json);
+	public void updateJSONTopic(@PathParam("id") final Integer id, final T dataObject);
 }

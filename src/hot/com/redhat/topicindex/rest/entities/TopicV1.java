@@ -1,10 +1,14 @@
 package com.redhat.topicindex.rest.entities;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import com.redhat.topicindex.rest.collections.BaseRestCollectionV1;
 
 /**
  * A representation of the Topic resource to be sent via the REST interface.
  */
+@XmlRootElement( name="topic" )
 public class TopicV1 extends BaseRestV1
 {
 	public static final String ID_NAME = "id";
@@ -27,6 +31,7 @@ public class TopicV1 extends BaseRestV1
 	private BaseRestCollectionV1<TopicV1> incomingRelationships = null;
 	private BaseRestCollectionV1<TopicV1> twoWayRelationships = null;
 
+	@XmlElement
 	public Integer getId()
 	{
 		return id;
@@ -38,6 +43,7 @@ public class TopicV1 extends BaseRestV1
 		setParamaterToConfigured(ID_NAME);
 	}
 
+	@XmlElement
 	public String getTitle()
 	{
 		return title;
@@ -49,6 +55,7 @@ public class TopicV1 extends BaseRestV1
 		setParamaterToConfigured(TITLE_NAME);
 	}
 
+	@XmlElement
 	public String getDescription()
 	{
 		return description;
@@ -60,6 +67,7 @@ public class TopicV1 extends BaseRestV1
 		setParamaterToConfigured(DESCRIPTION_NAME);
 	}
 
+	@XmlElement
 	public String getXml()
 	{
 		return xml;
@@ -71,6 +79,7 @@ public class TopicV1 extends BaseRestV1
 		setParamaterToConfigured(XML_NAME);
 	}
 
+	@XmlElement
 	public String getHtml()
 	{
 		return html;
@@ -82,6 +91,7 @@ public class TopicV1 extends BaseRestV1
 		setParamaterToConfigured(HTML_NAME);
 	}
 
+	@XmlElement
 	public BaseRestCollectionV1<TagV1> getTags()
 	{
 		return tags;
@@ -93,6 +103,7 @@ public class TopicV1 extends BaseRestV1
 		setParamaterToConfigured(TAGS_NAME);
 	}
 
+	@XmlElement
 	public BaseRestCollectionV1<TopicV1> getOutgoingRelationships()
 	{
 		return outgoingRelationships;
@@ -104,6 +115,7 @@ public class TopicV1 extends BaseRestV1
 		setParamaterToConfigured(OUTGOING_NAME);
 	}
 
+	@XmlElement
 	public BaseRestCollectionV1<TopicV1> getIncomingRelationships()
 	{
 		return incomingRelationships;
@@ -115,6 +127,7 @@ public class TopicV1 extends BaseRestV1
 		setParamaterToConfigured(INCOMING_NAME);		
 	}
 
+	@XmlElement
 	public BaseRestCollectionV1<TopicV1> getTwoWayRelationships()
 	{
 		return twoWayRelationships;

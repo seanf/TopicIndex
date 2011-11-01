@@ -2,6 +2,8 @@ package com.redhat.topicindex.rest.collections;
 
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlElement;
+
 public class BaseRestCollectionV1<T>
 {
 	private Integer size = 0;
@@ -10,6 +12,7 @@ public class BaseRestCollectionV1<T>
 	private Integer endExpandIndex = null;
 	private List<T> items = null;
 	
+	@XmlElement
 	public Integer getSize()
 	{
 		return size;
@@ -20,6 +23,7 @@ public class BaseRestCollectionV1<T>
 		this.size = size;
 	}
 
+	@XmlElement
 	public String getExpand()
 	{
 		return expand;
@@ -30,6 +34,7 @@ public class BaseRestCollectionV1<T>
 		this.expand = expand;
 	}
 
+	@XmlElement
 	public List<T> getItems()
 	{
 		return items;
@@ -40,6 +45,7 @@ public class BaseRestCollectionV1<T>
 		this.items = items;
 	}
 
+	@XmlElement
 	public Integer getStartExpandIndex()
 	{
 		return startExpandIndex;
@@ -50,6 +56,7 @@ public class BaseRestCollectionV1<T>
 		this.startExpandIndex = startExpandIndex;
 	}
 
+	@XmlElement
 	public Integer getEndExpandIndex()
 	{
 		return endExpandIndex;
