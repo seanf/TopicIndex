@@ -19,6 +19,7 @@ import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.rest.entities.TopicV1;
 import com.redhat.topicindex.rest.factory.TopicV1Factory;
+import com.redhat.topicindex.rest.marshal.Pretty;
 import com.redhat.topicindex.rest.sharedinterface.TopicRESTInterfaceV1;
 
 @Path("/1")
@@ -28,6 +29,7 @@ public class TopicRESTv1 extends RESTv1 implements TopicRESTInterfaceV1<TopicV1>
 	@Path("/topic/get/json/{id}")	
 	@Produces("application/json")
 	@Consumes({"*"})
+	@Pretty
 	public TopicV1 getJSONTopic(@PathParam("id") final Integer id, @QueryParam("expand") final String expand)
 	{
 		assert id != null : "The id parameter can not be null";

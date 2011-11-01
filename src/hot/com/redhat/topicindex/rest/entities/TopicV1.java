@@ -31,7 +31,6 @@ public class TopicV1 extends BaseRestV1
 	private BaseRestCollectionV1<TopicV1> incomingRelationships = null;
 	private BaseRestCollectionV1<TopicV1> twoWayRelationships = null;
 
-	@XmlElement
 	public Integer getId()
 	{
 		return id;

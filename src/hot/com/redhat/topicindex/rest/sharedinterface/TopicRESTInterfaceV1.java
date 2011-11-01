@@ -10,6 +10,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import com.redhat.topicindex.rest.entities.TopicV1;
+import com.redhat.topicindex.rest.marshal.Pretty;
 
 @Path("/1")
 public interface TopicRESTInterfaceV1<T>
@@ -18,6 +19,7 @@ public interface TopicRESTInterfaceV1<T>
 	@Path("/topic/get/json/{id}")	
 	@Produces("application/json")
 	@Consumes({"*"})
+	@Pretty
 	public T getJSONTopic(@PathParam("id") final Integer id, @QueryParam("expand") final String expand);
 	
 	@GET

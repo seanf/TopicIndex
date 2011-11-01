@@ -3,6 +3,8 @@ package com.redhat.topicindex.rest.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlElement;
+
 public abstract class BaseRestV1
 {
 	/**
@@ -38,6 +40,7 @@ public abstract class BaseRestV1
 		this.setEditLink(baseUrl + "/1/" + restBasePath + "/put/" + dataType + "/" + id);
 	}
 
+	@XmlElement
 	public String getSelfLink()
 	{
 		return selfLink;
@@ -48,6 +51,7 @@ public abstract class BaseRestV1
 		this.selfLink = selfLink;
 	}
 
+	@XmlElement
 	public String getEditLink()
 	{
 		return editLink;
@@ -58,6 +62,7 @@ public abstract class BaseRestV1
 		this.editLink = editLink;
 	}
 
+	@XmlElement
 	public String getDeleteLink()
 	{
 		return deleteLink;
@@ -68,6 +73,7 @@ public abstract class BaseRestV1
 		this.deleteLink = deleteLink;
 	}
 
+	@XmlElement
 	public String getAddLink()
 	{
 		return addLink;
@@ -78,6 +84,7 @@ public abstract class BaseRestV1
 		this.addLink = addLink;
 	}
 
+	@XmlElement
 	public String[] getExpand()
 	{
 		return expand;
