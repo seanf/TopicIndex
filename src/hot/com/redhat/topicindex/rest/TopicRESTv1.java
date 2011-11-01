@@ -34,6 +34,14 @@ public class TopicRESTv1 extends RESTv1 implements TopicRESTInterfaceV1<TopicV1>
 
 		return getJSONResource(Topic.class, new TopicV1Factory(), id, expand);
 	}
+	
+	@Override
+	public TopicV1 getXMLTopic(Integer id, String expand)
+	{
+		assert id != null : "The id parameter can not be null";
+		
+		return getXMLResource(Topic.class, new TopicV1Factory(), id, expand);
+	}
 
 	@PUT
 	@Path("/topic/put/json/{id}")
@@ -107,4 +115,6 @@ public class TopicRESTv1 extends RESTv1 implements TopicRESTInterfaceV1<TopicV1>
 				entityManager.close();
 		}
 	}
+
+	
 }

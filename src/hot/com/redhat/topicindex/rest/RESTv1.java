@@ -37,6 +37,7 @@ public class RESTv1
 	public static final String CATEGORY_URL_NAME = "category";
 
 	public static final String JSON_URL = "json";
+	public static final String XML_URL = "json";
 
 	private @Context
 	UriInfo uriInfo;
@@ -53,10 +54,15 @@ public class RESTv1
 
 	protected <T, U> T getJSONResource(final Class<U> type, final RESTDataObjectFactory<T, U> dataObjectFactory, final Object id, final String expand)
 	{
-		return getJSONResource(type, dataObjectFactory, id, expand, null);
+		return getResource(type, dataObjectFactory, id, expand, JSON_URL);
 	}
-
-	protected <T, U> T getJSONResource(final Class<U> type, final RESTDataObjectFactory<T, U> dataObjectFactory, final Object id, final String expand, final String fileName)
+	
+	protected <T, U> T getXMLResource(final Class<U> type, final RESTDataObjectFactory<T, U> dataObjectFactory, final Object id, final String expand)
+	{
+		return getResource(type, dataObjectFactory, id, expand, XML_URL);
+	}
+	
+	private <T, U> T getResource(final Class<U> type, final RESTDataObjectFactory<T, U> dataObjectFactory, final Object id, final String expand, final String dataType)
 	{
 		assert type != null : "The type parameter can not be null";
 		assert id != null : "The id parameter can not be null";
@@ -79,7 +85,7 @@ public class RESTv1
 				throw new BadRequestException("No entity was found with the primary key " + id);
 
 			/* create the REST representation of the topic */
-			final T restRepresentation = dataObjectFactory.create(entity, this.getBaseUrl(), JSON_URL, expand);
+			final T restRepresentation = dataObjectFactory.create(entity, this.getBaseUrl(), dataType, expand);
 
 			return restRepresentation;
 		}
