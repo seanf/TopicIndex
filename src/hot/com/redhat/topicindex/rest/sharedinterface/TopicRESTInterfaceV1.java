@@ -17,15 +17,17 @@ public interface TopicRESTInterfaceV1<T>
 	@GET
 	@Path("/topic/get/json/{id}")	
 	@Produces("application/json")
+	@Consumes({"*"})
 	public T getJSONTopic(@PathParam("id") final Integer id, @QueryParam("expand") final String expand);
 	
 	@GET
 	@Path("/topic/get/xml/{id}")
 	@Produces("application/xml")
+	@Consumes({"*"})
 	public T getXMLTopic(@PathParam("id") final Integer id, @QueryParam("expand") final String expand);
 	
 	@PUT
 	@Path("/topic/put/json/{id}")
-	@Consumes({"application/json", "text/plain"})
+	@Consumes({"application/json"})
 	public void updateJSONTopic(@PathParam("id") final Integer id, final T dataObject);
 }
