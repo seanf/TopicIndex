@@ -20,7 +20,7 @@ public interface TopicRESTInterfaceV1<T>
 	public T getJSONTopic(@PathParam("id") final Integer id, @QueryParam("expand") final String expand);
 	
 	@GET
-	@Path("/topic/get/json/{id}")
+	@Path("/topic/get/xml/{id}")
 	@Produces("application/xml")
 	public T getXMLTopic(@PathParam("id") final Integer id, @QueryParam("expand") final String expand);
 	
