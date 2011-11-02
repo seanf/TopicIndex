@@ -8,28 +8,48 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
+import com.redhat.topicindex.rest.entities.TopicV1;
+
 @Path("/1")
-public interface RESTInterfaceV1<T>
+public interface RESTInterfaceV1
 {
 	@GET
 	@Path("/topic/get/json/{id}")	
 	@Produces("application/json")
 	@Consumes({"*"})
-	public T getJSONTopic(@PathParam("id") final Integer id, @QueryParam("expand") final String expand);
+	public TopicV1 getJSONTopic(@PathParam("id") final Integer id, @QueryParam("expand") final String expand);
 	
 	@GET
 	@Path("/topic/get/xml/{id}")
 	@Produces("application/xml")
 	@Consumes({"*"})
-	public T getXMLTopic(@PathParam("id") final Integer id, @QueryParam("expand") final String expand);
+	public TopicV1 getXMLTopic(@PathParam("id") final Integer id, @QueryParam("expand") final String expand);
+	
+	@GET
+	@Path("/topic/get/xml/{id}/xml")
+	@Produces("application/xml")
+	@Consumes({"*"})
+	public String getXMLTopicXML(@PathParam("id") final Integer id, @QueryParam("expand") final String expand);
+	
+	@GET
+	@Path("/topic/get/xml/{id}/xmlContained")
+	@Produces("application/xml")
+	@Consumes({"*"})
+	public String getXMLTopicXMLContained(@PathParam("id") final Integer id, @QueryParam("expand") final String expand, @QueryParam("container") final String containerName);
+	
+	@GET
+	@Path("/topic/get/xml/{id}/xmlNoContainer")
+	@Produces("application/xml")
+	@Consumes({"*"})
+	public String getXMLTopicXMLNoContainer(@PathParam("id") final Integer id, @QueryParam("expand") final String expand, @QueryParam("includeTitle") final Boolean includeTitle);
 	
 	@PUT
 	@Path("/topic/put/json/{id}")
 	@Consumes({"application/json"})
-	public void updateJSONTopic(@PathParam("id") final Integer id, final T dataObject);
+	public void updateJSONTopic(@PathParam("id") final Integer id, final TopicV1 dataObject);
 	
 	@PUT
 	@Path("/topic/put/xml/{id}")
 	@Consumes({"application/xml"})
-	public void updateXMLTopic(@PathParam("id") final Integer id, final T dataObject);
+	public void updateXMLTopic(@PathParam("id") final Integer id, final TopicV1 dataObject);
 }

@@ -14,7 +14,7 @@ import com.redhat.topicindex.rest.factory.TopicV1Factory;
 import com.redhat.topicindex.rest.sharedinterface.RESTInterfaceV1;
 
 @Path("/1")
-public class TopicRESTv1 extends RESTv1 implements RESTInterfaceV1<TopicV1>
+public class TopicRESTv1 extends RESTv1 implements RESTInterfaceV1
 {
 	@GET
 	@Path("/topic/get/json/{id}")	
@@ -36,6 +36,40 @@ public class TopicRESTv1 extends RESTv1 implements RESTInterfaceV1<TopicV1>
 		assert id != null : "The id parameter can not be null";
 		
 		return getXMLResource(Topic.class, new TopicV1Factory(), id, expand);
+	}
+	
+	@GET
+	@Path("/topic/get/xml/{id}/xml")
+	@Produces("application/xml")
+	@Consumes({"*"})
+	public String getXMLTopicXML(@PathParam("id") final Integer id, @QueryParam("expand") final String expand)
+	{
+		assert id != null : "The id parameter can not be null";
+		
+		return getXMLResource(Topic.class, new TopicV1Factory(), id, expand).getXml();
+	}
+	
+	@GET
+	@Path("/topic/get/xml/{id}/xmlContained")
+	@Produces("application/xml")
+	@Consumes({"*"})
+	public String getXMLTopicXMLContained(@PathParam("id") final Integer id, @QueryParam("expand") final String expand, @QueryParam("container") final String containerName)
+	{
+		assert id != null : "The id parameter can not be null";
+		assert containerName != null : "The containerName parameter can not be null";
+		
+		return getXMLResource(Topic.class, new TopicV1Factory(), id, expand).getXMLWithNewContainer(containerName);
+	}
+	
+	@GET
+	@Path("/topic/get/xml/{id}/xmlNoContainer")
+	@Produces("application/xml")
+	@Consumes({"*"})
+	public String getXMLTopicXMLNoContainer(@PathParam("id") final Integer id, @QueryParam("expand") final String expand, @QueryParam("includeTitle") final Boolean includeTitle)
+	{
+		assert id != null : "The id parameter can not be null";
+		
+		return getXMLResource(Topic.class, new TopicV1Factory(), id, expand).getXMLWithNewContainer(containerName);
 	}
 
 	@PUT

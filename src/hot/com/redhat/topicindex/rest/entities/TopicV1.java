@@ -1,8 +1,14 @@
 package com.redhat.topicindex.rest.entities;
 
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import com.redhat.ecs.commonutils.XMLUtilities;
 import com.redhat.topicindex.rest.collections.BaseRestCollectionV1;
 
 /**
@@ -136,5 +142,29 @@ public class TopicV1 extends BaseRestV1
 	{
 		this.twoWayRelationships = twoWayRelationships;
 		setParamaterToConfigured(TWO_WAY_NAME);
+	}
+	
+	/**
+	 * @return the XML contained in a new element, or null if the XML is not valid
+	 */
+	@XmlTransient
+	public String getXMLWithNewContainer(final String containerName)
+	{
+		assert containerName != null : "The containerName parameter can not be null";
+		
+		final Document document = XMLUtilities.convertStringToDocument(this.xml);
+		
+		if (document == null)
+			return null;
+		
+		final Element newElement = document.createElement(containerName);
+		final Element documentElement = document.getDocumentElement();
+		
+		document.removeChild(documentElement);
+		document.appendChild(newElement);
+		newElement.appendChild(documentElement);
+		
+		return XMLUtilities.convertDocumentToString(document);
+		
 	}
 }
