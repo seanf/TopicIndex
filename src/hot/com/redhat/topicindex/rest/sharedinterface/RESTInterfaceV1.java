@@ -32,14 +32,14 @@ public interface RESTInterfaceV1
 	public String getXMLTopicXML(@PathParam("id") final Integer id, @QueryParam("expand") final String expand);
 	
 	@GET
-	@Path("/topic/get/xml/{id}/xmlContained")
+	@Path("/topic/get/xml/{id}/xmlContainedIn")
 	@Produces("application/xml")
 	@Consumes({"*"})
 	public String getXMLTopicXMLContained(@PathParam("id") final Integer id, @QueryParam("expand") final String expand, @QueryParam("container") final String containerName);
 	
 	@GET
 	@Path("/topic/get/xml/{id}/xmlNoContainer")
-	@Produces("application/xml")
+	@Produces("text/plain")
 	@Consumes({"*"})
 	public String getXMLTopicXMLNoContainer(@PathParam("id") final Integer id, @QueryParam("expand") final String expand, @QueryParam("includeTitle") final Boolean includeTitle);
 	

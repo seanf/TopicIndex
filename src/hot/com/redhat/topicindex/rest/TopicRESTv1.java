@@ -31,7 +31,7 @@ public class TopicRESTv1 extends RESTv1 implements RESTInterfaceV1
 	@Path("/topic/get/xml/{id}")	
 	@Produces("application/xml")
 	@Consumes({"*"})
-	public TopicV1 getXMLTopic(Integer id, String expand)
+	public TopicV1 getXMLTopic(@PathParam("id") final Integer id, @QueryParam("expand") final String expand)
 	{
 		assert id != null : "The id parameter can not be null";
 		
@@ -50,7 +50,7 @@ public class TopicRESTv1 extends RESTv1 implements RESTInterfaceV1
 	}
 	
 	@GET
-	@Path("/topic/get/xml/{id}/xmlContained")
+	@Path("/topic/get/xml/{id}/xmlContainedIn")
 	@Produces("application/xml")
 	@Consumes({"*"})
 	public String getXMLTopicXMLContained(@PathParam("id") final Integer id, @QueryParam("expand") final String expand, @QueryParam("container") final String containerName)
@@ -63,13 +63,14 @@ public class TopicRESTv1 extends RESTv1 implements RESTInterfaceV1
 	
 	@GET
 	@Path("/topic/get/xml/{id}/xmlNoContainer")
-	@Produces("application/xml")
+	@Produces("text/plain")
 	@Consumes({"*"})
 	public String getXMLTopicXMLNoContainer(@PathParam("id") final Integer id, @QueryParam("expand") final String expand, @QueryParam("includeTitle") final Boolean includeTitle)
 	{
 		assert id != null : "The id parameter can not be null";
 		
-		return getXMLResource(Topic.class, new TopicV1Factory(), id, expand).getXMLWithNoContainer(includeTitle);
+		final String retValue = getXMLResource(Topic.class, new TopicV1Factory(), id, expand).getXMLWithNoContainer(includeTitle);
+		return retValue;
 	}
 
 	@PUT
