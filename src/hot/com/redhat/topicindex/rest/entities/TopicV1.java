@@ -7,6 +7,8 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import com.redhat.ecs.commonutils.XMLUtilities;
 import com.redhat.topicindex.rest.collections.BaseRestCollectionV1;
@@ -164,7 +166,38 @@ public class TopicV1 extends BaseRestV1
 		document.appendChild(newElement);
 		newElement.appendChild(documentElement);
 		
-		return XMLUtilities.convertDocumentToString(document);
+		return XMLUtilities.convertDocumentToString(document);		
+	}
+	
+	/**
+	 * @return the XML contained in a new element, or null if the XML is not valid
+	 */
+	@XmlTransient
+	public String getXMLWithNoContainer(final Boolean includeTitle)
+	{
+		final Document document = XMLUtilities.convertStringToDocument(this.xml);
 		
+		if (document == null)
+			return null;
+		
+		String retValue = "";
+		
+		final Element documentElement = document.getDocumentElement();
+		
+		final NodeList nodes = documentElement.getChildNodes();
+		
+		for (int i = 0; i < nodes.getLength(); ++i)
+		{
+			final Node node = nodes.item(i);
+			if (includeTitle != null && !includeTitle)
+			{
+				if (node.getNodeName().equals("title"))
+					continue;
+			}
+			retValue += XMLUtilities.convertNodeToString(node);
+			
+		}
+		
+		return retValue;	
 	}
 }

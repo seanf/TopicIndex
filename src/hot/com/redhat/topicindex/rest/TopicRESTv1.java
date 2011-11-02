@@ -69,7 +69,7 @@ public class TopicRESTv1 extends RESTv1 implements RESTInterfaceV1
 	{
 		assert id != null : "The id parameter can not be null";
 		
-		return getXMLResource(Topic.class, new TopicV1Factory(), id, expand).getXMLWithNewContainer(containerName);
+		return getXMLResource(Topic.class, new TopicV1Factory(), id, expand).getXMLWithNoContainer(includeTitle);
 	}
 
 	@PUT
