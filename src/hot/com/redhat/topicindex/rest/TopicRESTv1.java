@@ -9,6 +9,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 import com.redhat.topicindex.entity.Topic;
+import com.redhat.topicindex.rest.collections.BaseRestCollectionV1;
 import com.redhat.topicindex.rest.entities.TopicV1;
 import com.redhat.topicindex.rest.factory.TopicV1Factory;
 import com.redhat.topicindex.rest.sharedinterface.RESTInterfaceV1;
@@ -16,6 +17,15 @@ import com.redhat.topicindex.rest.sharedinterface.RESTInterfaceV1;
 @Path("/1")
 public class TopicRESTv1 extends RESTv1 implements RESTInterfaceV1
 {
+	@GET
+	@Path("/topic/get/json")	
+	@Produces("application/json")
+	@Consumes({"*"})
+	public BaseRestCollectionV1<TopicV1> getJSONTopics(@QueryParam("expand") final String expand)
+	{
+		return getJSONResources(Topic.class, new TopicV1Factory(), TOPICS_EXPANSION_NAME, expand);
+	}
+	
 	@GET
 	@Path("/topic/get/json/{id}")	
 	@Produces("application/json")

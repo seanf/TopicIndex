@@ -8,11 +8,18 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
+import com.redhat.topicindex.rest.collections.BaseRestCollectionV1;
 import com.redhat.topicindex.rest.entities.TopicV1;
 
 @Path("/1")
 public interface RESTInterfaceV1
 {
+	@GET
+	@Path("/topic/get/json")	
+	@Produces("application/json")
+	@Consumes({"*"})
+	public BaseRestCollectionV1<TopicV1> getJSONTopics(@QueryParam("expand") final String expand);
+	
 	@GET
 	@Path("/topic/get/json/{id}")	
 	@Produces("application/json")

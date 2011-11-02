@@ -1,9 +1,16 @@
 package com.redhat.topicindex.rest;
 
+import java.util.List;
+
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import javax.transaction.TransactionManager;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
@@ -12,6 +19,8 @@ import org.jboss.resteasy.spi.BadRequestException;
 import org.jboss.resteasy.spi.Failure;
 import org.jboss.resteasy.spi.InternalServerErrorException;
 import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.rest.collections.BaseRestCollectionV1;
+import com.redhat.topicindex.rest.factory.RESTDataObjectCollectionFactory;
 import com.redhat.topicindex.rest.factory.RESTDataObjectFactory;
 import com.redhat.topicindex.utils.Constants;
 
@@ -149,6 +158,52 @@ public class RESTv1
 			final T restRepresentation = dataObjectFactory.create(entity, this.getBaseUrl(), dataType, expand);
 
 			return restRepresentation;
+		}
+		catch (final NamingException ex)
+		{
+			throw new InternalServerErrorException("Could not find the EntityManagerFactory");
+		}
+	}
+	
+	protected <T, U> BaseRestCollectionV1<T> getXMLResources(final Class<U> type, final RESTDataObjectFactory<T, U> dataObjectFactory, final String expandName, final String expand)
+	{
+		return getResources(type, dataObjectFactory, expandName, expand, XML_URL);
+	}
+	
+	protected <T, U> BaseRestCollectionV1<T> getJSONResources(final Class<U> type, final RESTDataObjectFactory<T, U> dataObjectFactory, final String expandName, final String expand)
+	{
+		return getResources(type, dataObjectFactory, expandName, expand, JSON_URL);
+	}
+	
+	protected <T, U> BaseRestCollectionV1<T> getResources(final Class<U> type, final RESTDataObjectFactory<T, U> dataObjectFactory, final String expandName, final String expand, final String dataType)
+	{
+		assert type != null : "The type parameter can not be null";
+		assert dataObjectFactory != null : "The dataObjectFactory parameter can not be null";
+
+		try
+		{
+			final InitialContext initCtx = new InitialContext();
+
+			final EntityManagerFactory entityManagerFactory = (EntityManagerFactory) initCtx.lookup("java:jboss/EntityManagerFactory");
+			if (entityManagerFactory == null)
+				throw new InternalServerErrorException("Could not find the EntityManagerFactory");
+
+			final EntityManager entityManager = entityManagerFactory.createEntityManager();
+			if (entityManager == null)
+				throw new InternalServerErrorException("Could not create an EntityManager");
+			
+			final CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();			
+			final CriteriaQuery<U> criteriaQuery = criteriaBuilder.createQuery(type);
+			
+			criteriaQuery.from(type);
+			
+			final TypedQuery<U> query = entityManager.createQuery(criteriaQuery);
+			
+			final List<U> result = query.getResultList();
+
+			final BaseRestCollectionV1<T> retValue = new RESTDataObjectCollectionFactory<T, U>().create(dataObjectFactory, result, expandName, dataType, new ExpandData(expand), getBaseUrl());
+
+			return retValue;
 		}
 		catch (final NamingException ex)
 		{
