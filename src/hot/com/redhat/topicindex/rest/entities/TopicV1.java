@@ -167,11 +167,8 @@ public class TopicV1 extends BaseRestV1
 		newElement.appendChild(documentElement);
 		
 		return XMLUtilities.convertDocumentToString(document);		
-	}
+	}	
 	
-	/**
-	 * @return the XML contained in a new element, or null if the XML is not valid
-	 */
 	@XmlTransient
 	public String getXMLWithNoContainer(final Boolean includeTitle)
 	{
@@ -182,9 +179,7 @@ public class TopicV1 extends BaseRestV1
 		
 		String retValue = "";
 		
-		final Element documentElement = document.getDocumentElement();
-		
-		final NodeList nodes = documentElement.getChildNodes();
+		final NodeList nodes = document.getDocumentElement().getChildNodes();
 		
 		for (int i = 0; i < nodes.getLength(); ++i)
 		{
@@ -192,12 +187,15 @@ public class TopicV1 extends BaseRestV1
 			if (includeTitle != null && !includeTitle)
 			{
 				if (node.getNodeName().equals("title"))
+				{
 					continue;
+				}
 			}
-			retValue += XMLUtilities.convertNodeToString(node);
 			
+			retValue += XMLUtilities.convertNodeToString(node);
 		}
 		
-		return retValue;	
+		return retValue;
+		
 	}
 }
