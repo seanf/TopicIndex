@@ -25,36 +25,37 @@ public class ExpandData
 
 	public ExpandData(final String expand)
 	{
-		assert expand != null : "The expand parameter can not be null";
-
-		final String[] expandElements = expand.split(",");
-
-		assert expandElements.length >= 1 : "Expected at least 1 element in expandElements";
-
-		for (final String expandElement : expandElements)
+		if (expand != null)
 		{
-			final ArrayList<String> expandSubElements = CollectionUtilities.toArrayList(expandElement.split("\\."));
+			final String[] expandElements = expand.split(",");
 
-			assert expandSubElements.size() >= 1 : "Expected at least 1 element in expandSubElements";
+			assert expandElements.length >= 1 : "Expected at least 1 element in expandElements";
 
-			final ExpandDataIndexes topLevelExpandOption = new ExpandDataIndexes(expandSubElements.remove(0));
-
-			boolean allChildrenAreValid = true;
-			final ArrayList<ExpandDataIndexes> childExpandOptions = new ArrayList<ExpandDataIndexes>();
-			for (final String expandSubElement : expandSubElements)
+			for (final String expandElement : expandElements)
 			{
-				final ExpandDataIndexes childExpandOption = new ExpandDataIndexes(expandSubElement);
-				if (!childExpandOption.isValid())
+				final ArrayList<String> expandSubElements = CollectionUtilities.toArrayList(expandElement.split("\\."));
+
+				assert expandSubElements.size() >= 1 : "Expected at least 1 element in expandSubElements";
+
+				final ExpandDataIndexes topLevelExpandOption = new ExpandDataIndexes(expandSubElements.remove(0));
+
+				boolean allChildrenAreValid = true;
+				final ArrayList<ExpandDataIndexes> childExpandOptions = new ArrayList<ExpandDataIndexes>();
+				for (final String expandSubElement : expandSubElements)
 				{
-					allChildrenAreValid = false;
-					break;
+					final ExpandDataIndexes childExpandOption = new ExpandDataIndexes(expandSubElement);
+					if (!childExpandOption.isValid())
+					{
+						allChildrenAreValid = false;
+						break;
+					}
+					childExpandOptions.add(childExpandOption);
 				}
-				childExpandOptions.add(childExpandOption);
+
+				if (topLevelExpandOption.isValid() && allChildrenAreValid)
+					expandOptions.put(topLevelExpandOption, childExpandOptions);
+
 			}
-
-			if (topLevelExpandOption.isValid() && allChildrenAreValid)
-				expandOptions.put(topLevelExpandOption, childExpandOptions);
-
 		}
 	}
 
@@ -80,7 +81,7 @@ public class ExpandData
 	{
 		return getExpandDataIndexes(topLevel) != null;
 	}
-	
+
 	public ArrayList<ExpandDataIndexes> getSubExpandIndexes(final String topLevel)
 	{
 		assert topLevel != null : "The topLevel instance variable can not be null";
@@ -92,7 +93,7 @@ public class ExpandData
 
 		return null;
 	}
-	
+
 	public ExpandDataIndexes getExpandDataIndexes(final String topLevel)
 	{
 		assert topLevel != null : "The topLevel instance variable can not be null";
