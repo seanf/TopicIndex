@@ -17,7 +17,7 @@ import org.hibernate.envers.Audited;
 import org.hibernate.validator.NotNull;
 
 import com.redhat.ecs.commonthread.WorkQueue;
-import com.redhat.topicindex.utils.TopicRenderer;
+import com.redhat.topicindex.utils.topicrenderer.TopicRenderer;
 
 @Audited
 @Entity

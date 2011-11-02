@@ -13,10 +13,19 @@ import com.redhat.topicindex.rest.collections.BaseRestCollectionV1;
 import com.redhat.topicindex.rest.entities.TopicV1;
 import com.redhat.topicindex.rest.factory.TopicV1Factory;
 import com.redhat.topicindex.rest.sharedinterface.RESTInterfaceV1;
+import com.redhat.topicindex.utils.topicrenderer.TopicRenderer;
 
 @Path("/1")
 public class TopicRESTv1 extends RESTv1 implements RESTInterfaceV1
 {
+	@PUT
+	@Path("/settings/rerenderTopic")
+	@Consumes({"*"})
+	public void setRerenderTopic(@QueryParam("enabled") final Boolean enalbed)
+	{
+		System.setProperty(TopicRenderer.ENABLE_RENDERING_PROPERTY, enalbed == null ? null : enalbed.toString());
+	}
+	
 	@GET
 	@Path("/topic/get/json")	
 	@Produces("application/json")

@@ -63,10 +63,10 @@ import com.redhat.topicindex.sort.TopicToTopicTopicIDSort;
 import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.EntityQueries;
 import com.redhat.topicindex.utils.EntityUtilities;
-import com.redhat.topicindex.utils.TopicRenderer;
 import com.redhat.topicindex.utils.XMLValidator;
 import com.redhat.topicindex.utils.docbookbuilding.XMLPreProcessor;
 import com.redhat.topicindex.utils.structures.NameIDSortMap;
+import com.redhat.topicindex.utils.topicrenderer.TopicRenderer;
 import com.redhat.topicindex.utils.topicrenderer.XMLRenderer;
 
 @Entity

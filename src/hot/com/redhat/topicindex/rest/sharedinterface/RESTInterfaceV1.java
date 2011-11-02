@@ -14,6 +14,11 @@ import com.redhat.topicindex.rest.entities.TopicV1;
 @Path("/1")
 public interface RESTInterfaceV1
 {
+	@PUT
+	@Path("/settings/rerenderTopic")
+	@Consumes({"*"})
+	public void setRerenderTopic(@QueryParam("enabled") final Boolean enalbed);
+	
 	@GET
 	@Path("/topic/get/json")	
 	@Produces("application/json")
