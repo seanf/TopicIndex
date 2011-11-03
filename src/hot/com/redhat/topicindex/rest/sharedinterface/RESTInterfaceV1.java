@@ -26,19 +26,19 @@ public interface RESTInterfaceV1
 	
 	/* TOPIC FUNCTIONS */
 	@GET
-	@Path("/topic/get/json")	
+	@Path("/topics/get/json/all")	
 	@Produces("application/json")
 	@Consumes({"*"})
 	public BaseRestCollectionV1<TopicV1> getJSONTopics(@QueryParam("expand") final String expand);
 	
 	@GET
-	@Path("/topic/get/json/query/{query}")	
+	@Path("/topics/get/json/{query}")	
 	@Produces("application/json")
 	@Consumes({"*"})
 	public BaseRestCollectionV1<TopicV1> getJSONTopicsWithQuery(@PathParam("query") PathSegment query, @QueryParam("expand") final String expand);
 	
 	@GET
-	@Path("/topic/get/xml")	
+	@Path("/topics/get/xml/all")	
 	@Produces("application/xml")
 	@Consumes({"*"})
 	public BaseRestCollectionV1<TopicV1> getXMLTopics(@QueryParam("expand") final String expand);
