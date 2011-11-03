@@ -7,6 +7,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.PathSegment;
 
 import com.redhat.topicindex.rest.collections.BaseRestCollectionV1;
 import com.redhat.topicindex.rest.entities.CategoryV1;
@@ -29,6 +30,18 @@ public interface RESTInterfaceV1
 	@Produces("application/json")
 	@Consumes({"*"})
 	public BaseRestCollectionV1<TopicV1> getJSONTopics(@QueryParam("expand") final String expand);
+	
+	@GET
+	@Path("/topic/get/json/query/{query}")	
+	@Produces("application/json")
+	@Consumes({"*"})
+	public BaseRestCollectionV1<TopicV1> getJSONTopicsWithQuery(@PathParam("query") PathSegment query, @QueryParam("expand") final String expand);
+	
+	@GET
+	@Path("/topic/get/xml")	
+	@Produces("application/xml")
+	@Consumes({"*"})
+	public BaseRestCollectionV1<TopicV1> getXMLTopics(@QueryParam("expand") final String expand);
 	
 	@GET
 	@Path("/topic/get/json/{id}")	

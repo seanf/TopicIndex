@@ -7,6 +7,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.PathSegment;
 
 import com.redhat.topicindex.entity.Category;
 import com.redhat.topicindex.entity.Project;
@@ -39,13 +40,30 @@ public class TopicRESTv1 extends RESTv1 implements RESTInterfaceV1
 
 	/* TOPIC FUNCTIONS */
 	@GET
-	@Path("/topic/get/json")
+	@Path("/topic/get/json")	
 	@Produces("application/json")
-	@Consumes(
-	{ "*" })
+	@Consumes({"*"})
 	public BaseRestCollectionV1<TopicV1> getJSONTopics(@QueryParam("expand") final String expand)
 	{
 		return getJSONResources(Topic.class, new TopicV1Factory(), TOPICS_EXPANSION_NAME, expand);
+	}
+	
+	@GET
+	@Path("/topic/get/json/query/{query}")	
+	@Produces("application/json")
+	@Consumes({"*"})
+	public BaseRestCollectionV1<TopicV1> getJSONTopicsWithQuery(@PathParam("query") PathSegment query, @QueryParam("expand") final String expand)
+	{
+		return getJSONTopicsFromQuery(query.getMatrixParameters(), new TopicV1Factory(), TOPICS_EXPANSION_NAME, null);
+	}
+	
+	@GET
+	@Path("/topic/get/xml")	
+	@Produces("application/xml")
+	@Consumes({"*"})
+	public BaseRestCollectionV1<TopicV1> getXMLTopics(@QueryParam("expand") final String expand)
+	{
+		return getXMLResources(Topic.class, new TopicV1Factory(), TOPICS_EXPANSION_NAME, expand);
 	}
 
 	@GET

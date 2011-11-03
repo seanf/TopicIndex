@@ -160,7 +160,7 @@ public class RelatedTopicTagsList extends ExtendedTopicList
 		
 		// build up a Filter object from the URL variables
 		final Filter filter = EntityUtilities.populateFilter(
-				FacesContext.getCurrentInstance(), 
+				FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap(), 
 				Constants.FILTER_ID, 
 				Constants.MATCH_TAG, 
 				Constants.CATEORY_INTERNAL_LOGIC, 

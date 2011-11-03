@@ -15,6 +15,8 @@ import java.util.Map;
 import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.util.Version;
 import org.drools.ClassObjectFilter;
@@ -375,32 +377,22 @@ public class EntityUtilities
 		}
 	}
 
+	public static Filter populateFilter(final MultivaluedMap<String, String> paramMap, final String filterName, final String tagPrefix, final String categoryInternalPrefix, final String categoryExternalPrefix)
+	{
+		final Map<String, String> newParamMap = new HashMap<String, String>();
+		for (final String key : paramMap.keySet())
+			newParamMap.put(key, paramMap.getFirst(key));
+		return populateFilter(newParamMap, filterName, tagPrefix, categoryInternalPrefix, categoryExternalPrefix);
+		
+	}
+	
 	/**
 	 * This function takes the url parameters and uses them to populate a Filter
 	 * object
-	 * 
-	 * @param filterHome
-	 *            The object that is used to manage the Filter object
-	 * @param context
-	 *            This is used to access the url parameters
-	 * @param filterName
-	 *            The name of the url parameter that defines a Filter ID
-	 * @param tagPrefix
-	 *            The prefix assigned to url parameters that identify tag
-	 *            filters
-	 * @param categoryInternalPrefix
-	 *            The prefix assigned to url parameters that identify category
-	 *            internal logic settings
-	 * @param categoryExternalPrefix
-	 *            The prefix assigned to url parameters that identify category
-	 *            external logic settings
 	 */
-	public static Filter populateFilter(final FacesContext context, final String filterName, final String tagPrefix, final String categoryInternalPrefix, final String categoryExternalPrefix)
+	public static Filter populateFilter(final Map<String, String> paramMap, final String filterName, final String tagPrefix, final String categoryInternalPrefix, final String categoryExternalPrefix)
 	{
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
-
-		// get the tags from the url, and categorize them
-		final Map<String, String> paramMap = context.getExternalContext().getRequestParameterMap();
 
 		// attempt to get the filter id from the url
 		Integer filterId = null;

@@ -2,6 +2,7 @@ package com.redhat.topicindex.rest;
 
 import java.util.List;
 
+import javax.faces.context.FacesContext;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.persistence.EntityManager;
@@ -13,16 +14,22 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.transaction.TransactionManager;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
 import org.jboss.resteasy.spi.BadRequestException;
 import org.jboss.resteasy.spi.Failure;
 import org.jboss.resteasy.spi.InternalServerErrorException;
 import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.entity.Filter;
+import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.rest.collections.BaseRestCollectionV1;
+import com.redhat.topicindex.rest.entities.TopicV1;
 import com.redhat.topicindex.rest.factory.RESTDataObjectCollectionFactory;
 import com.redhat.topicindex.rest.factory.RESTDataObjectFactory;
+import com.redhat.topicindex.rest.factory.TopicV1Factory;
 import com.redhat.topicindex.utils.Constants;
+import com.redhat.topicindex.utils.EntityUtilities;
 
 public class RESTv1
 {
@@ -202,6 +209,50 @@ public class RESTv1
 			final List<U> result = query.getResultList();
 
 			final BaseRestCollectionV1<T> retValue = new RESTDataObjectCollectionFactory<T, U>().create(dataObjectFactory, result, expandName, dataType, new ExpandData(expand), getBaseUrl());
+
+			return retValue;
+		}
+		catch (final NamingException ex)
+		{
+			throw new InternalServerErrorException("Could not find the EntityManagerFactory");
+		}
+	}
+	
+	protected BaseRestCollectionV1<TopicV1> getJSONTopicsFromQuery(final MultivaluedMap<String, String> queryParams, final TopicV1Factory dataObjectFactory, final String expandName, final String expand)
+	{
+		return getTopicsFromQuery(queryParams, dataObjectFactory, expandName, expand, JSON_URL);
+	}
+	
+	protected BaseRestCollectionV1<TopicV1> getTopicsFromQuery(final MultivaluedMap<String, String> queryParams, final TopicV1Factory dataObjectFactory, final String expandName, final String expand, final String dataType)
+	{
+		assert dataObjectFactory != null : "The dataObjectFactory parameter can not be null";
+		assert uriInfo != null : "uriInfo can not be null";
+
+		try
+		{
+			final InitialContext initCtx = new InitialContext();
+
+			final EntityManagerFactory entityManagerFactory = (EntityManagerFactory) initCtx.lookup("java:jboss/EntityManagerFactory");
+			if (entityManagerFactory == null)
+				throw new InternalServerErrorException("Could not find the EntityManagerFactory");
+
+			final EntityManager entityManager = entityManagerFactory.createEntityManager();
+			if (entityManager == null)
+				throw new InternalServerErrorException("Could not create an EntityManager");
+			
+			// build up a Filter object from the URL variables
+			final Filter filter = EntityUtilities.populateFilter(
+					queryParams,
+					Constants.FILTER_ID, 
+					Constants.MATCH_TAG, 
+					Constants.CATEORY_INTERNAL_LOGIC, 
+					Constants.CATEORY_EXTERNAL_LOGIC);	
+			
+			final String query = filter.buildQuery();
+			
+			final List<Topic> result = entityManager.createQuery(Topic.SELECT_ALL_QUERY + query).getResultList();
+
+			final BaseRestCollectionV1<TopicV1> retValue = new RESTDataObjectCollectionFactory<TopicV1, Topic>().create(dataObjectFactory, result, expandName, dataType, new ExpandData(expand), getBaseUrl());
 
 			return retValue;
 		}
