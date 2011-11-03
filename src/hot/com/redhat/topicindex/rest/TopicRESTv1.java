@@ -31,8 +31,7 @@ public class TopicRESTv1 extends RESTv1 implements RESTInterfaceV1
 	/* SYSTEM FUNCTIONS */
 	@PUT
 	@Path("/settings/rerenderTopic")
-	@Consumes(
-	{ "*" })
+	@Consumes({ "*" })
 	public void setRerenderTopic(@QueryParam("enabled") final Boolean enalbed)
 	{
 		System.setProperty(TopicRenderer.ENABLE_RENDERING_PROPERTY, enalbed == null ? null : enalbed.toString());
