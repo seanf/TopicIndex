@@ -248,7 +248,7 @@ public class RESTv1
 					Constants.CATEORY_INTERNAL_LOGIC, 
 					Constants.CATEORY_EXTERNAL_LOGIC);	
 			
-			final String query = filter.buildQuery();
+			final String query = filter.buildQuery(true);
 			
 			final List<Topic> result = entityManager.createQuery(Topic.SELECT_ALL_QUERY + query).getResultList();
 

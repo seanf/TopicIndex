@@ -33,8 +33,10 @@ import org.hibernate.validator.NotNull;
 import org.jboss.seam.Component;
 
 import com.redhat.ecs.commonutils.CollectionUtilities;
+import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.topicindex.filter.TopicFilter;
 import com.redhat.topicindex.utils.Constants;
+import com.redhat.topicindex.utils.EntityUtilities;
 import com.redhat.topicindex.utils.docbookbuilding.DocbookBuildingOptions;
 import com.redhat.topicindex.utils.structures.tags.UICategoryData;
 import com.redhat.topicindex.utils.structures.tags.UIProjectCategoriesData;
@@ -149,7 +151,7 @@ public class Filter implements java.io.Serializable
 	{
 		this.filterFields = filterFields;
 	}
-	
+
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "filter", orphanRemoval = true, cascade = CascadeType.ALL)
 	public Set<FilterOption> getFilterOptions()
 	{
@@ -411,6 +413,11 @@ public class Filter implements java.io.Serializable
 		return urlVars;
 	}
 
+	public String buildQuery()
+	{
+		return buildQuery(false);
+	}
+
 	/**
 	 * This function is used to create the HQL query where clause that is
 	 * appended to the generic EJBQL (as created in default EntityList objects)
@@ -421,7 +428,7 @@ public class Filter implements java.io.Serializable
 	 * 
 	 * @return the clause to append to the EJBQL select statement
 	 */
-	public String buildQuery()
+	public String buildQuery(final boolean extended)
 	{
 		// the categories to be ANDed will be added to this string
 		String andQueryBlock = "";
@@ -543,37 +550,97 @@ public class Filter implements java.io.Serializable
 			}
 		}
 
-		
-		
-		/* Do an initial loop over the FilterFields, looking for the field logic value */
-		/*String filterFieldQueryBlock = "";
-		String filterFieldsLogic = "AND";
-		for (final FilterField filterField : this.getFilterFields())
+		/*
+		 * This section will add the SQL that is usually added by restrictions
+		 * defined in ExtendedTopicList EXTENDED_RESTRICTIONS
+		 */
+		if (extended)
 		{
-			if (filterField.getField().equals(Constants.TOPIC_LOGIC_FILTER_VAR))
+			/*
+			 * Do an initial loop over the FilterFields, looking for the field
+			 * logic value
+			 */
+			String filterFieldQueryBlock = "";
+			String filterFieldsLogic = "AND";
+			for (final FilterField filterField : this.getFilterFields())
 			{
-				filterFieldsLogic = filterField.getValue();
-				break;
+				if (filterField.getField().equals(Constants.TOPIC_LOGIC_FILTER_VAR))
+				{
+					filterFieldsLogic = filterField.getValue();
+					break;
+				}
+			}
+
+			/* Now add the SQL for the fields */
+			for (final FilterField filterField : this.getFilterFields())
+			{
+				String thisRestriction = "";
+
+				if (filterField.getField().equals(Constants.TOPIC_IDS_FILTER_VAR))
+				{
+					thisRestriction = "topic.topicId in (" + filterField.getValue() + ")";
+				}
+				else if (filterField.getField().equals(Constants.TOPIC_TITLE_FILTER_VAR))
+				{
+					thisRestriction = "lower(topic.topicTitle) like lower('%" + filterField.getValue() + "%')"; 
+				}
+				else if (filterField.getField().equals(Constants.TOPIC_TITLE_FILTER_VAR))
+				{
+					thisRestriction = "lower(topic.topicTitle) like lower('%" + filterField.getValue() + "%')"; 
+				}
+				else if (filterField.getField().equals(Constants.TOPIC_XML_FILTER_VAR))
+				{
+					thisRestriction = "lower(topic.topicXML) like lower('%" + filterField.getValue() + "%')"; 
+				}
+				else if (filterField.getField().equals(Constants.TOPIC_DESCRIPTION_FILTER_VAR))
+				{
+					thisRestriction = "lower(topic.topicText) like lower('%" + filterField.getValue() + "%')"; 
+				}
+				else if (filterField.getField().equals(Constants.TOPIC_ADDED_BY_FILTER_VAR))
+				{
+					thisRestriction = "lower(topic.topicAddedBy) like lower('%" + filterField.getValue() + "%')"; 
+				}
+				else if (filterField.getField().equals(Constants.TOPIC_STARTDATE_FILTER_VAR))
+				{
+					thisRestriction = "topic.topicTimeStamp >= " + filterField.getValue(); 
+				}
+				else if (filterField.getField().equals(Constants.TOPIC_ENDDATE_FILTER_VAR))
+				{
+					thisRestriction = "topic.topicTimeStamp <= " + filterField.getValue(); 
+				}
+				else if (filterField.getField().equals(Constants.TOPIC_HAS_RELATIONSHIPS))
+				{
+					thisRestriction = "topic.parentTopicToTopics.size >= 1"; 
+				}
+				else if (filterField.getField().equals(Constants.TOPIC_HAS_INCOMING_RELATIONSHIPS))
+				{
+					thisRestriction = "topic.childTopicToTopics.size >= 1"; 
+				}
+				else if (filterField.getField().equals(Constants.TOPIC_RELATED_TO) || filterField.getField().equals(Constants.TOPIC_RELATED_FROM))
+				{
+					try
+					{
+						final Integer topicId = Integer.parseInt(filterField.getValue());
+						final String relatedTopics = EntityUtilities.getRelatedTopicIDsString(topicId);
+						
+						thisRestriction = "topic.topicId in (" + relatedTopics + ")";
+					}
+					catch (final Exception ex)
+					{
+						ExceptionUtilities.handleException(ex);
+					}
+				}
+				
+
+				if (thisRestriction.length() != 0)
+				{
+					if (filterFieldQueryBlock.length() != 0)
+						filterFieldQueryBlock += " " + filterFieldsLogic + " ";
+
+					filterFieldQueryBlock += thisRestriction;
+				}
 			}
 		}
-
-		for (final FilterField filterField : this.getFilterFields())
-		{
-			String thisRestriction = "";
-
-			if (filterField.getField().equals(Constants.TOPIC_IDS_FILTER_VAR))
-			{
-				thisRestriction += "topic.topicId in (" + filterField.getValue() + ")";
-			}
-			
-			if (thisRestriction.length() != 0)
-			{
-				if (filterFieldQueryBlock.length() != 0)
-					filterFieldQueryBlock += " " + filterFieldsLogic + " ";
-					
-				filterFieldQueryBlock += thisRestriction;
-			}
-		}*/
 
 		String query = "";
 
@@ -588,11 +655,12 @@ public class Filter implements java.io.Serializable
 			// add the or categories
 			if (orQueryBlock.length() != 0)
 				query += (query.length() != 0 ? " And " : "") + "(" + orQueryBlock + ")";
-			
-			/*if (filterFieldQueryBlock.length() != 0)
-				query += (query.length() != 0 ? " And " : "") + "(" + filterFieldQueryBlock + ")";*/
-			
-			
+
+			/*
+			 * if (filterFieldQueryBlock.length() != 0) query += (query.length()
+			 * != 0 ? " And " : "") + "(" + filterFieldQueryBlock + ")";
+			 */
+
 			// add the where clause
 			// have to join the topic and its collection of tags in order for
 			// the filter to work
@@ -602,7 +670,7 @@ public class Filter implements java.io.Serializable
 
 		return query;
 	}
-	
+
 	public void syncFilterWithTags(final UIProjectData selectedTags)
 	{
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
@@ -671,7 +739,10 @@ public class Filter implements java.io.Serializable
 
 		for (final FilterTag filterTag : this.getFilterTags())
 		{
-			/* don't attempt to remove a FilterTag that was specifically added above */
+			/*
+			 * don't attempt to remove a FilterTag that was specifically added
+			 * above
+			 */
 			if (!selectedFilterTags.contains(filterTag))
 			{
 				boolean found = false;
@@ -704,7 +775,7 @@ public class Filter implements java.io.Serializable
 		for (final FilterTag filterTag : removeTags)
 			this.getFilterTags().remove(filterTag);
 	}
-	
+
 	public void syncFilterWithFieldUIElements(final TopicFilter topic)
 	{
 		for (final String fieldName : TopicFilter.getFilterNames().keySet())
@@ -749,7 +820,7 @@ public class Filter implements java.io.Serializable
 				this.getFilterFields().remove(filterField.get(0));
 		}
 	}
-	
+
 	public void syncFilterWithCategories(final UIProjectData selectedTags)
 	{
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
@@ -848,7 +919,7 @@ public class Filter implements java.io.Serializable
 			}
 		}
 	}
-	
+
 	/**
 	 * A utility function that persists a FilterCategory object to the database
 	 */
@@ -861,7 +932,7 @@ public class Filter implements java.io.Serializable
 		filterCategory.setCategory(category);
 		this.getFilterCategories().add(filterCategory);
 	}
-	
+
 	public void syncWithDocbookOptions(final DocbookBuildingOptions options)
 	{
 		final List<String> docbookOptions = DocbookBuildingOptions.getOptionNames();
@@ -874,9 +945,9 @@ public class Filter implements java.io.Serializable
 				{
 					found = true;
 					filterOption.setFilterOptionValue(options.getFieldValue(option));
-				}	
+				}
 			}
-			
+
 			if (!found)
 			{
 				final FilterOption filterOption = new FilterOption();
@@ -886,7 +957,7 @@ public class Filter implements java.io.Serializable
 				this.filterOptions.add(filterOption);
 			}
 		}
-		
+
 	}
 
 }

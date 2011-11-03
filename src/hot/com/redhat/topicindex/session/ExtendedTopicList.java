@@ -32,12 +32,12 @@ public class ExtendedTopicList extends TopicList
 			"lower(topic.topicXML) like lower(concat('%', #{" + BEAN_NAME_MARKER + ".topic.topicXML}, '%'))",
 			"lower(topic.topicText) like lower(concat('%', #{" + BEAN_NAME_MARKER + ".topic.topicText}, '%'))",
 			"lower(topic.topicAddedBy) like lower(concat('%', #{" + BEAN_NAME_MARKER + ".topic.topicAddedBy}, '%'))",
-			"lower(topic.topicProduct) like lower(concat('%', #{" + BEAN_NAME_MARKER + ".topic.topicProduct}, '%'))",
 			"topic.topicTimeStamp >= #{" + BEAN_NAME_MARKER + ".topic.startCreateDatePlain}",
 			"topic.topicTimeStamp <= #{" + BEAN_NAME_MARKER + ".topic.endCreateDatePlain}", "topic.topicId in (#{" + BEAN_NAME_MARKER + ".topic.topicIds})",
 			"topic.parentTopicToTopics.size >= #{" + BEAN_NAME_MARKER + ".topic.minimumRelationshipCount}",
 			"topic.childTopicToTopics.size >= #{" + BEAN_NAME_MARKER + ".topic.minimumIncomingRelationshipCount}",
-			"topic.topicId in (#{" + BEAN_NAME_MARKER + ".topic.relatedTopicIDs})", "topic.topicId in (#{" + BEAN_NAME_MARKER + ".topic.incomingRelatedTopicIDs})",
+			"topic.topicId in (#{" + BEAN_NAME_MARKER + ".topic.relatedTopicIDs})", 
+			"topic.topicId in (#{" + BEAN_NAME_MARKER + ".topic.incomingRelatedTopicIDs})",
 			"topic.topicId in (#{" + BEAN_NAME_MARKER + ".topic.topicTextSearchIDs})"
 
 	};
