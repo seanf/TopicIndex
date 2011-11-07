@@ -17,10 +17,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 
+import javax.naming.InitialContext;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -33,6 +35,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+import javax.transaction.Transaction;
+import javax.transaction.TransactionManager;
 
 import net.htmlparser.jericho.Source;
 
@@ -765,10 +769,16 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	{
 		if (!isRerenderRelatedTopics())
 			return;
+		
+		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");		
 
 		try
 		{
-			WorkQueue.getInstance().execute(TopicRenderer.createNewInstance(this.getTopicId()));
+			final InitialContext initCtx = new InitialContext();
+			final TransactionManager transactionManager = (TransactionManager) initCtx.lookup("java:jboss/TransactionManager");
+			final Transaction transaction = transactionManager.getTransaction();
+			
+			WorkQueue.getInstance().execute(TopicRenderer.createNewInstance(this.getTopicId(), transaction));
 
 			/*
 			 * Because of the ability to inject topic contents into other
@@ -776,10 +786,10 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 			 * relationship.
 			 */
 			for (final Topic relatedTopic : this.getIncomingRelatedTopicsArray())
-				WorkQueue.getInstance().execute(TopicRenderer.createNewInstance(relatedTopic.getTopicId()));
+				WorkQueue.getInstance().execute(TopicRenderer.createNewInstance(relatedTopic.getTopicId(), transaction));
 
 			for (final Topic relatedTopic : this.getTwoWayRelatedTopicsArray())
-				WorkQueue.getInstance().execute(TopicRenderer.createNewInstance(relatedTopic.getTopicId()));
+				WorkQueue.getInstance().execute(TopicRenderer.createNewInstance(relatedTopic.getTopicId(), transaction));
 		}
 		catch (final Exception ex)
 		{

@@ -6,6 +6,8 @@ import java.util.List;
 import javax.naming.InitialContext;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.transaction.Status;
+import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 
 import org.w3c.dom.Document;
@@ -24,20 +26,30 @@ public class TopicRenderer implements Runnable
 	 * HTML
 	 */
 	public static final String ENABLE_RENDERING_PROPERTY = "topicindex.rerenderTopic";
+	/**
+	 * The maximum amount of time (in seconds) to wait for the entity
+	 * transaction to finish
+	 */
+	private static final int MAX_WAIT = 5;
 	/** The ID of the topic to rerender */
 	private Integer topicId = null;
 	private EntityManagerFactory entityManagerFactory = null;
 	private TransactionManager transactionManager = null;
-
+	private Transaction transaction = null;
 
 	public static TopicRenderer createNewInstance(final Integer topicId)
+	{
+		return createNewInstance(topicId, null);
+	}
+
+	public static TopicRenderer createNewInstance(final Integer topicId, final Transaction transaction)
 	{
 		try
 		{
 			final InitialContext initCtx = new InitialContext();
 			final EntityManagerFactory entityManagerFactory = (EntityManagerFactory) initCtx.lookup("java:jboss/EntityManagerFactory");
 			final TransactionManager transactionManager = (TransactionManager) initCtx.lookup("java:jboss/TransactionManager");
-			return new TopicRenderer(topicId, entityManagerFactory, transactionManager);
+			return new TopicRenderer(topicId, entityManagerFactory, transactionManager, transaction);
 		}
 		catch (final Exception ex)
 		{
@@ -49,7 +61,7 @@ public class TopicRenderer implements Runnable
 
 	public static String renderXML(final EntityManager entityManager, final Topic topic)
 	{
-		System.out.println("Topic.renderXML() ID: " + topic.getTopicId());
+		System.out.println("START Topic.renderXML() ID: " + topic.getTopicId());
 
 		try
 		{
@@ -85,15 +97,20 @@ public class TopicRenderer implements Runnable
 		{
 			ExceptionUtilities.handleException(ex);
 		}
+		finally
+		{
+			System.out.println("FINISH Topic.renderXML() ID: " + topic.getTopicId());
+		}
 
 		return Constants.XSL_ERROR_TEMPLATE;
 	}
 
-	public TopicRenderer(final Integer topicId, final EntityManagerFactory entityManagerFactory, final TransactionManager transactionManager)
+	public TopicRenderer(final Integer topicId, final EntityManagerFactory entityManagerFactory, final TransactionManager transactionManager, final Transaction transaction)
 	{
 		this.topicId = topicId;
 		this.entityManagerFactory = entityManagerFactory;
 		this.transactionManager = transactionManager;
+		this.transaction = transaction;
 	}
 
 	@Override
@@ -103,6 +120,46 @@ public class TopicRenderer implements Runnable
 
 		if (enableRendering == null || "true".equalsIgnoreCase(enableRendering))
 		{
+			/*
+			 * Wait for the transaction associated with the main entity to
+			 * finish
+			 */
+			boolean renderTopic = transaction != null ? false : true;
+			try
+			{
+				if (transaction != null)
+				{
+					for (int i = 0; i < MAX_WAIT; ++i)
+					{
+						final int status = transaction.getStatus();
+
+						if (status == Status.STATUS_COMMITTED)
+						{
+							renderTopic = true;
+							break;
+						}
+
+						if (status == Status.STATUS_NO_TRANSACTION || status == Status.STATUS_ROLLEDBACK || status == Status.STATUS_UNKNOWN)
+						{
+							return;
+						}
+
+						Thread.sleep(1000);
+					}
+				}
+			}
+			catch (final Exception ex)
+			{
+				ExceptionUtilities.handleException(ex);
+			}
+
+			/*
+			 * There was a problem with the transaction, so don't renrender the
+			 * topic
+			 */
+			if (!renderTopic)
+				return;
+
 			EntityManager entityManager = null;
 
 			try
@@ -125,14 +182,17 @@ public class TopicRenderer implements Runnable
 
 				/*
 				 * And now get the state of the topic after it has been
-				 * rendered. Rendering can be time consuming, so we will only update
-				 * the TopicRendered field with what we have just rendered to lessen 
-				 * the impact of database race conditions (such as when the topic has been edited
-				 * since when we started the rendering process and when we finished).
+				 * rendered. Rendering can be time consuming, so we will only
+				 * update the TopicRendered field (and leave the others alone)
+				 * with what we have just rendered to lessen the impact of
+				 * database race conditions (such as when the topic has been
+				 * edited since when we started the rendering process and when
+				 * we finished).
 				 */
 				if (renderedXML != null)
 				{
 					final Topic updateTopic = entityManager.find(Topic.class, this.topicId);
+					updateTopic.setRerenderRelatedTopics(false);
 					updateTopic.setTopicRendered(renderedXML);
 					entityManager.persist(updateTopic);
 					entityManager.flush();
