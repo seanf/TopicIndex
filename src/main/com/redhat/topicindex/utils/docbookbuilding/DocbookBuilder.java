@@ -1400,6 +1400,9 @@ public class DocbookBuilder
 
 		try
 		{
+			final String instanceNameProperty = System.getProperty(Constants.INSTANCE_NAME_PROPERTY);
+			final String fixedInstanceNameProperty = instanceNameProperty == null ? "Not Defined" : instanceNameProperty;
+			
 			final Element bugzillaPara = topic.getTempTopicXMLDoc().createElement("para");
 			bugzillaPara.setAttribute("role", ROLE_CREATE_BUG_PARA);
 
@@ -1408,7 +1411,7 @@ public class DocbookBuilder
 			bugzillaULink.setTextContent("Report a bug");
 
 			final SimpleDateFormat formatter = new SimpleDateFormat(Constants.FILTER_DISPLAY_DATE_FORMAT);
-			final String whiteboard = URLEncoder.encode("Topic ID:" + topic.getTopicId() + " Skynet Build: " + Constants.BUILD + " Topic Title: " + topic.getTopicTitle() + " Topic Revision: " + topic.getLatestRevision() + " Topic Revision Date: " + formatter.format(topic.getLatestRevisionDate()) + " Topic Tags: "
+			final String whiteboard = URLEncoder.encode("Instance Name: " + fixedInstanceNameProperty + " Topic ID:" + topic.getTopicId() + " Skynet Build: " + Constants.BUILD + " Topic Title: " + topic.getTopicTitle() + " Topic Revision: " + topic.getLatestRevision() + " Topic Revision Date: " + formatter.format(topic.getLatestRevisionDate()) + " Topic Tags: "
 					+ topic.getCommaSeparatedTagList(), "UTF-8");
 
 			bugzillaULink.setAttribute("url", "https://bugzilla.redhat.com/enter_bug.cgi?product=Topic+Tool&component=topics-EAP6&keywords=Documentation&status_whiteboard=" + whiteboard);

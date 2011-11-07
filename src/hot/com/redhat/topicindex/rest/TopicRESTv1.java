@@ -23,6 +23,7 @@ import com.redhat.topicindex.rest.factory.ProjectV1Factory;
 import com.redhat.topicindex.rest.factory.TagV1Factory;
 import com.redhat.topicindex.rest.factory.TopicV1Factory;
 import com.redhat.topicindex.rest.sharedinterface.RESTInterfaceV1;
+import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.topicrenderer.TopicRenderer;
 
 @Path("/1")
@@ -34,7 +35,7 @@ public class TopicRESTv1 extends RESTv1 implements RESTInterfaceV1
 	@Consumes({ "*" })
 	public void setRerenderTopic(@QueryParam("enabled") final Boolean enalbed)
 	{
-		System.setProperty(TopicRenderer.ENABLE_RENDERING_PROPERTY, enalbed == null ? null : enalbed.toString());
+		System.setProperty(Constants.ENABLE_RENDERING_PROPERTY, enalbed == null ? null : enalbed.toString());
 	}
 
 	/* TOPIC FUNCTIONS */

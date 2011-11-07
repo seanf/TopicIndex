@@ -21,11 +21,7 @@ import com.redhat.topicindex.utils.docbookbuilding.XMLPreProcessor;
 
 public class TopicRenderer implements Runnable
 {
-	/**
-	 * The system property that determines if topics should be rendered into
-	 * HTML
-	 */
-	public static final String ENABLE_RENDERING_PROPERTY = "topicindex.rerenderTopic";
+
 	/**
 	 * The maximum amount of time (in seconds) to wait for the entity
 	 * transaction to finish
@@ -116,7 +112,7 @@ public class TopicRenderer implements Runnable
 	@Override
 	public void run()
 	{
-		final String enableRendering = System.getProperty(ENABLE_RENDERING_PROPERTY);
+		final String enableRendering = System.getProperty(Constants.ENABLE_RENDERING_PROPERTY);
 
 		if (enableRendering == null || "true".equalsIgnoreCase(enableRendering))
 		{
