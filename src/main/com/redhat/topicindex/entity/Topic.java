@@ -91,8 +91,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	private static final Integer TASK_TOPIC_STRINGCONSTANTID = 13;
 	/** The string constant that is used as a concept template */
 	private static final Integer CONCEPT_TOPIC_STRINGCONSTANTID = 14;
-	/** The encoding of the XML, used when converting a DOM object to a string */
-	private static final String XML_ENCODING = "UTF-8";
+
 	private static final long serialVersionUID = 5580473587657911655L;
 
 	/**
@@ -790,41 +789,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 
 	public void renderXML(final EntityManager entityManager)
 	{
-		System.out.println("Topic.renderXML() ID: " + this.topicId);
-
-		try
-		{
-			final Document doc = XMLUtilities.convertStringToDocument(this.topicXML);
-			if (doc != null)
-			{
-				/*
-				 * create a collection of the tags that make up the topics types
-				 * that will be included in generic injection points
-				 */
-				final List<Pair<Integer, String>> topicTypeTagDetails = new ArrayList<Pair<Integer, String>>();
-				topicTypeTagDetails.add(Pair.newPair(Constants.TASK_TAG_ID, Constants.TASK_TAG_NAME));
-				topicTypeTagDetails.add(Pair.newPair(Constants.REFERENCE_TAG_ID, Constants.REFERENCE_TAG_NAME));
-				topicTypeTagDetails.add(Pair.newPair(Constants.CONCEPT_TAG_ID, Constants.CONCEPT_TAG_NAME));
-				topicTypeTagDetails.add(Pair.newPair(Constants.CONCEPTUALOVERVIEW_TAG_ID, Constants.CONCEPTUALOVERVIEW_TAG_NAME));
-
-				final ArrayList<Integer> customInjectionIds = new ArrayList<Integer>();
-				XMLPreProcessor.processInjections(true, this, customInjectionIds, doc, null, null);
-				XMLPreProcessor.processGenericInjections(true, this, doc, customInjectionIds, topicTypeTagDetails, null, null);
-				XMLPreProcessor.processInternalImageFiles(doc);
-
-				XMLPreProcessor.processTopicContentFragments(this, doc, null);
-				XMLPreProcessor.processTopicTitleFragments(this, doc, null);
-
-				/* render the topic html */
-				final String processedXML = XMLUtilities.convertDocumentToString(doc, XML_ENCODING);
-				final String processedXMLWithDocType = XMLPreProcessor.processDocumentType(processedXML);
-				this.setTopicRendered(XMLRenderer.transformDocbook(entityManager, processedXMLWithDocType));
-			}
-		}
-		catch (final Exception ex)
-		{
-			ExceptionUtilities.handleException(ex);
-		}
+		this.topicRendered = TopicRenderer.renderXML(entityManager, this);
 	}
 
 	private void validateRelationships()
@@ -1015,7 +980,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	{
 		if (tempTopicXMLDoc != null)
 		{
-			String retValue = XMLUtilities.convertDocumentToString(this.tempTopicXMLDoc, XML_ENCODING);
+			String retValue = XMLUtilities.convertDocumentToString(this.tempTopicXMLDoc, Constants.XML_ENCODING);
 
 			retValue = "<!-- Topic ID: " + this.topicId + " -->\n" + retValue.replaceAll("<\\?xml.*?\\?>", "").trim();
 
@@ -1127,7 +1092,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 				doc.getDocumentElement().appendChild(detailsComment);
 			}
 
-			this.topicXML = XMLUtilities.convertDocumentToString(doc, XML_ENCODING);
+			this.topicXML = XMLUtilities.convertDocumentToString(doc, Constants.XML_ENCODING);
 		}
 	}
 
@@ -1193,7 +1158,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 						docElement.appendChild(newTitle);
 				}
 
-				this.topicXML = XMLUtilities.convertDocumentToString(doc, XML_ENCODING);
+				this.topicXML = XMLUtilities.convertDocumentToString(doc, Constants.XML_ENCODING);
 			}
 		}
 	}
