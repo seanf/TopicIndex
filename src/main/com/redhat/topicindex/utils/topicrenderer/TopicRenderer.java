@@ -47,19 +47,28 @@ public class TopicRenderer implements Runnable
 		if (enableRendering == null || "true".equalsIgnoreCase(enableRendering))
 		{
 			EntityManager entityManager = null;
-
+			
 			try
-			{
+			{			
 				transactionManager.begin();
-
+				
+				/* get the state of the topic now */
 				entityManager = this.entityManagerFactory.createEntityManager();
-				final Topic topic = entityManager.find(Topic.class, this.topicId);
-
-				if (topic != null)
+				final Topic initialTopic = entityManager.find(Topic.class, this.topicId);
+				if (initialTopic != null)
 				{
-					topic.setRerenderRelatedTopics(false);
-					topic.renderXML(entityManager);
-					entityManager.persist(topic);
+					/* detach the entity - it will not be saved to the database */
+					entityManager.detach(initialTopic);
+					/* render the html view */
+					initialTopic.setRerenderRelatedTopics(false);
+					initialTopic.renderXML(entityManager);
+				}
+
+				if (initialTopic != null)
+				{
+					final Topic updateTopic = entityManager.find(Topic.class, this.topicId);
+					updateTopic.setTopicRendered(initialTopic.getTopicRendered());					
+					entityManager.persist(updateTopic);
 					entityManager.flush();
 				}
 

@@ -25,6 +25,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -665,6 +666,12 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	
 	@PostUpdate
 	private void onPostUpdate()
+	{
+		renderTopics();
+	}
+	
+	@PostPersist
+	private void onPostPersist()
 	{
 		renderTopics();
 	}
