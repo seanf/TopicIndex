@@ -25,6 +25,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.PostUpdate;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -650,16 +651,22 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	}
 
 	@PrePersist
-	protected void onCreate()
+	private void onPrePresist()
 	{
 		this.topicTimeStamp = new Date();
 		validate();
 	}
 
 	@PreUpdate
-	protected void onUpdate()
+	private void onPreUpdate()
 	{
 		validate();
+	}
+	
+	@PostUpdate
+	private void onPostUpdate()
+	{
+		renderTopics();
 	}
 
 	public void setTopicAddedBy(final String topicAddedBy)
@@ -746,7 +753,6 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		syncXML();
 		validateTags();
 		validateRelationships();
-		renderTopics();
 	}
 
 	private void renderTopics()
