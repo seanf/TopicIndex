@@ -647,59 +647,5 @@ public class TopicTagsList extends ExtendedTopicList
 		return "";
 	}
 
-	public void addToTempList()
-	{
-		try
-		{
-			if (actionTopicID != null)
-			{
-				final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
-				final Topic topic = entityManager.find(Topic.class, actionTopicID);
 
-				if (!this.tempList.contains(topic))
-					this.tempList.add(topic);
-			}
-		}
-		catch (final Exception ex)
-		{
-			ExceptionUtilities.handleException(ex);
-		}
-		finally
-		{
-			actionTopicID = null;
-			otherTopicId = null;
-		}
-	}
-
-	public void removeFromTempList(final Integer topicId)
-	{
-		try
-		{
-			if (topicId != null)
-			{
-				final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
-				final Topic topic = entityManager.find(Topic.class, topicId);
-
-				if (this.tempList.contains(topic))
-					this.tempList.remove(topic);
-			}
-		}
-		catch (final Exception ex)
-		{
-			ExceptionUtilities.handleException(ex);
-		}
-	}
-
-	public String getTempTopicListURLParam()
-	{
-		String topicIds = "";
-		for (final Topic topic : this.tempList)
-		{
-			if (topicIds.length() != 0)
-				topicIds += ",";
-			topicIds += topic.getTopicId();
-		}
-
-		return topicIds;
-	}
 }

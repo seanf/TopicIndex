@@ -1,9 +1,7 @@
 package com.redhat.topicindex.session;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import javax.faces.context.FacesContext;
 
 import com.redhat.topicindex.entity.Filter;
@@ -64,18 +62,7 @@ public class ExtendedTopicList extends TopicList
 	 */
 	private HashMap<String, String> filterVars;
 
-	/** A temporary list of topics that can be used for special processing tasks */ 
-	protected List<Topic> tempList;
 
-	public List<Topic> getTempList()
-	{
-		return tempList;
-	}
-
-	public void setTempList(final List<Topic> tempList)
-	{
-		this.tempList = tempList;
-	}
 
 	public void setSelectedTags(final UIProjectData selectedTags)
 	{
@@ -140,8 +127,6 @@ public class ExtendedTopicList extends TopicList
 	protected void construct(final int limit, final String constructedEJBQL, final TopicFilter topic, final String beanName)
 	{
 		super.construct(limit, constructedEJBQL, topic);
-		
-		tempList = new ArrayList<Topic>();
 
 		// populate the bulk tag database
 		selectedTags = new UIProjectData();

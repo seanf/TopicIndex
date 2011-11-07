@@ -183,13 +183,15 @@
 				attached="false">
 
 				<rich:menuItem value="Add To Temporary List"
-					action="#{topicTagsList.addToTempList}"
+					action="#{temporaryTopicList.addToTempList}"
 					rendered="#{s:hasPermission('ViewAddToTemporaryListContextMenuItem', 'Rendered', null)}">
 					<a4j:actionparam name="actionTopicID"
-						assignTo="#{topicTagsList.actionTopicID}" value="{actionTopicID}" />
+						assignTo="#{temporaryTopicList.actionTopicID}"
+						value="{actionTopicID}" />
 					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
 						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
+					<s:conversationPropagation type="join" />
 				</rich:menuItem>
 
 				<rich:menuItem value="View" action="#{ajaxHelper.getTopicUrl}"
@@ -347,9 +349,10 @@
 			<br />
 
 			<rich:simpleTogglePanel label="Temporary Topic List"
-				switchType="client" opened="#{not empty topicTagsList.tempList}"
-				rendered="#{not empty topicTagsList.tempList}">
-				<rich:dataTable value="#{topicTagsList.tempList}" var="topic"
+				switchType="client"
+				opened="#{not empty temporaryTopicList.tempList}"
+				rendered="#{not empty temporaryTopicList.tempList}">
+				<rich:dataTable value="#{temporaryTopicList.tempList}" var="topic"
 					id="tempListTable">
 					<rich:column>
 						<f:facet name="header">
@@ -369,7 +372,7 @@
 						</f:facet>
 						<h:form>
 							<h:commandLink value="Remove"
-								action="#{topicTagsList.removeFromTempList(topic.topicId)}" />
+								action="#{temporaryTopicList.removeFromTempList(topic.topicId)}" />
 						</h:form>
 					</rich:column>
 				</rich:dataTable>
@@ -380,7 +383,7 @@
 					<s:link id="topicTagsViewTempList" value="View Temporary List"
 						action="CustomSearchTopicList.xhtml" propagation="none">
 						<f:param name="topicIds"
-							value="#{topicTagsList.tempTopicListURLParam}" />
+							value="#{temporaryTopicList.tempTopicListURLParam}" />
 						<f:param name="firstResult" value="0" />
 					</s:link>
 					#{' '}
@@ -389,7 +392,7 @@
 						action="CustomSearchTopicList.xhtml" target="_blank"
 						propagation="none">
 						<f:param name="topicIds"
-							value="#{topicTagsList.tempTopicListURLParam}" />
+							value="#{temporaryTopicList.tempTopicListURLParam}" />
 						<f:param name="firstResult" value="0" />
 					</s:link>
 				</div>
@@ -418,7 +421,7 @@
 						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</s:button>
-				
+
 				<s:button action="#{topicTagsList.downloadXML()}"
 					value="Download XML">
 					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
@@ -714,7 +717,7 @@
 						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 					</c:forEach>
 				</s:button>
-				
+
 				<s:button action="#{topicTagsList.downloadXML()}"
 					value="Download XML">
 					<c:forEach items="#{topicTagsList.filterVars}" var="filtervar">
