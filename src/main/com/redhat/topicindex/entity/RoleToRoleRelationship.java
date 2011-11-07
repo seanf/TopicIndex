@@ -21,7 +21,7 @@ import org.hibernate.validator.Length;
  */
 @Entity
 @Audited
-@Table(name = "RoleToRoleRelationship", catalog = "Skynet")
+@Table(name = "RoleToRoleRelationship")
 public class RoleToRoleRelationship implements java.io.Serializable 
 {
 	private static final long serialVersionUID = -5070074888185753060L;

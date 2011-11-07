@@ -34,7 +34,7 @@ import com.redhat.topicindex.sort.TagToCategorySortingComparator;
 
 @Entity
 @Audited
-@Table(name = "Category", catalog = "Skynet", uniqueConstraints = @UniqueConstraint(columnNames =
+@Table(name = "Category", uniqueConstraints = @UniqueConstraint(columnNames =
 { "CategoryName" }))
 public class Category implements java.io.Serializable, Comparable<Category>
 {

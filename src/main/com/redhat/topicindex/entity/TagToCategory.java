@@ -21,7 +21,7 @@ import org.hibernate.validator.NotNull;
  */
 @Entity
 @Audited
-@Table(name = "TagToCategory", catalog = "Skynet", uniqueConstraints = @UniqueConstraint(columnNames = {"TagID", "CategoryID" }))
+@Table(name = "TagToCategory", uniqueConstraints = @UniqueConstraint(columnNames = {"TagID", "CategoryID" }))
 public class TagToCategory implements java.io.Serializable 
 {
 	public static final String SELECT_ALL_QUERY = "select tagToCategory from TagToCategory tagToCategory";

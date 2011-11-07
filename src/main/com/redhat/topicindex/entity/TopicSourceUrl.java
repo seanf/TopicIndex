@@ -32,7 +32,7 @@ import com.redhat.ecs.commonutils.ExceptionUtilities;
  */
 @Entity
 @Audited
-@Table(name = "TopicSourceURL", catalog = "Skynet")
+@Table(name = "TopicSourceURL")
 public class TopicSourceUrl implements java.io.Serializable
 {
 

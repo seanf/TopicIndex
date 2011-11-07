@@ -21,7 +21,7 @@ import com.redhat.topicindex.utils.topicrenderer.TopicRenderer;
 
 @Audited
 @Entity
-@Table(name = "TopicToTopic", catalog = "Skynet", uniqueConstraints = @UniqueConstraint(columnNames =
+@Table(name = "TopicToTopic", uniqueConstraints = @UniqueConstraint(columnNames =
 { "MainTopicID", "RelatedTopicID" }))
 public class TopicToTopic implements java.io.Serializable
 {

@@ -16,7 +16,7 @@ import org.hibernate.validator.NotNull;
 
 @Audited
 @Entity
-@Table(name = "TagToProject", catalog = "Skynet", uniqueConstraints = @UniqueConstraint(columnNames = {
+@Table(name = "TagToProject", uniqueConstraints = @UniqueConstraint(columnNames = {
 		"ProjectID", "TagID" }))
 public class TagToProject implements java.io.Serializable 
 {

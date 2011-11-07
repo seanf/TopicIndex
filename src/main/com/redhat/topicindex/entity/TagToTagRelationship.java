@@ -16,7 +16,7 @@ import org.hibernate.validator.Length;
 
 @Audited
 @Entity
-@Table(name = "TagToTagRelationship", catalog = "Skynet")
+@Table(name = "TagToTagRelationship")
 public class TagToTagRelationship implements java.io.Serializable 
 {
 	private static final long serialVersionUID = 54337112345485162L;

@@ -18,7 +18,7 @@ import org.hibernate.validator.NotNull;
  */
 @Entity
 @Audited
-@Table(name = "StringConstants", catalog = "Skynet")
+@Table(name = "StringConstants")
 public class StringConstants implements java.io.Serializable 
 {
 	private static final long serialVersionUID = -6403239052018430987L;

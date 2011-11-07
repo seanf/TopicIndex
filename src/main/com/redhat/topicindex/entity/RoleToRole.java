@@ -21,7 +21,7 @@ import org.hibernate.validator.NotNull;
  */
 @Entity
 @Audited
-@Table(name = "RoleToRole", catalog = "Skynet", uniqueConstraints = @UniqueConstraint(columnNames = {
+@Table(name = "RoleToRole", uniqueConstraints = @UniqueConstraint(columnNames = {
 		"PrimaryRole", "SecondaryRole", "RelationshipType" }))
 public class RoleToRole implements java.io.Serializable 
 {

@@ -74,7 +74,7 @@ import com.redhat.topicindex.utils.topicrenderer.XMLRenderer;
 @Entity
 @Audited
 @Indexed
-@Table(name = "Topic", catalog = "Skynet")
+@Table(name = "Topic")
 public class Topic implements java.io.Serializable, Comparable<Topic>
 {
 	public static final String SELECT_ALL_QUERY = "select topic from com.redhat.topicindex.entity.Topic as Topic";

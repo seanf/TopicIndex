@@ -21,7 +21,7 @@ import org.hibernate.validator.NotNull;
  */
 @Entity
 @Audited
-@Table(name = "FilterField", catalog = "Skynet")
+@Table(name = "FilterField")
 public class FilterField implements java.io.Serializable 
 {
 	private static final long serialVersionUID = -4542168304657354480L;

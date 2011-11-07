@@ -20,7 +20,7 @@ import org.hibernate.validator.NotNull;
  */
 @Entity
 @Audited
-@Table(name = "FilterTag", catalog = "Skynet")
+@Table(name = "FilterTag")
 public class FilterTag implements java.io.Serializable 
 {
 	private static final long serialVersionUID = -1480119876615559516L;

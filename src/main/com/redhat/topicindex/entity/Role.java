@@ -23,7 +23,7 @@ import org.hibernate.validator.NotNull;
 
 @Entity
 @Audited
-@Table(name = "Role", catalog = "Skynet", uniqueConstraints = @UniqueConstraint(columnNames =
+@Table(name = "Role", uniqueConstraints = @UniqueConstraint(columnNames =
 { "RoleName" }))
 public class Role implements java.io.Serializable
 {

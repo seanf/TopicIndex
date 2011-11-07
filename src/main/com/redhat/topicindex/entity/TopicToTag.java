@@ -20,7 +20,7 @@ import org.hibernate.validator.NotNull;
  */
 @Entity
 @Audited
-@Table(name = "TopicToTag", catalog = "Skynet", uniqueConstraints = @UniqueConstraint(columnNames = {"TopicID", "TagID"}))
+@Table(name = "TopicToTag", uniqueConstraints = @UniqueConstraint(columnNames = {"TopicID", "TagID"}))
 public class TopicToTag implements java.io.Serializable 
 {
 	private static final long serialVersionUID = -7516063608506037594L;

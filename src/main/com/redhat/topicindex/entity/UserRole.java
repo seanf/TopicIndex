@@ -20,7 +20,7 @@ import org.hibernate.validator.NotNull;
  */
 @Entity
 @Audited
-@Table(name = "UserRole", catalog = "Skynet")
+@Table(name = "UserRole")
 public class UserRole implements java.io.Serializable
 {
 

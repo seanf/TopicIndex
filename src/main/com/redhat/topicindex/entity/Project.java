@@ -28,7 +28,7 @@ import com.redhat.topicindex.utils.structures.NameIDSortMap;
 
 @Audited
 @Entity
-@Table(name = "Project", catalog = "Skynet")
+@Table(name = "Project")
 public class Project implements java.io.Serializable 
 {
 	public static final String SELECT_ALL_QUERY = "select project from Project project";

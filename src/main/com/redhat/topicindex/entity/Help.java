@@ -17,7 +17,7 @@ import org.hibernate.validator.Length;
  */
 @Entity
 @Audited
-@Table(name = "Help", catalog = "Skynet")
+@Table(name = "Help")
 public class Help implements java.io.Serializable 
 {
 	private static final long serialVersionUID = 8247134318338564478L;

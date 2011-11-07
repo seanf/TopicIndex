@@ -31,7 +31,7 @@ import com.redhat.topicindex.utils.SVGIcon;
 
 @Entity
 @Audited
-@Table(name = "ImageFile", catalog = "Skynet")
+@Table(name = "ImageFile")
 public class ImageFile implements java.io.Serializable
 {
 	private static String SVG_MIME_TYPE = "image/svg+xml";

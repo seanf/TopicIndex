@@ -48,7 +48,7 @@ import com.redhat.topicindex.utils.structures.tags.UITagData;
  */
 @Entity
 @Audited
-@Table(name = "Filter", catalog = "Skynet", uniqueConstraints = @UniqueConstraint(columnNames =
+@Table(name = "Filter", uniqueConstraints = @UniqueConstraint(columnNames =
 { "FilterName" }))
 public class Filter implements java.io.Serializable
 {

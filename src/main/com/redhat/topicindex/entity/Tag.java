@@ -41,7 +41,7 @@ import com.redhat.topicindex.sort.CategoryIDComparator;
 
 @Entity
 @Audited
-@Table(name = "Tag", catalog = "Skynet", uniqueConstraints = @UniqueConstraint(columnNames = {"TagName" })) 
+@Table(name = "Tag", uniqueConstraints = @UniqueConstraint(columnNames = {"TagName" })) 
 public class Tag implements java.io.Serializable
 {
 	public static final String SELECT_ALL_QUERY = "select tag from Tag tag";
@@ -267,7 +267,7 @@ public class Tag implements java.io.Serializable
 	}
 
 	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "TagExclusion", catalog = "Skynet", joinColumns =
+	@JoinTable(name = "TagExclusion", joinColumns =
 	{ @JoinColumn(name = "Tag1ID", nullable = false, updatable = false) }, inverseJoinColumns =
 	{ @JoinColumn(name = "Tag2ID", nullable = false, updatable = false) })
 	public Set<Tag> getExcludedTags()

@@ -21,7 +21,7 @@ import org.hibernate.validator.NotNull;
  */
 @Entity
 @Audited
-@Table(name = "TopicToTopicSourceURL", catalog = "Skynet", uniqueConstraints = @UniqueConstraint(columnNames = {
+@Table(name = "TopicToTopicSourceURL", uniqueConstraints = @UniqueConstraint(columnNames = {
 		"TopicID", "TopicSourceURLID" }))
 public class TopicToTopicSourceUrl implements java.io.Serializable 
 {
