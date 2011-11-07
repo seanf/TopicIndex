@@ -22,7 +22,7 @@ public class Constants
 	/** The encoding of the XML, used when converting a DOM object to a string */
 	public static final String XML_ENCODING = "UTF-8";
 	
-	public static final String XSL_ERROR_TEMPLATE = "<html><head><title>ERROR</title></head><body>The topic could not be transformed into XML</body></html>";
+	public static final String XSL_ERROR_TEMPLATE = "<html><head><title>ERROR</title></head><body>The topic could not be transformed into HTML</body></html>";
 	
 	public static final String TOPIC_XREF_PREFIX = "TopicID";
 	public static final int HOME_LANDING_PAGE_TOPIC_ID = -1;
