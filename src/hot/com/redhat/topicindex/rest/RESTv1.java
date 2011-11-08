@@ -104,11 +104,11 @@ public class RESTv1
 				.add(AuditEntity.revisionProperty("timestamp").ge(date.getTime()))
 				.add(AuditEntity.revisionProperty("timestamp").maximize());				
 			
-			final List<Topic> result = query.getResultList();
+			final List<U> result = query.getResultList();
 			
 			transactionManager.commit();
 			
-			final BaseRestCollectionV1<T> retValue = null;// = new RESTDataObjectCollectionFactory<T, U>().create(dataObjectFactory, result, expandName, dataType, new ExpandData(expand), getBaseUrl());
+			final BaseRestCollectionV1<T> retValue = new RESTDataObjectCollectionFactory<T, U>().create(dataObjectFactory, result, expandName, dataType, new ExpandData(expand), getBaseUrl());
 			
 			return retValue;
 		}
