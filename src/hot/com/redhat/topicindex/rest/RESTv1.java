@@ -75,6 +75,7 @@ public class RESTv1
 		assert date != null : "The date parameter can not be null";
 		
 		EntityManager entityManager = null;
+		TransactionManager transactionManager = null;
 		
 		try
 		{
@@ -84,24 +85,46 @@ public class RESTv1
 			if (entityManagerFactory == null)
 				throw new InternalServerErrorException("Could not find the EntityManagerFactory");
 			
+			transactionManager = (TransactionManager) initCtx.lookup("java:jboss/TransactionManager");
+			if (transactionManager == null)
+				throw new InternalServerErrorException("Could not find the TransactionManager");
+			
+			assert transactionManager != null : "transactionManager should not be null";
+			assert entityManagerFactory != null : "entityManagerFactory should not be null";
+			
+			transactionManager.begin();
+			
 			entityManager = entityManagerFactory.createEntityManager();
 			if (entityManager == null)
 				throw new InternalServerErrorException("Could not create an EntityManager");
 			
 			final AuditReader reader = AuditReaderFactory.get(entityManager);
 			final AuditQuery query = reader.createQuery()
-				.forRevisionsOfEntity(type, false, true)
-				.add(AuditEntity.revisionProperty("timestamp").ge(date));
+				.forRevisionsOfEntity(type, true, false)
+				.add(AuditEntity.revisionProperty("timestamp").ge(date.getTime()))
+				.add(AuditEntity.revisionProperty("timestamp").maximize());				
 			
-			final List<U> result = query.getResultList();
+			final List<Topic> result = query.getResultList();
 			
-			final BaseRestCollectionV1<T> retValue = new RESTDataObjectCollectionFactory<T, U>().create(dataObjectFactory, result, expandName, dataType, new ExpandData(expand), getBaseUrl());
+			transactionManager.commit();
+			
+			final BaseRestCollectionV1<T> retValue = null;// = new RESTDataObjectCollectionFactory<T, U>().create(dataObjectFactory, result, expandName, dataType, new ExpandData(expand), getBaseUrl());
 			
 			return retValue;
 		}
 		catch (final Exception ex)
 		{
 			ExceptionUtilities.handleException(ex);
+		
+			try
+			{
+				transactionManager.rollback();
+			}
+			catch (final Exception ex2)
+			{
+				ExceptionUtilities.handleException(ex2);
+			}
+			
 			throw new InternalServerErrorException("There was an error running the query");
 		}
 		finally
