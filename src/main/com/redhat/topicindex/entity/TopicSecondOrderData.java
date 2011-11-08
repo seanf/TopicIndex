@@ -9,6 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.Length;
@@ -19,8 +20,7 @@ import org.hibernate.validator.Length;
 public class TopicSecondOrderData implements java.io.Serializable
 {
 	private static final long serialVersionUID = 3393132758855818345L;
-	private Integer topicSecondOrderDataID;
-	private Topic topic;
+	private Integer topicId;
 	private String topicHTMLView;
 	private String topicXMLErrors;
 	
@@ -28,34 +28,21 @@ public class TopicSecondOrderData implements java.io.Serializable
 	{
 	}
 	
-	public TopicSecondOrderData(final Topic topic)
+	public TopicSecondOrderData(final Integer topicId)
 	{
-		this.topic = topic;
+		this.topicId = topicId;
 	}
 	
 	@Id
-	@GeneratedValue(strategy = IDENTITY)
-	@Column(name = "TopicSecondOrderDataID", unique = true, nullable = false)
-	public Integer getTopicSecondOrderDataID()
+	@Column(name = "TopicID")
+    public Integer getTopicID()
 	{
-		return this.topicSecondOrderDataID;
-	}
-
-	public void setTopicSecondOrderDataID(final Integer topicSecondOrderDataID)
-	{
-		this.topicSecondOrderDataID = topicSecondOrderDataID;
+		return this.topicId;
 	}
 	
-	@OneToOne
-	@JoinColumn(name="TopicID")
-    public Topic getTopic()
+	public void setTopicID(final Integer topicId)
 	{
-		return this.topic;
-	}
-	
-	public void setTopic(final Topic topic)
-	{
-		this.topic = topic;
+		this.topicId = topicId;
 	}
 	
 	// @Column(name = "TopicHTMLView", length = 65535)

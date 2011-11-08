@@ -33,6 +33,7 @@ import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -42,6 +43,8 @@ import javax.transaction.TransactionManager;
 
 import net.htmlparser.jericho.Source;
 
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
 import org.hibernate.envers.Audited;
@@ -792,7 +795,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		if (topicSecondOrderData == null)
 		{
 			topicSecondOrderData = new TopicSecondOrderData();
-			topicSecondOrderData.setTopic(this);
+			topicSecondOrderData.setTopicID(this.topicId);
 		}
 		
 		this.topicSecondOrderData.setTopicHTMLView(TopicRenderer.renderXML(entityManager, this));
@@ -1239,7 +1242,9 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		this.rerenderRelatedTopics = rerenderRelatedTopics;
 	}
 
-	@OneToOne(mappedBy="topic")
+	@OneToOne(cascade = CascadeType.ALL, optional = true, fetch = FetchType.EAGER, orphanRemoval = true)
+	@NotFound(action=NotFoundAction.IGNORE)
+	@PrimaryKeyJoinColumn
 	public TopicSecondOrderData getTopicSecondOrderData()
 	{
 		return topicSecondOrderData;
@@ -1263,7 +1268,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		if (this.topicSecondOrderData == null)
 		{
 			this.topicSecondOrderData = new TopicSecondOrderData();
-			this.topicSecondOrderData.setTopic(this);
+			this.topicSecondOrderData.setTopicID(this.topicId);
 		}
 		
 		this.topicSecondOrderData.setTopicHTMLView(value);
