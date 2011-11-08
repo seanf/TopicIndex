@@ -3,7 +3,6 @@ package com.redhat.topicindex.rest;
 import java.util.Date;
 import java.util.List;
 
-import javax.faces.context.FacesContext;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.persistence.EntityManager;
@@ -11,15 +10,12 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.transaction.TransactionManager;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Property;
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
 import org.hibernate.envers.query.AuditEntity;
@@ -106,7 +102,7 @@ public class RESTv1
 				.forRevisionsOfEntity(type, true, false)
 				.addOrder(AuditEntity.revisionProperty("timestamp").desc())
 				.add(AuditEntity.revisionProperty("timestamp").ge(date.getTime()))
-				.addProjection(AuditEntity.property(idProperty).distinct());
+				.addProjection(AuditEntity.property("originalId." + idProperty).distinct());
 			
 			final List entityyIds = query.getResultList();
 			
