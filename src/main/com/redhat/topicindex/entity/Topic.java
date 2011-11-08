@@ -43,6 +43,7 @@ import net.htmlparser.jericho.Source;
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
 import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
@@ -513,6 +514,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	// @Column(name = "TopicRendered", length = 65535)
 	@Column(name = "TopicRendered", columnDefinition = "TEXT")
 	@Length(max = 65535)
+	@NotAudited
 	public String getTopicRendered()
 	{
 		return this.topicRendered;
