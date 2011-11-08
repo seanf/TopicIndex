@@ -1,5 +1,6 @@
 package com.redhat.topicindex.rest;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.ws.rs.Consumes;
@@ -10,6 +11,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.PathSegment;
+
+import org.joda.time.DateTime;
 
 import com.redhat.topicindex.entity.Category;
 import com.redhat.topicindex.entity.Project;
@@ -64,9 +67,18 @@ public class TopicRESTv1 extends RESTv1 implements RESTInterfaceV1
 	@Path("/topics/get/json/editedSince")	
 	@Produces("application/json")
 	@Consumes({"*"})
-	public BaseRestCollectionV1<TopicV1> getJSONTopicsFromHistory(@QueryParam("date") @DateFormat("dd-MMM-yyyy") final Date date, @QueryParam("expand") final String expand)
+	public BaseRestCollectionV1<TopicV1> getJSONTopicsEditedSince(@QueryParam("date") @DateFormat("dd-MMM-yyyy") final Date date, @QueryParam("expand") final String expand)
 	{
 		return getJSONEntitiesUpdatedSince(Topic.class, "topicId", new TopicV1Factory(), TOPICS_EXPANSION_NAME, expand, date);
+	}
+	
+	@GET
+	@Path("/topics/get/json/editedInLast")	
+	@Produces("application/json")
+	@Consumes({"*"})
+	public BaseRestCollectionV1<TopicV1> getJSONTopicsEditedInLast(@QueryParam("days") final int days, @QueryParam("expand") final String expand)
+	{
+		return getJSONEntitiesUpdatedSince(Topic.class, "topicId", new TopicV1Factory(), TOPICS_EXPANSION_NAME, expand, new DateTime().minusDays(days).toDate());
 	}	
 	
 	@GET

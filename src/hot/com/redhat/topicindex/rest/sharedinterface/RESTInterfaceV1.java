@@ -38,7 +38,7 @@ public interface RESTInterfaceV1
 	@Path("/topics/get/json/editedSince")	
 	@Produces("application/json")
 	@Consumes({"*"})
-	public BaseRestCollectionV1<TopicV1> getJSONTopicsFromHistory(@QueryParam("date") @DateFormat("dd-MMM-yyyy") final Date date, @QueryParam("expand") final String expand);
+	public BaseRestCollectionV1<TopicV1> getJSONTopicsEditedSince(@QueryParam("date") @DateFormat("dd-MMM-yyyy") final Date date, @QueryParam("expand") final String expand);
 	
 	@GET
 	@Path("/topics/get/json/{query}")	
