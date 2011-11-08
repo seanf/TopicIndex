@@ -27,6 +27,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
 import javax.persistence.PrePersist;
@@ -121,7 +122,6 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 
 	private String topicAddedBy;
 	private Integer topicId;
-	private String topicRendered;
 	private String topicText;
 	private Date topicTimeStamp;
 	private String topicTitle;
@@ -130,6 +130,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	private Set<TopicToTopic> childTopicToTopics = new HashSet<TopicToTopic>(0);
 	private Set<TopicToTopicSourceUrl> topicToTopicSourceUrls = new HashSet<TopicToTopicSourceUrl>(0);
 	private String topicXML;
+	private TopicSecondOrderData topicSecondOrderData;
 
 	/*
 	 * While processing a topic for inclusion in the final output we need some
@@ -511,15 +512,6 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		return this.topicId;
 	}
 
-	// @Column(name = "TopicRendered", length = 65535)
-	@Column(name = "TopicRendered", columnDefinition = "TEXT")
-	@Length(max = 65535)
-	@NotAudited
-	public String getTopicRendered()
-	{
-		return this.topicRendered;
-	}
-
 	// @Column(name = "TopicText", length = 65535)
 	@Column(name = "TopicText", columnDefinition = "TEXT")
 	@Length(max = 65535)
@@ -691,11 +683,6 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		this.topicId = topicId;
 	}
 
-	public void setTopicRendered(final String topicRendered)
-	{
-		this.topicRendered = topicRendered;
-	}
-
 	public void setTopicText(final String topicText)
 	{
 		this.topicText = topicText;
@@ -801,7 +788,13 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 
 	public void renderXML(final EntityManager entityManager)
 	{
-		this.topicRendered = TopicRenderer.renderXML(entityManager, this);
+		if (topicSecondOrderData == null)
+		{
+			topicSecondOrderData = new TopicSecondOrderData();
+			topicSecondOrderData.setTopic(this);
+		}
+		
+		this.topicSecondOrderData.setTopicHTMLView(TopicRenderer.renderXML(entityManager, this));
 	}
 
 	private void validateRelationships()
@@ -1243,5 +1236,35 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	public void setRerenderRelatedTopics(boolean rerenderRelatedTopics)
 	{
 		this.rerenderRelatedTopics = rerenderRelatedTopics;
+	}
+
+	@OneToOne
+	public TopicSecondOrderData getTopicSecondOrderData()
+	{
+		return topicSecondOrderData;
+	}
+
+	public void setTopicSecondOrderData(TopicSecondOrderData topicSecondOrderData)
+	{
+		this.topicSecondOrderData = topicSecondOrderData;
+	}
+	
+	@Transient 
+	public String getTopicRendered()
+	{
+		if (this.topicSecondOrderData == null)
+			return null;
+		return topicSecondOrderData.getTopicHTMLView();
+	}
+	
+	public void setTopicRendered(final String value)
+	{
+		if (this.topicSecondOrderData == null)
+		{
+			this.topicSecondOrderData = new TopicSecondOrderData();
+			this.topicSecondOrderData.setTopic(this);
+		}
+		
+		this.topicSecondOrderData.setTopicHTMLView(value);
 	}
 }

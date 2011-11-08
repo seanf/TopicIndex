@@ -35,11 +35,7 @@ import com.redhat.ecs.commonutils.ExceptionUtilities;
 @Table(name = "TopicSourceURL")
 public class TopicSourceUrl implements java.io.Serializable
 {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1923828486173137768L;
 	private Integer topicSourceUrlid;
 	private String sourceUrl;
 	private String title;
