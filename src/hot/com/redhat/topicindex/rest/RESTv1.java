@@ -18,6 +18,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Property;
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
 import org.hibernate.envers.query.AuditEntity;
@@ -65,12 +67,12 @@ public class RESTv1
 		return null;
 	}
 	
-	protected <T, U> BaseRestCollectionV1<T> getJSONEntitiesUpdatedSince(final Class<U> type, final RESTDataObjectFactory<T, U> dataObjectFactory, final String expandName, final String expand, final Date date)
+	protected <T, U> BaseRestCollectionV1<T> getJSONEntitiesUpdatedSince(final Class<U> type, final String idProperty, final RESTDataObjectFactory<T, U> dataObjectFactory, final String expandName, final String expand, final Date date)
 	{
-		return getEntitiesUpdatedSince(type, dataObjectFactory, expandName, expand, JSON_URL, date);
+		return getEntitiesUpdatedSince(type, idProperty, dataObjectFactory, expandName, expand, JSON_URL, date);
 	}
 	
-	protected <T, U> BaseRestCollectionV1<T> getEntitiesUpdatedSince(final Class<U> type, final RESTDataObjectFactory<T, U> dataObjectFactory, final String expandName, final String expand, final String dataType, final Date date)
+	protected <T, U> BaseRestCollectionV1<T> getEntitiesUpdatedSince(final Class<U> type, final String idProperty, final RESTDataObjectFactory<T, U> dataObjectFactory, final String expandName, final String expand, final String dataType, final Date date)
 	{
 		assert date != null : "The date parameter can not be null";
 		
@@ -98,17 +100,29 @@ public class RESTv1
 			if (entityManager == null)
 				throw new InternalServerErrorException("Could not create an EntityManager");
 			
+			/* get the list of topic ids that were edited after the selected date */
 			final AuditReader reader = AuditReaderFactory.get(entityManager);
 			final AuditQuery query = reader.createQuery()
 				.forRevisionsOfEntity(type, true, false)
+				.addOrder(AuditEntity.revisionProperty("timestamp").desc())
 				.add(AuditEntity.revisionProperty("timestamp").ge(date.getTime()))
-				.add(AuditEntity.revisionProperty("timestamp").maximize());				
+				.addProjection(AuditEntity.property(idProperty).distinct());
 			
-			final List<U> result = query.getResultList();
+			final List entityyIds = query.getResultList();
+			
+			/* now get the topics */
+			final CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();			
+			final CriteriaQuery<U> criteriaQuery = criteriaBuilder.createQuery(type);
+			final Root<U> root = criteriaQuery.from(type);
+			criteriaQuery.where(root.get(idProperty).in(entityyIds));
+			
+			final TypedQuery<U> jpaQuery = entityManager.createQuery(criteriaQuery);
+			
+			final List<U> entities = jpaQuery.getResultList();
 			
 			transactionManager.commit();
 			
-			final BaseRestCollectionV1<T> retValue = new RESTDataObjectCollectionFactory<T, U>().create(dataObjectFactory, result, expandName, dataType, new ExpandData(expand), getBaseUrl());
+			final BaseRestCollectionV1<T> retValue = new RESTDataObjectCollectionFactory<T, U>().create(dataObjectFactory, entities, expandName, dataType, new ExpandData(expand), getBaseUrl());
 			
 			return retValue;
 		}

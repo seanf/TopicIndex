@@ -66,7 +66,7 @@ public class TopicRESTv1 extends RESTv1 implements RESTInterfaceV1
 	@Consumes({"*"})
 	public BaseRestCollectionV1<TopicV1> getJSONTopicsFromHistory(@QueryParam("date") @DateFormat("dd-MMM-yyyy") final Date date, @QueryParam("expand") final String expand)
 	{
-		return getJSONEntitiesUpdatedSince(Topic.class, new TopicV1Factory(), TOPICS_EXPANSION_NAME, expand, date);
+		return getJSONEntitiesUpdatedSince(Topic.class, "topicId", new TopicV1Factory(), TOPICS_EXPANSION_NAME, expand, date);
 	}	
 	
 	@GET
