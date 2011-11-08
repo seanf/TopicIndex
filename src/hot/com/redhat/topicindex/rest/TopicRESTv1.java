@@ -1,5 +1,7 @@
 package com.redhat.topicindex.rest;
 
+import java.util.Date;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -22,6 +24,7 @@ import com.redhat.topicindex.rest.factory.CategoryV1Factory;
 import com.redhat.topicindex.rest.factory.ProjectV1Factory;
 import com.redhat.topicindex.rest.factory.TagV1Factory;
 import com.redhat.topicindex.rest.factory.TopicV1Factory;
+import com.redhat.topicindex.rest.formatter.DateFormat;
 import com.redhat.topicindex.rest.sharedinterface.RESTInterfaceV1;
 import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.topicrenderer.TopicRenderer;
@@ -56,6 +59,15 @@ public class TopicRESTv1 extends RESTv1 implements RESTInterfaceV1
 	{
 		return getJSONTopicsFromQuery(query.getMatrixParameters(), new TopicV1Factory(), TOPICS_EXPANSION_NAME, expand);
 	}
+	
+	@GET
+	@Path("/topics/get/json/editedSince")	
+	@Produces("application/json")
+	@Consumes({"*"})
+	public BaseRestCollectionV1<TopicV1> getJSONTopicsFromHistory(@QueryParam("date") @DateFormat("dd-MMM-yyyy") final Date date, @QueryParam("expand") final String expand)
+	{
+		return getJSONEntitiesUpdatedSince(Topic.class, new TopicV1Factory(), TOPICS_EXPANSION_NAME, expand, date);
+	}	
 	
 	@GET
 	@Path("/topics/get/xml/all")	

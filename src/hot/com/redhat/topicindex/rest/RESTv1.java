@@ -1,5 +1,6 @@
 package com.redhat.topicindex.rest;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.faces.context.FacesContext;
@@ -17,6 +18,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
+import org.hibernate.envers.AuditReader;
+import org.hibernate.envers.AuditReaderFactory;
+import org.hibernate.envers.query.AuditEntity;
+import org.hibernate.envers.query.AuditQuery;
 import org.jboss.resteasy.spi.BadRequestException;
 import org.jboss.resteasy.spi.Failure;
 import org.jboss.resteasy.spi.InternalServerErrorException;
@@ -58,6 +63,53 @@ public class RESTv1
 			return fullPath.substring(0, index + Constants.BASE_REST_PATH.length());
 
 		return null;
+	}
+	
+	protected <T, U> BaseRestCollectionV1<T> getJSONEntitiesUpdatedSince(final Class<U> type, final RESTDataObjectFactory<T, U> dataObjectFactory, final String expandName, final String expand, final Date date)
+	{
+		return getEntitiesUpdatedSince(type, dataObjectFactory, expandName, expand, JSON_URL, date);
+	}
+	
+	protected <T, U> BaseRestCollectionV1<T> getEntitiesUpdatedSince(final Class<U> type, final RESTDataObjectFactory<T, U> dataObjectFactory, final String expandName, final String expand, final String dataType, final Date date)
+	{
+		assert date != null : "The date parameter can not be null";
+		
+		EntityManager entityManager = null;
+		
+		try
+		{
+			final InitialContext initCtx = new InitialContext();
+
+			final EntityManagerFactory entityManagerFactory = (EntityManagerFactory) initCtx.lookup("java:jboss/EntityManagerFactory");
+			if (entityManagerFactory == null)
+				throw new InternalServerErrorException("Could not find the EntityManagerFactory");
+			
+			entityManager = entityManagerFactory.createEntityManager();
+			if (entityManager == null)
+				throw new InternalServerErrorException("Could not create an EntityManager");
+			
+			final AuditReader reader = AuditReaderFactory.get(entityManager);
+			final AuditQuery query = reader.createQuery()
+				.forRevisionsOfEntity(type, false, true)
+				.add(AuditEntity.revisionProperty("timestamp").ge(date));
+			
+			final List<U> result = query.getResultList();
+			
+			final BaseRestCollectionV1<T> retValue = new RESTDataObjectCollectionFactory<T, U>().create(dataObjectFactory, result, expandName, dataType, new ExpandData(expand), getBaseUrl());
+			
+			return retValue;
+		}
+		catch (final Exception ex)
+		{
+			ExceptionUtilities.handleException(ex);
+			throw new InternalServerErrorException("There was an error running the query");
+		}
+		finally
+		{
+			if (entityManager != null)
+				entityManager.close();
+		}
+		
 	}
 	
 	protected <T, U> void updateEntity(final Class<U> type, final T dataObject, final RESTDataObjectFactory<T, U> factory, final Object id)

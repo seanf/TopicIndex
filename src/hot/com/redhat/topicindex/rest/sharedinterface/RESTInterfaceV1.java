@@ -1,5 +1,7 @@
 package com.redhat.topicindex.rest.sharedinterface;
 
+import java.util.Date;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -14,6 +16,7 @@ import com.redhat.topicindex.rest.entities.CategoryV1;
 import com.redhat.topicindex.rest.entities.ProjectV1;
 import com.redhat.topicindex.rest.entities.TagV1;
 import com.redhat.topicindex.rest.entities.TopicV1;
+import com.redhat.topicindex.rest.formatter.DateFormat;
 
 @Path("/1")
 public interface RESTInterfaceV1
@@ -30,6 +33,12 @@ public interface RESTInterfaceV1
 	@Produces("application/json")
 	@Consumes({"*"})
 	public BaseRestCollectionV1<TopicV1> getJSONTopics(@QueryParam("expand") final String expand);
+	
+	@GET
+	@Path("/topics/get/json/editedSince")	
+	@Produces("application/json")
+	@Consumes({"*"})
+	public BaseRestCollectionV1<TopicV1> getJSONTopicsFromHistory(@QueryParam("date") @DateFormat("dd-MMM-yyyy") final Date date, @QueryParam("expand") final String expand);
 	
 	@GET
 	@Path("/topics/get/json/{query}")	
