@@ -26,6 +26,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PostPersist;
@@ -1238,7 +1239,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		this.rerenderRelatedTopics = rerenderRelatedTopics;
 	}
 
-	@OneToOne
+	@OneToOne(mappedBy="topic")
 	public TopicSecondOrderData getTopicSecondOrderData()
 	{
 		return topicSecondOrderData;
@@ -1249,7 +1250,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		this.topicSecondOrderData = topicSecondOrderData;
 	}
 	
-	@Transient 
+	@Transient
 	public String getTopicRendered()
 	{
 		if (this.topicSecondOrderData == null)

@@ -6,20 +6,21 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.Length;
 
 @Audited
 @Entity
-@Table(name = "TopicSecondOrderData", uniqueConstraints = @UniqueConstraint(columnNames = { "TopicID" }))
-public class TopicSecondOrderData
+@Table(name = "TopicSecondOrderData")
+public class TopicSecondOrderData implements java.io.Serializable
 {
-	private Topic topic;
+	private static final long serialVersionUID = 3393132758855818345L;
 	private Integer topicSecondOrderDataID;
+	private Topic topic;
 	private String topicHTMLView;
 	private String topicXMLErrors;
 	
@@ -27,10 +28,9 @@ public class TopicSecondOrderData
 	{
 	}
 	
-	public TopicSecondOrderData(final Topic topic, final Integer topicSecondOrderDataID)
+	public TopicSecondOrderData(final Topic topic)
 	{
 		this.topic = topic;
-		this.topicSecondOrderDataID = topicSecondOrderDataID;
 	}
 	
 	@Id
@@ -46,7 +46,8 @@ public class TopicSecondOrderData
 		this.topicSecondOrderDataID = topicSecondOrderDataID;
 	}
 	
-	@OneToOne(mappedBy="TopicID")
+	@OneToOne
+	@JoinColumn(name="TopicID")
     public Topic getTopic()
 	{
 		return this.topic;
