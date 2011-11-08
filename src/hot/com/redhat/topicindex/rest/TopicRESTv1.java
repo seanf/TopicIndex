@@ -82,7 +82,7 @@ public class TopicRESTv1 extends RESTv1 implements RESTInterfaceV1
 	}	
 	
 	@GET
-	@Path("/topics/get/xml/all")	
+	@Path("/topics/get/xml/all")
 	@Produces("application/xml")
 	@Consumes({"*"})
 	public BaseRestCollectionV1<TopicV1> getXMLTopics(@QueryParam("expand") final String expand)

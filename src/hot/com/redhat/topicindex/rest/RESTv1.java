@@ -100,7 +100,7 @@ public class RESTv1
 			final AuditReader reader = AuditReaderFactory.get(entityManager);
 			final AuditQuery query = reader.createQuery()
 				.forRevisionsOfEntity(type, true, false)
-				.addOrder(AuditEntity.revisionProperty("timestamp").desc())
+				.addOrder(AuditEntity.revisionProperty("timestamp").asc())
 				.add(AuditEntity.revisionProperty("timestamp").ge(date.getTime()))
 				.addProjection(AuditEntity.property("originalId." + idProperty).distinct());
 			
