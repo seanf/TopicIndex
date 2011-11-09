@@ -39,6 +39,7 @@ public class TopicFilter
 	private Integer minimumIncomingRelationshipCount;
 	private String topicTextSearch;
 	private Boolean hasXMLErrors;
+	private Integer minXMLErrorLength;
 
 	public List<Integer> getRelatedTopicIDs()
 	{
@@ -512,17 +513,18 @@ public class TopicFilter
 	public void setHasXMLErrors(final Boolean hasXMLErrors)
 	{
 		this.hasXMLErrors = hasXMLErrors;
+		this.minXMLErrorLength = this.hasXMLErrors == null ? null : this.hasXMLErrors.equals(Boolean.TRUE) ? 1 : null;
 	}
 	
 	public void setHasXMLErrorsString(final String hasXMLErrors)
 	{
 		try
 		{
-			this.hasXMLErrors = hasXMLErrors == null ? null : Boolean.parseBoolean(hasXMLErrors);
+			this.setHasXMLErrors(hasXMLErrors == null ? null : Boolean.parseBoolean(hasXMLErrors));
 		}
 		catch(final Exception ex)
 		{
-			this.hasXMLErrors = null;
+			this.setHasXMLErrors(null);
 			ExceptionUtilities.handleException(ex);
 		}
 	}
@@ -530,6 +532,16 @@ public class TopicFilter
 	public String getHasXMLErrorsString()
 	{
 		return this.hasXMLErrors == null ? null : this.hasXMLErrors.toString(); 
+	}
+
+	public Integer getMinXMLErrorLength()
+	{
+		return minXMLErrorLength;
+	}
+
+	public void setMinXMLErrorLength(final Integer minXMLErrorLength)
+	{
+		this.minXMLErrorLength = minXMLErrorLength;
 	}
 
 

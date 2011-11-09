@@ -18,4 +18,5 @@
  <param name="topicRelatedFrom" value="#{topicTagsList.topic.topicRelatedFrom}"/>
  <param name="topicXml" value="#{topicTagsList.topic.topicXML}"/>
  <param name="topicTextSearch" value="#{topicTagsList.topic.topicTextSearch}"/>
+ <param name="topicHasXMLErrors" value="#{topicTagsList.topic.hasXMLErrors}"/>
 </page>

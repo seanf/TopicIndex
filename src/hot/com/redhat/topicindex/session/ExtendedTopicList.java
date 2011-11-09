@@ -37,7 +37,7 @@ public class ExtendedTopicList extends TopicList
 			"topic.topicId in (#{" + BEAN_NAME_MARKER + ".topic.relatedTopicIDs})", 
 			"topic.topicId in (#{" + BEAN_NAME_MARKER + ".topic.incomingRelatedTopicIDs})",
 			"topic.topicId in (#{" + BEAN_NAME_MARKER + ".topic.topicTextSearchIDs})",
-			"topic.topicSecondOrderData.topicXMLErrors is not null = #{" + BEAN_NAME_MARKER + ".topic.hasXMLErrors}"
+			"length(topic.topicSecondOrderData.topicXMLErrors) >= #{" + BEAN_NAME_MARKER + ".topic.minXMLErrorLength}"
 
 	};
 
