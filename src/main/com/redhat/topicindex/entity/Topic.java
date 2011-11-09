@@ -246,9 +246,9 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 			if (!topicToTopic.getRelatedTopic().isRelatedTo(this))
 				retValue.add(topicToTopic.getRelatedTopic());
 		}
-		
+
 		Collections.sort(retValue, new TopicIDComparator());
-		
+
 		return retValue;
 	}
 
@@ -259,9 +259,9 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		for (final TopicToTopic topicToTopic : this.getParentTopicToTopics())
 			if (topicToTopic.getRelatedTopic().isRelatedTo(this))
 				retValue.add(topicToTopic.getRelatedTopic());
-		
+
 		Collections.sort(retValue, new TopicIDComparator());
-		
+
 		return retValue;
 	}
 
@@ -272,9 +272,9 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		for (final TopicToTopic topicToTopic : this.getChildTopicToTopics())
 			if (!this.isRelatedTo(topicToTopic.getMainTopic()))
 				retValue.add(topicToTopic.getMainTopic());
-		
+
 		Collections.sort(retValue, new TopicIDComparator());
-		
+
 		return retValue;
 	}
 
@@ -611,13 +611,13 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		for (final TopicToTopic topicToTopic : this.getParentTopicToTopics())
 		{
 			final Topic relatedTopic = topicToTopic.getRelatedTopic();
-			
+
 			if (relatedTopic.getTopicId().equals(relatedTopicId))
 			{
 				/* remove the relationship from this topic */
 				this.getParentTopicToTopics().remove(topicToTopic);
 
-				/* now remove the relationship from the other topic */	
+				/* now remove the relationship from the other topic */
 				for (final TopicToTopic childTopicToTopic : relatedTopic.getChildTopicToTopics())
 				{
 					if (childTopicToTopic.getMainTopic().equals(this))
@@ -664,13 +664,13 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	{
 		validate();
 	}
-	
+
 	@PostUpdate
 	private void onPostUpdate()
 	{
 		renderTopics();
 	}
-	
+
 	@PostPersist
 	private void onPostPersist()
 	{
@@ -762,15 +762,15 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	{
 		if (!isRerenderRelatedTopics())
 			return;
-		
-		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");		
+
+		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 
 		try
 		{
 			final InitialContext initCtx = new InitialContext();
 			final TransactionManager transactionManager = (TransactionManager) initCtx.lookup("java:jboss/TransactionManager");
 			final Transaction transaction = transactionManager.getTransaction();
-			
+
 			WorkQueue.getInstance().execute(TopicRenderer.createNewInstance(this.getTopicId(), transaction));
 
 			/*
@@ -797,7 +797,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 			topicSecondOrderData = new TopicSecondOrderData();
 			topicSecondOrderData.setTopicID(this.topicId);
 		}
-		
+
 		this.topicSecondOrderData.setTopicHTMLView(TopicRenderer.renderXML(entityManager, this));
 	}
 
@@ -932,7 +932,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 			final Tag tag = topicToTag.getTag();
 			retValue.add(tag);
 		}
-		
+
 		Collections.sort(retValue, new TagIDComparator());
 
 		return retValue;
@@ -1243,8 +1243,15 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	}
 
 	@OneToOne(cascade = CascadeType.ALL, optional = true, fetch = FetchType.EAGER, orphanRemoval = true)
-	@NotFound(action=NotFoundAction.IGNORE)
-	@PrimaryKeyJoinColumn
+	/*
+	 * Hibernate does not properly support @OneToOne(optional=true). With
+	 * Hibernate you must use the proprietary annotation extension @NotFound.
+	 * See http://opensource.atlassian.com/projects/hibernate/browse/ANN-725 and
+	 * http
+	 * ://stackoverflow.com/questions/2784228/optional-one-to-one-mapping-in-
+	 * hibernate
+	 */
+	@JoinColumn(name = "TopicID", referencedColumnName = "TopicID", nullable = true)
 	public TopicSecondOrderData getTopicSecondOrderData()
 	{
 		return topicSecondOrderData;
@@ -1254,15 +1261,16 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	{
 		this.topicSecondOrderData = topicSecondOrderData;
 	}
-	
+
 	@Transient
 	public String getTopicRendered()
 	{
 		if (this.topicSecondOrderData == null)
 			return null;
+		
 		return topicSecondOrderData.getTopicHTMLView();
 	}
-	
+
 	public void setTopicRendered(final String value)
 	{
 		if (this.topicSecondOrderData == null)
@@ -1270,7 +1278,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 			this.topicSecondOrderData = new TopicSecondOrderData();
 			this.topicSecondOrderData.setTopicID(this.topicId);
 		}
-		
+
 		this.topicSecondOrderData.setTopicHTMLView(value);
 	}
 }
