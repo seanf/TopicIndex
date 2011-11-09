@@ -21,5 +21,7 @@
 	<param name="topicXml" value="#{relatedTopicTagsList.topic.topicXML}" />
 	<param name="topicTextSearch" value="#{relatedTopicTagsList.topic.topicTextSearch}" />
 	<param name="topicHasXMLErrors" value="#{relatedTopicTagsList.topic.hasXMLErrors}" />
+	<param name="endEditDate" value="#{relatedTopicTagsList.topic.endEditDateString}" />
+	<param name="startEditDate" value="#{relatedTopicTagsList.topic.startEditDateString}" />
 
 </page>
