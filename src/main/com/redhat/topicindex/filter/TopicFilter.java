@@ -38,6 +38,7 @@ public class TopicFilter
 	private Boolean hasIncomingRelationships;
 	private Integer minimumIncomingRelationshipCount;
 	private String topicTextSearch;
+	private Boolean hasXMLErrors;
 
 	public List<Integer> getRelatedTopicIDs()
 	{
@@ -327,6 +328,9 @@ public class TopicFilter
 			return this.topicRelatedTo == null ? null : this.topicRelatedTo.toString();
 		else if (fieldName.equals(Constants.TOPIC_RELATED_FROM))
 			return this.topicRelatedFrom == null ? null : this.topicRelatedFrom.toString();
+		else if (fieldName.equals(Constants.TOPIC_HAS_XML_ERRORS))
+			return this.getHasXMLErrorsString();
+		
 
 		return null;
 	}
@@ -351,6 +355,8 @@ public class TopicFilter
 			this.setEndCreateDateString(fieldValue);
 		else if (fieldName.equals(Constants.TOPIC_LOGIC_FILTER_VAR))
 			this.setLogic(fieldValue);
+		else if (fieldName.equals(Constants.TOPIC_HAS_XML_ERRORS))
+			this.setHasXMLErrorsString(fieldValue);
 		else if (fieldName.equals(Constants.TOPIC_HAS_RELATIONSHIPS))
 			this.setHasRelationships(fieldValue == null ? null : fieldValue.equalsIgnoreCase("true"));
 		else if (fieldName.equals(Constants.TOPIC_HAS_INCOMING_RELATIONSHIPS))
@@ -397,6 +403,7 @@ public class TopicFilter
 		retValue.put(Constants.TOPIC_HAS_INCOMING_RELATIONSHIPS, this.getHasIncomingRelationships() == null ? "" : this.getHasIncomingRelationships().toString());
 		retValue.put(Constants.TOPIC_RELATED_TO, this.getTopicRelatedTo() == null ? "" : this.getTopicRelatedTo().toString());
 		retValue.put(Constants.TOPIC_RELATED_FROM, this.getTopicRelatedFrom() == null ? "" : this.getTopicRelatedFrom().toString());
+		retValue.put(Constants.TOPIC_HAS_XML_ERRORS, this.getHasXMLErrorsString());
 		return retValue;
 	}
 
@@ -416,6 +423,7 @@ public class TopicFilter
 		retValue.put(Constants.TOPIC_HAS_INCOMING_RELATIONSHIPS, Constants.TOPIC_HAS_INCOMING_RELATIONSHIPS_DESC);
 		retValue.put(Constants.TOPIC_RELATED_TO, Constants.TOPIC_RELATED_TO_DESC);
 		retValue.put(Constants.TOPIC_RELATED_FROM, Constants.TOPIC_RELATED_FROM_DESC);
+		retValue.put(Constants.TOPIC_HAS_XML_ERRORS, Constants.TOPIC_HAS_XML_ERRORS_DESC);
 		return retValue;
 	}
 
@@ -494,6 +502,34 @@ public class TopicFilter
 
 			this.setFieldValue(field, value);
 		}
+	}
+
+	public Boolean getHasXMLErrors()
+	{
+		return hasXMLErrors;
+	}
+
+	public void setHasXMLErrors(final Boolean hasXMLErrors)
+	{
+		this.hasXMLErrors = hasXMLErrors;
+	}
+	
+	public void setHasXMLErrorsString(final String hasXMLErrors)
+	{
+		try
+		{
+			this.hasXMLErrors = hasXMLErrors == null ? null : Boolean.parseBoolean(hasXMLErrors);
+		}
+		catch(final Exception ex)
+		{
+			this.hasXMLErrors = null;
+			ExceptionUtilities.handleException(ex);
+		}
+	}
+	
+	public String getHasXMLErrorsString()
+	{
+		return this.hasXMLErrors == null ? null : this.hasXMLErrors.toString(); 
 	}
 
 

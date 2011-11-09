@@ -180,6 +180,10 @@ public class Constants
 	public static final String TOPIC_RELATED_FROM = "topicRelatedFrom";
 	/** The description of the has related from search field */
 	public static final String TOPIC_RELATED_FROM_DESC = "Related From";
+	/** The URL variable that defines the has related from search field */
+	public static final String TOPIC_HAS_XML_ERRORS = "topicHasXMLErrors";
+	/** The description of the has related from search field */
+	public static final String TOPIC_HAS_XML_ERRORS_DESC = "Topic Has XML Errors";
 	/** The default logic to be applied to the search fields */
 	public static final String TOPIC_LOGIC_FILTER_VAR_DEFAULT_VALUE = "and";
 

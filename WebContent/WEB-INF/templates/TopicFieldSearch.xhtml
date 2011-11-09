@@ -100,6 +100,13 @@
 					<h:inputText size="125" id="topicFreeTextSearch"
 						value="#{topic.topicTextSearch}" />
 				</s:decorate>
+				
+				<s:decorate template="/layout/display.xhtml"
+					rendered="#{s:hasPermission('FilterHasXMLErrors', 'Rendered', null)}">
+					<ui:define name="label">Has XML Errors</ui:define>
+					<h:selectBooleanCheckbox id="hasXMLErrors"
+						value="#{topic.hasXMLErrors}" />
+				</s:decorate>
 
 				<s:decorate template="/layout/display.xhtml">
 					<ui:define name="label">Match</ui:define>

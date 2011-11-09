@@ -754,16 +754,25 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	public void validate()
 	{
 		syncXML();
+		validateXML();		
 		validateTags();
 		validateRelationships();
+	}
+	
+	private void validateXML()
+	{
+		final XMLValidator validator = new XMLValidator();
+		final boolean valid = validator.validateTopicXML(this.topicXML, true) != null;
+		if (!valid)
+			setTopicXMLErrors(validator.getErrorText());
+		else
+			setTopicXMLErrors(null);
 	}
 
 	private void renderTopics()
 	{
 		if (!isRerenderRelatedTopics())
 			return;
-
-		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 
 		try
 		{
@@ -1242,7 +1251,6 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		this.rerenderRelatedTopics = rerenderRelatedTopics;
 	}
 
-	@OneToOne(cascade = CascadeType.ALL, optional = true, fetch = FetchType.EAGER, orphanRemoval = true)
 	/*
 	 * Hibernate does not properly support @OneToOne(optional=true). With
 	 * Hibernate you must use the proprietary annotation extension @NotFound.
@@ -1251,6 +1259,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	 * ://stackoverflow.com/questions/2784228/optional-one-to-one-mapping-in-
 	 * hibernate
 	 */
+	@OneToOne(cascade = CascadeType.ALL, optional = true, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JoinColumn(name = "TopicID", referencedColumnName = "TopicID", nullable = true)
 	public TopicSecondOrderData getTopicSecondOrderData()
 	{
@@ -1280,5 +1289,25 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		}
 
 		this.topicSecondOrderData.setTopicHTMLView(value);
+	}
+	
+	@Transient
+	public String getTopicXMLErrors()
+	{
+		if (this.topicSecondOrderData == null)
+			return null;
+		
+		return topicSecondOrderData.getTopicXMLErrors();
+	}
+
+	public void setTopicXMLErrors(final String value)
+	{
+		if (this.topicSecondOrderData == null)
+		{
+			this.topicSecondOrderData = new TopicSecondOrderData();
+			this.topicSecondOrderData.setTopicID(this.topicId);
+		}
+
+		this.topicSecondOrderData.setTopicXMLErrors(value);
 	}
 }
