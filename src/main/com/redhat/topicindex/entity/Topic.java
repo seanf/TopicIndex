@@ -1252,15 +1252,11 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	}
 
 	/*
-	 * Hibernate does not properly support @OneToOne(optional=true). With
-	 * Hibernate you must use the proprietary annotation extension @NotFound.
-	 * See http://opensource.atlassian.com/projects/hibernate/browse/ANN-725 and
-	 * http
-	 * ://stackoverflow.com/questions/2784228/optional-one-to-one-mapping-in-
-	 * hibernate
+	 * Envers has issues with this: https://hibernate.onjira.com/browse/HHH-3853
 	 */
 	@OneToOne(cascade = CascadeType.ALL, optional = true, fetch = FetchType.EAGER, orphanRemoval = true)
-	@JoinColumn(name = "TopicID", referencedColumnName = "TopicID", nullable = true)
+	@PrimaryKeyJoinColumn
+	@NotAudited
 	public TopicSecondOrderData getTopicSecondOrderData()
 	{
 		return topicSecondOrderData;
