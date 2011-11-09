@@ -44,8 +44,6 @@ import org.jboss.resteasy.spi.InternalServerErrorException;
 @Path("/1")
 public class RESTv1 extends BaseRESTv1 implements RESTInterfaceV1
 {
-	private static final String DATE_FORMAT = "dd-MMM-yyyy";
-	
 	/* SYSTEM FUNCTIONS */
 	@PUT
 	@Path("/settings/rerenderTopic")
@@ -82,7 +80,7 @@ public class RESTv1 extends BaseRESTv1 implements RESTInterfaceV1
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(
 	{ "*" })
-	public BaseRestCollectionV1<TopicV1> getJSONTopicsEditedSince(@QueryParam("date") @DateFormat(DATE_FORMAT) final Date date, @QueryParam("expand") final String expand)
+	public BaseRestCollectionV1<TopicV1> getJSONTopicsEditedSince(@QueryParam("date") @DateFormat(REST_DATE_FORMAT) final Date date, @QueryParam("expand") final String expand)
 	{
 		return getJSONEntitiesUpdatedSince(Topic.class, "topicId", new TopicV1Factory(), TOPICS_EXPANSION_NAME, expand, date);
 	}
@@ -92,9 +90,9 @@ public class RESTv1 extends BaseRESTv1 implements RESTInterfaceV1
 	@Produces(MediaType.APPLICATION_ATOM_XML)
 	@Consumes(
 	{ "*" })
-	public Feed getATOMTopicsEditedSince(@QueryParam("date") @DateFormat(DATE_FORMAT) final Date date, @QueryParam("expand") final String expand)
+	public Feed getATOMTopicsEditedSince(@QueryParam("date") @DateFormat(REST_DATE_FORMAT) final Date date, @QueryParam("expand") final String expand)
 	{
-		final SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
+		final SimpleDateFormat formatter = new SimpleDateFormat(REST_DATE_FORMAT);
 		final BaseRestCollectionV1<TopicV1> topics = getJSONEntitiesUpdatedSince(Topic.class, "topicId", new TopicV1Factory(), TOPICS_EXPANSION_NAME, expand, date);
 
 		try

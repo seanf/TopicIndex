@@ -40,6 +40,8 @@ public class Constants
 	 * links in the documentation.
 	 */
 	public static final String SERVER_URL = "http://jboss-eap.bne.redhat.com:8080";
+	
+	public static final String FULL_SERVER_URL = "http://jboss-eap.bne.redhat.com:8080/TopicIndex";
 
 	/**
 	 * The "Common" project includes any tags that are not assigned to any other

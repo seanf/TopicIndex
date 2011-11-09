@@ -2,6 +2,7 @@ package com.redhat.topicindex.rest;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -42,6 +43,8 @@ import com.redhat.topicindex.utils.EntityUtilities;
 
 public class BaseRESTv1
 {
+	protected static final String REST_DATE_FORMAT = "dd-MMM-yyyy";
+	
 	public static final String TOPICS_EXPANSION_NAME = "topics";
 	public static final String TAGS_EXPANSION_NAME = "tags";
 	public static final String CATEGORIES_EXPANSION_NAME = "categories";
@@ -84,17 +87,28 @@ public class BaseRESTv1
 
 		for (final TopicV1 topic : topics.getItems())
 		{
+			final String html = topic.getHtml();
+			
 			final Entry entry = new Entry();
-			entry.setTitle(topic.getTitle());
-
-			final Content content = new Content();
-			content.setType(MediaType.TEXT_HTML_TYPE);
-			content.setText(topic.getHtml());
+			entry.setTitle("Title: " + topic.getTitle() + " Edited: " + new SimpleDateFormat(REST_DATE_FORMAT).format(topic.getLastModified()));
+			
+			if (html != null)
+			{
+				final Content content = new Content();
+				content.setType(MediaType.TEXT_HTML_TYPE);
+				content.setText(fixHrefs(topic.getHtml()));
+				entry.setContent(content);
+			}
 
 			feed.getEntries().add(entry);
 		}
 
 		return feed;
+	}
+	
+	private String fixHrefs(final String input)
+	{
+		return input.replaceAll("Topic\\.seam", Constants.FULL_SERVER_URL + "/Topic.seam");
 	}
 	
 	protected <T, U> BaseRestCollectionV1<T> getJSONEntitiesUpdatedSince(final Class<U> type, final String idProperty, final RESTDataObjectFactory<T, U> dataObjectFactory, final String expandName, final String expand, final Date date)

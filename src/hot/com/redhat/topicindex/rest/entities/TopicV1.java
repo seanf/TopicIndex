@@ -1,5 +1,7 @@
 package com.redhat.topicindex.rest.entities;
 
+import java.util.Date;
+
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -33,6 +35,7 @@ public class TopicV1 extends BaseRestV1 {
 	private String description = null;
 	private String xml = null;
 	private String html = null;
+	private Date lastModified = null;
 	private BaseRestCollectionV1<TagV1> tags = null;
 	private BaseRestCollectionV1<TopicV1> outgoingRelationships = null;
 	private BaseRestCollectionV1<TopicV1> incomingRelationships = null;
@@ -181,5 +184,15 @@ public class TopicV1 extends BaseRestV1 {
 
 		return retValue;
 
+	}
+
+	public Date getLastModified()
+	{
+		return lastModified;
+	}
+
+	public void setLastModified(final Date lastModified)
+	{
+		this.lastModified = lastModified;
 	}
 }
