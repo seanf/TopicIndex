@@ -36,6 +36,7 @@ public class TopicV1 extends BaseRestV1 {
 	private String xml = null;
 	private String html = null;
 	private Date lastModified = null;
+	private Date created = null;
 	private BaseRestCollectionV1<TagV1> tags = null;
 	private BaseRestCollectionV1<TopicV1> outgoingRelationships = null;
 	private BaseRestCollectionV1<TopicV1> incomingRelationships = null;
@@ -194,5 +195,15 @@ public class TopicV1 extends BaseRestV1 {
 	public void setLastModified(final Date lastModified)
 	{
 		this.lastModified = lastModified;
+	}
+
+	public Date getCreated()
+	{
+		return created;
+	}
+
+	public void setCreated(Date created)
+	{
+		this.created = created;
 	}
 }

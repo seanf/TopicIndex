@@ -90,7 +90,9 @@ public class BaseRESTv1
 			final String html = topic.getHtml();
 			
 			final Entry entry = new Entry();
-			entry.setTitle("Title: " + topic.getTitle() + " Edited: " + new SimpleDateFormat(REST_DATE_FORMAT).format(topic.getLastModified()));
+			entry.setTitle(topic.getTitle());
+			entry.setUpdated(topic.getLastModified());
+			entry.setPublished(topic.getCreated());
 			
 			if (html != null)
 			{

@@ -23,6 +23,7 @@ public class TopicV1Factory implements RESTDataObjectFactory<TopicV1, Topic>
 		retValue.setXml(entity.getTopicXML());
 		retValue.setHtml(entity.getTopicRendered());
 		retValue.setLastModified(entity.getLatestRevisionDate());
+		retValue.setCreated(entity.getTopicTimeStamp());
 		retValue.setExpand(new String[]
 		{ BaseRESTv1.TAGS_EXPANSION_NAME, BaseRESTv1.TOPIC_INCOMING_RELATIONSHIPS_EXPANSION_NAME, BaseRESTv1.TOPIC_OUTGOING_RELATIONSHIPS_EXPANSION_NAME, BaseRESTv1.TOPIC_TWO_WAY_RELATIONSHIPS_EXPANSION_NAME });
 		
