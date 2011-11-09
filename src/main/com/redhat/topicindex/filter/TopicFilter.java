@@ -12,6 +12,7 @@ import org.joda.time.format.ISODateTimeFormat;
 import com.redhat.ecs.commonutils.ExceptionUtilities;
 import com.redhat.topicindex.entity.Filter;
 import com.redhat.topicindex.entity.FilterField;
+import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.EntityUtilities;
 
@@ -40,17 +41,18 @@ public class TopicFilter
 	private String topicTextSearch;
 	private Boolean hasXMLErrors;
 	private Integer minXMLErrorLength;
+	private DateTime startEditDate;
+	private DateTime endEditDate;
 
 	public List<Integer> getRelatedTopicIDs()
 	{
 		final List<Integer> retValue = EntityUtilities.getRelatedTopicIDs(this.topicRelatedFrom);
-		// The EntityQuery class treats an empty list as null, and will not
-		// attempt to
-		// apply a restriction against it. If there are no topics returned, add
-		// -1 to the
-		// list to ensure that no topics are matched, but the list is not empty
-		// and therefore
-		// counted as a restriction.
+		/*
+		 * The EntityQuery class treats an empty list as null, and will not
+		 * attempt to apply a restriction against it. If there are no topics
+		 * returned, add -1 to the list to ensure that no topics are matched,
+		 * but the list is not empty and therefore counted as a restriction.
+		 */
 		if (retValue != null && retValue.size() == 0)
 			retValue.add(-1);
 		return retValue;
@@ -61,6 +63,12 @@ public class TopicFilter
 		final List<Integer> retValue = EntityUtilities.getIncomingRelatedTopicIDs(this.topicRelatedTo);
 		if (retValue != null && retValue.size() == 0)
 			retValue.add(-1);
+		return retValue;
+	}
+
+	public List<Integer> getEditedTopics()
+	{
+		final List<Integer> retValue = EntityUtilities.getEditedEntities(Topic.class, "topicId", this.startEditDate, this.endEditDate);
 		return retValue;
 	}
 
@@ -233,42 +241,42 @@ public class TopicFilter
 
 	public void setStartCreateDateString(final String startDate)
 	{
-		try
-		{
-			if (startDate == null || startDate.length() == 0)
-				this.startCreateDate = null;
-			else
-				this.startCreateDate = ISODateTimeFormat.dateTime().parseDateTime(startDate);
-		}
-		catch (final Exception ex)
-		{
-			ExceptionUtilities.handleException(ex);
-		}
+		this.startCreateDate = convertStringToDate(startDate);
 	}
 
 	public String getStartCreateDateString()
 	{
-		return this.startCreateDate == null ? null : ISODateTimeFormat.dateTime().print(this.startCreateDate);
+		return convertDateToString(this.startCreateDate);
 	}
 
 	public void setEndCreateDateString(final String endDate)
 	{
-		try
-		{
-			if (endDate == null || endDate.length() == 0)
-				this.endCreateDate = null;
-			else
-				this.endCreateDate = ISODateTimeFormat.dateTime().parseDateTime(endDate);
-		}
-		catch (final Exception ex)
-		{
-			ExceptionUtilities.handleException(ex);
-		}
+		this.endCreateDate = convertStringToDate(endDate);
 	}
 
 	public String getEndCreateDateString()
 	{
-		return this.endCreateDate == null ? null : ISODateTimeFormat.dateTime().print(this.endCreateDate);
+		return convertDateToString(this.endCreateDate);
+	}
+
+	public void setStartEditDateString(final String startDate)
+	{
+		this.startEditDate = convertStringToDate(startDate);
+	}
+
+	public String getStartEditDateString()
+	{
+		return convertDateToString(this.startEditDate);
+	}
+
+	public void setEndEditDateString(final String endDate)
+	{
+		this.endEditDate = convertStringToDate(endDate);
+	}
+
+	public String getEndEditDateString()
+	{
+		return convertDateToString(this.endEditDate);
 	}
 
 	public void setLogic(String logic)
@@ -291,6 +299,16 @@ public class TopicFilter
 		return this.startCreateDate == null ? null : this.startCreateDate.toDate();
 	}
 
+	public void setStartEditDatePlain(final Date startEditDate)
+	{
+		this.startEditDate = startEditDate == null ? null : new DateTime(startEditDate);
+	}
+
+	public Date getStartEditDatePlain()
+	{
+		return this.startEditDate == null ? null : this.startEditDate.toDate();
+	}
+
 	public void setEndCreateDatePlain(final Date endCreateDate)
 	{
 		this.endCreateDate = endCreateDate == null ? null : new DateTime(endCreateDate);
@@ -299,6 +317,16 @@ public class TopicFilter
 	public Date getEndCreateDatePlain()
 	{
 		return this.endCreateDate == null ? null : this.endCreateDate.toDate();
+	}
+
+	public void setEndEditDatePlain(final Date endEditDate)
+	{
+		this.endEditDate = endEditDate == null ? null : new DateTime(endEditDate);
+	}
+
+	public Date getEndEditDatePlain()
+	{
+		return this.endEditDate == null ? null : this.endEditDate.toDate();
 	}
 
 	public String getFieldValue(final String fieldName)
@@ -319,6 +347,10 @@ public class TopicFilter
 			return this.getStartCreateDateString();
 		else if (fieldName.equals(Constants.TOPIC_ENDDATE_FILTER_VAR))
 			return this.getEndCreateDateString();
+		else if (fieldName.equals(Constants.TOPIC_STARTEDITDATE_FILTER_VAR))
+			return this.getStartEditDateString();
+		else if (fieldName.equals(Constants.TOPIC_ENDEDITDATE_FILTER_VAR))
+			return this.getEndEditDateString();
 		else if (fieldName.equals(Constants.TOPIC_LOGIC_FILTER_VAR))
 			return this.getLogic();
 		else if (fieldName.equals(Constants.TOPIC_HAS_RELATIONSHIPS))
@@ -331,7 +363,6 @@ public class TopicFilter
 			return this.topicRelatedFrom == null ? null : this.topicRelatedFrom.toString();
 		else if (fieldName.equals(Constants.TOPIC_HAS_XML_ERRORS))
 			return this.getHasXMLErrorsString();
-		
 
 		return null;
 	}
@@ -354,6 +385,10 @@ public class TopicFilter
 			this.setStartCreateDateString(fieldValue);
 		else if (fieldName.equals(Constants.TOPIC_ENDDATE_FILTER_VAR))
 			this.setEndCreateDateString(fieldValue);
+		else if (fieldName.equals(Constants.TOPIC_STARTEDITDATE_FILTER_VAR))
+			this.setStartEditDateString(fieldValue);
+		else if (fieldName.equals(Constants.TOPIC_ENDEDITDATE_FILTER_VAR))
+			this.setEndEditDateString(fieldValue);
 		else if (fieldName.equals(Constants.TOPIC_LOGIC_FILTER_VAR))
 			this.setLogic(fieldValue);
 		else if (fieldName.equals(Constants.TOPIC_HAS_XML_ERRORS))
@@ -365,7 +400,7 @@ public class TopicFilter
 		else if (fieldName.equals(Constants.TOPIC_RELATED_TO))
 		{
 			try
-			{				
+			{
 				this.setTopicRelatedTo(fieldValue == null ? null : Integer.parseInt(fieldValue));
 			}
 			catch (final Exception ex)
@@ -399,6 +434,8 @@ public class TopicFilter
 		retValue.put(Constants.TOPIC_DESCRIPTION_FILTER_VAR, this.getTopicText());
 		retValue.put(Constants.TOPIC_STARTDATE_FILTER_VAR, this.getStartCreateDateString());
 		retValue.put(Constants.TOPIC_ENDDATE_FILTER_VAR, this.getEndCreateDateString());
+		retValue.put(Constants.TOPIC_STARTEDITDATE_FILTER_VAR, this.getStartEditDateString());
+		retValue.put(Constants.TOPIC_ENDEDITDATE_FILTER_VAR, this.getEndEditDateString());
 		retValue.put(Constants.TOPIC_LOGIC_FILTER_VAR, this.getLogic());
 		retValue.put(Constants.TOPIC_HAS_RELATIONSHIPS, this.getHasRelationships() == null ? "" : this.getHasRelationships().toString());
 		retValue.put(Constants.TOPIC_HAS_INCOMING_RELATIONSHIPS, this.getHasIncomingRelationships() == null ? "" : this.getHasIncomingRelationships().toString());
@@ -419,6 +456,8 @@ public class TopicFilter
 		retValue.put(Constants.TOPIC_DESCRIPTION_FILTER_VAR, Constants.TOPIC_DESCRIPTION_FILTER_VAR_DESC);
 		retValue.put(Constants.TOPIC_STARTDATE_FILTER_VAR, Constants.TOPIC_STARTDATE_FILTER_VAR_DESC);
 		retValue.put(Constants.TOPIC_ENDDATE_FILTER_VAR, Constants.TOPIC_ENDDATE_FILTER_VAR_DESC);
+		retValue.put(Constants.TOPIC_STARTEDITDATE_FILTER_VAR, Constants.TOPIC_STARTEDITDATE_FILTER_VAR_DESC);
+		retValue.put(Constants.TOPIC_ENDEDITDATE_FILTER_VAR, Constants.TOPIC_ENDEDITDATE_FILTER_VAR_DESC);
 		retValue.put(Constants.TOPIC_LOGIC_FILTER_VAR, Constants.TOPIC_LOGIC_FILTER_VAR_DESC);
 		retValue.put(Constants.TOPIC_HAS_RELATIONSHIPS, Constants.TOPIC_HAS_RELATIONSHIPS_DESC);
 		retValue.put(Constants.TOPIC_HAS_INCOMING_RELATIONSHIPS, Constants.TOPIC_HAS_INCOMING_RELATIONSHIPS_DESC);
@@ -484,13 +523,13 @@ public class TopicFilter
 
 		return EntityUtilities.getTextSearchTopicMatch(this.topicTextSearch);
 	}
-	
+
 	public void syncWithFilter(final Filter filter)
 	{
 		for (final FilterField field : filter.getFilterFields())
 			this.setFieldValue(field.getField(), field.getValue());
 	}
-	
+
 	public void loadFilterFields(final Filter filter)
 	{
 		for (final String fieldName : TopicFilter.getFilterNames().keySet())
@@ -515,23 +554,23 @@ public class TopicFilter
 		this.hasXMLErrors = hasXMLErrors;
 		this.minXMLErrorLength = this.hasXMLErrors == null ? null : this.hasXMLErrors.equals(Boolean.TRUE) ? 1 : null;
 	}
-	
+
 	public void setHasXMLErrorsString(final String hasXMLErrors)
 	{
 		try
 		{
 			this.setHasXMLErrors(hasXMLErrors == null ? null : Boolean.parseBoolean(hasXMLErrors));
 		}
-		catch(final Exception ex)
+		catch (final Exception ex)
 		{
 			this.setHasXMLErrors(null);
 			ExceptionUtilities.handleException(ex);
 		}
 	}
-	
+
 	public String getHasXMLErrorsString()
 	{
-		return this.hasXMLErrors == null ? null : this.hasXMLErrors.toString(); 
+		return this.hasXMLErrors == null ? null : this.hasXMLErrors.toString();
 	}
 
 	public Integer getMinXMLErrorLength()
@@ -544,5 +583,45 @@ public class TopicFilter
 		this.minXMLErrorLength = minXMLErrorLength;
 	}
 
+	public DateTime getStartEditDate()
+	{
+		return startEditDate;
+	}
 
+	public void setStartEditDate(DateTime startEditDate)
+	{
+		this.startEditDate = startEditDate;
+	}
+
+	public DateTime getEndEditTime()
+	{
+		return endEditDate;
+	}
+
+	public void setEndEditTime(DateTime endEditTime)
+	{
+		this.endEditDate = endEditTime;
+	}
+
+	private String convertDateToString(final DateTime date)
+	{
+		return date == null ? null : ISODateTimeFormat.dateTime().print(date);
+	}
+
+	private DateTime convertStringToDate(final String date)
+	{
+		try
+		{
+			if (date == null || date.length() == 0)
+				return null;
+			else
+				return ISODateTimeFormat.dateTime().parseDateTime(date);
+		}
+		catch (final Exception ex)
+		{
+			ExceptionUtilities.handleException(ex);
+		}
+
+		return null;
+	}
 }

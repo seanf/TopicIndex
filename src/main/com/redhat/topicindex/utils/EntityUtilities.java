@@ -22,11 +22,16 @@ import org.apache.lucene.util.Version;
 import org.drools.ClassObjectFilter;
 import org.drools.WorkingMemory;
 import org.hibernate.Session;
+import org.hibernate.envers.AuditReader;
+import org.hibernate.envers.AuditReaderFactory;
+import org.hibernate.envers.query.AuditEntity;
+import org.hibernate.envers.query.AuditQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.jboss.seam.Component;
 import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.Role;
+import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 import org.jsoup.Jsoup;
 
@@ -542,6 +547,30 @@ public class EntityUtilities
 		}
 
 		return filter;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static <E> List<Integer> getEditedEntities(final Class<E> type, final String pkColumnName, final DateTime startDate, final DateTime endDate)
+	{
+		if (startDate == null && endDate == null)
+			return null;
+		
+		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+		final AuditReader reader = AuditReaderFactory.get(entityManager);
+		final AuditQuery query = reader.createQuery()
+			.forRevisionsOfEntity(type, true, false)
+			.addOrder(AuditEntity.revisionProperty("timestamp").asc())			
+			.addProjection(AuditEntity.property("originalId." + pkColumnName).distinct());
+		
+		if (startDate != null)
+			query.add(AuditEntity.revisionProperty("timestamp").ge(startDate.toDate().getTime()));
+		
+		if (endDate != null)
+			query.add(AuditEntity.revisionProperty("timestamp").le(endDate.toDate().getTime()));
+		
+		final List<Integer> entityyIds = query.getResultList();
+		
+		return entityyIds;
 	}
 
 	@SuppressWarnings("unchecked")

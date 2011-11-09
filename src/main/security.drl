@@ -311,7 +311,21 @@ rule "FilterTextFreeSearchRendered"
 		Role(name == "smeRole" || == "iaRole" || == "editorRole" || == "writerRole" || == "qeRole")
    	then
 end
-	
+
+rule "FilterHasXMLErrorsRendered"
+	when
+		c: PermissionCheck(name == "FilterHasXMLErrors", action == "Rendered")
+		Role(name == "smeRole" || == "iaRole" || == "editorRole" || == "writerRole" || == "qeRole")
+   	then
+end
+		
+rule "FilterTopicEditDatesRendered"
+	when
+		c: PermissionCheck(name == "FilterTopicEditDates", action == "Rendered")
+		Role(name == "smeRole" || == "iaRole" || == "editorRole" || == "writerRole" || == "qeRole")
+   	then
+		c.grant();
+end
 
 rule "FilterTopicDatesRendered"
 	when
