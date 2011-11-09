@@ -630,6 +630,10 @@ public class Filter implements java.io.Serializable
 						ExceptionUtilities.handleException(ex);
 					}
 				}
+				else if (filterField.getField().equals(Constants.TOPIC_HAS_XML_ERRORS))
+				{
+					thisRestriction = "length(topic.topicSecondOrderData.topicXMLErrors) >= 1";
+				}
 				
 
 				if (thisRestriction.length() != 0)
