@@ -1,7 +1,9 @@
 package com.redhat.topicindex.rest;
 
 import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Formatter;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -42,6 +44,8 @@ import org.jboss.resteasy.spi.InternalServerErrorException;
 @Path("/1")
 public class RESTv1 extends BaseRESTv1 implements RESTInterfaceV1
 {
+	private static final String DATE_FORMAT = "dd-MMM-yyyy";
+	
 	/* SYSTEM FUNCTIONS */
 	@PUT
 	@Path("/settings/rerenderTopic")
@@ -78,9 +82,29 @@ public class RESTv1 extends BaseRESTv1 implements RESTInterfaceV1
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(
 	{ "*" })
-	public BaseRestCollectionV1<TopicV1> getJSONTopicsEditedSince(@QueryParam("date") @DateFormat("dd-MMM-yyyy") final Date date, @QueryParam("expand") final String expand)
+	public BaseRestCollectionV1<TopicV1> getJSONTopicsEditedSince(@QueryParam("date") @DateFormat(DATE_FORMAT) final Date date, @QueryParam("expand") final String expand)
 	{
 		return getJSONEntitiesUpdatedSince(Topic.class, "topicId", new TopicV1Factory(), TOPICS_EXPANSION_NAME, expand, date);
+	}
+	
+	@GET
+	@Path("/topics/get/atom/editedSince")
+	@Produces(MediaType.APPLICATION_ATOM_XML)
+	@Consumes(
+	{ "*" })
+	public Feed getATOMTopicsEditedSince(@QueryParam("date") @DateFormat(DATE_FORMAT) final Date date, @QueryParam("expand") final String expand)
+	{
+		final SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
+		final BaseRestCollectionV1<TopicV1> topics = getJSONEntitiesUpdatedSince(Topic.class, "topicId", new TopicV1Factory(), TOPICS_EXPANSION_NAME, expand, date);
+
+		try
+		{			
+			return convertTopicsIntoFeed(topics, "Topics Edited Since " + formatter.format(date));
+		}
+		catch (final Exception ex)
+		{
+			throw new InternalServerErrorException("Could not build the ATOM feed");
+		}
 	}
 
 	@GET
@@ -104,25 +128,7 @@ public class RESTv1 extends BaseRESTv1 implements RESTInterfaceV1
 
 		try
 		{
-			final Feed feed = new Feed();
-
-			feed.setId(new URI(this.getUrl()));
-			feed.setTitle("Topics Edited In The Last " + days + " Days");
-			feed.setUpdated(new Date());
-
-			for (final TopicV1 topic : topics.getItems())
-			{
-				final Entry entry = new Entry();
-				entry.setTitle(topic.getTitle());
-
-				final Content content = new Content();
-				content.setType(MediaType.TEXT_HTML_TYPE);
-				content.setText(topic.getHtml());
-
-				feed.getEntries().add(entry);
-			}
-
-			return feed;
+			return convertTopicsIntoFeed(topics, "Topics Edited In The Last " + days + " Days");
 		}
 		catch (final Exception ex)
 		{

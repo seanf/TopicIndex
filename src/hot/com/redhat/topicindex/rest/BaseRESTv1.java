@@ -1,5 +1,7 @@
 package com.redhat.topicindex.rest;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
 
@@ -13,6 +15,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import javax.transaction.TransactionManager;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
@@ -20,6 +23,9 @@ import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
 import org.hibernate.envers.query.AuditEntity;
 import org.hibernate.envers.query.AuditQuery;
+import org.jboss.resteasy.plugins.providers.atom.Content;
+import org.jboss.resteasy.plugins.providers.atom.Entry;
+import org.jboss.resteasy.plugins.providers.atom.Feed;
 import org.jboss.resteasy.spi.BadRequestException;
 import org.jboss.resteasy.spi.Failure;
 import org.jboss.resteasy.spi.InternalServerErrorException;
@@ -66,6 +72,29 @@ public class BaseRESTv1
 	protected String getUrl()
 	{
 		return uriInfo.getAbsolutePath().toString();
+	}
+	
+	protected Feed convertTopicsIntoFeed(final BaseRestCollectionV1<TopicV1> topics, final String title) throws URISyntaxException
+	{
+		final Feed feed = new Feed();
+
+		feed.setId(new URI(this.getUrl()));
+		feed.setTitle(title);
+		feed.setUpdated(new Date());
+
+		for (final TopicV1 topic : topics.getItems())
+		{
+			final Entry entry = new Entry();
+			entry.setTitle(topic.getTitle());
+
+			final Content content = new Content();
+			content.setType(MediaType.TEXT_HTML_TYPE);
+			content.setText(topic.getHtml());
+
+			feed.getEntries().add(entry);
+		}
+
+		return feed;
 	}
 	
 	protected <T, U> BaseRestCollectionV1<T> getJSONEntitiesUpdatedSince(final Class<U> type, final String idProperty, final RESTDataObjectFactory<T, U> dataObjectFactory, final String expandName, final String expand, final Date date)
