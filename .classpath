@@ -18,5 +18,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Java Servlet"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/RESTeasy"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/AS7 JAX-RS"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/RESTEasy ATOM Provider"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

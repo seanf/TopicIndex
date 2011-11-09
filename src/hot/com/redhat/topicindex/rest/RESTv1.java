@@ -1,349 +1,382 @@
 package com.redhat.topicindex.rest;
 
+import java.net.URI;
 import java.util.Date;
-import java.util.List;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-import javax.transaction.TransactionManager;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.PathSegment;
 
-import org.hibernate.envers.AuditReader;
-import org.hibernate.envers.AuditReaderFactory;
-import org.hibernate.envers.query.AuditEntity;
-import org.hibernate.envers.query.AuditQuery;
-import org.jboss.resteasy.spi.BadRequestException;
-import org.jboss.resteasy.spi.Failure;
-import org.jboss.resteasy.spi.InternalServerErrorException;
-import com.redhat.ecs.commonutils.ExceptionUtilities;
-import com.redhat.topicindex.entity.Filter;
+import org.joda.time.DateTime;
+
+import com.redhat.topicindex.entity.Category;
+import com.redhat.topicindex.entity.Project;
+import com.redhat.topicindex.entity.Tag;
 import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.rest.collections.BaseRestCollectionV1;
+import com.redhat.topicindex.rest.entities.CategoryV1;
+import com.redhat.topicindex.rest.entities.ProjectV1;
+import com.redhat.topicindex.rest.entities.TagV1;
 import com.redhat.topicindex.rest.entities.TopicV1;
-import com.redhat.topicindex.rest.factory.RESTDataObjectCollectionFactory;
-import com.redhat.topicindex.rest.factory.RESTDataObjectFactory;
+import com.redhat.topicindex.rest.factory.CategoryV1Factory;
+import com.redhat.topicindex.rest.factory.ProjectV1Factory;
+import com.redhat.topicindex.rest.factory.TagV1Factory;
 import com.redhat.topicindex.rest.factory.TopicV1Factory;
+import com.redhat.topicindex.rest.formatter.DateFormat;
+import com.redhat.topicindex.rest.sharedinterface.RESTInterfaceV1;
 import com.redhat.topicindex.utils.Constants;
-import com.redhat.topicindex.utils.EntityUtilities;
 
-public class RESTv1
+import org.jboss.resteasy.plugins.providers.atom.Content;
+import org.jboss.resteasy.plugins.providers.atom.Entry;
+import org.jboss.resteasy.plugins.providers.atom.Feed;
+import org.jboss.resteasy.plugins.providers.atom.Link;
+import org.jboss.resteasy.plugins.providers.atom.Person;
+import org.jboss.resteasy.spi.InternalServerErrorException;
+
+@Path("/1")
+public class RESTv1 extends BaseRESTv1 implements RESTInterfaceV1
 {
-	public static final String TOPICS_EXPANSION_NAME = "topics";
-	public static final String TAGS_EXPANSION_NAME = "tags";
-	public static final String CATEGORIES_EXPANSION_NAME = "categories";
-	public static final String TOPIC_INCOMING_RELATIONSHIPS_EXPANSION_NAME = "incomingRelationships";
-	public static final String TOPIC_OUTGOING_RELATIONSHIPS_EXPANSION_NAME = "outgoingRelationships";
-	public static final String TOPIC_TWO_WAY_RELATIONSHIPS_EXPANSION_NAME = "twoWayRelationships";
-
-	public static final String TOPIC_URL_NAME = "topic";
-	public static final String TAG_URL_NAME = "tag";
-	public static final String CATEGORY_URL_NAME = "category";
-
-	public static final String JSON_URL = "json";
-	public static final String XML_URL = "json";
-
-	private @Context
-	UriInfo uriInfo;
-
-	protected String getBaseUrl()
+	/* SYSTEM FUNCTIONS */
+	@PUT
+	@Path("/settings/rerenderTopic")
+	@Consumes(
+	{ "*" })
+	public void setRerenderTopic(@QueryParam("enabled") final Boolean enalbed)
 	{
-		final String fullPath = uriInfo.getAbsolutePath().toString();
-		final int index = fullPath.indexOf(Constants.BASE_REST_PATH);
-		if (index != -1)
-			return fullPath.substring(0, index + Constants.BASE_REST_PATH.length());
-
-		return null;
+		System.setProperty(Constants.ENABLE_RENDERING_PROPERTY, enalbed == null ? null : enalbed.toString());
 	}
-	
-	protected <T, U> BaseRestCollectionV1<T> getJSONEntitiesUpdatedSince(final Class<U> type, final String idProperty, final RESTDataObjectFactory<T, U> dataObjectFactory, final String expandName, final String expand, final Date date)
+
+	/* TOPIC FUNCTIONS */
+	@GET
+	@Path("/topics/get/json/all")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(
+	{ "*" })
+	public BaseRestCollectionV1<TopicV1> getJSONTopics(@QueryParam("expand") final String expand)
 	{
-		return getEntitiesUpdatedSince(type, idProperty, dataObjectFactory, expandName, expand, JSON_URL, date);
+		return getJSONResources(Topic.class, new TopicV1Factory(), TOPICS_EXPANSION_NAME, expand);
 	}
-	
-	protected <T, U> BaseRestCollectionV1<T> getEntitiesUpdatedSince(final Class<U> type, final String idProperty, final RESTDataObjectFactory<T, U> dataObjectFactory, final String expandName, final String expand, final String dataType, final Date date)
+
+	@GET
+	@Path("/topics/get/json/{query}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(
+	{ "*" })
+	public BaseRestCollectionV1<TopicV1> getJSONTopicsWithQuery(@PathParam("query") PathSegment query, @QueryParam("expand") final String expand)
 	{
-		assert date != null : "The date parameter can not be null";
-		
-		EntityManager entityManager = null;
-		TransactionManager transactionManager = null;
-		
+		return getJSONTopicsFromQuery(query.getMatrixParameters(), new TopicV1Factory(), TOPICS_EXPANSION_NAME, expand);
+	}
+
+	@GET
+	@Path("/topics/get/json/editedSince")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(
+	{ "*" })
+	public BaseRestCollectionV1<TopicV1> getJSONTopicsEditedSince(@QueryParam("date") @DateFormat("dd-MMM-yyyy") final Date date, @QueryParam("expand") final String expand)
+	{
+		return getJSONEntitiesUpdatedSince(Topic.class, "topicId", new TopicV1Factory(), TOPICS_EXPANSION_NAME, expand, date);
+	}
+
+	@GET
+	@Path("/topics/get/json/editedInLast")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(
+	{ "*" })
+	public BaseRestCollectionV1<TopicV1> getJSONTopicsEditedInLast(@QueryParam("days") final int days, @QueryParam("expand") final String expand)
+	{
+		return getJSONEntitiesUpdatedSince(Topic.class, "topicId", new TopicV1Factory(), TOPICS_EXPANSION_NAME, expand, new DateTime().minusDays(days).toDate());
+	}
+
+	@GET
+	@Path("/topics/get/atom/editedInLast")
+	@Produces(MediaType.APPLICATION_ATOM_XML)
+	@Consumes(
+	{ "*" })
+	public Feed getATOMTopicsEditedInLast(@QueryParam("days") final int days, @QueryParam("expand") final String expand)
+	{
+		final BaseRestCollectionV1<TopicV1> topics = getJSONEntitiesUpdatedSince(Topic.class, "topicId", new TopicV1Factory(), TOPICS_EXPANSION_NAME, expand, new DateTime().minusDays(days).toDate());
+
 		try
 		{
-			final InitialContext initCtx = new InitialContext();
+			final Feed feed = new Feed();
 
-			final EntityManagerFactory entityManagerFactory = (EntityManagerFactory) initCtx.lookup("java:jboss/EntityManagerFactory");
-			if (entityManagerFactory == null)
-				throw new InternalServerErrorException("Could not find the EntityManagerFactory");
-			
-			transactionManager = (TransactionManager) initCtx.lookup("java:jboss/TransactionManager");
-			if (transactionManager == null)
-				throw new InternalServerErrorException("Could not find the TransactionManager");
-			
-			assert transactionManager != null : "transactionManager should not be null";
-			assert entityManagerFactory != null : "entityManagerFactory should not be null";
-			
-			transactionManager.begin();
-			
-			entityManager = entityManagerFactory.createEntityManager();
-			if (entityManager == null)
-				throw new InternalServerErrorException("Could not create an EntityManager");
-			
-			/* get the list of topic ids that were edited after the selected date */
-			final AuditReader reader = AuditReaderFactory.get(entityManager);
-			final AuditQuery query = reader.createQuery()
-				.forRevisionsOfEntity(type, true, false)
-				.addOrder(AuditEntity.revisionProperty("timestamp").asc())
-				.add(AuditEntity.revisionProperty("timestamp").ge(date.getTime()))
-				.addProjection(AuditEntity.property("originalId." + idProperty).distinct());
-			
-			final List entityyIds = query.getResultList();
-			
-			/* now get the topics */
-			final CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();			
-			final CriteriaQuery<U> criteriaQuery = criteriaBuilder.createQuery(type);
-			final Root<U> root = criteriaQuery.from(type);
-			criteriaQuery.where(root.get(idProperty).in(entityyIds));
-			
-			final TypedQuery<U> jpaQuery = entityManager.createQuery(criteriaQuery);
-			
-			final List<U> entities = jpaQuery.getResultList();
-			
-			transactionManager.commit();
-			
-			final BaseRestCollectionV1<T> retValue = new RESTDataObjectCollectionFactory<T, U>().create(dataObjectFactory, entities, expandName, dataType, new ExpandData(expand), getBaseUrl());
-			
-			return retValue;
+			feed.setId(new URI(this.getUrl()));
+			feed.setTitle("Topics Edited In The Last " + days + " Days");
+			feed.setUpdated(new Date());
+
+			for (final TopicV1 topic : topics.getItems())
+			{
+				final Entry entry = new Entry();
+				entry.setTitle(topic.getTitle());
+
+				final Content content = new Content();
+				content.setType(MediaType.TEXT_HTML_TYPE);
+				content.setText(topic.getHtml());
+
+				feed.getEntries().add(entry);
+			}
+
+			return feed;
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
-		
-			try
-			{
-				transactionManager.rollback();
-			}
-			catch (final Exception ex2)
-			{
-				ExceptionUtilities.handleException(ex2);
-			}
-			
-			throw new InternalServerErrorException("There was an error running the query");
+			throw new InternalServerErrorException("Could not build the ATOM feed");
 		}
-		finally
-		{
-			if (entityManager != null)
-				entityManager.close();
-		}
-		
 	}
-	
-	protected <T, U> void updateEntity(final Class<U> type, final T dataObject, final RESTDataObjectFactory<T, U> factory, final Object id)
+
+	@GET
+	@Path("/topics/get/xml/all")
+	@Produces(MediaType.TEXT_XML)
+	@Consumes(
+	{ "*" })
+	public BaseRestCollectionV1<TopicV1> getXMLTopics(@QueryParam("expand") final String expand)
+	{
+		return getXMLResources(Topic.class, new TopicV1Factory(), TOPICS_EXPANSION_NAME, expand);
+	}
+
+	@GET
+	@Path("/topic/get/json/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(
+	{ "*" })
+	public TopicV1 getJSONTopic(@PathParam("id") final Integer id, @QueryParam("expand") final String expand)
 	{
 		assert id != null : "The id parameter can not be null";
-		assert dataObject != null : "The dataObject parameter can not be null";
 
-		TransactionManager transactionManager = null;
-		EntityManager entityManager = null;
-		
-		try
-		{
-			final InitialContext initCtx = new InitialContext();
-
-			final EntityManagerFactory entityManagerFactory = (EntityManagerFactory) initCtx.lookup("java:jboss/EntityManagerFactory");
-			if (entityManagerFactory == null)
-				throw new InternalServerErrorException("Could not find the EntityManagerFactory");
-
-			transactionManager = (TransactionManager) initCtx.lookup("java:jboss/TransactionManager");
-			if (transactionManager == null)
-				throw new InternalServerErrorException("Could not find the TransactionManager");
-			
-			assert transactionManager != null : "transactionManager should not be null";
-			assert entityManagerFactory != null : "entityManagerFactory should not be null";
-
-			transactionManager.begin();
-
-			entityManager = entityManagerFactory.createEntityManager();
-			if (entityManager == null)
-				throw new InternalServerErrorException("Could not create an EntityManager");
-
-			assert entityManager != null : "entityManager should not be null";
-
-			final U entity = entityManager.find(type, id);
-			if (entity == null)
-				throw new BadRequestException("No entity was found with the primary key " + id);
-
-			assert entity != null : "entity should not be null";
-
-			factory.sync(entity, dataObject);
-			entityManager.persist(entity);
-			entityManager.flush();
-			transactionManager.commit();
-		}
-		catch (final Failure ex)
-		{
-			ExceptionUtilities.handleException(ex);
-			throw ex;
-		}
-		catch (final Exception ex)
-		{
-			ExceptionUtilities.handleException(ex);
-			
-			try
-			{
-				transactionManager.rollback();
-			}
-			catch (final Exception ex2)
-			{
-				ExceptionUtilities.handleException(ex2);
-			}
-
-			throw new InternalServerErrorException("There was an error saving the entity");
-		}
-		finally
-		{
-			if (entityManager != null)
-				entityManager.close();
-		}
+		return getJSONResource(Topic.class, new TopicV1Factory(), id, expand);
 	}
 
-	protected <T, U> T getJSONResource(final Class<U> type, final RESTDataObjectFactory<T, U> dataObjectFactory, final Object id, final String expand)
+	@GET
+	@Path("/topic/get/xml/{id}")
+	@Produces(MediaType.TEXT_XML)
+	@Consumes(
+	{ "*" })
+	public TopicV1 getXMLTopic(@PathParam("id") final Integer id, @QueryParam("expand") final String expand)
 	{
-		return getResource(type, dataObjectFactory, id, expand, JSON_URL);
-	}
-	
-	protected <T, U> T getXMLResource(final Class<U> type, final RESTDataObjectFactory<T, U> dataObjectFactory, final Object id, final String expand)
-	{
-		return getResource(type, dataObjectFactory, id, expand, XML_URL);
-	}
-	
-	private <T, U> T getResource(final Class<U> type, final RESTDataObjectFactory<T, U> dataObjectFactory, final Object id, final String expand, final String dataType)
-	{
-		assert type != null : "The type parameter can not be null";
 		assert id != null : "The id parameter can not be null";
-		assert dataObjectFactory != null : "The dataObjectFactory parameter can not be null";
 
-		try
-		{
-			final InitialContext initCtx = new InitialContext();
-
-			final EntityManagerFactory entityManagerFactory = (EntityManagerFactory) initCtx.lookup("java:jboss/EntityManagerFactory");
-			if (entityManagerFactory == null)
-				throw new InternalServerErrorException("Could not find the EntityManagerFactory");
-
-			final EntityManager entityManager = entityManagerFactory.createEntityManager();
-			if (entityManager == null)
-				throw new InternalServerErrorException("Could not create an EntityManager");
-
-			final U entity = entityManager.find(type, id);
-			if (entity == null)
-				throw new BadRequestException("No entity was found with the primary key " + id);
-
-			/* create the REST representation of the topic */
-			final T restRepresentation = dataObjectFactory.create(entity, this.getBaseUrl(), dataType, expand);
-
-			return restRepresentation;
-		}
-		catch (final NamingException ex)
-		{
-			throw new InternalServerErrorException("Could not find the EntityManagerFactory");
-		}
+		return getXMLResource(Topic.class, new TopicV1Factory(), id, expand);
 	}
-	
-	protected <T, U> BaseRestCollectionV1<T> getXMLResources(final Class<U> type, final RESTDataObjectFactory<T, U> dataObjectFactory, final String expandName, final String expand)
+
+	@GET
+	@Path("/topic/get/xml/{id}/xml")
+	@Produces(MediaType.TEXT_XML)
+	@Consumes(
+	{ "*" })
+	public String getXMLTopicXML(@PathParam("id") final Integer id, @QueryParam("expand") final String expand)
 	{
-		return getResources(type, dataObjectFactory, expandName, expand, XML_URL);
+		assert id != null : "The id parameter can not be null";
+
+		return getXMLResource(Topic.class, new TopicV1Factory(), id, expand).getXml();
 	}
-	
-	protected <T, U> BaseRestCollectionV1<T> getJSONResources(final Class<U> type, final RESTDataObjectFactory<T, U> dataObjectFactory, final String expandName, final String expand)
+
+	@GET
+	@Path("/topic/get/xml/{id}/xmlContainedIn")
+	@Produces(MediaType.TEXT_XML)
+	@Consumes(
+	{ "*" })
+	public String getXMLTopicXMLContained(@PathParam("id") final Integer id, @QueryParam("expand") final String expand, @QueryParam("container") final String containerName)
 	{
-		return getResources(type, dataObjectFactory, expandName, expand, JSON_URL);
+		assert id != null : "The id parameter can not be null";
+		assert containerName != null : "The containerName parameter can not be null";
+
+		return getXMLResource(Topic.class, new TopicV1Factory(), id, expand).getXMLWithNewContainer(containerName);
 	}
-	
-	protected <T, U> BaseRestCollectionV1<T> getResources(final Class<U> type, final RESTDataObjectFactory<T, U> dataObjectFactory, final String expandName, final String expand, final String dataType)
+
+	@GET
+	@Path("/topic/get/xml/{id}/xmlNoContainer")
+	@Produces(MediaType.TEXT_PLAIN)
+	@Consumes(
+	{ "*" })
+	public String getXMLTopicXMLNoContainer(@PathParam("id") final Integer id, @QueryParam("expand") final String expand, @QueryParam("includeTitle") final Boolean includeTitle)
 	{
-		assert type != null : "The type parameter can not be null";
-		assert dataObjectFactory != null : "The dataObjectFactory parameter can not be null";
+		assert id != null : "The id parameter can not be null";
 
-		try
-		{
-			final InitialContext initCtx = new InitialContext();
-
-			final EntityManagerFactory entityManagerFactory = (EntityManagerFactory) initCtx.lookup("java:jboss/EntityManagerFactory");
-			if (entityManagerFactory == null)
-				throw new InternalServerErrorException("Could not find the EntityManagerFactory");
-
-			final EntityManager entityManager = entityManagerFactory.createEntityManager();
-			if (entityManager == null)
-				throw new InternalServerErrorException("Could not create an EntityManager");
-			
-			final CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();			
-			final CriteriaQuery<U> criteriaQuery = criteriaBuilder.createQuery(type);
-			
-			criteriaQuery.from(type);
-			
-			final TypedQuery<U> query = entityManager.createQuery(criteriaQuery);
-			
-			final List<U> result = query.getResultList();
-
-			final BaseRestCollectionV1<T> retValue = new RESTDataObjectCollectionFactory<T, U>().create(dataObjectFactory, result, expandName, dataType, new ExpandData(expand), getBaseUrl());
-
-			return retValue;
-		}
-		catch (final NamingException ex)
-		{
-			throw new InternalServerErrorException("Could not find the EntityManagerFactory");
-		}
+		final String retValue = getXMLResource(Topic.class, new TopicV1Factory(), id, expand).getXMLWithNoContainer(includeTitle);
+		return retValue;
 	}
-	
-	protected BaseRestCollectionV1<TopicV1> getJSONTopicsFromQuery(final MultivaluedMap<String, String> queryParams, final TopicV1Factory dataObjectFactory, final String expandName, final String expand)
+
+	@PUT
+	@Path("/topic/put/json/{id}")
+	@Consumes(
+	{ MediaType.APPLICATION_JSON })
+	public void updateJSONTopic(@PathParam("id") final Integer id, final TopicV1 dataObject)
 	{
-		return getTopicsFromQuery(queryParams, dataObjectFactory, expandName, expand, JSON_URL);
+		updateEntity(Topic.class, dataObject, new TopicV1Factory(), id);
 	}
-	
-	protected BaseRestCollectionV1<TopicV1> getTopicsFromQuery(final MultivaluedMap<String, String> queryParams, final TopicV1Factory dataObjectFactory, final String expandName, final String expand, final String dataType)
+
+	@PUT
+	@Path("/topic/put/xml/{id}")
+	@Consumes(
+	{ MediaType.TEXT_XML })
+	public void updateXMLTopic(@PathParam("id") final Integer id, final TopicV1 dataObject)
 	{
-		assert dataObjectFactory != null : "The dataObjectFactory parameter can not be null";
-		assert uriInfo != null : "uriInfo can not be null";
-
-		try
-		{
-			final InitialContext initCtx = new InitialContext();
-
-			final EntityManagerFactory entityManagerFactory = (EntityManagerFactory) initCtx.lookup("java:jboss/EntityManagerFactory");
-			if (entityManagerFactory == null)
-				throw new InternalServerErrorException("Could not find the EntityManagerFactory");
-
-			final EntityManager entityManager = entityManagerFactory.createEntityManager();
-			if (entityManager == null)
-				throw new InternalServerErrorException("Could not create an EntityManager");
-			
-			// build up a Filter object from the URL variables
-			final Filter filter = EntityUtilities.populateFilter(
-					queryParams,
-					Constants.FILTER_ID, 
-					Constants.MATCH_TAG, 
-					Constants.CATEORY_INTERNAL_LOGIC, 
-					Constants.CATEORY_EXTERNAL_LOGIC);	
-			
-			final String query = filter.buildQuery(true);
-			
-			final List<Topic> result = entityManager.createQuery(Topic.SELECT_ALL_QUERY + query).getResultList();
-
-			final BaseRestCollectionV1<TopicV1> retValue = new RESTDataObjectCollectionFactory<TopicV1, Topic>().create(dataObjectFactory, result, expandName, dataType, new ExpandData(expand), getBaseUrl());
-
-			return retValue;
-		}
-		catch (final NamingException ex)
-		{
-			throw new InternalServerErrorException("Could not find the EntityManagerFactory");
-		}
+		updateEntity(Topic.class, dataObject, new TopicV1Factory(), id);
 	}
+
+	/* TAG FUNCTIONS */
+	@GET
+	@Path("/tag/get/json")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(
+	{ "*" })
+	public BaseRestCollectionV1<TagV1> getJSONTags(@QueryParam("expand") final String expand)
+	{
+		return getJSONResources(Tag.class, new TagV1Factory(), TAGS_EXPANSION_NAME, expand);
+	}
+
+	@GET
+	@Path("/tag/get/json/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(
+	{ "*" })
+	public TagV1 getJSONTag(@PathParam("id") final Integer id, @QueryParam("expand") final String expand)
+	{
+		assert id != null : "The id parameter can not be null";
+
+		return getJSONResource(Tag.class, new TagV1Factory(), id, expand);
+	}
+
+	@GET
+	@Path("/tag/get/xml/{id}")
+	@Produces(MediaType.TEXT_XML)
+	@Consumes(
+	{ "*" })
+	public TagV1 getXMLTag(@PathParam("id") final Integer id, @QueryParam("expand") final String expand)
+	{
+		assert id != null : "The id parameter can not be null";
+
+		return getXMLResource(Tag.class, new TagV1Factory(), id, expand);
+	}
+
+	@PUT
+	@Path("/tag/put/json/{id}")
+	@Consumes(
+	{ MediaType.APPLICATION_JSON })
+	public void updateJSONTag(@PathParam("id") final Integer id, final TagV1 dataObject)
+	{
+		updateEntity(Tag.class, dataObject, new TagV1Factory(), id);
+	}
+
+	@PUT
+	@Path("/tag/put/xml/{id}")
+	@Consumes(
+	{ MediaType.TEXT_XML })
+	public void updateXMLTag(@PathParam("id") final Integer id, final TagV1 dataObject)
+	{
+		updateEntity(Tag.class, dataObject, new TagV1Factory(), id);
+	}
+
+	/* CATEGORY FUNCTIONS */
+	@GET
+	@Path("/category/get/json")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(
+	{ "*" })
+	public BaseRestCollectionV1<CategoryV1> getJSONCategories(@QueryParam("expand") final String expand)
+	{
+		return getJSONResources(Category.class, new CategoryV1Factory(), CATEGORIES_EXPANSION_NAME, expand);
+	}
+
+	@GET
+	@Path("/category/get/json/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(
+	{ "*" })
+	public CategoryV1 getJSONCategory(@PathParam("id") final Integer id, @QueryParam("expand") final String expand)
+	{
+		assert id != null : "The id parameter can not be null";
+
+		return getJSONResource(Category.class, new CategoryV1Factory(), id, expand);
+	}
+
+	@GET
+	@Path("/category/get/xml/{id}")
+	@Produces(MediaType.TEXT_XML)
+	@Consumes(
+	{ "*" })
+	public CategoryV1 getXMLCategory(@PathParam("id") final Integer id, @QueryParam("expand") final String expand)
+	{
+		assert id != null : "The id parameter can not be null";
+
+		return getXMLResource(Category.class, new CategoryV1Factory(), id, expand);
+	}
+
+	@PUT
+	@Path("/category/put/json/{id}")
+	@Consumes(
+	{ MediaType.APPLICATION_JSON })
+	public void updateJSONCategory(@PathParam("id") final Integer id, final CategoryV1 dataObject)
+	{
+		updateEntity(Category.class, dataObject, new CategoryV1Factory(), id);
+	}
+
+	@PUT
+	@Path("/category/put/xml/{id}")
+	@Consumes(
+	{ MediaType.TEXT_XML })
+	public void updateXMLCategory(@PathParam("id") final Integer id, final CategoryV1 dataObject)
+	{
+		updateEntity(Category.class, dataObject, new CategoryV1Factory(), id);
+	}
+
+	/* PROJECT FUNCTIONS */
+	@GET
+	@Path("/project/get/json")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(
+	{ "*" })
+	public BaseRestCollectionV1<ProjectV1> getJSONProjects(@QueryParam("expand") final String expand)
+	{
+		return getJSONResources(Project.class, new ProjectV1Factory(), TAGS_EXPANSION_NAME, expand);
+	}
+
+	@GET
+	@Path("/project/get/json/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(
+	{ "*" })
+	public ProjectV1 getJSONProject(@PathParam("id") final Integer id, @QueryParam("expand") final String expand)
+	{
+		assert id != null : "The id parameter can not be null";
+
+		return getJSONResource(Project.class, new ProjectV1Factory(), id, expand);
+	}
+
+	@GET
+	@Path("/project/get/xml/{id}")
+	@Produces(MediaType.TEXT_XML)
+	@Consumes(
+	{ "*" })
+	public ProjectV1 getXMLProject(@PathParam("id") final Integer id, @QueryParam("expand") final String expand)
+	{
+		assert id != null : "The id parameter can not be null";
+
+		return getXMLResource(Project.class, new ProjectV1Factory(), id, expand);
+	}
+
+	@PUT
+	@Path("/project/put/json/{id}")
+	@Consumes(
+	{ MediaType.APPLICATION_JSON })
+	public void updateJSONProject(@PathParam("id") final Integer id, final ProjectV1 dataObject)
+	{
+		updateEntity(Project.class, dataObject, new ProjectV1Factory(), id);
+	}
+
+	@PUT
+	@Path("/project/put/xml/{id}")
+	@Consumes(
+	{ MediaType.TEXT_XML })
+	public void updateXMLProject(@PathParam("id") final Integer id, final ProjectV1 dataObject)
+	{
+		updateEntity(Project.class, dataObject, new ProjectV1Factory(), id);
+	}
+
 }

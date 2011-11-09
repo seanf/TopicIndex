@@ -3,7 +3,7 @@ package com.redhat.topicindex.rest.factory;
 import com.redhat.topicindex.entity.Category;
 import com.redhat.topicindex.entity.Tag;
 import com.redhat.topicindex.rest.ExpandData;
-import com.redhat.topicindex.rest.RESTv1;
+import com.redhat.topicindex.rest.BaseRESTv1;
 import com.redhat.topicindex.rest.entities.CategoryV1;
 import com.redhat.topicindex.rest.entities.TagV1;
 
@@ -30,18 +30,18 @@ public class TagV1Factory implements RESTDataObjectFactory<TagV1, Tag>
 		retValue.setId(entity.getTagId());
 		retValue.setName(entity.getTagName());
 		retValue.setDescription(entity.getTagDescription());
-		retValue.setExpand(new String[] {RESTv1.CATEGORIES_EXPANSION_NAME});
+		retValue.setExpand(new String[] {BaseRESTv1.CATEGORIES_EXPANSION_NAME});
 		
-		if (expand.contains(RESTv1.CATEGORIES_EXPANSION_NAME))
+		if (expand.contains(BaseRESTv1.CATEGORIES_EXPANSION_NAME))
 		{
-			retValue.setCategories(new RESTDataObjectCollectionFactory<CategoryV1, Category>().create(new CategoryV1Factory(), entity.getCategories(), RESTv1.CATEGORIES_EXPANSION_NAME, dataType, expand, baseUrl));
+			retValue.setCategories(new RESTDataObjectCollectionFactory<CategoryV1, Category>().create(new CategoryV1Factory(), entity.getCategories(), BaseRESTv1.CATEGORIES_EXPANSION_NAME, dataType, expand, baseUrl));
 		}
 		else
 		{
-			retValue.setCategories(new RESTDataObjectCollectionFactory<CategoryV1, Category>().create(new CategoryV1Factory(), entity.getCategories(), RESTv1.CATEGORIES_EXPANSION_NAME, dataType));
+			retValue.setCategories(new RESTDataObjectCollectionFactory<CategoryV1, Category>().create(new CategoryV1Factory(), entity.getCategories(), BaseRESTv1.CATEGORIES_EXPANSION_NAME, dataType));
 		}
 		
-		retValue.setLinks(baseUrl, RESTv1.TAG_URL_NAME, dataType, retValue.getId());
+		retValue.setLinks(baseUrl, BaseRESTv1.TAG_URL_NAME, dataType, retValue.getId());
 		
 		return retValue;
 	}
