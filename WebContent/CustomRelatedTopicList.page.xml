@@ -23,5 +23,6 @@
 	<param name="topicHasXMLErrors" value="#{relatedTopicTagsList.topic.hasXMLErrors}" />
 	<param name="endEditDate" value="#{relatedTopicTagsList.topic.endEditDateString}" />
 	<param name="startEditDate" value="#{relatedTopicTagsList.topic.startEditDateString}" />
+	<param name="topicEditedInLastDays" value="#{relatedTopicTagsList.topic.editedInLastDaysString}"/>
 
 </page>

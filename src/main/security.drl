@@ -312,6 +312,13 @@ rule "FilterTextFreeSearchRendered"
    	then
 end
 
+rule "FilterTopicEditedInLastRendered"
+	when
+		c: PermissionCheck(name == "FilterTopicEditedInLast", action == "Rendered")
+		Role(name == "smeRole" || == "iaRole" || == "editorRole" || == "writerRole" || == "qeRole")
+   	then
+end
+
 rule "FilterHasXMLErrorsRendered"
 	when
 		c: PermissionCheck(name == "FilterHasXMLErrors", action == "Rendered")

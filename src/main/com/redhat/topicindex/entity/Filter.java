@@ -571,45 +571,48 @@ public class Filter implements java.io.Serializable
 
 		for (final FilterField filterField : this.getFilterFields())
 		{
+			final String fieldName = filterField.getField();
+			final String fieldValue = filterField.getValue();
+
 			String thisRestriction = "";
 
-			if (filterField.getField().equals(Constants.TOPIC_IDS_FILTER_VAR))
+			if (fieldName.equals(Constants.TOPIC_IDS_FILTER_VAR))
 			{
-				thisRestriction = "topic.topicId in (" + filterField.getValue() + ")";
+				thisRestriction = "topic.topicId in (" + fieldValue + ")";
 			}
-			else if (filterField.getField().equals(Constants.TOPIC_TITLE_FILTER_VAR))
+			else if (fieldName.equals(Constants.TOPIC_TITLE_FILTER_VAR))
 			{
-				thisRestriction = "lower(topic.topicTitle) like lower('%" + filterField.getValue() + "%')";
+				thisRestriction = "lower(topic.topicTitle) like lower('%" + fieldValue + "%')";
 			}
-			else if (filterField.getField().equals(Constants.TOPIC_TITLE_FILTER_VAR))
+			else if (fieldName.equals(Constants.TOPIC_TITLE_FILTER_VAR))
 			{
-				thisRestriction = "lower(topic.topicTitle) like lower('%" + filterField.getValue() + "%')";
+				thisRestriction = "lower(topic.topicTitle) like lower('%" + fieldValue + "%')";
 			}
-			else if (filterField.getField().equals(Constants.TOPIC_XML_FILTER_VAR))
+			else if (fieldName.equals(Constants.TOPIC_XML_FILTER_VAR))
 			{
-				thisRestriction = "lower(topic.topicXML) like lower('%" + filterField.getValue() + "%')";
+				thisRestriction = "lower(topic.topicXML) like lower('%" + fieldValue + "%')";
 			}
-			else if (filterField.getField().equals(Constants.TOPIC_DESCRIPTION_FILTER_VAR))
+			else if (fieldName.equals(Constants.TOPIC_DESCRIPTION_FILTER_VAR))
 			{
-				thisRestriction = "lower(topic.topicText) like lower('%" + filterField.getValue() + "%')";
+				thisRestriction = "lower(topic.topicText) like lower('%" + fieldValue + "%')";
 			}
-			else if (filterField.getField().equals(Constants.TOPIC_ADDED_BY_FILTER_VAR))
+			else if (fieldName.equals(Constants.TOPIC_ADDED_BY_FILTER_VAR))
 			{
-				thisRestriction = "lower(topic.topicAddedBy) like lower('%" + filterField.getValue() + "%')";
+				thisRestriction = "lower(topic.topicAddedBy) like lower('%" + fieldValue + "%')";
 			}
-			else if (filterField.getField().equals(Constants.TOPIC_HAS_RELATIONSHIPS))
+			else if (fieldName.equals(Constants.TOPIC_HAS_RELATIONSHIPS))
 			{
 				thisRestriction = "topic.parentTopicToTopics.size >= 1";
 			}
-			else if (filterField.getField().equals(Constants.TOPIC_HAS_INCOMING_RELATIONSHIPS))
+			else if (fieldName.equals(Constants.TOPIC_HAS_INCOMING_RELATIONSHIPS))
 			{
 				thisRestriction = "topic.childTopicToTopics.size >= 1";
 			}
-			else if (filterField.getField().equals(Constants.TOPIC_RELATED_TO) || filterField.getField().equals(Constants.TOPIC_RELATED_FROM))
+			else if (fieldName.equals(Constants.TOPIC_RELATED_TO) || fieldName.equals(Constants.TOPIC_RELATED_FROM))
 			{
 				try
 				{
-					final Integer topicId = Integer.parseInt(filterField.getValue());
+					final Integer topicId = Integer.parseInt(fieldValue);
 					final String relatedTopics = EntityUtilities.getRelatedTopicIDsString(topicId);
 
 					thisRestriction = "topic.topicId in (" + relatedTopics + ")";
@@ -619,47 +622,61 @@ public class Filter implements java.io.Serializable
 					ExceptionUtilities.handleException(ex);
 				}
 			}
-			else if (filterField.getField().equals(Constants.TOPIC_HAS_XML_ERRORS))
+			else if (fieldName.equals(Constants.TOPIC_HAS_XML_ERRORS))
 			{
 				try
 				{
-					final Boolean hasXMLErrors = Boolean.valueOf(filterField.getValue());
+					final Boolean hasXMLErrors = Boolean.valueOf(fieldValue);
 					if (hasXMLErrors)
 						thisRestriction = "length(topic.topicSecondOrderData.topicXMLErrors) >= 1";
 				}
 				catch (final Exception ex)
 				{
-
+					ExceptionUtilities.handleException(ex);
 				}
 
 			}
-			
-			else if (filterField.getField().equals(Constants.TOPIC_STARTDATE_FILTER_VAR))
-			{
-				startCreateDate = filterField.getValue();
-				
-			}
-			else if (filterField.getField().equals(Constants.TOPIC_ENDDATE_FILTER_VAR))
-			{
-				endCreateDate = filterField.getValue();				
-			}
-
-			else if (filterField.getField().equals(Constants.TOPIC_STARTEDITDATE_FILTER_VAR))
+			else if (fieldName.equals(Constants.TOPIC_EDITED_IN_LAST_DAYS))
 			{
 				try
 				{
-					startEditDate = ISODateTimeFormat.dateTime().parseDateTime(filterField.getValue());
+					final Integer days = Integer.parseInt(fieldValue);
+					final DateTime date = new DateTime().minusDays(days);
+					final String editedTopics = EntityUtilities.getEditedEntitiesString(Topic.class, "topicId", date, null);
+					thisRestriction += "topic.topicId in (" + editedTopics + ")";
 				}
 				catch (final Exception ex)
 				{
 					ExceptionUtilities.handleException(ex);
 				}
 			}
-			else if (filterField.getField().equals(Constants.TOPIC_ENDEDITDATE_FILTER_VAR))
+
+			else if (fieldName.equals(Constants.TOPIC_STARTDATE_FILTER_VAR))
+			{
+				startCreateDate = fieldValue;
+
+			}
+			else if (fieldName.equals(Constants.TOPIC_ENDDATE_FILTER_VAR))
+			{
+				endCreateDate = fieldValue;
+			}
+
+			else if (fieldName.equals(Constants.TOPIC_STARTEDITDATE_FILTER_VAR))
 			{
 				try
 				{
-					endEditDate = ISODateTimeFormat.dateTime().parseDateTime(filterField.getValue());
+					startEditDate = ISODateTimeFormat.dateTime().parseDateTime(fieldValue);
+				}
+				catch (final Exception ex)
+				{
+					ExceptionUtilities.handleException(ex);
+				}
+			}
+			else if (fieldName.equals(Constants.TOPIC_ENDEDITDATE_FILTER_VAR))
+			{
+				try
+				{
+					endEditDate = ISODateTimeFormat.dateTime().parseDateTime(fieldValue);
 				}
 				catch (final Exception ex)
 				{
@@ -675,22 +692,22 @@ public class Filter implements java.io.Serializable
 				filterFieldQueryBlock += thisRestriction;
 			}
 		}
-		
+
 		if (startCreateDate != null || endCreateDate != null)
 		{
 			String thisRestriction = "";
-			
+
 			if (startCreateDate != null)
 				thisRestriction = "topic.topicTimeStamp >= " + startCreateDate;
-			
+
 			if (endCreateDate != null)
 			{
 				if (startCreateDate != null)
 					thisRestriction += " and ";
-				
+
 				thisRestriction += "topic.topicTimeStamp <= " + endCreateDate;
 			}
-			
+
 			if (thisRestriction.length() != 0)
 			{
 				if (filterFieldQueryBlock.length() != 0)
@@ -698,7 +715,7 @@ public class Filter implements java.io.Serializable
 
 				filterFieldQueryBlock += thisRestriction;
 			}
-			
+
 		}
 
 		if (startEditDate != null || endEditDate != null)

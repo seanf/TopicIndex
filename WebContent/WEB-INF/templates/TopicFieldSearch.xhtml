@@ -43,6 +43,12 @@
 					cellWidth="24px" cellHeight="22px" style="width:200px" />
 
 			</s:decorate>
+			
+			<s:decorate template="/layout/display.xhtml"
+				rendered="#{s:hasPermission('FilterTopicEditedInLast', 'Rendered', null)}">
+				<ui:define name="label">Topic Edited In Last x Days</ui:define>
+				<h:inputText size="125" id="topicEditedInLast" value="#{topic.editedInLastDaysString}" />
+			</s:decorate>
 
 			<s:decorate template="/layout/display.xhtml"
 				rendered="#{s:hasPermission('FilterTopicID', 'Rendered', null)}">
