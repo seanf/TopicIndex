@@ -87,24 +87,27 @@ public class BaseRESTv1
 			feed.setTitle(title);
 			feed.setUpdated(new Date());
 
-			for (final TopicV1 topic : topics.getItems())
+			if (topics.getItems() != null)
 			{
-				final String html = topic.getHtml();
-
-				final Entry entry = new Entry();
-				entry.setTitle(topic.getTitle());
-				entry.setUpdated(topic.getLastModified());
-				entry.setPublished(topic.getCreated());
-
-				if (html != null)
+				for (final TopicV1 topic : topics.getItems())
 				{
-					final Content content = new Content();
-					content.setType(MediaType.TEXT_HTML_TYPE);
-					content.setText(fixHrefs(topic.getHtml()));
-					entry.setContent(content);
-				}
+					final String html = topic.getHtml();
 
-				feed.getEntries().add(entry);
+					final Entry entry = new Entry();
+					entry.setTitle(topic.getTitle());
+					entry.setUpdated(topic.getLastModified());
+					entry.setPublished(topic.getCreated());
+
+					if (html != null)
+					{
+						final Content content = new Content();
+						content.setType(MediaType.TEXT_HTML_TYPE);
+						content.setText(fixHrefs(topic.getHtml()));
+						entry.setContent(content);
+					}
+
+					feed.getEntries().add(entry);
+				}
 			}
 
 			return feed;
