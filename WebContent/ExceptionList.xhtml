@@ -60,7 +60,7 @@
                     <ui:param name="propertyPath" value="exception.exceptionId"/>
                 </ui:include>
             </f:facet>
-            <h:outputText value="#{_exception.exceptionId}"/>
+            <h:outputText value="#{_exception.exceptionId}" title="#{_exception.description}"/>
         </h:column>
         <h:column>
             <f:facet name="header">
@@ -81,16 +81,6 @@
                 </ui:include>
             </f:facet>
             <h:outputText value="#{_exception.expected}"/>
-        </h:column>
-        <h:column>
-            <f:facet name="header">
-                <ui:include src="layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{exceptionList}"/>
-                    <ui:param name="propertyLabel" value="Description"/>
-                    <ui:param name="propertyPath" value="exception.description"/>
-                </ui:include>
-            </f:facet>
-            <h:outputText value="#{_exception.description}"/>
         </h:column>
         <rich:column styleClass="action">
             <f:facet name="header">Action</f:facet>
