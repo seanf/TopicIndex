@@ -157,6 +157,9 @@ public class ImageFile implements java.io.Serializable
 
 	private byte[] createImage(final boolean resize)
 	{
+		if (this.imageData == null)
+			return null;
+		
 		try
 		{
 			BufferedImage outImage = null;

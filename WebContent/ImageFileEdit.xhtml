@@ -11,78 +11,67 @@
 
 	<ui:define name="body">
 
-<h:form enctype="multipart/form-data" id="imageFile"
-					styleClass="edit">
+		<h:form enctype="multipart/form-data" id="imageFile" styleClass="edit">
 
-		<rich:tabPanel switchType="client">
-			<f:facet name="header">#{imageFileHome.managed ? 'Edit' : 'Add'} Image file</f:facet>
-			<rich:tab label="Tags">
+			<rich:panel>
+				<f:facet name="header">#{imageFileHome.managed ? 'Edit' : 'Add'} Image file</f:facet>
 
-					<s:decorate id="imageFileId" template="layout/display.xhtml">
-						<ui:define name="label">Image File ID</ui:define>
-						<h:outputText value="#{imageFileHome.instance.imageFileId}" />
-					</s:decorate>
+				<s:decorate id="imageFileId" template="layout/display.xhtml">
+					<ui:define name="label">Image File ID</ui:define>
+					<h:outputText value="#{imageFileHome.instance.imageFileId}" />
+				</s:decorate>
 
-					<s:decorate id="docbookFileName" template="layout/display.xhtml">
-						<ui:define name="label">Docbook File Name</ui:define>
-						<h:outputText value="#{imageFileHome.instance.docbookFileName}" />
-					</s:decorate>
+				<s:decorate id="docbookFileName" template="layout/display.xhtml">
+					<ui:define name="label">Docbook File Name</ui:define>
+					<h:outputText value="#{imageFileHome.instance.docbookFileName}" />
+				</s:decorate>
 
-					<s:decorate id="originalFileName" template="layout/display.xhtml">
-						<ui:define name="label">Original File Name</ui:define>
-						<h:outputText value="#{imageFileHome.instance.originalFileName}" />
-					</s:decorate>
+				<s:decorate id="originalFileName" template="layout/display.xhtml">
+					<ui:define name="label">Original File Name</ui:define>
+					<h:outputText value="#{imageFileHome.instance.originalFileName}" />
+				</s:decorate>
 
-					<s:decorate id="description" template="layout/edit.xhtml">
-						<ui:define name="label">Description</ui:define>
-						<h:inputTextarea id="description" cols="80" rows="6"
-							required="false" value="#{imageFileHome.instance.description}" />
-					</s:decorate>
+				<s:decorate id="description" template="layout/edit.xhtml">
+					<ui:define name="label">Description</ui:define>
+					<h:inputTextarea id="description" cols="80" rows="6"
+						required="false" value="#{imageFileHome.instance.description}" />
+				</s:decorate>
 
+				<s:decorate id="imageData" template="layout/display.xhtml">
+					<ui:define name="label">Upload An Image</ui:define>
+					<s:fileUpload data="#{imageFileHome.imageData}"
+						fileName="#{imageFileHome.instance.originalFileName}" />
+				</s:decorate>
 
+				<div style="clear: both" />
 
-			</rich:tab>
-			<rich:tab label="Upload">
-				
-					<s:decorate id="imageData" template="layout/display.xhtml">
-						<ui:define name="label">Upload An Image</ui:define>
-						<s:fileUpload data="#{imageFileHome.imageData}"
-							fileName="#{imageFileHome.instance.originalFileName}" />
-					</s:decorate>
+			</rich:panel>
 
-					
-				
-			</rich:tab>
+			<div class="actionButtons">
 
-		</rich:tabPanel>
-		
-							<div style="clear: both" />
+				<h:commandButton id="save" value="Save"
+					action="#{imageFileHome.persist}"
+					disabled="#{!imageFileHome.wired}"
+					rendered="#{!imageFileHome.managed}" />
 
-					<div class="actionButtons">
+				<h:commandButton id="update" value="Save"
+					action="#{imageFileHome.update}"
+					rendered="#{imageFileHome.managed}" />
 
-						<h:commandButton id="save" value="Save"
-							action="#{imageFileHome.persist}"
-							disabled="#{!imageFileHome.wired}"
-							rendered="#{!imageFileHome.managed}" />
+				<h:commandButton id="delete" value="Delete"
+					action="#{imageFileHome.remove}" immediate="true"
+					rendered="#{imageFileHome.managed}" />
 
-						<h:commandButton id="update" value="Save"
-							action="#{imageFileHome.update}"
-							rendered="#{imageFileHome.managed}" />
+				<s:button id="cancelEdit" value="Cancel" propagation="end"
+					view="/ImageFile.xhtml" rendered="#{imageFileHome.managed}" />
 
-						<h:commandButton id="delete" value="Delete"
-							action="#{imageFileHome.remove}" immediate="true"
-							rendered="#{imageFileHome.managed}" />
+				<s:button id="cancelAdd" value="Cancel" propagation="end"
+					view="/#{empty imageFileFrom ? 'ImageFileList' : imageFileFrom}.xhtml"
+					rendered="#{!imageFileHome.managed}" />
 
-						<s:button id="cancelEdit" value="Cancel" propagation="end"
-							view="/ImageFile.xhtml" rendered="#{imageFileHome.managed}" />
+			</div>
 
-						<s:button id="cancelAdd" value="Cancel" propagation="end"
-							view="/#{empty imageFileFrom ? 'ImageFileList' : imageFileFrom}.xhtml"
-							rendered="#{!imageFileHome.managed}" />
-
-					</div>
-					
-					</h:form>
+		</h:form>
 
 		<ui:include src="/WEB-INF/templates/DisplayErrorMessage.xhtml">
 			<ui:param name="messageComponent" value="#{imageFileHome}" />

@@ -7,6 +7,7 @@ import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 
 import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.validator.InvalidStateException;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.framework.EntityHome;
 
@@ -80,11 +81,16 @@ public class ImageFileHome extends EntityHome<ImageFile> implements DisplayMessa
 			
 			return super.persist();
 		}
+		catch (final InvalidStateException ex)
+		{
+			this.setDisplayMessage("The image requires a image file to be uploaded");
+			SkynetExceptionUtilities.handleException(ex, true, "Probably a constraint violation");
+		}
 		catch (final PersistenceException ex)
 		{
 			if (ex.getCause() instanceof ConstraintViolationException)
 			{
-				this.setDisplayMessage("The image requires a image file to be uploaded");
+				this.setDisplayMessage("The image violated a constraint");
 				SkynetExceptionUtilities.handleException(ex, true, "Probably a constraint violation");
 			}
 			else
@@ -112,11 +118,16 @@ public class ImageFileHome extends EntityHome<ImageFile> implements DisplayMessa
 			
 			return super.update();
 		}
+		catch (final InvalidStateException ex)
+		{
+			this.setDisplayMessage("The image requires a image file to be uploaded");
+			SkynetExceptionUtilities.handleException(ex, true, "Probably a constraint violation");
+		}
 		catch (final PersistenceException ex)
 		{
 			if (ex.getCause() instanceof ConstraintViolationException)
 			{
-				this.setDisplayMessage("The image requires a image file to be uploaded");
+				this.setDisplayMessage("The image violated a constraint");
 				SkynetExceptionUtilities.handleException(ex, true, "Probably a constraint violation");
 			}
 			else
