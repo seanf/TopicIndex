@@ -31,6 +31,8 @@ import org.hibernate.envers.Audited;
 import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
 import org.jboss.seam.Component;
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 
 import com.redhat.ecs.commonutils.CollectionUtilities;
 import com.redhat.ecs.commonutils.ExceptionUtilities;
@@ -633,6 +635,34 @@ public class Filter implements java.io.Serializable
 				else if (filterField.getField().equals(Constants.TOPIC_HAS_XML_ERRORS))
 				{
 					thisRestriction = "length(topic.topicSecondOrderData.topicXMLErrors) >= 1";
+				}
+				else if (filterField.getField().equals(Constants.TOPIC_STARTEDITDATE_FILTER_VAR))
+				{
+					try
+					{
+						final DateTime startDate = ISODateTimeFormat.dateTime().parseDateTime(filterField.getValue());					
+						final String editedTopics = EntityUtilities.getEditedEntitiesString(Topic.class, "topicId", startDate, null);
+					
+						thisRestriction = "topic.topicId in (" + editedTopics + ")";
+					}
+					catch (final Exception ex)
+					{
+						ExceptionUtilities.handleException(ex);
+					}
+				}
+				else if (filterField.getField().equals(Constants.TOPIC_ENDEDITDATE_FILTER_VAR))
+				{
+					try
+					{
+						final DateTime endDate = ISODateTimeFormat.dateTime().parseDateTime(filterField.getValue());					
+						final String editedTopics = EntityUtilities.getEditedEntitiesString(Topic.class, "topicId", null, endDate);
+					
+						thisRestriction = "topic.topicId in (" + editedTopics + ")";
+					}
+					catch (final Exception ex)
+					{
+						ExceptionUtilities.handleException(ex);
+					}
 				}
 				
 

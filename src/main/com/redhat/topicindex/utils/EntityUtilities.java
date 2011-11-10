@@ -572,6 +572,23 @@ public class EntityUtilities
 		
 		return entityyIds;
 	}
+	
+	public static <E> String getEditedEntitiesString(final Class<E> type, final String pkColumnName, final DateTime startDate, final DateTime endDate)
+	{
+		final List<Integer> ids = getEditedEntities(type, pkColumnName, startDate, endDate);
+		if (ids != null)
+		{
+			String retValue = "";
+			for (final Integer id : ids)
+			{
+				if (retValue.length() != 0)
+					retValue += ",";
+				retValue += id.toString();
+			}
+			return retValue;
+		}
+		return "";
+	}
 
 	@SuppressWarnings("unchecked")
 	public static List<Integer> getTextSearchTopicMatch(final String phrase)
