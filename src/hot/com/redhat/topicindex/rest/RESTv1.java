@@ -1,9 +1,7 @@
 package com.redhat.topicindex.rest;
 
-import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Formatter;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -34,11 +32,7 @@ import com.redhat.topicindex.rest.formatter.DateFormat;
 import com.redhat.topicindex.rest.sharedinterface.RESTInterfaceV1;
 import com.redhat.topicindex.utils.Constants;
 
-import org.jboss.resteasy.plugins.providers.atom.Content;
-import org.jboss.resteasy.plugins.providers.atom.Entry;
 import org.jboss.resteasy.plugins.providers.atom.Feed;
-import org.jboss.resteasy.plugins.providers.atom.Link;
-import org.jboss.resteasy.plugins.providers.atom.Person;
 import org.jboss.resteasy.spi.InternalServerErrorException;
 
 @Path("/1")

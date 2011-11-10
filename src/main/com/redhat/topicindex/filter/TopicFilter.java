@@ -43,6 +43,7 @@ public class TopicFilter
 	private Integer minXMLErrorLength;
 	private DateTime startEditDate;
 	private DateTime endEditDate;
+	private Integer editedInLastDays;
 
 	public List<Integer> getRelatedTopicIDs()
 	{
@@ -363,6 +364,8 @@ public class TopicFilter
 			return this.topicRelatedFrom == null ? null : this.topicRelatedFrom.toString();
 		else if (fieldName.equals(Constants.TOPIC_HAS_XML_ERRORS))
 			return this.getHasXMLErrorsString();
+		else if (fieldName.equals(Constants.TOPIC_EDITED_IN_LAST_DAYS))
+			return this.editedInLastDays == null ? null : editedInLastDays.toString();
 
 		return null;
 	}
@@ -393,6 +396,8 @@ public class TopicFilter
 			this.setLogic(fieldValue);
 		else if (fieldName.equals(Constants.TOPIC_HAS_XML_ERRORS))
 			this.setHasXMLErrorsString(fieldValue);
+		else if (fieldName.equals(Constants.TOPIC_EDITED_IN_LAST_DAYS))
+			this.setEditedInLastDaysString(fieldValue);
 		else if (fieldName.equals(Constants.TOPIC_HAS_RELATIONSHIPS))
 			this.setHasRelationships(fieldValue == null ? null : fieldValue.equalsIgnoreCase("true"));
 		else if (fieldName.equals(Constants.TOPIC_HAS_INCOMING_RELATIONSHIPS))
@@ -442,6 +447,7 @@ public class TopicFilter
 		retValue.put(Constants.TOPIC_RELATED_TO, this.getTopicRelatedTo() == null ? "" : this.getTopicRelatedTo().toString());
 		retValue.put(Constants.TOPIC_RELATED_FROM, this.getTopicRelatedFrom() == null ? "" : this.getTopicRelatedFrom().toString());
 		retValue.put(Constants.TOPIC_HAS_XML_ERRORS, this.getHasXMLErrorsString());
+		retValue.put(Constants.TOPIC_EDITED_IN_LAST_DAYS, this.getEditedInLastDaysString());
 		return retValue;
 	}
 
@@ -464,6 +470,7 @@ public class TopicFilter
 		retValue.put(Constants.TOPIC_RELATED_TO, Constants.TOPIC_RELATED_TO_DESC);
 		retValue.put(Constants.TOPIC_RELATED_FROM, Constants.TOPIC_RELATED_FROM_DESC);
 		retValue.put(Constants.TOPIC_HAS_XML_ERRORS, Constants.TOPIC_HAS_XML_ERRORS_DESC);
+		retValue.put(Constants.TOPIC_EDITED_IN_LAST_DAYS, Constants.TOPIC_EDITED_IN_LAST_DAYS_DESC);
 		return retValue;
 	}
 
@@ -623,5 +630,34 @@ public class TopicFilter
 		}
 
 		return null;
+	}
+
+	public Integer getEditedInLastDays()
+	{
+		return editedInLastDays;
+	}
+
+	public void setEditedInLastDays(Integer editedInLastDays)
+	{
+		this.editedInLastDays = editedInLastDays;
+	}
+	
+	public String getEditedInLastDaysString()
+	{
+		return editedInLastDays == null ? null : editedInLastDays.toString();
+	}
+
+	public void setEditedInLastDaysString(final String editedInLastDays)
+	{
+		try
+		{
+			this.editedInLastDays = editedInLastDays == null ? null : Integer.parseInt(editedInLastDays);
+		}
+		catch(final Exception ex)
+		{
+			this.editedInLastDays = null;
+			ExceptionUtilities.handleException(ex);
+		}
+		
 	}
 }
