@@ -1,8 +1,5 @@
 package com.redhat.topicindex.rest;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -13,7 +10,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
 
-import org.joda.time.DateTime;
 
 import com.redhat.topicindex.entity.Category;
 import com.redhat.topicindex.entity.Project;
@@ -28,12 +24,10 @@ import com.redhat.topicindex.rest.factory.CategoryV1Factory;
 import com.redhat.topicindex.rest.factory.ProjectV1Factory;
 import com.redhat.topicindex.rest.factory.TagV1Factory;
 import com.redhat.topicindex.rest.factory.TopicV1Factory;
-import com.redhat.topicindex.rest.formatter.DateFormat;
 import com.redhat.topicindex.rest.sharedinterface.RESTInterfaceV1;
 import com.redhat.topicindex.utils.Constants;
 
 import org.jboss.resteasy.plugins.providers.atom.Feed;
-import org.jboss.resteasy.spi.InternalServerErrorException;
 
 @Path("/1")
 public class RESTv1 extends BaseRESTv1 implements RESTInterfaceV1
@@ -68,64 +62,15 @@ public class RESTv1 extends BaseRESTv1 implements RESTInterfaceV1
 	{
 		return getJSONTopicsFromQuery(query.getMatrixParameters(), new TopicV1Factory(), TOPICS_EXPANSION_NAME, expand);
 	}
-
-	@GET
-	@Path("/topics/get/json/editedSince")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(
-	{ "*" })
-	public BaseRestCollectionV1<TopicV1> getJSONTopicsEditedSince(@QueryParam("date") @DateFormat(REST_DATE_FORMAT) final Date date, @QueryParam("expand") final String expand)
-	{
-		return getJSONEntitiesUpdatedSince(Topic.class, "topicId", new TopicV1Factory(), TOPICS_EXPANSION_NAME, expand, date);
-	}
 	
 	@GET
-	@Path("/topics/get/atom/editedSince")
+	@Path("/topics/get/atom/{query}")
 	@Produces(MediaType.APPLICATION_ATOM_XML)
 	@Consumes(
 	{ "*" })
-	public Feed getATOMTopicsEditedSince(@QueryParam("date") @DateFormat(REST_DATE_FORMAT) final Date date, @QueryParam("expand") final String expand)
+	public Feed getATOMTopicsWithQuery(@PathParam("query") PathSegment query, @QueryParam("expand") final String expand)
 	{
-		final SimpleDateFormat formatter = new SimpleDateFormat(REST_DATE_FORMAT);
-		final BaseRestCollectionV1<TopicV1> topics = getJSONEntitiesUpdatedSince(Topic.class, "topicId", new TopicV1Factory(), TOPICS_EXPANSION_NAME, expand, date);
-
-		try
-		{			
-			return convertTopicsIntoFeed(topics, "Topics Edited Since " + formatter.format(date));
-		}
-		catch (final Exception ex)
-		{
-			throw new InternalServerErrorException("Could not build the ATOM feed");
-		}
-	}
-
-	@GET
-	@Path("/topics/get/json/editedInLast")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(
-	{ "*" })
-	public BaseRestCollectionV1<TopicV1> getJSONTopicsEditedInLast(@QueryParam("days") final int days, @QueryParam("expand") final String expand)
-	{
-		return getJSONEntitiesUpdatedSince(Topic.class, "topicId", new TopicV1Factory(), TOPICS_EXPANSION_NAME, expand, new DateTime().minusDays(days).toDate());
-	}
-
-	@GET
-	@Path("/topics/get/atom/editedInLast")
-	@Produces(MediaType.APPLICATION_ATOM_XML)
-	@Consumes(
-	{ "*" })
-	public Feed getATOMTopicsEditedInLast(@QueryParam("days") final int days, @QueryParam("expand") final String expand)
-	{
-		final BaseRestCollectionV1<TopicV1> topics = getJSONEntitiesUpdatedSince(Topic.class, "topicId", new TopicV1Factory(), TOPICS_EXPANSION_NAME, expand, new DateTime().minusDays(days).toDate());
-
-		try
-		{
-			return convertTopicsIntoFeed(topics, "Topics Edited In The Last " + days + " Days");
-		}
-		catch (final Exception ex)
-		{
-			throw new InternalServerErrorException("Could not build the ATOM feed");
-		}
+		return this.convertTopicsIntoFeed(getJSONTopicsFromQuery(query.getMatrixParameters(), new TopicV1Factory(), TOPICS_EXPANSION_NAME, expand), "Topic Query");
 	}
 
 	@GET

@@ -44,7 +44,7 @@ import com.redhat.topicindex.utils.EntityUtilities;
 public class BaseRESTv1
 {
 	protected static final String REST_DATE_FORMAT = "dd-MMM-yyyy";
-	
+
 	public static final String TOPICS_EXPANSION_NAME = "topics";
 	public static final String TAGS_EXPANSION_NAME = "tags";
 	public static final String CATEGORIES_EXPANSION_NAME = "categories";
@@ -71,60 +71,68 @@ public class BaseRESTv1
 
 		return null;
 	}
-	
+
 	protected String getUrl()
 	{
 		return uriInfo.getAbsolutePath().toString();
 	}
-	
-	protected Feed convertTopicsIntoFeed(final BaseRestCollectionV1<TopicV1> topics, final String title) throws URISyntaxException
+
+	protected Feed convertTopicsIntoFeed(final BaseRestCollectionV1<TopicV1> topics, final String title)
 	{
-		final Feed feed = new Feed();
-
-		feed.setId(new URI(this.getUrl()));
-		feed.setTitle(title);
-		feed.setUpdated(new Date());
-
-		for (final TopicV1 topic : topics.getItems())
+		try
 		{
-			final String html = topic.getHtml();
-			
-			final Entry entry = new Entry();
-			entry.setTitle(topic.getTitle());
-			entry.setUpdated(topic.getLastModified());
-			entry.setPublished(topic.getCreated());
-			
-			if (html != null)
+			final Feed feed = new Feed();
+
+			feed.setId(new URI(this.getUrl()));
+			feed.setTitle(title);
+			feed.setUpdated(new Date());
+
+			for (final TopicV1 topic : topics.getItems())
 			{
-				final Content content = new Content();
-				content.setType(MediaType.TEXT_HTML_TYPE);
-				content.setText(fixHrefs(topic.getHtml()));
-				entry.setContent(content);
+				final String html = topic.getHtml();
+
+				final Entry entry = new Entry();
+				entry.setTitle(topic.getTitle());
+				entry.setUpdated(topic.getLastModified());
+				entry.setPublished(topic.getCreated());
+
+				if (html != null)
+				{
+					final Content content = new Content();
+					content.setType(MediaType.TEXT_HTML_TYPE);
+					content.setText(fixHrefs(topic.getHtml()));
+					entry.setContent(content);
+				}
+
+				feed.getEntries().add(entry);
 			}
 
-			feed.getEntries().add(entry);
+			return feed;
 		}
-
-		return feed;
+		catch (final Exception ex)
+		{
+			ExceptionUtilities.handleException(ex);
+			throw new InternalServerErrorException("There was an error creating the ATOM feed");
+		}
 	}
-	
+
 	private String fixHrefs(final String input)
 	{
 		return input.replaceAll("Topic\\.seam", Constants.FULL_SERVER_URL + "/Topic.seam");
 	}
-	
+
 	protected <T, U> BaseRestCollectionV1<T> getJSONEntitiesUpdatedSince(final Class<U> type, final String idProperty, final RESTDataObjectFactory<T, U> dataObjectFactory, final String expandName, final String expand, final Date date)
 	{
 		return getEntitiesUpdatedSince(type, idProperty, dataObjectFactory, expandName, expand, JSON_URL, date);
 	}
-	
+
 	protected <T, U> BaseRestCollectionV1<T> getEntitiesUpdatedSince(final Class<U> type, final String idProperty, final RESTDataObjectFactory<T, U> dataObjectFactory, final String expandName, final String expand, final String dataType, final Date date)
 	{
 		assert date != null : "The date parameter can not be null";
-		
+
 		EntityManager entityManager = null;
 		TransactionManager transactionManager = null;
-		
+
 		try
 		{
 			final InitialContext initCtx = new InitialContext();
@@ -132,50 +140,49 @@ public class BaseRESTv1
 			final EntityManagerFactory entityManagerFactory = (EntityManagerFactory) initCtx.lookup("java:jboss/EntityManagerFactory");
 			if (entityManagerFactory == null)
 				throw new InternalServerErrorException("Could not find the EntityManagerFactory");
-			
+
 			transactionManager = (TransactionManager) initCtx.lookup("java:jboss/TransactionManager");
 			if (transactionManager == null)
 				throw new InternalServerErrorException("Could not find the TransactionManager");
-			
+
 			assert transactionManager != null : "transactionManager should not be null";
 			assert entityManagerFactory != null : "entityManagerFactory should not be null";
-			
+
 			transactionManager.begin();
-			
+
 			entityManager = entityManagerFactory.createEntityManager();
 			if (entityManager == null)
 				throw new InternalServerErrorException("Could not create an EntityManager");
-			
-			/* get the list of topic ids that were edited after the selected date */
+
+			/*
+			 * get the list of topic ids that were edited after the selected
+			 * date
+			 */
 			final AuditReader reader = AuditReaderFactory.get(entityManager);
-			final AuditQuery query = reader.createQuery()
-				.forRevisionsOfEntity(type, true, false)
-				.addOrder(AuditEntity.revisionProperty("timestamp").asc())
-				.add(AuditEntity.revisionProperty("timestamp").ge(date.getTime()))
-				.addProjection(AuditEntity.property("originalId." + idProperty).distinct());
-			
+			final AuditQuery query = reader.createQuery().forRevisionsOfEntity(type, true, false).addOrder(AuditEntity.revisionProperty("timestamp").asc()).add(AuditEntity.revisionProperty("timestamp").ge(date.getTime())).addProjection(AuditEntity.property("originalId." + idProperty).distinct());
+
 			final List entityyIds = query.getResultList();
-			
+
 			/* now get the topics */
-			final CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();			
+			final CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 			final CriteriaQuery<U> criteriaQuery = criteriaBuilder.createQuery(type);
 			final Root<U> root = criteriaQuery.from(type);
 			criteriaQuery.where(root.get(idProperty).in(entityyIds));
-			
+
 			final TypedQuery<U> jpaQuery = entityManager.createQuery(criteriaQuery);
-			
+
 			final List<U> entities = jpaQuery.getResultList();
-			
+
 			transactionManager.commit();
-			
+
 			final BaseRestCollectionV1<T> retValue = new RESTDataObjectCollectionFactory<T, U>().create(dataObjectFactory, entities, expandName, dataType, new ExpandData(expand), getBaseUrl());
-			
+
 			return retValue;
 		}
 		catch (final Exception ex)
 		{
 			ExceptionUtilities.handleException(ex);
-		
+
 			try
 			{
 				transactionManager.rollback();
@@ -184,7 +191,7 @@ public class BaseRESTv1
 			{
 				ExceptionUtilities.handleException(ex2);
 			}
-			
+
 			throw new InternalServerErrorException("There was an error running the query");
 		}
 		finally
@@ -192,9 +199,9 @@ public class BaseRESTv1
 			if (entityManager != null)
 				entityManager.close();
 		}
-		
+
 	}
-	
+
 	protected <T, U> void updateEntity(final Class<U> type, final T dataObject, final RESTDataObjectFactory<T, U> factory, final Object id)
 	{
 		assert id != null : "The id parameter can not be null";
@@ -202,7 +209,7 @@ public class BaseRESTv1
 
 		TransactionManager transactionManager = null;
 		EntityManager entityManager = null;
-		
+
 		try
 		{
 			final InitialContext initCtx = new InitialContext();
@@ -214,7 +221,7 @@ public class BaseRESTv1
 			transactionManager = (TransactionManager) initCtx.lookup("java:jboss/TransactionManager");
 			if (transactionManager == null)
 				throw new InternalServerErrorException("Could not find the TransactionManager");
-			
+
 			assert transactionManager != null : "transactionManager should not be null";
 			assert entityManagerFactory != null : "entityManagerFactory should not be null";
 
@@ -245,7 +252,7 @@ public class BaseRESTv1
 		catch (final Exception ex)
 		{
 			ExceptionUtilities.handleException(ex);
-			
+
 			try
 			{
 				transactionManager.rollback();
@@ -268,12 +275,12 @@ public class BaseRESTv1
 	{
 		return getResource(type, dataObjectFactory, id, expand, JSON_URL);
 	}
-	
+
 	protected <T, U> T getXMLResource(final Class<U> type, final RESTDataObjectFactory<T, U> dataObjectFactory, final Object id, final String expand)
 	{
 		return getResource(type, dataObjectFactory, id, expand, XML_URL);
 	}
-	
+
 	private <T, U> T getResource(final Class<U> type, final RESTDataObjectFactory<T, U> dataObjectFactory, final Object id, final String expand, final String dataType)
 	{
 		assert type != null : "The type parameter can not be null";
@@ -306,17 +313,17 @@ public class BaseRESTv1
 			throw new InternalServerErrorException("Could not find the EntityManagerFactory");
 		}
 	}
-	
+
 	protected <T, U> BaseRestCollectionV1<T> getXMLResources(final Class<U> type, final RESTDataObjectFactory<T, U> dataObjectFactory, final String expandName, final String expand)
 	{
 		return getResources(type, dataObjectFactory, expandName, expand, XML_URL);
 	}
-	
+
 	protected <T, U> BaseRestCollectionV1<T> getJSONResources(final Class<U> type, final RESTDataObjectFactory<T, U> dataObjectFactory, final String expandName, final String expand)
 	{
 		return getResources(type, dataObjectFactory, expandName, expand, JSON_URL);
 	}
-	
+
 	protected <T, U> BaseRestCollectionV1<T> getResources(final Class<U> type, final RESTDataObjectFactory<T, U> dataObjectFactory, final String expandName, final String expand, final String dataType)
 	{
 		assert type != null : "The type parameter can not be null";
@@ -333,14 +340,14 @@ public class BaseRESTv1
 			final EntityManager entityManager = entityManagerFactory.createEntityManager();
 			if (entityManager == null)
 				throw new InternalServerErrorException("Could not create an EntityManager");
-			
-			final CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();			
+
+			final CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 			final CriteriaQuery<U> criteriaQuery = criteriaBuilder.createQuery(type);
-			
+
 			criteriaQuery.from(type);
-			
+
 			final TypedQuery<U> query = entityManager.createQuery(criteriaQuery);
-			
+
 			final List<U> result = query.getResultList();
 
 			final BaseRestCollectionV1<T> retValue = new RESTDataObjectCollectionFactory<T, U>().create(dataObjectFactory, result, expandName, dataType, new ExpandData(expand), getBaseUrl());
@@ -352,12 +359,12 @@ public class BaseRESTv1
 			throw new InternalServerErrorException("Could not find the EntityManagerFactory");
 		}
 	}
-	
+
 	protected BaseRestCollectionV1<TopicV1> getJSONTopicsFromQuery(final MultivaluedMap<String, String> queryParams, final TopicV1Factory dataObjectFactory, final String expandName, final String expand)
 	{
 		return getTopicsFromQuery(queryParams, dataObjectFactory, expandName, expand, JSON_URL);
 	}
-	
+
 	protected BaseRestCollectionV1<TopicV1> getTopicsFromQuery(final MultivaluedMap<String, String> queryParams, final TopicV1Factory dataObjectFactory, final String expandName, final String expand, final String dataType)
 	{
 		assert dataObjectFactory != null : "The dataObjectFactory parameter can not be null";
@@ -374,17 +381,12 @@ public class BaseRESTv1
 			final EntityManager entityManager = entityManagerFactory.createEntityManager();
 			if (entityManager == null)
 				throw new InternalServerErrorException("Could not create an EntityManager");
-			
+
 			// build up a Filter object from the URL variables
-			final Filter filter = EntityUtilities.populateFilter(
-					queryParams,
-					Constants.FILTER_ID, 
-					Constants.MATCH_TAG, 
-					Constants.CATEORY_INTERNAL_LOGIC, 
-					Constants.CATEORY_EXTERNAL_LOGIC);	
-			
+			final Filter filter = EntityUtilities.populateFilter(queryParams, Constants.FILTER_ID, Constants.MATCH_TAG, Constants.CATEORY_INTERNAL_LOGIC, Constants.CATEORY_EXTERNAL_LOGIC);
+
 			final String query = filter.buildQuery();
-			
+
 			final List<Topic> result = entityManager.createQuery(Topic.SELECT_ALL_QUERY + query).getResultList();
 
 			final BaseRestCollectionV1<TopicV1> retValue = new RESTDataObjectCollectionFactory<TopicV1, Topic>().create(dataObjectFactory, result, expandName, dataType, new ExpandData(expand), getBaseUrl());
