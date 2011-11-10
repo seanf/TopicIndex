@@ -9,6 +9,7 @@ public class SkynetExceptionUtilities
 	public static void handleException(final Exception ex, final boolean isExpected, final String explaination)
 	{
 		System.out.println(ex.toString());
-		ex.printStackTrace();
+		System.out.println("The above Exception was " + (isExpected ? "expected" : "unexptected!!!"));
+		System.out.println(explaination);
 	}
 }
