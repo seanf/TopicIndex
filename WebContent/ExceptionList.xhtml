@@ -6,7 +6,7 @@
     xmlns:f="http://java.sun.com/jsf/core"
     xmlns:h="http://java.sun.com/jsf/html"
     xmlns:rich="http://richfaces.org/rich"
-    template="layout/template.xhtml">
+    template="layout/cleantemplate.xhtml">
 
 <ui:define name="body">
 
@@ -16,12 +16,12 @@
 
             <s:decorate template="layout/display.xhtml">
                 <ui:define name="label">Details</ui:define>
-                <h:inputText id="details" value="#{exceptionList.exception.details}"/>
+                <h:inputText id="details" value="#{exceptionList.skynetException.details}"/>
             </s:decorate>
 
             <s:decorate template="layout/display.xhtml">
                 <ui:define name="label">Description</ui:define>
-                <h:inputText id="description" value="#{exceptionList.exception.description}"/>
+                <h:inputText id="description" value="#{exceptionList.skynetException.description}"/>
             </s:decorate>
 
             <s:decorate template="layout/display.xhtml">
@@ -57,7 +57,7 @@
                 <ui:include src="layout/sort.xhtml">
                     <ui:param name="entityList" value="#{exceptionList}"/>
                     <ui:param name="propertyLabel" value="Exception id"/>
-                    <ui:param name="propertyPath" value="exception.exceptionId"/>
+                    <ui:param name="propertyPath" value="skynetException.exceptionId"/>
                 </ui:include>
             </f:facet>
             <h:outputText value="#{_exception.exceptionId}" title="#{_exception.description}"/>
@@ -67,7 +67,7 @@
                 <ui:include src="layout/sort.xhtml">
                     <ui:param name="entityList" value="#{exceptionList}"/>
                     <ui:param name="propertyLabel" value="Details"/>
-                    <ui:param name="propertyPath" value="exception.details"/>
+                    <ui:param name="propertyPath" value="skynetException.details"/>
                 </ui:include>
             </f:facet>
             <h:outputText value="#{_exception.details}"/>
@@ -77,7 +77,7 @@
                 <ui:include src="layout/sort.xhtml">
                     <ui:param name="entityList" value="#{exceptionList}"/>
                     <ui:param name="propertyLabel" value="Expected"/>
-                    <ui:param name="propertyPath" value="exception.expected"/>
+                    <ui:param name="propertyPath" value="skynetException.expected"/>
                 </ui:include>
             </f:facet>
             <h:outputText value="#{_exception.expected}"/>
@@ -131,15 +131,6 @@
         </s:link>
 
     </div>
-
-    <s:div styleClass="actionButtons" rendered="#{empty from}">
-        <s:button view="/ExceptionEdit.xhtml"
-                    id="create"
-           propagation="none"
-                 value="Create exception">
-            <f:param name="exceptionExceptionId"/>
-        </s:button>
-    </s:div>
 
 </ui:define>
 

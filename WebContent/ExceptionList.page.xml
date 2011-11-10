@@ -9,7 +9,7 @@
    <param name="logic" value="#{exceptionList.restrictionLogicOperator}"/>
 
    <param name="from"/>
-   <param name="details" value="#{exceptionList.exception.details}"/>
-   <param name="description" value="#{exceptionList.exception.description}"/>
+   <param name="details" value="#{exceptionList.skynetException.details}"/>
+   <param name="description" value="#{exceptionList.skynetException.description}"/>
 
 </page>

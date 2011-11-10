@@ -4,7 +4,7 @@
       xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd">
 
    <param name="exceptionFrom"/>
-   <param name="exceptionExceptionId" value="#{exceptionHome.exceptionExceptionId}"/>
+   <param name="exceptionExceptionId" value="#{exceptionHome.skynetExceptionExceptionId}"/>
 
 
 </page>

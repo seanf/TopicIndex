@@ -8,12 +8,12 @@ import org.jboss.seam.framework.EntityHome;
 public class ExceptionHome extends EntityHome<SkynetException>
 {
 
-	public void setExceptionExceptionId(Integer id)
+	public void setSkynetExceptionExceptionId(Integer id)
 	{
 		setId(id);
 	}
 
-	public Integer getExceptionExceptionId()
+	public Integer getSkynetExceptionExceptionId()
 	{
 		return (Integer) getId();
 	}
