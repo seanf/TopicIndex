@@ -70,7 +70,8 @@ public class RESTv1 extends BaseRESTv1 implements RESTInterfaceV1
 	{ "*" })
 	public Feed getATOMTopicsWithQuery(@PathParam("query") PathSegment query, @QueryParam("expand") final String expand)
 	{
-		return this.convertTopicsIntoFeed(getJSONTopicsFromQuery(query.getMatrixParameters(), new TopicV1Factory(), TOPICS_EXPANSION_NAME, expand), "Topic Query");
+		final BaseRestCollectionV1<TopicV1> topics = getJSONTopicsFromQuery(query.getMatrixParameters(), new TopicV1Factory(), TOPICS_EXPANSION_NAME, expand);
+		return this.convertTopicsIntoFeed(topics, "Topic Query (" + topics.getSize() + " items)");
 	}
 
 	@GET
