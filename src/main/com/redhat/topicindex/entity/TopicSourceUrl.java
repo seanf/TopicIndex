@@ -163,7 +163,7 @@ public class TopicSourceUrl implements java.io.Serializable
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably a problem with HTMLCleaner");
 		}
 	}
 

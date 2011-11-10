@@ -99,12 +99,12 @@ public class Authenticator
 		}
 		catch (final LoginException ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, true, "The user could not be authenticated against a Kerberos database");
 			return false;
 		}
 		catch (final SecurityException ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, true, "The user could not be authenticated against a Kerberos database");
 			return false;
 		}
 
@@ -134,7 +134,7 @@ public class Authenticator
 		catch (final LoginException ex)
 		{
 			// Authentication failed
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, true, "The user could not be authenticated");
 			return false;
 		}
 	}

@@ -619,15 +619,17 @@ public class EntityUtilities
 				retValue.add(id);
 			}
 
-			// an empty list will be interpreted as no restriction as opposed to
-			// return none. so add a non existent topic id so no matches are
-			// made
+			/*
+			 * an empty list will be interpreted as no restriction as opposed to
+			 * return none. so add a non existent topic id so no matches are
+			 * made
+			 */
 			if (retValue.size() == 0)
 				retValue.add(-1);
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error using Lucene");
 		}
 
 		return retValue;
@@ -679,7 +681,7 @@ public class EntityUtilities
 					}
 					catch (final Exception ex)
 					{
-						SkynetExceptionUtilities.handleException(ex);
+						SkynetExceptionUtilities.handleException(ex, false, "An invalid date was stored as a Filter option in the database");
 					}
 				}
 				else if (fieldName.equals(Constants.TOPIC_HAS_RELATIONSHIPS))
@@ -704,7 +706,7 @@ public class EntityUtilities
 					catch (final Exception ex)
 					{
 						// failed to parse integer
-						SkynetExceptionUtilities.handleException(ex);
+						SkynetExceptionUtilities.handleException(ex, false, "An invalid Topic ID was stored for a Filter in the database");
 					}
 				}
 				else

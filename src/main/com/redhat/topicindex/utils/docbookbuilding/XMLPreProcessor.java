@@ -180,7 +180,7 @@ public class XMLPreProcessor
 				 * these lists are discovered by a regular expression so we
 				 * shouldn't have any trouble here with Integer.parse
 				 */
-				SkynetExceptionUtilities.handleException(ex);
+				SkynetExceptionUtilities.handleException(ex, false, "Probably an error with the list parameter, which should be a comma seperated list of ints");
 				retValue.add(new InjectionTopicData(-1, false));
 			}
 		}
@@ -635,7 +635,7 @@ public class XMLPreProcessor
 					}
 					catch (final Exception ex)
 					{
-						SkynetExceptionUtilities.handleException(ex);
+						SkynetExceptionUtilities.handleException(ex, false, "Probably an XML processing error");
 					}
 				}
 			}
@@ -755,7 +755,7 @@ public class XMLPreProcessor
 					}
 					catch (final Exception ex)
 					{
-						SkynetExceptionUtilities.handleException(ex);
+						SkynetExceptionUtilities.handleException(ex, false, "Probably an error retrieving a Topic entity");
 					}
 				}
 			}

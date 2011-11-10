@@ -795,7 +795,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably a thread problem");
 		}
 	}
 
@@ -1143,8 +1143,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		}
 		catch (final Exception ex)
 		{
-			// probably countn't find one of the string constants
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Pprobably countn't find one of the string constants");
 		}
 	}
 
@@ -1227,7 +1226,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably a thread problem");
 		}
 	}
 

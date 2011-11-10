@@ -49,7 +49,7 @@ public class TopicRenderer implements Runnable
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error looking up the manager objects");
 		}
 
 		return null;
@@ -91,7 +91,7 @@ public class TopicRenderer implements Runnable
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error with one of the steps used to preprocess the Topic's XML");
 		}
 		finally
 		{
@@ -146,7 +146,7 @@ public class TopicRenderer implements Runnable
 			}
 			catch (final Exception ex)
 			{
-				SkynetExceptionUtilities.handleException(ex);
+				SkynetExceptionUtilities.handleException(ex, false, "Probably a thread error");
 			}
 
 			/*
@@ -198,7 +198,7 @@ public class TopicRenderer implements Runnable
 			}
 			catch (final Exception ex)
 			{
-				SkynetExceptionUtilities.handleException(ex);
+				SkynetExceptionUtilities.handleException(ex, false, "Probably a problem updating a Topic entity");
 
 				try
 				{
@@ -206,7 +206,7 @@ public class TopicRenderer implements Runnable
 				}
 				catch (final Exception ex2)
 				{
-					SkynetExceptionUtilities.handleException(ex2);
+					SkynetExceptionUtilities.handleException(ex2, false, "An error rolling back a transaction");
 				}
 			}
 			finally

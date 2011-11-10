@@ -460,7 +460,7 @@ public class UIProjectData
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "A catch all Exception");
 		}
 	}
 

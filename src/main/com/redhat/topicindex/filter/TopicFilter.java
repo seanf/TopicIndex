@@ -216,7 +216,7 @@ public class TopicFilter
 				}
 				catch (final Exception ex)
 				{
-					SkynetExceptionUtilities.handleException(ex);
+					SkynetExceptionUtilities.handleException(ex, true, "Probably a malformed URL query paramater option for the Topic IDs");
 				}
 			}
 		}
@@ -410,7 +410,7 @@ public class TopicFilter
 			catch (final Exception ex)
 			{
 				// could not parse integer, so silently fail
-				SkynetExceptionUtilities.handleException(ex);
+				SkynetExceptionUtilities.handleException(ex, true, "Probably a malformed URL query parameter for the 'Related To' Topic ID");
 			}
 		}
 		else if (fieldName.equals(Constants.TOPIC_RELATED_FROM))
@@ -422,7 +422,7 @@ public class TopicFilter
 			catch (final Exception ex)
 			{
 				// could not parse integer, so silently fail
-				SkynetExceptionUtilities.handleException(ex);
+				SkynetExceptionUtilities.handleException(ex, true, "Probably a malformed URL query parameter for the 'Related From' Topic ID");
 			}
 		}
 	}
@@ -569,7 +569,7 @@ public class TopicFilter
 		catch (final Exception ex)
 		{
 			this.setHasXMLErrors(null);
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, true, "Probably a malformed URL query parameter for the 'Has XML Errors' option");
 		}
 	}
 
@@ -614,7 +614,7 @@ public class TopicFilter
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, true, "Probably invalid input from a malformed URL query parameter");
 		}
 
 		return null;
@@ -644,7 +644,7 @@ public class TopicFilter
 		catch(final Exception ex)
 		{
 			this.editedInLastDays = null;
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, true, "Probably a malformed URL query parameter for the 'Edited In Last Days' option");
 		}
 		
 	}

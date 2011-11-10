@@ -619,7 +619,7 @@ public class Filter implements java.io.Serializable
 				}
 				catch (final Exception ex)
 				{
-					SkynetExceptionUtilities.handleException(ex);
+					SkynetExceptionUtilities.handleException(ex, false, "An invalid Topic ID was stored for a Filter in the database");
 				}
 			}
 			else if (fieldName.equals(Constants.TOPIC_HAS_XML_ERRORS))
@@ -632,7 +632,7 @@ public class Filter implements java.io.Serializable
 				}
 				catch (final Exception ex)
 				{
-					SkynetExceptionUtilities.handleException(ex);
+					SkynetExceptionUtilities.handleException(ex, false, "An invalid boolean value was stored for a Filter in the database");
 				}
 
 			}
@@ -647,7 +647,7 @@ public class Filter implements java.io.Serializable
 				}
 				catch (final Exception ex)
 				{
-					SkynetExceptionUtilities.handleException(ex);
+					SkynetExceptionUtilities.handleException(ex, false, "An invalid integer was stored for a Filter in the database");
 				}
 			}
 
@@ -669,7 +669,7 @@ public class Filter implements java.io.Serializable
 				}
 				catch (final Exception ex)
 				{
-					SkynetExceptionUtilities.handleException(ex);
+					SkynetExceptionUtilities.handleException(ex, false, "An invalid DateTime string was stored by the Filter for the start edit date");
 				}
 			}
 			else if (fieldName.equals(Constants.TOPIC_ENDEDITDATE_FILTER_VAR))
@@ -680,7 +680,7 @@ public class Filter implements java.io.Serializable
 				}
 				catch (final Exception ex)
 				{
-					SkynetExceptionUtilities.handleException(ex);
+					SkynetExceptionUtilities.handleException(ex, false,  "An invalid DateTime string was stored by the Filter for the end edit date");
 				}
 			}
 

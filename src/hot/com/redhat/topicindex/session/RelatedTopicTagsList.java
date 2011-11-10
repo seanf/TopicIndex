@@ -206,7 +206,7 @@ public class RelatedTopicTagsList extends ExtendedTopicList
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error retrieving Topics from the database");
 		}
 		
 		return false;
@@ -223,7 +223,7 @@ public class RelatedTopicTagsList extends ExtendedTopicList
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error retrieving Topics from the database");
 		}
 		
 		return false;
@@ -273,7 +273,7 @@ public class RelatedTopicTagsList extends ExtendedTopicList
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error retrieving or persiting Topics in the database");
 		}
 		
 		final String retValue = returnToSearch ? "/CustomSearchTopicList.xhtml" : null;
@@ -318,7 +318,7 @@ public class RelatedTopicTagsList extends ExtendedTopicList
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error retrieving or perssting Topics in the database");
 		}
 		
 		final String retValue = returnToSearch ?
@@ -338,7 +338,7 @@ public class RelatedTopicTagsList extends ExtendedTopicList
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error retrieving a Topic from the database" );
 		}
 	}
 

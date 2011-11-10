@@ -27,7 +27,7 @@ public class GlobalDatabaseUtilities
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "An error reindexing the Lucene database");
 		}
 	}
 	
@@ -52,7 +52,7 @@ public class GlobalDatabaseUtilities
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "An error while rerendering all the topics in the database");
 		}
 	}
 }

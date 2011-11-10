@@ -42,7 +42,7 @@ public class SystemInfo
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error getting the details of the database connection");
 		}
 
 		return url;

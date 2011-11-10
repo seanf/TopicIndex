@@ -217,7 +217,7 @@ public class ImageFile implements java.io.Serializable
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "An error creating an image thumbnail");
 		}
 
 		return null;

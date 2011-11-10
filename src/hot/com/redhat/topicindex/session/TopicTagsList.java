@@ -224,7 +224,7 @@ public class TopicTagsList extends ExtendedTopicList
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "An error creating a ZIP file");
 			zipFile = null;
 		}
 
@@ -380,7 +380,7 @@ public class TopicTagsList extends ExtendedTopicList
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably a problem retrieving a Topic entity");
 		}
 		finally
 		{
@@ -407,7 +407,7 @@ public class TopicTagsList extends ExtendedTopicList
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably a problem retrieving a Topic entity");
 		}
 		finally
 		{
@@ -434,7 +434,7 @@ public class TopicTagsList extends ExtendedTopicList
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably a problem retrieving a Topic entity");
 		}
 		finally
 		{
@@ -463,7 +463,7 @@ public class TopicTagsList extends ExtendedTopicList
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably a problem retrieving a Topic entity");
 		}
 		finally
 		{
@@ -563,7 +563,7 @@ public class TopicTagsList extends ExtendedTopicList
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably a problem retrieving or updating a Topic entity");
 		}
 		finally
 		{
@@ -575,24 +575,16 @@ public class TopicTagsList extends ExtendedTopicList
 
 	public String getRelatedTopicsUrl()
 	{
-		try
-		{
-			if (actionTopicID != null)
-			{
-				return "/CustomSearchTopicList.seam?topicRelatedTo=" + actionTopicID;
-			}
-		}
-		catch (final Exception ex)
-		{
-			SkynetExceptionUtilities.handleException(ex);
-		}
-		finally
-		{
-			actionTopicID = null;
-			otherTopicId = null;
-		}
 
-		return "";
+		final Integer thisActionTopicID = actionTopicID;
+
+		actionTopicID = null;
+		otherTopicId = null;
+
+		if (thisActionTopicID != null)
+			return "/CustomSearchTopicList.seam?topicRelatedTo=" + thisActionTopicID;
+
+		return null;
 	}
 
 	public void removeRelationships()
@@ -610,7 +602,7 @@ public class TopicTagsList extends ExtendedTopicList
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably a problem retrieving or updating a Topic entity");
 		}
 		finally
 		{
@@ -621,24 +613,15 @@ public class TopicTagsList extends ExtendedTopicList
 
 	public String viewRelatedTopic()
 	{
-		try
-		{
-			if (otherTopicId != null)
-			{
-				return "/Topic.xhtml?topicTopicId=" + otherTopicId;
-			}
-		}
-		catch (final Exception ex)
-		{
-			SkynetExceptionUtilities.handleException(ex);
-		}
-		finally
-		{
-			actionTopicID = null;
-			otherTopicId = null;
-		}
+		final Integer thisOtherTopicId = otherTopicId;
 
-		return "";
+		actionTopicID = null;
+		otherTopicId = null;
+
+		if (thisOtherTopicId != null)
+			return "/Topic.xhtml?topicTopicId=" + thisOtherTopicId;
+
+		return null;
 	}
 
 }

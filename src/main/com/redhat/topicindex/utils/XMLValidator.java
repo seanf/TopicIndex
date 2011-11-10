@@ -35,7 +35,7 @@ public class XMLValidator implements DOMErrorHandler, LSResourceResolver
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error processing the XML");
 		}
 
 		return null;
@@ -76,7 +76,7 @@ public class XMLValidator implements DOMErrorHandler, LSResourceResolver
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, true, "The XML was not valid");
 
 			/*
 			 * something happened, which we will assume means the xml is invalid
@@ -107,7 +107,7 @@ public class XMLValidator implements DOMErrorHandler, LSResourceResolver
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error processing the XML");
 		}
 
 		return null;

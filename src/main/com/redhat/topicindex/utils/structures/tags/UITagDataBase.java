@@ -105,7 +105,7 @@ public class UITagDataBase
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "An error parsing the integer '" + newSort + "'");
 		}
 	}
 

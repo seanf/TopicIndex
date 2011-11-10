@@ -103,7 +103,7 @@ public class TagHome extends VersionedEntityHome<Tag> implements DisplayMessageI
 		}
 		catch (final PersistenceException ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);	
+			SkynetExceptionUtilities.handleException(ex, true, "Probably a constraint violation");	
 			if (ex.getCause() instanceof ConstraintViolationException)
 				this.setDisplayMessage("The tag requires a unique name");
 			else
@@ -111,7 +111,7 @@ public class TagHome extends VersionedEntityHome<Tag> implements DisplayMessageI
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error persisting a Tag entity");
 			this.setDisplayMessage("The tag could not be saved");
 		}
 		
@@ -163,7 +163,7 @@ public class TagHome extends VersionedEntityHome<Tag> implements DisplayMessageI
 		}
 		catch (final PersistenceException ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);	
+			SkynetExceptionUtilities.handleException(ex, true, "Probably a constraint violation");	
 			if (ex.getCause() instanceof ConstraintViolationException)
 				this.setDisplayMessage("The tag requires a unique name");
 			else
@@ -171,7 +171,7 @@ public class TagHome extends VersionedEntityHome<Tag> implements DisplayMessageI
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error updating a Tag entity");
 			this.setDisplayMessage("The tag could not be saved");
 		}
 		
@@ -229,8 +229,7 @@ public class TagHome extends VersionedEntityHome<Tag> implements DisplayMessageI
 		}
 		catch (final Exception ex)
 		{
-			// probably could not find the tag, but this shouldn't happen
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably could not find the tag");
 		}
 	}
 	

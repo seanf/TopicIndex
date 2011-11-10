@@ -41,7 +41,7 @@ public class TopBar
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, true, "Probably an invalid input for the Topic ID");
 		}
 
 		return null;
@@ -59,7 +59,7 @@ public class TopBar
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, true, "Probably an invalid input for the Topic ID");
 		}
 		
 		return null;

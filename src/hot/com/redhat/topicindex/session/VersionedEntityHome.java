@@ -45,7 +45,7 @@ public abstract class VersionedEntityHome<E> extends EntityHome<E>
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error retrieving an Envers historical entity");
 			revisionInstance = null;
 		}
 	}

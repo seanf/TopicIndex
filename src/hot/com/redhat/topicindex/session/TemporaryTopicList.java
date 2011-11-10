@@ -48,7 +48,7 @@ public class TemporaryTopicList
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error retrieving a Topic");
 		}
 		finally
 		{
@@ -71,7 +71,7 @@ public class TemporaryTopicList
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error retrieving a Topic");
 		}
 	}
 

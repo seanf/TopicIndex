@@ -49,7 +49,7 @@ public class ImageFileDisplay
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "An error writing an image to the http output stream");
 		}
 	}
 

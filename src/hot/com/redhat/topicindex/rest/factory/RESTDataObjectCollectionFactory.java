@@ -92,7 +92,7 @@ public class RESTDataObjectCollectionFactory<T, U>
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "An error creating or populating a BaseRestCollectionV1");
 		}
 
 		return retValue;

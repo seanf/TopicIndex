@@ -91,7 +91,7 @@ public class ExpandDataIndexes
 				}
 				catch (final Exception ex)
 				{
-					SkynetExceptionUtilities.handleException(ex);
+					SkynetExceptionUtilities.handleException(ex, false, "The regular expression used to define the start index of a collection expansion pulled in something other than an integer");
 				}
 			}
 
@@ -103,7 +103,7 @@ public class ExpandDataIndexes
 				}
 				catch (final Exception ex)
 				{
-					SkynetExceptionUtilities.handleException(ex);
+					SkynetExceptionUtilities.handleException(ex, false, "The regular expression used to define the end index of a collection expansion pulled in something other than an integer");
 				}
 			}
 		}

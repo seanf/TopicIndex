@@ -261,7 +261,7 @@ public class TopicHome extends VersionedEntityHome<Topic>
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error saving a TopicToTopicSourceUrl entity");
 		}
 	}
 
@@ -312,7 +312,7 @@ public class TopicHome extends VersionedEntityHome<Topic>
 				}
 				catch (final NumberFormatException ex)
 				{
-					SkynetExceptionUtilities.handleException(ex);
+					SkynetExceptionUtilities.handleException(ex, false, "Probably an invalid integer value in the URL query paramaters");
 				}
 			}
 		}
@@ -527,7 +527,7 @@ public class TopicHome extends VersionedEntityHome<Topic>
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error retrieving a Topic entity");
 		}
 	}
 }
