@@ -94,10 +94,12 @@
 							action="#{imageFileHome.remove}" immediate="true"
 							rendered="#{imageFileHome.managed}" />
 
-						<s:button id="cancelEditFromUploadTab" value="Cancel" propagation="end"
-							view="/ImageFile.xhtml" rendered="#{imageFileHome.managed}" />
+						<s:button id="cancelEditFromUploadTab" value="Cancel"
+							propagation="end" view="/ImageFile.xhtml"
+							rendered="#{imageFileHome.managed}" />
 
-						<s:button id="cancelAddFromUploadTab" value="Cancel" propagation="end"
+						<s:button id="cancelAddFromUploadTab" value="Cancel"
+							propagation="end"
 							view="/#{empty imageFileFrom ? 'ImageFileList' : imageFileFrom}.xhtml"
 							rendered="#{!imageFileHome.managed}" />
 
@@ -107,6 +109,9 @@
 
 		</rich:tabPanel>
 
+		<ui:include src="/WEB-INF/templates/DisplayErrorMessage.xhtml">
+			<ui:param name="messageComponent" value="#{imageFileHome}" />
+		</ui:include>
 
 
 	</ui:define>
