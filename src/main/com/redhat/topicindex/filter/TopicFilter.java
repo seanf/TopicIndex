@@ -40,7 +40,6 @@ public class TopicFilter
 	private Integer minimumIncomingRelationshipCount;
 	private String topicTextSearch;
 	private Boolean hasXMLErrors;
-	private Integer minXMLErrorLength;
 	private DateTime startEditDate;
 	private DateTime endEditDate;
 	private Integer editedInLastDays;
@@ -558,8 +557,7 @@ public class TopicFilter
 
 	public void setHasXMLErrors(final Boolean hasXMLErrors)
 	{
-		this.hasXMLErrors = hasXMLErrors;
-		this.minXMLErrorLength = this.hasXMLErrors == null ? null : this.hasXMLErrors.equals(Boolean.TRUE) ? 1 : null;
+		this.hasXMLErrors = hasXMLErrors == null || hasXMLErrors == false ? null : true;
 	}
 
 	public void setHasXMLErrorsString(final String hasXMLErrors)
@@ -578,16 +576,6 @@ public class TopicFilter
 	public String getHasXMLErrorsString()
 	{
 		return this.hasXMLErrors == null ? null : this.hasXMLErrors.toString();
-	}
-
-	public Integer getMinXMLErrorLength()
-	{
-		return minXMLErrorLength;
-	}
-
-	public void setMinXMLErrorLength(final Integer minXMLErrorLength)
-	{
-		this.minXMLErrorLength = minXMLErrorLength;
 	}
 
 	public DateTime getStartEditDate()

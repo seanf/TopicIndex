@@ -628,7 +628,7 @@ public class Filter implements java.io.Serializable
 				{
 					final Boolean hasXMLErrors = Boolean.valueOf(fieldValue);
 					if (hasXMLErrors)
-						thisRestriction = "length(topic.topicSecondOrderData.topicXMLErrors) >= 1";
+						thisRestriction = "topic.topicSecondOrderData.topicXMLErrors is not null";
 				}
 				catch (final Exception ex)
 				{
