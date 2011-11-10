@@ -19,6 +19,8 @@ public class Constants
 	 */
 	public static final String INSTANCE_NAME_PROPERTY = "topicindex.instanceName";
 	
+	public static final String GENERIC_ERROR_INSTRUCTIONS = "Please log out, log back in and try again. If the problem persists, please log a bug.";
+	
 	/** The encoding of the XML, used when converting a DOM object to a string */
 	public static final String XML_ENCODING = "UTF-8";
 	

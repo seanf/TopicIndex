@@ -37,7 +37,7 @@ import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.NotLoggedInException;
 
 @Name("topicHome")
-public class TopicHome extends VersionedEntityHome<Topic>
+public class TopicHome extends VersionedEntityHome<Topic> implements DisplayMessageInterface
 {
 	/** Serializable version identifier */
 	private static final long serialVersionUID = 1701692331956663275L;
@@ -55,6 +55,8 @@ public class TopicHome extends VersionedEntityHome<Topic>
 	 * displayed
 	 */
 	private String selectedTab;
+	/** The message to be displayed to the user */
+	private String displayMessage;
 
 	public TopicHome()
 	{
@@ -197,15 +199,25 @@ public class TopicHome extends VersionedEntityHome<Topic>
 
 	public String persistEx(final boolean addMore)
 	{
-		persist();
-		processedTopics.add(this.getInstance().getTopicId());
+		try
+		{
+			persist();
+			processedTopics.add(this.getInstance().getTopicId());
 
-		this.clearInstance();
+			this.clearInstance();
 
-		if (addMore)
-			return EntityUtilities.buildEditNewTopicUrl(selectedTags);
+			if (addMore)
+				return EntityUtilities.buildEditNewTopicUrl(selectedTags);
 
-		return "backToList";
+			return "backToList";
+		}
+		catch (final Exception ex)
+		{
+			this.setDisplayMessage("The topic could not be saved due to an unexpected Exception. " + Constants.GENERIC_ERROR_INSTRUCTIONS);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error persisting a topic");
+		}
+
+		return null;
 	}
 
 	public void populate()
@@ -339,15 +351,25 @@ public class TopicHome extends VersionedEntityHome<Topic>
 
 	public String updateEx(final boolean addMore)
 	{
-		update();
-		processedTopics.add(this.getInstance().getTopicId());
-		this.clearInstance();
-		// this.clearDirty();
+		try
+		{
+			update();
+			processedTopics.add(this.getInstance().getTopicId());
+			this.clearInstance();
+			// this.clearDirty();
 
-		if (addMore)
-			return EntityUtilities.buildEditNewTopicUrl(selectedTags);
+			if (addMore)
+				return EntityUtilities.buildEditNewTopicUrl(selectedTags);
 
-		return "backToList";
+			return "backToList";
+		}
+		catch (final Exception ex)
+		{
+			this.setDisplayMessage("The topic could not be saved due to an unexpected Exception. " + Constants.GENERIC_ERROR_INSTRUCTIONS);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error persisting a topic");
+		}
+
+		return null;
 	}
 
 	@SuppressWarnings("serial")
@@ -366,21 +388,22 @@ public class TopicHome extends VersionedEntityHome<Topic>
 					// is this a mutually exclusive category?
 					if (cat.isMutuallyExclusive())
 					{
-						// if so, the selected tag is stored in the selectedID
-						// field
-						// of the category GuiInputData
-						// this has the effect of removing any other tags that
-						// might
-						// be already selected in this category
+						/*
+						 * if so, the selected tag is stored in the selectedID
+						 * field of the category GuiInputData this has the
+						 * effect of removing any other tags that might be
+						 * already selected in this category
+						 */
 						if (cat.getSelectedTag() != null)
 							selectedTagObjects.add(getTagFromId(cat.getSelectedTag()));
 
 					}
 					else
 					{
-						// otherwise we find the selected tags from the tag
-						// GuiInputData
-						// objects in the ArrayList
+						/*
+						 * otherwise we find the selected tags from the tag
+						 * GuiInputData objects in the ArrayList
+						 */
 						for (final UITagData tagId : cat.getTags())
 						{
 							// if tag is selected
@@ -446,10 +469,12 @@ public class TopicHome extends VersionedEntityHome<Topic>
 
 					if (hasPermission)
 					{
-						// if we get to this point (i.e. no exception was
-						// thrown), we had authority to alter this flag
-						// add to external collection to avoid modifying a
-						// collection while looping over it
+						/*
+						 * if we get to this point (i.e. no exception was
+						 * thrown), we had authority to alter this flag add to
+						 * external collection to avoid modifying a collection
+						 * while looping over it
+						 */
 						removeTags.add(existingTag);
 					}
 
@@ -529,5 +554,15 @@ public class TopicHome extends VersionedEntityHome<Topic>
 		{
 			SkynetExceptionUtilities.handleException(ex, false, "Probably an error retrieving a Topic entity");
 		}
+	}
+
+	public String getDisplayMessage()
+	{
+		return displayMessage;
+	}
+
+	public void setDisplayMessage(String displayMessage)
+	{
+		this.displayMessage = displayMessage;
 	}
 }

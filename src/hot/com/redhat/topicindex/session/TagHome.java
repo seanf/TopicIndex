@@ -11,6 +11,7 @@ import java.util.Set;
 
 import javax.persistence.PersistenceException;
 
+import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.topicindex.entity.*;
 import com.redhat.topicindex.utils.EntityUtilities;
@@ -102,17 +103,22 @@ public class TagHome extends VersionedEntityHome<Tag> implements DisplayMessageI
 			return super.persist();
 		}
 		catch (final PersistenceException ex)
-		{
-			SkynetExceptionUtilities.handleException(ex, true, "Probably a constraint violation");	
+		{			
 			if (ex.getCause() instanceof ConstraintViolationException)
-				this.setDisplayMessage("The tag requires a unique name");
+			{				
+				this.setDisplayMessage("The tag requires a unique name.");
+				SkynetExceptionUtilities.handleException(ex, true, "Probably a constraint violation");	
+			}
 			else
-				this.setDisplayMessage("The tag could not be saved");
+			{
+				this.setDisplayMessage("The tag could not be saved. " + Constants.GENERIC_ERROR_INSTRUCTIONS);
+				SkynetExceptionUtilities.handleException(ex, false, "Probably an error persisting a Tag entity");	
+			}
 		}
 		catch (final Exception ex)
 		{
 			SkynetExceptionUtilities.handleException(ex, false, "Probably an error persisting a Tag entity");
-			this.setDisplayMessage("The tag could not be saved");
+			this.setDisplayMessage("The tag could not be saved. " + Constants.GENERIC_ERROR_INSTRUCTIONS);
 		}
 		
 		return null;
@@ -162,17 +168,22 @@ public class TagHome extends VersionedEntityHome<Tag> implements DisplayMessageI
 			return super.update();
 		}
 		catch (final PersistenceException ex)
-		{
-			SkynetExceptionUtilities.handleException(ex, true, "Probably a constraint violation");	
+		{			
 			if (ex.getCause() instanceof ConstraintViolationException)
+			{
 				this.setDisplayMessage("The tag requires a unique name");
+				SkynetExceptionUtilities.handleException(ex, true, "Probably a constraint violation");	
+			}
 			else
-				this.setDisplayMessage("The tag could not be saved");
+			{
+				this.setDisplayMessage("The tag could not be saved. " + Constants.GENERIC_ERROR_INSTRUCTIONS);
+				SkynetExceptionUtilities.handleException(ex, false, "Probably an error updating a Tag entity");
+			}
 		}
 		catch (final Exception ex)
 		{
 			SkynetExceptionUtilities.handleException(ex, false, "Probably an error updating a Tag entity");
-			this.setDisplayMessage("The tag could not be saved");
+			this.setDisplayMessage("The tag could not be saved. " + Constants.GENERIC_ERROR_INSTRUCTIONS);
 		}
 		
 		return null;

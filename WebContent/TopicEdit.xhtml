@@ -228,6 +228,10 @@
 
 		</h:form>
 
+		<ui:include src="/WEB-INF/templates/DisplayErrorMessage.xhtml">
+			<ui:param name="messageComponent" value="#{topicHome}" />
+		</ui:include>
+
 	</ui:define>
 
 </ui:composition>
