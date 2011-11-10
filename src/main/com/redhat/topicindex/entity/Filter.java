@@ -564,6 +564,8 @@ public class Filter implements java.io.Serializable
 
 		/* Now add the SQL for the fields */
 
+		String startCreateDate = null;
+		String endCreateDate = null;
 		DateTime startEditDate = null;
 		DateTime endEditDate = null;
 
@@ -595,14 +597,6 @@ public class Filter implements java.io.Serializable
 			{
 				thisRestriction = "lower(topic.topicAddedBy) like lower('%" + filterField.getValue() + "%')";
 			}
-			else if (filterField.getField().equals(Constants.TOPIC_STARTDATE_FILTER_VAR))
-			{
-				thisRestriction = "topic.topicTimeStamp >= " + filterField.getValue();
-			}
-			else if (filterField.getField().equals(Constants.TOPIC_ENDDATE_FILTER_VAR))
-			{
-				thisRestriction = "topic.topicTimeStamp <= " + filterField.getValue();
-			}
 			else if (filterField.getField().equals(Constants.TOPIC_HAS_RELATIONSHIPS))
 			{
 				thisRestriction = "topic.parentTopicToTopics.size >= 1";
@@ -629,15 +623,25 @@ public class Filter implements java.io.Serializable
 			{
 				try
 				{
-					final Boolean hasXMLErrors = Boolean.valueOf(filterField.getValue()); 
+					final Boolean hasXMLErrors = Boolean.valueOf(filterField.getValue());
 					if (hasXMLErrors)
 						thisRestriction = "length(topic.topicSecondOrderData.topicXMLErrors) >= 1";
 				}
 				catch (final Exception ex)
 				{
-					
+
 				}
+
+			}
+			
+			else if (filterField.getField().equals(Constants.TOPIC_STARTDATE_FILTER_VAR))
+			{
+				startCreateDate = filterField.getValue();
 				
+			}
+			else if (filterField.getField().equals(Constants.TOPIC_ENDDATE_FILTER_VAR))
+			{
+				endCreateDate = filterField.getValue();				
 			}
 
 			else if (filterField.getField().equals(Constants.TOPIC_STARTEDITDATE_FILTER_VAR))
@@ -671,6 +675,31 @@ public class Filter implements java.io.Serializable
 				filterFieldQueryBlock += thisRestriction;
 			}
 		}
+		
+		if (startCreateDate != null || endCreateDate != null)
+		{
+			String thisRestriction = "";
+			
+			if (startCreateDate != null)
+				thisRestriction = "topic.topicTimeStamp >= " + startCreateDate;
+			
+			if (endCreateDate != null)
+			{
+				if (startCreateDate != null)
+					thisRestriction += " and ";
+				
+				thisRestriction += "topic.topicTimeStamp <= " + endCreateDate;
+			}
+			
+			if (thisRestriction.length() != 0)
+			{
+				if (filterFieldQueryBlock.length() != 0)
+					filterFieldQueryBlock += " " + filterFieldsLogic + " ";
+
+				filterFieldQueryBlock += thisRestriction;
+			}
+			
+		}
 
 		if (startEditDate != null || endEditDate != null)
 		{
@@ -688,8 +717,10 @@ public class Filter implements java.io.Serializable
 
 		String query = filterFieldQueryBlock;
 
-		// build up the category query if some conditions were specified
-		// if not, we will just return an empty string
+		/*
+		 * build up the category query if some conditions were specified if not,
+		 * we will just return an empty string
+		 */
 		if (andQueryBlock.length() != 0 || orQueryBlock.length() != 0)
 		{
 			// add the and categories
@@ -700,10 +731,11 @@ public class Filter implements java.io.Serializable
 			if (orQueryBlock.length() != 0)
 				query += (query.length() != 0 ? " And " : "") + "(" + orQueryBlock + ")";
 		}
-		
-		// add the where clause
-		// have to join the topic and its collection of tags in order for
-		// the filter to work
+
+		/*
+		 * add the where clause have to join the topic and its collection of
+		 * tags in order for the filter to work
+		 */
 		if (query.length() != 0)
 			query = " where " + query;
 
@@ -826,8 +858,10 @@ public class Filter implements java.io.Serializable
 		// get the database filterfield object that matches the fieldName
 		final List<FilterField> filterField = filter(having(on(FilterField.class).getField(), equalTo(fieldName)), this.getFilterFields());
 
-		// if fieldValue is set to a value, we need to modify or add a
-		// FilterField entity
+		/*
+		 * if fieldValue is set to a value, we need to modify or add a
+		 * FilterField entity
+		 */
 		if (fieldValue != null && fieldValue.trim().length() != 0)
 		{
 			final String fixedFieldValue = fieldValue.trim();
@@ -937,9 +971,10 @@ public class Filter implements java.io.Serializable
 						}
 					}
 
-					// if we find both the internal and external filter
-					// categories,
-					// we can exit the loop
+					/*
+					 * if we find both the internal and external filter
+					 * categories, we can exit the loop
+					 */
 					if (foundIntCat && foundExtCat)
 						break;
 				}
