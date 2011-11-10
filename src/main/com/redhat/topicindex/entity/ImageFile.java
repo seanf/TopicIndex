@@ -26,7 +26,7 @@ import org.hibernate.envers.Audited;
 import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
 
-import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.topicindex.utils.SVGIcon;
 
 @Entity
@@ -217,7 +217,7 @@ public class ImageFile implements java.io.Serializable
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 
 		return null;

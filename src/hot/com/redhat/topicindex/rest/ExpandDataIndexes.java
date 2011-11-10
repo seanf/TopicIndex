@@ -4,7 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 
 public class ExpandDataIndexes
 {
@@ -91,7 +91,7 @@ public class ExpandDataIndexes
 				}
 				catch (final Exception ex)
 				{
-					ExceptionUtilities.handleException(ex);
+					SkynetExceptionUtilities.handleException(ex);
 				}
 			}
 
@@ -103,7 +103,7 @@ public class ExpandDataIndexes
 				}
 				catch (final Exception ex)
 				{
-					ExceptionUtilities.handleException(ex);
+					SkynetExceptionUtilities.handleException(ex);
 				}
 			}
 		}

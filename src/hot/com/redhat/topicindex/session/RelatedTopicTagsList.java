@@ -8,7 +8,7 @@ import javax.persistence.EntityManager;
 import org.jboss.seam.Component;
 import org.jboss.seam.annotations.Name;
 
-import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.topicindex.entity.Filter;
 import com.redhat.topicindex.entity.FilterField;
 import com.redhat.topicindex.entity.Topic;
@@ -206,7 +206,7 @@ public class RelatedTopicTagsList extends ExtendedTopicList
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 		
 		return false;
@@ -223,7 +223,7 @@ public class RelatedTopicTagsList extends ExtendedTopicList
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 		
 		return false;
@@ -273,7 +273,7 @@ public class RelatedTopicTagsList extends ExtendedTopicList
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 		
 		final String retValue = returnToSearch ? "/CustomSearchTopicList.xhtml" : null;
@@ -318,7 +318,7 @@ public class RelatedTopicTagsList extends ExtendedTopicList
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 		
 		final String retValue = returnToSearch ?
@@ -338,7 +338,7 @@ public class RelatedTopicTagsList extends ExtendedTopicList
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 	}
 

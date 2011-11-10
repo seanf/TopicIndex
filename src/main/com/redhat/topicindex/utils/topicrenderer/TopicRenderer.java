@@ -13,7 +13,7 @@ import javax.transaction.TransactionManager;
 import org.w3c.dom.Document;
 
 import com.redhat.ecs.commonstructures.Pair;
-import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.ecs.commonutils.XMLUtilities;
 import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.utils.Constants;
@@ -49,7 +49,7 @@ public class TopicRenderer implements Runnable
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 
 		return null;
@@ -91,7 +91,7 @@ public class TopicRenderer implements Runnable
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 		finally
 		{
@@ -146,7 +146,7 @@ public class TopicRenderer implements Runnable
 			}
 			catch (final Exception ex)
 			{
-				ExceptionUtilities.handleException(ex);
+				SkynetExceptionUtilities.handleException(ex);
 			}
 
 			/*
@@ -198,7 +198,7 @@ public class TopicRenderer implements Runnable
 			}
 			catch (final Exception ex)
 			{
-				ExceptionUtilities.handleException(ex);
+				SkynetExceptionUtilities.handleException(ex);
 
 				try
 				{
@@ -206,7 +206,7 @@ public class TopicRenderer implements Runnable
 				}
 				catch (final Exception ex2)
 				{
-					ExceptionUtilities.handleException(ex2);
+					SkynetExceptionUtilities.handleException(ex2);
 				}
 			}
 			finally

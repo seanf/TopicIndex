@@ -10,7 +10,7 @@ import org.hibernate.search.Search;
 import org.jboss.seam.Component;
 import org.jboss.seam.annotations.Name;
 
-import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.topicindex.entity.Topic;
 
 @Name("globalDatabaseUtilities")
@@ -27,7 +27,7 @@ public class GlobalDatabaseUtilities
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 	}
 	
@@ -52,7 +52,7 @@ public class GlobalDatabaseUtilities
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 	}
 }

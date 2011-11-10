@@ -5,7 +5,7 @@ import javax.persistence.EntityManager;
 import org.jboss.seam.Component;
 import org.jboss.seam.annotations.Name;
 
-import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.utils.Constants;
 
@@ -41,7 +41,7 @@ public class TopBar
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 
 		return null;
@@ -59,7 +59,7 @@ public class TopBar
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 		
 		return null;

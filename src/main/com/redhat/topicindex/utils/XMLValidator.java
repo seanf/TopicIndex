@@ -15,7 +15,7 @@ import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 
 import com.redhat.ecs.commonutils.DocBookUtilities;
-import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.ecs.commonutils.XMLUtilities;
 
 /**
@@ -35,7 +35,7 @@ public class XMLValidator implements DOMErrorHandler, LSResourceResolver
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 
 		return null;
@@ -76,7 +76,7 @@ public class XMLValidator implements DOMErrorHandler, LSResourceResolver
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 
 			/*
 			 * something happened, which we will assume means the xml is invalid
@@ -107,7 +107,7 @@ public class XMLValidator implements DOMErrorHandler, LSResourceResolver
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 
 		return null;

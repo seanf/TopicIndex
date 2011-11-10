@@ -11,7 +11,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 
-import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.ecs.commonutils.HTTPUtilities;
 import com.redhat.ecs.commonutils.MIMEUtilities;
 import com.redhat.ecs.commonutils.ZipUtilities;
@@ -210,7 +210,7 @@ public class TopicTagsList extends ExtendedTopicList
 	{
 		final TopicTagsList cloneList = new TopicTagsList(-1, this.constructedEJBQL, this.topic);
 		final List<Topic> topicList = cloneList.getResultList();
-		
+
 		// build up the files that will make up the zip file
 		final HashMap<String, byte[]> files = new HashMap<String, byte[]>();
 
@@ -224,7 +224,7 @@ public class TopicTagsList extends ExtendedTopicList
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 			zipFile = null;
 		}
 
@@ -238,64 +238,58 @@ public class TopicTagsList extends ExtendedTopicList
 
 	public void addTagById(final Integer topicID, final Integer tagID)
 	{
-		try
+
+		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+		final Tag tag = entityManager.getReference(Tag.class, tagID);
+		final Topic topic = entityManager.find(Topic.class, topicID);
+
+		/* validity checking */
+		if (tag == null)
+			return;
+
+		if (topic == null)
+			return;
+
+		if (filter(having(on(TopicToTag.class).getTag(), equalTo(tag)), topic.getTopicToTags()).size() != 0)
 		{
-			final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
-			final Tag tag = entityManager.getReference(Tag.class, tagID);
-			final Topic topic = entityManager.find(Topic.class, topicID);
+			with(topic.getTopicToTags()).remove(having(on(TopicToTag.class).getTag(), equalTo(tag)));
+		}
+		else
+		{
+			topic.getTopicToTags().add(new TopicToTag(topic, tag));
 
-			/* validity checking */
-			if (tag == null)
-				return;
-
-			if (topic == null)
-				return;
-
-			if (filter(having(on(TopicToTag.class).getTag(), equalTo(tag)), topic.getTopicToTags()).size() != 0)
+			// remove any excluded tags
+			for (final Tag excludeTag : tag.getExcludedTags())
 			{
-				with(topic.getTopicToTags()).remove(having(on(TopicToTag.class).getTag(), equalTo(tag)));
+				if (excludeTag.equals(tag))
+					continue;
+
+				with(topic.getTopicToTags()).remove(having(on(TopicToTag.class).getTag(), equalTo(excludeTag)));
 			}
-			else
+
+			for (final TagToCategory category : tag.getTagToCategories())
 			{
-				topic.getTopicToTags().add(new TopicToTag(topic, tag));
-
-				// remove any excluded tags
-				for (final Tag excludeTag : tag.getExcludedTags())
+				if (category.getCategory().isMutuallyExclusive())
 				{
-					if (excludeTag.equals(tag))
-						continue;
-
-					with(topic.getTopicToTags()).remove(having(on(TopicToTag.class).getTag(), equalTo(excludeTag)));
-				}
-
-				for (final TagToCategory category : tag.getTagToCategories())
-				{
-					if (category.getCategory().isMutuallyExclusive())
+					for (final TagToCategory categoryTag : category.getCategory().getTagToCategories())
 					{
-						for (final TagToCategory categoryTag : category.getCategory().getTagToCategories())
-						{
-							if (categoryTag.getTag().equals(tag))
-								continue;
+						if (categoryTag.getTag().equals(tag))
+							continue;
 
-							with(topic.getTopicToTags()).remove(having(on(TopicToTag.class).getTag(), equalTo(categoryTag.getTag())));
-						}
+						with(topic.getTopicToTags()).remove(having(on(TopicToTag.class).getTag(), equalTo(categoryTag.getTag())));
 					}
 				}
 			}
-
-			entityManager.persist(topic);
-			entityManager.flush();
-
-			/*
-			 * we might have added a tag that excludes this topic from the
-			 * previous search, so we have to refresh the list
-			 */
-			this.refresh();
 		}
-		catch (final EntityNotFoundException ex)
-		{
-			ExceptionUtilities.handleException(ex);
-		}
+
+		entityManager.persist(topic);
+		entityManager.flush();
+
+		/*
+		 * we might have added a tag that excludes this topic from the previous
+		 * search, so we have to refresh the list
+		 */
+		this.refresh();
 	}
 
 	/**
@@ -343,7 +337,7 @@ public class TopicTagsList extends ExtendedTopicList
 			}
 			catch (final EntityNotFoundException ex)
 			{
-				ExceptionUtilities.handleException(ex);
+				SkynetExceptionUtilities.handleException(ex, false, "Probably an issue retrieving the Topic entities");
 			}
 		}
 
@@ -386,7 +380,7 @@ public class TopicTagsList extends ExtendedTopicList
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 		finally
 		{
@@ -413,7 +407,7 @@ public class TopicTagsList extends ExtendedTopicList
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 		finally
 		{
@@ -440,7 +434,7 @@ public class TopicTagsList extends ExtendedTopicList
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 		finally
 		{
@@ -469,7 +463,7 @@ public class TopicTagsList extends ExtendedTopicList
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 		finally
 		{
@@ -569,7 +563,7 @@ public class TopicTagsList extends ExtendedTopicList
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 		finally
 		{
@@ -590,7 +584,7 @@ public class TopicTagsList extends ExtendedTopicList
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 		finally
 		{
@@ -616,7 +610,7 @@ public class TopicTagsList extends ExtendedTopicList
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 		finally
 		{
@@ -636,7 +630,7 @@ public class TopicTagsList extends ExtendedTopicList
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 		finally
 		{
@@ -646,6 +640,5 @@ public class TopicTagsList extends ExtendedTopicList
 
 		return "";
 	}
-
 
 }

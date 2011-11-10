@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 
-import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.topicindex.entity.ImageFile;
 
 @Name("imageFileDisplay")
@@ -49,7 +49,7 @@ public class ImageFileDisplay
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 	}
 

@@ -11,7 +11,7 @@ import org.hibernate.jdbc.Work;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 
-import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.topicindex.utils.Constants;
 
 /** This class is used to provide information on the state of the server. */
@@ -42,7 +42,7 @@ public class SystemInfo
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 
 		return url;

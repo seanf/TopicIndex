@@ -64,7 +64,7 @@ import org.w3c.dom.NodeList;
 import com.redhat.ecs.commonstructures.Pair;
 import com.redhat.ecs.commonthread.WorkQueue;
 import com.redhat.ecs.commonutils.DocBookUtilities;
-import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.ecs.commonutils.XMLUtilities;
 import com.redhat.topicindex.sort.TagIDComparator;
 import com.redhat.topicindex.sort.TagNameComparator;
@@ -795,7 +795,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 	}
 
@@ -1144,7 +1144,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		catch (final Exception ex)
 		{
 			// probably countn't find one of the string constants
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 	}
 
@@ -1227,7 +1227,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 	}
 

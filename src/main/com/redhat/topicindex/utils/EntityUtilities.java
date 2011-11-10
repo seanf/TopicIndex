@@ -35,7 +35,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 import org.jsoup.Jsoup;
 
-import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.topicindex.entity.BlobConstants;
 import com.redhat.topicindex.entity.Category;
 import com.redhat.topicindex.entity.Filter;
@@ -85,7 +85,6 @@ public class EntityUtilities
 		if (id == null)
 			return null;
 
-		
 		final IntegerConstants constant = entityManager.find(IntegerConstants.class, id);
 
 		if (constant == null)
@@ -112,8 +111,6 @@ public class EntityUtilities
 
 		return constant.getConstantValue();
 	}
-
-	
 
 	@SuppressWarnings("unchecked")
 	static public void populateProjectTags(final Project project, final List<UIProjectTagData> tags)
@@ -143,7 +140,7 @@ public class EntityUtilities
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error retrieving a Tag entity");
 		}
 	}
 
@@ -175,7 +172,7 @@ public class EntityUtilities
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error retrieving a Project entity");
 		}
 	}
 
@@ -235,14 +232,14 @@ public class EntityUtilities
 		final Tag tag = entityManager.find(Tag.class, tagId);
 		return tag;
 	}
-	
+
 	public static com.redhat.topicindex.entity.Role getRoleFromId(final Integer roleId)
 	{
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 		final com.redhat.topicindex.entity.Role role = entityManager.find(com.redhat.topicindex.entity.Role.class, roleId);
 		return role;
 	}
-	
+
 	public static User getUserFromId(final Integer userId)
 	{
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
@@ -250,43 +247,42 @@ public class EntityUtilities
 		return user;
 	}
 
-
 	static public List<UIRoleUserData> getUserRoles(final User user)
 	{
 		final List<UIRoleUserData> retValue = new ArrayList<UIRoleUserData>();
-		
+
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 		final List<com.redhat.topicindex.entity.Role> roleList = entityManager.createQuery(com.redhat.topicindex.entity.Role.SELECT_ALL_QUERY).getResultList();
 		Collections.sort(roleList, new RoleNameComparator());
-		
+
 		for (final com.redhat.topicindex.entity.Role role : roleList)
 		{
 			final boolean selected = user.isInRole(role);
 			final UIRoleUserData roleUserData = new UIRoleUserData(role.getRoleId(), role.getRoleName(), selected);
-			retValue.add(roleUserData);			
+			retValue.add(roleUserData);
 		}
-		
+
 		return retValue;
 	}
-	
+
 	static public List<UIRoleUserData> getRoleUsers(final com.redhat.topicindex.entity.Role role)
 	{
 		final List<UIRoleUserData> retValue = new ArrayList<UIRoleUserData>();
-		
+
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 		final List<User> userList = entityManager.createQuery(User.SELECT_ALL_QUERY).getResultList();
 		Collections.sort(userList, new UserNameComparator());
-		
+
 		for (final User user : userList)
 		{
 			final boolean selected = role.hasUser(user);
 			final UIRoleUserData roleUserData = new UIRoleUserData(user.getUserId(), user.getUserName(), selected);
-			retValue.add(roleUserData);			
+			retValue.add(roleUserData);
 		}
-		
+
 		return retValue;
 	}
-	
+
 	/**
 	 * This function is used to populate the data structures that display the
 	 * categories that a tag can and does belong to.
@@ -388,9 +384,9 @@ public class EntityUtilities
 		for (final String key : paramMap.keySet())
 			newParamMap.put(key, paramMap.getFirst(key));
 		return populateFilter(newParamMap, filterName, tagPrefix, categoryInternalPrefix, categoryExternalPrefix);
-		
+
 	}
-	
+
 	/**
 	 * This function takes the url parameters and uses them to populate a Filter
 	 * object
@@ -403,16 +399,18 @@ public class EntityUtilities
 		Integer filterId = null;
 		if (paramMap.containsKey(filterName))
 		{
+			final String filterQueryParam = paramMap.get(filterName);
+
 			try
 			{
-				filterId = Integer.parseInt(paramMap.get(filterName));
+				filterId = Integer.parseInt(filterQueryParam);
 			}
 			catch (final Exception ex)
 			{
 				// filter value was not an integer
 				filterId = null;
 
-				ExceptionUtilities.handleException(ex);
+				SkynetExceptionUtilities.handleException(ex, true, "The filter ID URL query parameter was not an integer. Got " + filterQueryParam + ". Probably a malformed URL.");
 			}
 		}
 
@@ -428,151 +426,142 @@ public class EntityUtilities
 
 			for (final String key : paramMap.keySet())
 			{
-				try
-				{
-					final boolean tagVar = key.startsWith(tagPrefix);
-					final boolean catIntVar = key.startsWith(categoryInternalPrefix);
-					final boolean catExtVar = key.startsWith(categoryExternalPrefix);
-					final String state = paramMap.get(key);
+				final boolean tagVar = key.startsWith(tagPrefix);
+				final boolean catIntVar = key.startsWith(categoryInternalPrefix);
+				final boolean catExtVar = key.startsWith(categoryExternalPrefix);
+				final String state = paramMap.get(key);
 
-					// add the filter category states
-					if (catIntVar || catExtVar)
+				// add the filter category states
+				if (catIntVar || catExtVar)
+				{
+					/*
+					 * get the category and project id data from the variable
+					 * name
+					 */
+					final String catProjDetails = catIntVar ? key.replaceFirst(categoryInternalPrefix, "") : key.replaceFirst(categoryExternalPrefix, "");
+					// split the category and project id out of the data
+					final String[] catProjID = catProjDetails.split("-");
+
+					/*
+					 * some validity checks. make sure we have one or two
+					 * strings after the split.
+					 */
+					if (catProjID.length != 1 && catProjID.length != 2)
+						continue;
+
+					// try to get the category and project ids
+					Integer catID = null;
+					Integer projID = null;
+					try
 					{
-						// get the category and project id data from the
-						// variable name
-						final String catProjDetails = catIntVar ? key.replaceFirst(categoryInternalPrefix, "") : key.replaceFirst(categoryExternalPrefix, "");
-						// split the category and project id out of the data
-						final String[] catProjID = catProjDetails.split("-");
+						catID = Integer.parseInt(catProjID[0]);
 
 						/*
-						 * some validity checks. make sure we have one or two
-						 * strings after the split.
+						 * if the array has just one element, we have only
+						 * specified the category. in this case the project is
+						 * the common project
 						 */
-						if (catProjID.length != 1 && catProjID.length != 2)
-							continue;
-
-						// try to get the category and project ids
-						Integer catID = null;
-						Integer projID = null;
-						try
-						{
-							catID = Integer.parseInt(catProjID[0]);
-
-							/*
-							 * if the array has just one element, we have only
-							 * specified the category. in this case the project
-							 * is the common project
-							 */
-							if (catProjID.length == 2)
-								projID = Integer.parseInt(catProjID[1]);
-						}
-						catch (final Exception ex)
-						{
-							ExceptionUtilities.handleException(ex);
-							continue;
-						}
-
-						// at this point we have found a url variable that
-						// contains a catgeory and project id
-
-						final Category category = entityManager.find(Category.class, catID);
-						final Project project = projID != null ? entityManager.find(Project.class, projID) : null;
-
-						Integer dbState;
-
-						if (catIntVar)
-						{
-							if (state.equals(Constants.AND_LOGIC))
-								dbState = Constants.CATEGORY_INTERNAL_AND_STATE;
-							else
-								dbState = Constants.CATEGORY_INTERNAL_OR_STATE;
-						}
-						else
-						{
-							if (state.equals(Constants.AND_LOGIC))
-								dbState = Constants.CATEGORY_EXTERNAL_AND_STATE;
-							else
-								dbState = Constants.CATEGORY_EXTERNAL_OR_STATE;
-						}
-
-						final FilterCategory filterCategory = new FilterCategory();
-						filterCategory.setFilter(filter);
-						filterCategory.setProject(project);
-						filterCategory.setCategory(category);
-						filterCategory.setCategoryState(dbState);
-
-						filter.getFilterCategories().add(filterCategory);
+						if (catProjID.length == 2)
+							projID = Integer.parseInt(catProjID[1]);
+					}
+					catch (final Exception ex)
+					{
+						SkynetExceptionUtilities.handleException(ex, true, "Was expecting an integer. Got " + catProjID[0] + ". Probably a malformed URL.");
+						continue;
 					}
 
-					// add the filter tag states
-					if (tagVar)
+					// at this point we have found a url variable that
+					// contains a catgeory and project id
+
+					final Category category = entityManager.find(Category.class, catID);
+					final Project project = projID != null ? entityManager.find(Project.class, projID) : null;
+
+					Integer dbState;
+
+					if (catIntVar)
 					{
-						final Integer tagId = Integer.parseInt(key.replaceFirst(tagPrefix, ""));
-						final Integer intState = Integer.parseInt(state);
+						if (state.equals(Constants.AND_LOGIC))
+							dbState = Constants.CATEGORY_INTERNAL_AND_STATE;
+						else
+							dbState = Constants.CATEGORY_INTERNAL_OR_STATE;
+					}
+					else
+					{
+						if (state.equals(Constants.AND_LOGIC))
+							dbState = Constants.CATEGORY_EXTERNAL_AND_STATE;
+						else
+							dbState = Constants.CATEGORY_EXTERNAL_OR_STATE;
+					}
 
-						// get the Tag object that the tag id represents
-						final Tag tag = entityManager.getReference(Tag.class, tagId);
+					final FilterCategory filterCategory = new FilterCategory();
+					filterCategory.setFilter(filter);
+					filterCategory.setProject(project);
+					filterCategory.setCategory(category);
+					filterCategory.setCategoryState(dbState);
 
+					filter.getFilterCategories().add(filterCategory);
+				}
+
+				// add the filter tag states
+				if (tagVar)
+				{
+					final Integer tagId = Integer.parseInt(key.replaceFirst(tagPrefix, ""));
+					final Integer intState = Integer.parseInt(state);
+
+					// get the Tag object that the tag id represents
+					final Tag tag = entityManager.getReference(Tag.class, tagId);
+
+					if (tag != null)
+					{
 						final FilterTag filterTag = new FilterTag();
 						filterTag.setTag(tag);
 						filterTag.setTagState(intState);
 						filterTag.setFilter(filter);
 						filter.getFilterTags().add(filterTag);
 					}
-					else
+				}
+				// add the filter field states
+				else
+				{
+					if (TopicFilter.getFilterNames().keySet().contains(key))
 					{
-						if (TopicFilter.getFilterNames().keySet().contains(key))
-						{
-							final FilterField filterField = new FilterField();
-							filterField.setFilter(filter);
-							filterField.setField(key);
-							filterField.setValue(state);
-							filterField.setDescription(TopicFilter.getFilterNames().get(key));
-							filter.getFilterFields().add(filterField);
-						}
+						final FilterField filterField = new FilterField();
+						filterField.setFilter(filter);
+						filterField.setField(key);
+						filterField.setValue(state);
+						filterField.setDescription(TopicFilter.getFilterNames().get(key));
+						filter.getFilterFields().add(filterField);
 					}
 				}
-				catch (final NumberFormatException ex)
-				{
-					// probably a misformed tag request parameter
-					ExceptionUtilities.handleException(ex);
-				}
-				catch (final EntityNotFoundException ex)
-				{
-					// probably a missing tagid
-					ExceptionUtilities.handleException(ex);
-				}
+
 			}
 
 		}
 
 		return filter;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public static <E> List<Integer> getEditedEntities(final Class<E> type, final String pkColumnName, final DateTime startDate, final DateTime endDate)
 	{
 		if (startDate == null && endDate == null)
 			return null;
-		
+
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 		final AuditReader reader = AuditReaderFactory.get(entityManager);
-		final AuditQuery query = reader.createQuery()
-			.forRevisionsOfEntity(type, true, false)
-			.addOrder(AuditEntity.revisionProperty("timestamp").asc())			
-			.addProjection(AuditEntity.property("originalId." + pkColumnName).distinct());
-		
+		final AuditQuery query = reader.createQuery().forRevisionsOfEntity(type, true, false).addOrder(AuditEntity.revisionProperty("timestamp").asc()).addProjection(AuditEntity.property("originalId." + pkColumnName).distinct());
+
 		if (startDate != null)
 			query.add(AuditEntity.revisionProperty("timestamp").ge(startDate.toDate().getTime()));
-		
+
 		if (endDate != null)
 			query.add(AuditEntity.revisionProperty("timestamp").le(endDate.toDate().getTime()));
-		
+
 		final List<Integer> entityyIds = query.getResultList();
-		
+
 		return entityyIds;
 	}
-	
+
 	public static <E> String getEditedEntitiesString(final Class<E> type, final String pkColumnName, final DateTime startDate, final DateTime endDate)
 	{
 		final List<Integer> ids = getEditedEntities(type, pkColumnName, startDate, endDate);
@@ -638,7 +627,7 @@ public class EntityUtilities
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 
 		return retValue;
@@ -690,7 +679,7 @@ public class EntityUtilities
 					}
 					catch (final Exception ex)
 					{
-						ExceptionUtilities.handleException(ex);
+						SkynetExceptionUtilities.handleException(ex);
 					}
 				}
 				else if (fieldName.equals(Constants.TOPIC_HAS_RELATIONSHIPS))
@@ -715,7 +704,7 @@ public class EntityUtilities
 					catch (final Exception ex)
 					{
 						// failed to parse integer
-						ExceptionUtilities.handleException(ex);
+						SkynetExceptionUtilities.handleException(ex);
 					}
 				}
 				else
@@ -884,14 +873,6 @@ public class EntityUtilities
 
 		return newParams;
 	}
-
-	
-
-	
-
-	
-
-
 
 	public static String cleanStringForJavaScriptVariableName(final String input)
 	{

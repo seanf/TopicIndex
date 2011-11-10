@@ -35,7 +35,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 
 import com.redhat.ecs.commonutils.CollectionUtilities;
-import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.topicindex.filter.TopicFilter;
 import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.EntityUtilities;
@@ -619,7 +619,7 @@ public class Filter implements java.io.Serializable
 				}
 				catch (final Exception ex)
 				{
-					ExceptionUtilities.handleException(ex);
+					SkynetExceptionUtilities.handleException(ex);
 				}
 			}
 			else if (fieldName.equals(Constants.TOPIC_HAS_XML_ERRORS))
@@ -632,7 +632,7 @@ public class Filter implements java.io.Serializable
 				}
 				catch (final Exception ex)
 				{
-					ExceptionUtilities.handleException(ex);
+					SkynetExceptionUtilities.handleException(ex);
 				}
 
 			}
@@ -647,7 +647,7 @@ public class Filter implements java.io.Serializable
 				}
 				catch (final Exception ex)
 				{
-					ExceptionUtilities.handleException(ex);
+					SkynetExceptionUtilities.handleException(ex);
 				}
 			}
 
@@ -669,7 +669,7 @@ public class Filter implements java.io.Serializable
 				}
 				catch (final Exception ex)
 				{
-					ExceptionUtilities.handleException(ex);
+					SkynetExceptionUtilities.handleException(ex);
 				}
 			}
 			else if (fieldName.equals(Constants.TOPIC_ENDEDITDATE_FILTER_VAR))
@@ -680,7 +680,7 @@ public class Filter implements java.io.Serializable
 				}
 				catch (final Exception ex)
 				{
-					ExceptionUtilities.handleException(ex);
+					SkynetExceptionUtilities.handleException(ex);
 				}
 			}
 

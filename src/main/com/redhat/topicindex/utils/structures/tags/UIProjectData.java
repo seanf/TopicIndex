@@ -11,7 +11,7 @@ import org.jboss.seam.Component;
 
 import com.redhat.ecs.commonstructures.Pair;
 import com.redhat.ecs.commonutils.CollectionUtilities;
-import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.topicindex.entity.Category;
 import com.redhat.topicindex.entity.Filter;
 import com.redhat.topicindex.entity.FilterCategory;
@@ -460,7 +460,7 @@ public class UIProjectData
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 	}
 

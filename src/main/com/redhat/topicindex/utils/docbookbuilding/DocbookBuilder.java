@@ -30,7 +30,7 @@ import org.w3c.dom.Text;
 
 import com.redhat.ecs.commonstructures.Pair;
 import com.redhat.ecs.commonutils.CollectionUtilities;
-import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.ecs.commonutils.XMLUtilities;
 import com.redhat.ecs.commonutils.ZipUtilities;
 import com.redhat.topicindex.entity.Filter;
@@ -415,7 +415,7 @@ public class DocbookBuilder
 				{
 					success = false;
 					errorDatabase.addError(imageLocation.getTopic(), imageLocation + " is not a valid image. Must be in the format [ImageFileID].extension e.g. 123.png, or images/321.jpg");
-					ExceptionUtilities.handleException(ex);
+					SkynetExceptionUtilities.handleException(ex, true, "Probably some invalid XML defining the image");
 				}
 			}
 
@@ -617,7 +617,7 @@ public class DocbookBuilder
 		catch (final Exception ex)
 		{
 			zipFile = null;
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably a stream error");
 		}
 
 		return zipFile;
@@ -799,7 +799,7 @@ public class DocbookBuilder
 						 * a non-integer was probably entered into the field, so
 						 * ignore
 						 */
-						ExceptionUtilities.handleException(ex);
+						SkynetExceptionUtilities.handleException(ex, true, "Probably some invalid code in the XML injection point");
 					}
 				}
 			}
@@ -1102,7 +1102,7 @@ public class DocbookBuilder
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "An error generating the TOC");
 		}
 
 		tocTopLevel.sortChildren(new TocElementLabelComparator(true));
@@ -1425,7 +1425,7 @@ public class DocbookBuilder
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "An error generating the bugzilla link");
 		}
 
 		// SURVEY LINK

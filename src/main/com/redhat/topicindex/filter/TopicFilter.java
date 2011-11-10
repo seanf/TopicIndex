@@ -9,7 +9,7 @@ import java.util.Map;
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 
-import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.topicindex.entity.Filter;
 import com.redhat.topicindex.entity.FilterField;
 import com.redhat.topicindex.entity.Topic;
@@ -216,7 +216,7 @@ public class TopicFilter
 				}
 				catch (final Exception ex)
 				{
-					ExceptionUtilities.handleException(ex);
+					SkynetExceptionUtilities.handleException(ex);
 				}
 			}
 		}
@@ -410,7 +410,7 @@ public class TopicFilter
 			catch (final Exception ex)
 			{
 				// could not parse integer, so silently fail
-				ExceptionUtilities.handleException(ex);
+				SkynetExceptionUtilities.handleException(ex);
 			}
 		}
 		else if (fieldName.equals(Constants.TOPIC_RELATED_FROM))
@@ -422,7 +422,7 @@ public class TopicFilter
 			catch (final Exception ex)
 			{
 				// could not parse integer, so silently fail
-				ExceptionUtilities.handleException(ex);
+				SkynetExceptionUtilities.handleException(ex);
 			}
 		}
 	}
@@ -569,7 +569,7 @@ public class TopicFilter
 		catch (final Exception ex)
 		{
 			this.setHasXMLErrors(null);
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 	}
 
@@ -614,7 +614,7 @@ public class TopicFilter
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 
 		return null;
@@ -644,7 +644,7 @@ public class TopicFilter
 		catch(final Exception ex)
 		{
 			this.editedInLastDays = null;
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 		
 	}

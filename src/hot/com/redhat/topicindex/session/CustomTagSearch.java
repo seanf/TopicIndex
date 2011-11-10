@@ -17,7 +17,7 @@ import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 
-import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.ecs.commonutils.HTTPUtilities;
 import com.redhat.ecs.commonutils.MIMEUtilities;
 import com.redhat.ecs.commonutils.ZipUtilities;
@@ -218,7 +218,7 @@ public class CustomTagSearch implements DisplayMessageInterface
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably a stream error");
 			zipFile = null;
 		}
 
@@ -364,7 +364,7 @@ public class CustomTagSearch implements DisplayMessageInterface
 		}
 		catch (final PersistenceException ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, true, "Probably a constraint violation");
 			if (ex.getCause() instanceof ConstraintViolationException)
 				this.setDisplayMessage("The filter requires a unique name");
 			else
@@ -372,7 +372,7 @@ public class CustomTagSearch implements DisplayMessageInterface
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error saving the Filter");
 			this.setDisplayMessage("The filter could not be saved");
 		}
 	}

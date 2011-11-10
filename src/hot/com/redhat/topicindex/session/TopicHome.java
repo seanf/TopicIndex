@@ -11,7 +11,7 @@ import java.util.Set;
 import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
 
-import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.topicindex.entity.ImageFile;
 import com.redhat.topicindex.entity.Tag;
 import com.redhat.topicindex.entity.TagToCategory;
@@ -261,7 +261,7 @@ public class TopicHome extends VersionedEntityHome<Topic>
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 	}
 
@@ -312,7 +312,7 @@ public class TopicHome extends VersionedEntityHome<Topic>
 				}
 				catch (final NumberFormatException ex)
 				{
-					ExceptionUtilities.handleException(ex);
+					SkynetExceptionUtilities.handleException(ex);
 				}
 			}
 		}
@@ -417,11 +417,11 @@ public class TopicHome extends VersionedEntityHome<Topic>
 						}
 						catch (final NotLoggedInException ex)
 						{
-							ExceptionUtilities.handleException(ex);
+							SkynetExceptionUtilities.handleException(ex, true, "User is not logged in");
 						}
 						catch (final AuthorizationException ex)
 						{
-							ExceptionUtilities.handleException(ex);
+							SkynetExceptionUtilities.handleException(ex, true, "User does not have permission");
 						}
 					}
 
@@ -436,11 +436,11 @@ public class TopicHome extends VersionedEntityHome<Topic>
 						}
 						catch (final NotLoggedInException ex)
 						{
-							ExceptionUtilities.handleException(ex);
+							SkynetExceptionUtilities.handleException(ex, true, "User is not logged in");
 						}
 						catch (final AuthorizationException ex)
 						{
-							ExceptionUtilities.handleException(ex);
+							SkynetExceptionUtilities.handleException(ex, true, "User does not have permission");
 						}
 					}
 
@@ -527,7 +527,7 @@ public class TopicHome extends VersionedEntityHome<Topic>
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 	}
 }

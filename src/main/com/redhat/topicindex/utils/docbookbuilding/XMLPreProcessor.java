@@ -16,7 +16,7 @@ import com.google.code.regexp.NamedMatcher;
 import com.google.code.regexp.NamedPattern;
 import com.redhat.ecs.commonstructures.Pair;
 import com.redhat.ecs.commonutils.CollectionUtilities;
-import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.ecs.commonutils.XMLUtilities;
 import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.sort.ExternalListSort;
@@ -180,7 +180,7 @@ public class XMLPreProcessor
 				 * these lists are discovered by a regular expression so we
 				 * shouldn't have any trouble here with Integer.parse
 				 */
-				ExceptionUtilities.handleException(ex);
+				SkynetExceptionUtilities.handleException(ex);
 				retValue.add(new InjectionTopicData(-1, false));
 			}
 		}
@@ -635,7 +635,7 @@ public class XMLPreProcessor
 					}
 					catch (final Exception ex)
 					{
-						ExceptionUtilities.handleException(ex);
+						SkynetExceptionUtilities.handleException(ex);
 					}
 				}
 			}
@@ -755,7 +755,7 @@ public class XMLPreProcessor
 					}
 					catch (final Exception ex)
 					{
-						ExceptionUtilities.handleException(ex);
+						SkynetExceptionUtilities.handleException(ex);
 					}
 				}
 			}

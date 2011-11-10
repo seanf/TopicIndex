@@ -21,7 +21,7 @@ import org.jboss.seam.log.Log;
 import org.jboss.seam.security.Credentials;
 import org.jboss.seam.security.Identity;
 
-import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.topicindex.entity.Role;
 import com.redhat.topicindex.entity.RoleToRole;
 import com.redhat.topicindex.entity.User;
@@ -99,12 +99,12 @@ public class Authenticator
 		}
 		catch (final LoginException ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 			return false;
 		}
 		catch (final SecurityException ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 			return false;
 		}
 
@@ -134,7 +134,7 @@ public class Authenticator
 		catch (final LoginException ex)
 		{
 			// Authentication failed
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 			return false;
 		}
 	}

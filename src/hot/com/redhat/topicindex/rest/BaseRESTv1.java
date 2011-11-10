@@ -30,7 +30,7 @@ import org.jboss.resteasy.plugins.providers.atom.Feed;
 import org.jboss.resteasy.spi.BadRequestException;
 import org.jboss.resteasy.spi.Failure;
 import org.jboss.resteasy.spi.InternalServerErrorException;
-import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.topicindex.entity.Filter;
 import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.rest.collections.BaseRestCollectionV1;
@@ -114,7 +114,7 @@ public class BaseRESTv1
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "There was an error creating the ATOM feed");
 			throw new InternalServerErrorException("There was an error creating the ATOM feed");
 		}
 	}
@@ -184,7 +184,7 @@ public class BaseRESTv1
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an issue querying Envers");
 
 			try
 			{
@@ -192,7 +192,7 @@ public class BaseRESTv1
 			}
 			catch (final Exception ex2)
 			{
-				ExceptionUtilities.handleException(ex2);
+				SkynetExceptionUtilities.handleException(ex2, false, "There was an issue rolling back the transaction");
 			}
 
 			throw new InternalServerErrorException("There was an error running the query");
@@ -249,12 +249,12 @@ public class BaseRESTv1
 		}
 		catch (final Failure ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "There was an error looking up the required manager objects");
 			throw ex;
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error saving the entity");
 
 			try
 			{
@@ -262,7 +262,7 @@ public class BaseRESTv1
 			}
 			catch (final Exception ex2)
 			{
-				ExceptionUtilities.handleException(ex2);
+				SkynetExceptionUtilities.handleException(ex2, false, "There was an error rolling back the transaction");
 			}
 
 			throw new InternalServerErrorException("There was an error saving the entity");

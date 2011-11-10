@@ -3,7 +3,7 @@ package com.redhat.topicindex.utils.docbookbuilding;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.topicindex.entity.Filter;
 import com.redhat.topicindex.entity.FilterOption;
 
@@ -291,7 +291,7 @@ public class DocbookBuildingOptions
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "An error setting the makefile options");
 		}
 	}
 

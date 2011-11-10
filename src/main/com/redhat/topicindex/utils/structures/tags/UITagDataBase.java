@@ -1,6 +1,6 @@
 package com.redhat.topicindex.utils.structures.tags;
 
-import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 
 /**
  * This class defines the common properties to tags and categories.
@@ -105,7 +105,7 @@ public class UITagDataBase
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 	}
 

@@ -11,7 +11,7 @@ import java.util.Set;
 
 import javax.persistence.PersistenceException;
 
-import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.topicindex.entity.*;
 import com.redhat.topicindex.utils.EntityUtilities;
 import com.redhat.topicindex.utils.structures.tags.UIProjectData;
@@ -103,7 +103,7 @@ public class TagHome extends VersionedEntityHome<Tag> implements DisplayMessageI
 		}
 		catch (final PersistenceException ex)
 		{
-			ExceptionUtilities.handleException(ex);	
+			SkynetExceptionUtilities.handleException(ex);	
 			if (ex.getCause() instanceof ConstraintViolationException)
 				this.setDisplayMessage("The tag requires a unique name");
 			else
@@ -111,7 +111,7 @@ public class TagHome extends VersionedEntityHome<Tag> implements DisplayMessageI
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 			this.setDisplayMessage("The tag could not be saved");
 		}
 		
@@ -163,7 +163,7 @@ public class TagHome extends VersionedEntityHome<Tag> implements DisplayMessageI
 		}
 		catch (final PersistenceException ex)
 		{
-			ExceptionUtilities.handleException(ex);	
+			SkynetExceptionUtilities.handleException(ex);	
 			if (ex.getCause() instanceof ConstraintViolationException)
 				this.setDisplayMessage("The tag requires a unique name");
 			else
@@ -171,7 +171,7 @@ public class TagHome extends VersionedEntityHome<Tag> implements DisplayMessageI
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 			this.setDisplayMessage("The tag could not be saved");
 		}
 		
@@ -230,7 +230,7 @@ public class TagHome extends VersionedEntityHome<Tag> implements DisplayMessageI
 		catch (final Exception ex)
 		{
 			// probably could not find the tag, but this shouldn't happen
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 	}
 	

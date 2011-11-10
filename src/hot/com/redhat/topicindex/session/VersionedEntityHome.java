@@ -4,7 +4,7 @@ import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
 import org.jboss.seam.framework.EntityHome;
 
-import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 
 /**
  * This class provides a convenient way to access an historical version of an Entity.
@@ -45,7 +45,7 @@ public abstract class VersionedEntityHome<E> extends EntityHome<E>
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 			revisionInstance = null;
 		}
 	}

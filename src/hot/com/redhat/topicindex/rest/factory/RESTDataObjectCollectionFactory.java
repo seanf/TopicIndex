@@ -3,7 +3,7 @@ package com.redhat.topicindex.rest.factory;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.topicindex.rest.ExpandData;
 import com.redhat.topicindex.rest.ExpandDataIndexes;
 import com.redhat.topicindex.rest.collections.BaseRestCollectionV1;
@@ -92,7 +92,7 @@ public class RESTDataObjectCollectionFactory<T, U>
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex);
 		}
 
 		return retValue;

@@ -6,7 +6,7 @@ import java.util.Set;
 import javax.persistence.PersistenceException;
 
 import com.redhat.ecs.commonstructures.Pair;
-import com.redhat.ecs.commonutils.ExceptionUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.topicindex.entity.*;
 import com.redhat.topicindex.utils.EntityUtilities;
 import com.redhat.topicindex.utils.structures.tags.UIProjectData;
@@ -128,7 +128,7 @@ public class CategoryHome extends EntityHome<Category> implements DisplayMessage
 		}
 		catch (final PersistenceException ex)
 		{
-			ExceptionUtilities.handleException(ex);	
+			SkynetExceptionUtilities.handleException(ex, true, "Probably a constraint violation");	
 			if (ex.getCause() instanceof ConstraintViolationException)
 				this.displayMessage = "The category requires a unique name";
 			else
@@ -136,7 +136,7 @@ public class CategoryHome extends EntityHome<Category> implements DisplayMessage
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error saving the entity");
 			this.displayMessage = "The category could not be saved";
 		}
 		
@@ -152,7 +152,7 @@ public class CategoryHome extends EntityHome<Category> implements DisplayMessage
 		}
 		catch (final PersistenceException ex)
 		{
-			ExceptionUtilities.handleException(ex);	
+			SkynetExceptionUtilities.handleException(ex, true, "Probably a constraint violation");	
 			if (ex.getCause() instanceof ConstraintViolationException)
 				this.displayMessage = "The category requires a unique name";
 			else
@@ -160,7 +160,7 @@ public class CategoryHome extends EntityHome<Category> implements DisplayMessage
 		}
 		catch (final Exception ex)
 		{
-			ExceptionUtilities.handleException(ex);
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error saving the entity");
 			this.displayMessage = "The category could not be saved";
 		}
 		
