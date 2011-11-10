@@ -9,10 +9,10 @@ import java.util.Arrays;
 public class ExceptionList extends EntityQuery<Exception>
 {
 
-	private static final String EJBQL = "select exception from Exception exception";
+	private static final String EJBQL = "select skynetException from SkynetException skynetException";
 
 	private static final String[] RESTRICTIONS =
-	{ "lower(exception.details) like lower(concat(#{exceptionList.skynetException.details},'%'))", "lower(exception.description) like lower(concat(#{exceptionList.skynetException.description},'%'))", };
+	{ "lower(skynetException.details) like lower(concat(#{exceptionList.skynetException.details},'%'))", "lower(skynetException.description) like lower(concat(#{exceptionList.skynetException.description},'%'))", };
 
 	private SkynetException skynetException = new SkynetException();
 
