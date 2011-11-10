@@ -12,9 +12,9 @@ public class ExceptionList extends EntityQuery<Exception>
 	private static final String EJBQL = "select exception from Exception exception";
 
 	private static final String[] RESTRICTIONS =
-	{ "lower(exception.details) like lower(concat(#{exceptionList.exception.details},'%'))", "lower(exception.description) like lower(concat(#{exceptionList.exception.description},'%'))", };
+	{ "lower(exception.details) like lower(concat(#{exceptionList.skynetException.details},'%'))", "lower(exception.description) like lower(concat(#{exceptionList.skynetException.description},'%'))", };
 
-	private Exception exception = new Exception();
+	private SkynetException skynetException = new SkynetException();
 
 	public ExceptionList()
 	{
@@ -23,8 +23,8 @@ public class ExceptionList extends EntityQuery<Exception>
 		setMaxResults(25);
 	}
 
-	public Exception getException()
+	public SkynetException getSkynetException()
 	{
-		return exception;
+		return skynetException;
 	}
 }

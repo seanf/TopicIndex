@@ -5,7 +5,7 @@ import org.jboss.seam.annotations.Name;
 import org.jboss.seam.framework.EntityHome;
 
 @Name("exceptionHome")
-public class ExceptionHome extends EntityHome<Exception>
+public class ExceptionHome extends EntityHome<SkynetException>
 {
 
 	public void setExceptionExceptionId(Integer id)
@@ -19,9 +19,9 @@ public class ExceptionHome extends EntityHome<Exception>
 	}
 
 	@Override
-	protected Exception createInstance()
+	protected SkynetException createInstance()
 	{
-		Exception exception = new Exception();
+		SkynetException exception = new SkynetException();
 		return exception;
 	}
 
@@ -43,7 +43,7 @@ public class ExceptionHome extends EntityHome<Exception>
 		return true;
 	}
 
-	public Exception getDefinedInstance()
+	public SkynetException getDefinedInstance()
 	{
 		return isIdDefined() ? getInstance() : null;
 	}
