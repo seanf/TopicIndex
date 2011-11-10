@@ -6,7 +6,7 @@ public class Constants
 	 * The Skynet build number, displayed on the top bar of all Skynet pages. Is
 	 * in the format yyyymmdd-hhmm
 	 */
-	public static final String BUILD = "20111110-1859";
+	public static final String BUILD = "20111111-0633";
 	
 	/**
 	 * The system property that determines if topics should be rendered into
@@ -19,6 +19,7 @@ public class Constants
 	 */
 	public static final String INSTANCE_NAME_PROPERTY = "topicindex.instanceName";
 	
+	/** The generic error message to display to the user */
 	public static final String GENERIC_ERROR_INSTRUCTIONS = "Please log out, log back in and try again. If the problem persists, please log a bug.";
 	
 	/** The encoding of the XML, used when converting a DOM object to a string */

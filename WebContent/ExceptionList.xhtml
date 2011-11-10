@@ -12,7 +12,7 @@
 
     <h:form id="exceptionSearch" styleClass="edit">
 
-        <rich:simpleTogglePanel label="Exception Search Filter" switchType="ajax">
+        <rich:simpleTogglePanel label="Exception Search Filter" switchType="client" opened="false">
 
             <s:decorate template="layout/display.xhtml">
                 <ui:define name="label">Details</ui:define>
@@ -31,15 +31,17 @@
                     <f:selectItem itemLabel="Any" itemValue="or"/>
                 </h:selectOneRadio>
             </s:decorate>
-
-        </rich:simpleTogglePanel>
-
-        <div class="actionButtons">
+            
+            <div class="actionButtons">
             <h:commandButton id="search" value="Search" action="/ExceptionList.xhtml"/>
             <s:button id="reset" value="Reset" includePageParams="false"/>
         </div>
 
+        </rich:simpleTogglePanel>
+
     </h:form>
+    
+    <br/><br/>
 
     <rich:panel>
         <f:facet name="header">Exception Search Results (#{empty exceptionList.resultList ? 0 : (exceptionList.paginated ? exceptionList.resultCount : exceptionList.resultList.size)})</f:facet>
@@ -60,17 +62,17 @@
                     <ui:param name="propertyPath" value="skynetException.exceptionId"/>
                 </ui:include>
             </f:facet>
-            <h:outputText value="#{_exception.exceptionId}" title="#{_exception.description}"/>
+            <h:outputText value="#{_exception.exceptionId}" title="#{_exception.details}"/>
         </h:column>
         <h:column>
             <f:facet name="header">
                 <ui:include src="layout/sort.xhtml">
                     <ui:param name="entityList" value="#{exceptionList}"/>
-                    <ui:param name="propertyLabel" value="Details"/>
-                    <ui:param name="propertyPath" value="skynetException.details"/>
+                    <ui:param name="propertyLabel" value="Description"/>
+                    <ui:param name="propertyPath" value="skynetException.description"/>
                 </ui:include>
             </f:facet>
-            <h:outputText value="#{_exception.details}"/>
+            <h:outputText value="#{_exception.description}"/>
         </h:column>
         <h:column>
             <f:facet name="header">
