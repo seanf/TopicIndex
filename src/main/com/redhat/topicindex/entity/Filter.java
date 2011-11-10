@@ -415,11 +415,6 @@ public class Filter implements java.io.Serializable
 		return urlVars;
 	}
 
-	public String buildQuery()
-	{
-		return buildQuery(false);
-	}
-
 	/**
 	 * This function is used to create the HQL query where clause that is
 	 * appended to the generic EJBQL (as created in default EntityList objects)
@@ -430,7 +425,7 @@ public class Filter implements java.io.Serializable
 	 * 
 	 * @return the clause to append to the EJBQL select statement
 	 */
-	public String buildQuery(final boolean extended)
+	public String buildQuery()
 	{
 		// the categories to be ANDed will be added to this string
 		String andQueryBlock = "";
@@ -553,130 +548,145 @@ public class Filter implements java.io.Serializable
 		}
 
 		/*
-		 * This section will add the SQL that is usually added by restrictions
-		 * defined in ExtendedTopicList EXTENDED_RESTRICTIONS
+		 * Do an initial loop over the FilterFields, looking for the field logic
+		 * value
 		 */
-		if (extended)
+		String filterFieldQueryBlock = "";
+		String filterFieldsLogic = "AND";
+		for (final FilterField filterField : this.getFilterFields())
 		{
-			/*
-			 * Do an initial loop over the FilterFields, looking for the field
-			 * logic value
-			 */
-			String filterFieldQueryBlock = "";
-			String filterFieldsLogic = "AND";
-			for (final FilterField filterField : this.getFilterFields())
+			if (filterField.getField().equals(Constants.TOPIC_LOGIC_FILTER_VAR))
 			{
-				if (filterField.getField().equals(Constants.TOPIC_LOGIC_FILTER_VAR))
-				{
-					filterFieldsLogic = filterField.getValue();
-					break;
-				}
-			}
-
-			/* Now add the SQL for the fields */
-			for (final FilterField filterField : this.getFilterFields())
-			{
-				String thisRestriction = "";
-
-				if (filterField.getField().equals(Constants.TOPIC_IDS_FILTER_VAR))
-				{
-					thisRestriction = "topic.topicId in (" + filterField.getValue() + ")";
-				}
-				else if (filterField.getField().equals(Constants.TOPIC_TITLE_FILTER_VAR))
-				{
-					thisRestriction = "lower(topic.topicTitle) like lower('%" + filterField.getValue() + "%')"; 
-				}
-				else if (filterField.getField().equals(Constants.TOPIC_TITLE_FILTER_VAR))
-				{
-					thisRestriction = "lower(topic.topicTitle) like lower('%" + filterField.getValue() + "%')"; 
-				}
-				else if (filterField.getField().equals(Constants.TOPIC_XML_FILTER_VAR))
-				{
-					thisRestriction = "lower(topic.topicXML) like lower('%" + filterField.getValue() + "%')"; 
-				}
-				else if (filterField.getField().equals(Constants.TOPIC_DESCRIPTION_FILTER_VAR))
-				{
-					thisRestriction = "lower(topic.topicText) like lower('%" + filterField.getValue() + "%')"; 
-				}
-				else if (filterField.getField().equals(Constants.TOPIC_ADDED_BY_FILTER_VAR))
-				{
-					thisRestriction = "lower(topic.topicAddedBy) like lower('%" + filterField.getValue() + "%')"; 
-				}
-				else if (filterField.getField().equals(Constants.TOPIC_STARTDATE_FILTER_VAR))
-				{
-					thisRestriction = "topic.topicTimeStamp >= " + filterField.getValue(); 
-				}
-				else if (filterField.getField().equals(Constants.TOPIC_ENDDATE_FILTER_VAR))
-				{
-					thisRestriction = "topic.topicTimeStamp <= " + filterField.getValue(); 
-				}
-				else if (filterField.getField().equals(Constants.TOPIC_HAS_RELATIONSHIPS))
-				{
-					thisRestriction = "topic.parentTopicToTopics.size >= 1"; 
-				}
-				else if (filterField.getField().equals(Constants.TOPIC_HAS_INCOMING_RELATIONSHIPS))
-				{
-					thisRestriction = "topic.childTopicToTopics.size >= 1"; 
-				}
-				else if (filterField.getField().equals(Constants.TOPIC_RELATED_TO) || filterField.getField().equals(Constants.TOPIC_RELATED_FROM))
-				{
-					try
-					{
-						final Integer topicId = Integer.parseInt(filterField.getValue());
-						final String relatedTopics = EntityUtilities.getRelatedTopicIDsString(topicId);
-						
-						thisRestriction = "topic.topicId in (" + relatedTopics + ")";
-					}
-					catch (final Exception ex)
-					{
-						ExceptionUtilities.handleException(ex);
-					}
-				}
-				else if (filterField.getField().equals(Constants.TOPIC_HAS_XML_ERRORS))
-				{
-					thisRestriction = "length(topic.topicSecondOrderData.topicXMLErrors) >= 1";
-				}
-				else if (filterField.getField().equals(Constants.TOPIC_STARTEDITDATE_FILTER_VAR))
-				{
-					try
-					{
-						final DateTime startDate = ISODateTimeFormat.dateTime().parseDateTime(filterField.getValue());					
-						final String editedTopics = EntityUtilities.getEditedEntitiesString(Topic.class, "topicId", startDate, null);
-					
-						thisRestriction = "topic.topicId in (" + editedTopics + ")";
-					}
-					catch (final Exception ex)
-					{
-						ExceptionUtilities.handleException(ex);
-					}
-				}
-				else if (filterField.getField().equals(Constants.TOPIC_ENDEDITDATE_FILTER_VAR))
-				{
-					try
-					{
-						final DateTime endDate = ISODateTimeFormat.dateTime().parseDateTime(filterField.getValue());					
-						final String editedTopics = EntityUtilities.getEditedEntitiesString(Topic.class, "topicId", null, endDate);
-					
-						thisRestriction = "topic.topicId in (" + editedTopics + ")";
-					}
-					catch (final Exception ex)
-					{
-						ExceptionUtilities.handleException(ex);
-					}
-				}
-				
-
-				if (thisRestriction.length() != 0)
-				{
-					if (filterFieldQueryBlock.length() != 0)
-						filterFieldQueryBlock += " " + filterFieldsLogic + " ";
-
-					filterFieldQueryBlock += thisRestriction;
-				}
+				filterFieldsLogic = filterField.getValue();
+				break;
 			}
 		}
 
-		String query = "";
+		/* Now add the SQL for the fields */
+
+		DateTime startEditDate = null;
+		DateTime endEditDate = null;
+
+		for (final FilterField filterField : this.getFilterFields())
+		{
+			String thisRestriction = "";
+
+			if (filterField.getField().equals(Constants.TOPIC_IDS_FILTER_VAR))
+			{
+				thisRestriction = "topic.topicId in (" + filterField.getValue() + ")";
+			}
+			else if (filterField.getField().equals(Constants.TOPIC_TITLE_FILTER_VAR))
+			{
+				thisRestriction = "lower(topic.topicTitle) like lower('%" + filterField.getValue() + "%')";
+			}
+			else if (filterField.getField().equals(Constants.TOPIC_TITLE_FILTER_VAR))
+			{
+				thisRestriction = "lower(topic.topicTitle) like lower('%" + filterField.getValue() + "%')";
+			}
+			else if (filterField.getField().equals(Constants.TOPIC_XML_FILTER_VAR))
+			{
+				thisRestriction = "lower(topic.topicXML) like lower('%" + filterField.getValue() + "%')";
+			}
+			else if (filterField.getField().equals(Constants.TOPIC_DESCRIPTION_FILTER_VAR))
+			{
+				thisRestriction = "lower(topic.topicText) like lower('%" + filterField.getValue() + "%')";
+			}
+			else if (filterField.getField().equals(Constants.TOPIC_ADDED_BY_FILTER_VAR))
+			{
+				thisRestriction = "lower(topic.topicAddedBy) like lower('%" + filterField.getValue() + "%')";
+			}
+			else if (filterField.getField().equals(Constants.TOPIC_STARTDATE_FILTER_VAR))
+			{
+				thisRestriction = "topic.topicTimeStamp >= " + filterField.getValue();
+			}
+			else if (filterField.getField().equals(Constants.TOPIC_ENDDATE_FILTER_VAR))
+			{
+				thisRestriction = "topic.topicTimeStamp <= " + filterField.getValue();
+			}
+			else if (filterField.getField().equals(Constants.TOPIC_HAS_RELATIONSHIPS))
+			{
+				thisRestriction = "topic.parentTopicToTopics.size >= 1";
+			}
+			else if (filterField.getField().equals(Constants.TOPIC_HAS_INCOMING_RELATIONSHIPS))
+			{
+				thisRestriction = "topic.childTopicToTopics.size >= 1";
+			}
+			else if (filterField.getField().equals(Constants.TOPIC_RELATED_TO) || filterField.getField().equals(Constants.TOPIC_RELATED_FROM))
+			{
+				try
+				{
+					final Integer topicId = Integer.parseInt(filterField.getValue());
+					final String relatedTopics = EntityUtilities.getRelatedTopicIDsString(topicId);
+
+					thisRestriction = "topic.topicId in (" + relatedTopics + ")";
+				}
+				catch (final Exception ex)
+				{
+					ExceptionUtilities.handleException(ex);
+				}
+			}
+			else if (filterField.getField().equals(Constants.TOPIC_HAS_XML_ERRORS))
+			{
+				try
+				{
+					final Boolean hasXMLErrors = Boolean.valueOf(filterField.getValue()); 
+					if (hasXMLErrors)
+						thisRestriction = "length(topic.topicSecondOrderData.topicXMLErrors) >= 1";
+				}
+				catch (final Exception ex)
+				{
+					
+				}
+				
+			}
+
+			else if (filterField.getField().equals(Constants.TOPIC_STARTEDITDATE_FILTER_VAR))
+			{
+				try
+				{
+					startEditDate = ISODateTimeFormat.dateTime().parseDateTime(filterField.getValue());
+				}
+				catch (final Exception ex)
+				{
+					ExceptionUtilities.handleException(ex);
+				}
+			}
+			else if (filterField.getField().equals(Constants.TOPIC_ENDEDITDATE_FILTER_VAR))
+			{
+				try
+				{
+					endEditDate = ISODateTimeFormat.dateTime().parseDateTime(filterField.getValue());
+				}
+				catch (final Exception ex)
+				{
+					ExceptionUtilities.handleException(ex);
+				}
+			}
+
+			if (thisRestriction.length() != 0)
+			{
+				if (filterFieldQueryBlock.length() != 0)
+					filterFieldQueryBlock += " " + filterFieldsLogic + " ";
+
+				filterFieldQueryBlock += thisRestriction;
+			}
+		}
+
+		if (startEditDate != null || endEditDate != null)
+		{
+			final String editedTopics = EntityUtilities.getEditedEntitiesString(Topic.class, "topicId", startEditDate, endEditDate);
+			final String thisRestriction = "topic.topicId in (" + editedTopics + ")";
+
+			if (thisRestriction.length() != 0)
+			{
+				if (filterFieldQueryBlock.length() != 0)
+					filterFieldQueryBlock += " " + filterFieldsLogic + " ";
+
+				filterFieldQueryBlock += thisRestriction;
+			}
+		}
+
+		String query = filterFieldQueryBlock;
 
 		// build up the category query if some conditions were specified
 		// if not, we will just return an empty string
@@ -689,18 +699,13 @@ public class Filter implements java.io.Serializable
 			// add the or categories
 			if (orQueryBlock.length() != 0)
 				query += (query.length() != 0 ? " And " : "") + "(" + orQueryBlock + ")";
-
-			/*
-			 * if (filterFieldQueryBlock.length() != 0) query += (query.length()
-			 * != 0 ? " And " : "") + "(" + filterFieldQueryBlock + ")";
-			 */
-
-			// add the where clause
-			// have to join the topic and its collection of tags in order for
-			// the filter to work
-			if (query.length() != 0)
-				query = " where " + query;
 		}
+		
+		// add the where clause
+		// have to join the topic and its collection of tags in order for
+		// the filter to work
+		if (query.length() != 0)
+			query = " where " + query;
 
 		return query;
 	}

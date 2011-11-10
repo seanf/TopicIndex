@@ -19,28 +19,6 @@ public class ExtendedTopicList extends TopicList
 {
 	/** Serializable version identifier */
 	private static final long serialVersionUID = -4553573868560054166L;
-	protected static final String BEAN_NAME_MARKER = "#BEANNAME#";
-	protected static final String[] EXTENDED_RESTRICTIONS =
-	{
-			/*
-			 * "topic.topicId like concat('%', #{" + BEAN_NAME_MARKER +
-			 * ".topic.topicId}, '%')",
-			 */
-			"lower(topic.topicTitle) like lower(concat('%', #{" + BEAN_NAME_MARKER + ".topic.topicTitle}, '%'))",
-			"lower(topic.topicXML) like lower(concat('%', #{" + BEAN_NAME_MARKER + ".topic.topicXML}, '%'))",
-			"lower(topic.topicText) like lower(concat('%', #{" + BEAN_NAME_MARKER + ".topic.topicText}, '%'))",
-			"lower(topic.topicAddedBy) like lower(concat('%', #{" + BEAN_NAME_MARKER + ".topic.topicAddedBy}, '%'))",
-			"topic.topicTimeStamp >= #{" + BEAN_NAME_MARKER + ".topic.startCreateDatePlain}",
-			"topic.topicTimeStamp <= #{" + BEAN_NAME_MARKER + ".topic.endCreateDatePlain}", "topic.topicId in (#{" + BEAN_NAME_MARKER + ".topic.topicIds})",
-			"topic.parentTopicToTopics.size >= #{" + BEAN_NAME_MARKER + ".topic.minimumRelationshipCount}",
-			"topic.childTopicToTopics.size >= #{" + BEAN_NAME_MARKER + ".topic.minimumIncomingRelationshipCount}",
-			"topic.topicId in (#{" + BEAN_NAME_MARKER + ".topic.relatedTopicIDs})", 
-			"topic.topicId in (#{" + BEAN_NAME_MARKER + ".topic.incomingRelatedTopicIDs})",
-			"topic.topicId in (#{" + BEAN_NAME_MARKER + ".topic.topicTextSearchIDs})",
-			"topic.topicId in (#{" + BEAN_NAME_MARKER + ".topic.editedTopics})",
-			"length(topic.topicSecondOrderData.topicXMLErrors) >= #{" + BEAN_NAME_MARKER + ".topic.minXMLErrorLength}"
-
-	};
 
 	/** Provides the heading that identifies the currently selected filter tags */
 	protected String searchTagHeading;
@@ -181,17 +159,6 @@ public class ExtendedTopicList extends TopicList
 		// if we have supplied a topic to be used for the filter, assign it
 		if (topic != null)
 			this.topic = topic;
-
-		// use the topic object to filter the collection
-		setRestrictionExpressionStrings(Arrays.asList(getFixedRestrictions(beanName)));
-	}
-
-	protected String[] getFixedRestrictions(final String beanName)
-	{
-		final String[] retValue = new String[EXTENDED_RESTRICTIONS.length];
-		for (int i = 0; i < EXTENDED_RESTRICTIONS.length; ++i)
-			retValue[i] = EXTENDED_RESTRICTIONS[i].replaceAll(BEAN_NAME_MARKER, beanName);
-		return retValue;
 	}
 
 	public HashMap<String, String> getFilterVars()
