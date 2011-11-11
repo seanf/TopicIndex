@@ -10,6 +10,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -390,7 +391,7 @@ public class BaseRESTv1
 
 			final String query = filter.buildQuery();
 
-			final List<Topic> result = entityManager.createQuery(Topic.SELECT_ALL_QUERY + query).getResultList();
+			final List<Topic> result = entityManager.createQuery(query).getResultList();
 
 			final BaseRestCollectionV1<TopicV1> retValue = new RESTDataObjectCollectionFactory<TopicV1, Topic>().create(dataObjectFactory, result, expandName, dataType, new ExpandData(expand), getBaseUrl());
 

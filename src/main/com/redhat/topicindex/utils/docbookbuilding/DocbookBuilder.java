@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import org.drools.WorkingMemory;
 import org.jboss.seam.Component;
@@ -840,7 +841,7 @@ public class DocbookBuilder
 
 			final String query = filter.buildQuery();
 
-			final List<Topic> templates = entityManager.createQuery(Topic.SELECT_ALL_QUERY + " " + query).getResultList();
+			final List<Topic> templates = entityManager.createQuery(query).getResultList();
 
 			template = templates.size() != 0 ? templates.get(0) : null;
 		}

@@ -15,6 +15,7 @@ import java.util.Map;
 import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.Query;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.lucene.queryParser.QueryParser;
@@ -635,98 +636,6 @@ public class EntityUtilities
 		return retValue;
 	}
 
-	/**
-	 * This function will add to a query to replace the functionality of the
-	 * restrictions used by EntityQuery objects.
-	 */
-	public static String buildFilterFieldsQuery(final String query, final Filter filter)
-	{
-		final List<FilterField> logicField = filter(having(on(FilterField.class).getField(), equalTo(Constants.TOPIC_LOGIC_FILTER_VAR)), filter.getFilterFields());
-
-		String logic = Constants.TOPIC_LOGIC_FILTER_VAR_DEFAULT_VALUE;
-		if (logicField.size() == 1)
-			logic = logicField.get(0).getValue();
-
-		String myQuery = "";
-
-		for (final FilterField filterField : filter.getFilterFields())
-		{
-			if (!filterField.getField().equals(Constants.TOPIC_LOGIC_FILTER_VAR))
-			{
-				final String fieldName = filterField.getField();
-				final String fieldValue = filterField.getValue();
-
-				if (myQuery.length() != 0)
-					myQuery += logic + " ";
-
-				if (fieldName.equals(Constants.TOPIC_ENDDATE_FILTER_VAR) || fieldName.equals(Constants.TOPIC_STARTDATE_FILTER_VAR))
-				{
-					try
-					{
-						// this will throw an exception if the format of the
-						// field in the database is incorrect
-						ISODateTimeFormat.dateTime().parseDateTime(filterField.getValue());
-
-						// if we get to this line, it is safe to say we have a
-						// properly formatted date
-
-						if (filterField.getField().equals(Constants.TOPIC_STARTDATE_FILTER_VAR))
-						{
-							myQuery += "topic.topicTimeStamp >= '" + fieldValue + "'";
-						}
-						else if (filterField.getField().equals(Constants.TOPIC_ENDDATE_FILTER_VAR))
-						{
-							myQuery += "topic.topicTimeStamp <= '" + fieldValue + "'";
-						}
-					}
-					catch (final Exception ex)
-					{
-						SkynetExceptionUtilities.handleException(ex, false, "An invalid date was stored as a Filter option in the database");
-					}
-				}
-				else if (fieldName.equals(Constants.TOPIC_HAS_RELATIONSHIPS))
-				{
-					int minimum = 0;
-					if (fieldValue.equalsIgnoreCase("true"))
-						minimum = 1;
-
-					myQuery += "topic.parentTopicToTopics.size >= " + minimum;
-				}
-				else if (fieldName.equals(Constants.TOPIC_IDS_FILTER_VAR))
-				{
-					myQuery += "topic.topicId in (" + fieldValue + ")";
-				}
-				else if (fieldName.equals(Constants.TOPIC_RELATED_TO))
-				{
-					try
-					{
-						final Integer topicId = Integer.parseInt(fieldValue);
-						myQuery += "topic.topicId in (" + getRelatedTopicIDsString(topicId) + ")";
-					}
-					catch (final Exception ex)
-					{
-						// failed to parse integer
-						SkynetExceptionUtilities.handleException(ex, false, "An invalid Topic ID was stored for a Filter in the database");
-					}
-				}
-				else
-				{
-					myQuery += "'" + fieldName.toLowerCase() + "' like '%" + fieldValue.toLowerCase() + "%')";
-				}
-			}
-		}
-
-		if (myQuery.length() != 0)
-		{
-			if (query.length() != 0)
-				myQuery = " and (" + myQuery + ")";
-			else
-				myQuery = " where (" + myQuery + ")";
-		}
-
-		return query + myQuery;
-	}
-
 	@SuppressWarnings("unchecked")
 	public static HashMap<Integer, ArrayList<Integer>> populateExclusionTags()
 	{
@@ -963,11 +872,10 @@ public class EntityUtilities
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 
 		// build the query that will be used to get the topics
-		String query = filter.buildQuery();
-		query = EntityUtilities.buildFilterFieldsQuery(query, filter);
+		final String query = filter.buildQuery();
 
 		// get the base topic list
-		final List<Topic> topicList = entityManager.createQuery(Topic.SELECT_ALL_QUERY + query).getResultList();
+		final List<Topic> topicList = entityManager.createQuery(query).getResultList();
 
 		return topicList;
 	}

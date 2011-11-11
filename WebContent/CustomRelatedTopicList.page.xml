@@ -8,6 +8,9 @@
 	<param name="logic" value="#{relatedTopicTagsList.restrictionLogicOperator}" />
 
 	<param name="from" />
+	<param name="topicTopicId" value="#{relatedTopicTagsList.topicTopicId}" />
+	
+	
 	<param name="startDate" value="#{relatedTopicTagsList.topic.startCreateDateString}" />
 	<param name="endDate" value="#{relatedTopicTagsList.topic.endCreateDateString}" />
 	<param name="topicIds" value="#{relatedTopicTagsList.topic.topicIdsString}" />

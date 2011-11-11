@@ -134,7 +134,7 @@ public class ExtendedTopicList extends TopicList
 	
 				// add the and and or categories clause to the default statement
 				final String query = filter.buildQuery();
-				this.constructedEJBQL = Topic.SELECT_ALL_QUERY + " " + query;
+				this.constructedEJBQL = query;
 			}
 			else
 			{

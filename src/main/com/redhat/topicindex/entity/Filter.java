@@ -2,7 +2,10 @@ package com.redhat.topicindex.entity;
 
 // Generated Apr 14, 2011 12:17:30 PM by Hibernate Tools 3.4.0.CR1
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,6 +17,7 @@ import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Query;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
@@ -653,12 +657,16 @@ public class Filter implements java.io.Serializable
 
 			else if (fieldName.equals(Constants.TOPIC_STARTDATE_FILTER_VAR))
 			{
-				startCreateDate = fieldValue;
+
+					startCreateDate = fieldValue;
+
 
 			}
 			else if (fieldName.equals(Constants.TOPIC_ENDDATE_FILTER_VAR))
 			{
-				endCreateDate = fieldValue;
+
+					endCreateDate = fieldValue;
+
 			}
 
 			else if (fieldName.equals(Constants.TOPIC_STARTEDITDATE_FILTER_VAR))
@@ -680,7 +688,7 @@ public class Filter implements java.io.Serializable
 				}
 				catch (final Exception ex)
 				{
-					SkynetExceptionUtilities.handleException(ex, false,  "An invalid DateTime string was stored by the Filter for the end edit date");
+					SkynetExceptionUtilities.handleException(ex, false, "An invalid DateTime string was stored by the Filter for the end edit date");
 				}
 			}
 
@@ -698,14 +706,16 @@ public class Filter implements java.io.Serializable
 			String thisRestriction = "";
 
 			if (startCreateDate != null)
-				thisRestriction = "topic.topicTimeStamp >= " + startCreateDate;
+			{
+				thisRestriction = "topic.topicTimeStamp >= '"  + startCreateDate + "'";
+			}
 
 			if (endCreateDate != null)
 			{
 				if (startCreateDate != null)
 					thisRestriction += " and ";
 
-				thisRestriction += "topic.topicTimeStamp <= " + endCreateDate;
+				thisRestriction += "topic.topicTimeStamp <= '" + endCreateDate + "'";
 			}
 
 			if (thisRestriction.length() != 0)
@@ -742,7 +752,7 @@ public class Filter implements java.io.Serializable
 		{
 			// add the and categories
 			if (andQueryBlock.length() != 0)
-				query += "(" + andQueryBlock + ")";
+				query += (query.length() != 0 ? " And " : "") + "(" + andQueryBlock + ")";
 
 			// add the or categories
 			if (orQueryBlock.length() != 0)
@@ -755,8 +765,9 @@ public class Filter implements java.io.Serializable
 		 */
 		if (query.length() != 0)
 			query = " where " + query;
-
-		return query;
+		
+		return Topic.SELECT_ALL_QUERY + query;
+		
 	}
 
 	public void syncFilterWithTags(final UIProjectData selectedTags)
