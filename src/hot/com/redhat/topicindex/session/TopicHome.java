@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
 
 import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.topicindex.entity.ImageFile;
@@ -28,6 +29,8 @@ import com.redhat.topicindex.utils.structures.tags.UITagData;
 import com.redhat.topicindex.utils.structures.tags.UIProjectCategoriesData;
 
 import org.drools.WorkingMemory;
+import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.validator.InvalidStateException;
 import org.jboss.seam.Component;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
@@ -163,6 +166,7 @@ public class TopicHome extends VersionedEntityHome<Topic> implements DisplayMess
 	@Override
 	public String persist()
 	{
+
 		updateTags();
 		prePersist();
 
@@ -211,10 +215,28 @@ public class TopicHome extends VersionedEntityHome<Topic> implements DisplayMess
 
 			return "backToList";
 		}
+		catch (final InvalidStateException ex)
+		{
+			this.setDisplayMessage("The Topic violated a constraint");
+			SkynetExceptionUtilities.handleException(ex, true, "Probably a constraint violation");
+		}
+		catch (final PersistenceException ex)
+		{
+			if (ex.getCause() instanceof ConstraintViolationException)
+			{
+				this.setDisplayMessage("The Topic violated a constraint");
+				SkynetExceptionUtilities.handleException(ex, true, "Probably a constraint violation");
+			}
+			else
+			{
+				this.setDisplayMessage("The Topic could not be saved. " + Constants.GENERIC_ERROR_INSTRUCTIONS);
+				SkynetExceptionUtilities.handleException(ex, false, "Probably an error updating a Tag entity");
+			}
+		}
 		catch (final Exception ex)
 		{
-			this.setDisplayMessage("The topic could not be saved due to an unexpected Exception. " + Constants.GENERIC_ERROR_INSTRUCTIONS);
-			SkynetExceptionUtilities.handleException(ex, false, "Probably an error persisting a topic");
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error persisting a ImageFile entity");
+			this.setDisplayMessage("The Topic could not be saved. " + Constants.GENERIC_ERROR_INSTRUCTIONS);
 		}
 
 		return null;
@@ -363,10 +385,28 @@ public class TopicHome extends VersionedEntityHome<Topic> implements DisplayMess
 
 			return "backToList";
 		}
+		catch (final InvalidStateException ex)
+		{
+			this.setDisplayMessage("The Topic violated a constraint");
+			SkynetExceptionUtilities.handleException(ex, true, "Probably a constraint violation");
+		}
+		catch (final PersistenceException ex)
+		{
+			if (ex.getCause() instanceof ConstraintViolationException)
+			{
+				this.setDisplayMessage("The Topic violated a constraint");
+				SkynetExceptionUtilities.handleException(ex, true, "Probably a constraint violation");
+			}
+			else
+			{
+				this.setDisplayMessage("The Topic could not be saved. " + Constants.GENERIC_ERROR_INSTRUCTIONS);
+				SkynetExceptionUtilities.handleException(ex, false, "Probably an error updating a Tag entity");
+			}
+		}
 		catch (final Exception ex)
 		{
-			this.setDisplayMessage("The topic could not be saved due to an unexpected Exception. " + Constants.GENERIC_ERROR_INSTRUCTIONS);
-			SkynetExceptionUtilities.handleException(ex, false, "Probably an error persisting a topic");
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error persisting a ImageFile entity");
+			this.setDisplayMessage("The Topic could not be saved. " + Constants.GENERIC_ERROR_INSTRUCTIONS);
 		}
 
 		return null;
