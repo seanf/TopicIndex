@@ -1,8 +1,11 @@
 package com.redhat.topicindex.entity;
 
 
+import static javax.persistence.GenerationType.IDENTITY;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -15,7 +18,7 @@ import org.hibernate.validator.Length;
 public class TopicSecondOrderData implements java.io.Serializable
 {
 	private static final long serialVersionUID = 3393132758855818345L;
-	private Integer topicId;
+	private Integer topicSecondOrderDataId;
 	private String topicHTMLView;
 	private String topicXMLErrors;
 	
@@ -23,21 +26,22 @@ public class TopicSecondOrderData implements java.io.Serializable
 	{
 	}
 	
-	public TopicSecondOrderData(final Integer topicId)
+	public TopicSecondOrderData(final Integer topicSecondOrderDataId)
 	{
-		this.topicId = topicId;
+		this.topicSecondOrderDataId = topicSecondOrderDataId;
 	}
 	
 	@Id
+	@GeneratedValue(strategy = IDENTITY)
 	@Column(name = "TopicID")
-    public Integer getTopicID()
+    public Integer getTopicSecondOrderDataId()
 	{
-		return this.topicId;
+		return this.topicSecondOrderDataId;
 	}
 	
-	public void setTopicID(final Integer topicId)
+	public void setTopicSecondOrderDataId(final Integer topicSecondOrderDataId)
 	{
-		this.topicId = topicId;
+		this.topicSecondOrderDataId = topicSecondOrderDataId;
 	}
 	
 	// @Column(name = "TopicHTMLView", length = 65535)

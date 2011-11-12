@@ -27,6 +27,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PostPersist;
@@ -754,19 +755,8 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	public void validate()
 	{
 		syncXML();
-		validateXML();		
 		validateTags();
 		validateRelationships();
-	}
-	
-	private void validateXML()
-	{
-		final XMLValidator validator = new XMLValidator();
-		final boolean valid = validator.validateTopicXML(this.topicXML, true) != null;
-		if (!valid)
-			setTopicXMLErrors(validator.getErrorText());
-		else
-			setTopicXMLErrors(null);
 	}
 
 	private void renderTopics()
@@ -801,13 +791,8 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 
 	public void renderXML(final EntityManager entityManager)
 	{
-		if (topicSecondOrderData == null)
-		{
-			topicSecondOrderData = new TopicSecondOrderData();
-			topicSecondOrderData.setTopicID(this.topicId);
-		}
-
-		this.topicSecondOrderData.setTopicHTMLView(TopicRenderer.renderXML(entityManager, this));
+		this.setTopicRendered(TopicRenderer.renderXML(entityManager, this));
+		this.setTopicXMLErrors(TopicRenderer.validateXML(this));
 	}
 
 	private void validateRelationships()
@@ -1252,9 +1237,19 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 
 	/*
 	 * Envers has issues with this: https://hibernate.onjira.com/browse/HHH-3853
+	 * Hibernate also has issues here, so we use a join table instead
 	 */
-	@OneToOne(cascade = CascadeType.ALL, optional = true, fetch = FetchType.EAGER, orphanRemoval = true)
-	@PrimaryKeyJoinColumn
+	/*
+	 * @OneToOne(cascade = CascadeType.ALL, optional = true, fetch =
+	 * FetchType.EAGER, orphanRemoval = true)
+	 * 
+	 * @PrimaryKeyJoinColumn
+	 */
+
+	@OneToOne(optional = true, cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinTable(name = "TopicToTopicSecondOrderData", joinColumns =
+	{ @JoinColumn(name = "topicId", unique = true) }, inverseJoinColumns =
+	{ @JoinColumn(name = "topicSecondOrderDataId") })
 	@NotAudited
 	public TopicSecondOrderData getTopicSecondOrderData()
 	{
@@ -1271,27 +1266,24 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	{
 		if (this.topicSecondOrderData == null)
 			return null;
-		
+
 		return topicSecondOrderData.getTopicHTMLView();
 	}
 
 	public void setTopicRendered(final String value)
 	{
 		if (this.topicSecondOrderData == null)
-		{
 			this.topicSecondOrderData = new TopicSecondOrderData();
-			this.topicSecondOrderData.setTopicID(this.topicId);
-		}
 
 		this.topicSecondOrderData.setTopicHTMLView(value);
 	}
-	
+
 	@Transient
 	public String getTopicXMLErrors()
 	{
 		if (this.topicSecondOrderData == null)
 			return null;
-		
+
 		return topicSecondOrderData.getTopicXMLErrors();
 	}
 
@@ -1300,7 +1292,6 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		if (this.topicSecondOrderData == null)
 		{
 			this.topicSecondOrderData = new TopicSecondOrderData();
-			this.topicSecondOrderData.setTopicID(this.topicId);
 		}
 
 		this.topicSecondOrderData.setTopicXMLErrors(value);

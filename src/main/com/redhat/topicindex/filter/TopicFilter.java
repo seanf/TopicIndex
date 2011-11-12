@@ -639,7 +639,7 @@ public class TopicFilter
 	{
 		try
 		{
-			this.editedInLastDays = editedInLastDays == null ? null : Integer.parseInt(editedInLastDays);
+			this.editedInLastDays = editedInLastDays == null || editedInLastDays.trim().length() == 0 ? null : Integer.parseInt(editedInLastDays);
 		}
 		catch(final Exception ex)
 		{

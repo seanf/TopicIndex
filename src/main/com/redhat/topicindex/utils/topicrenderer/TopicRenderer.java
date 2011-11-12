@@ -14,6 +14,7 @@ import org.w3c.dom.Document;
 
 import com.redhat.ecs.commonstructures.Pair;
 import com.redhat.topicindex.utils.SkynetExceptionUtilities;
+import com.redhat.topicindex.utils.XMLValidator;
 import com.redhat.ecs.commonutils.XMLUtilities;
 import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.utils.Constants;
@@ -53,6 +54,13 @@ public class TopicRenderer implements Runnable
 		}
 
 		return null;
+	}
+
+	public static String validateXML(final Topic topic)
+	{
+		final XMLValidator validator = new XMLValidator();
+		final boolean valid = validator.validateTopicXML(topic.getTopicXML(), true) != null;
+		return valid ? null : validator.getErrorText();
 	}
 
 	public static String renderXML(final EntityManager entityManager, final Topic topic)
@@ -114,106 +122,110 @@ public class TopicRenderer implements Runnable
 	{
 		final String enableRendering = System.getProperty(Constants.ENABLE_RENDERING_PROPERTY);
 
-		if (enableRendering == null || "true".equalsIgnoreCase(enableRendering))
+		/*
+		 * Wait for the transaction associated with the main entity to finish
+		 */
+		boolean renderTopic = transaction != null ? false : true;
+		try
 		{
-			/*
-			 * Wait for the transaction associated with the main entity to
-			 * finish
-			 */
-			boolean renderTopic = transaction != null ? false : true;
-			try
+			if (transaction != null)
 			{
-				if (transaction != null)
+				for (int i = 0; i < MAX_WAIT; ++i)
 				{
-					for (int i = 0; i < MAX_WAIT; ++i)
+					final int status = transaction.getStatus();
+
+					if (status == Status.STATUS_COMMITTED)
 					{
-						final int status = transaction.getStatus();
-
-						if (status == Status.STATUS_COMMITTED)
-						{
-							renderTopic = true;
-							break;
-						}
-
-						if (status == Status.STATUS_NO_TRANSACTION || status == Status.STATUS_ROLLEDBACK || status == Status.STATUS_UNKNOWN)
-						{
-							return;
-						}
-
-						Thread.sleep(1000);
+						renderTopic = true;
+						break;
 					}
+
+					if (status == Status.STATUS_NO_TRANSACTION || status == Status.STATUS_ROLLEDBACK || status == Status.STATUS_UNKNOWN)
+					{
+						return;
+					}
+
+					Thread.sleep(1000);
 				}
 			}
-			catch (final Exception ex)
+		}
+		catch (final Exception ex)
+		{
+			SkynetExceptionUtilities.handleException(ex, false, "Probably a thread error");
+		}
+
+		/*
+		 * There was a problem with the transaction, so don't renrender the
+		 * topic
+		 */
+		if (!renderTopic)
+			return;
+
+		EntityManager entityManager = null;
+
+		try
+		{
+			transactionManager.begin();
+
+			/* get the state of the topic now */
+			entityManager = this.entityManagerFactory.createEntityManager();
+			String renderedXML = null;
+			String xmlErrors = null;
+			final Topic initialTopic = entityManager.find(Topic.class, this.topicId);
+			if (initialTopic != null)
 			{
-				SkynetExceptionUtilities.handleException(ex, false, "Probably a thread error");
-			}
+				/*
+				 * detach the entity - it will not be saved to the database
+				 */
+				entityManager.detach(initialTopic);
 
-			/*
-			 * There was a problem with the transaction, so don't renrender the
-			 * topic
-			 */
-			if (!renderTopic)
-				return;
+				/* validate the xml */
+				xmlErrors = validateXML(initialTopic);
 
-			EntityManager entityManager = null;
-
-			try
-			{
-				transactionManager.begin();
-
-				/* get the state of the topic now */
-				entityManager = this.entityManagerFactory.createEntityManager();
-				String renderedXML = null;
-				final Topic initialTopic = entityManager.find(Topic.class, this.topicId);
-				if (initialTopic != null)
+				/* render the html view */
+				if (enableRendering == null || "true".equalsIgnoreCase(enableRendering))
 				{
-					/*
-					 * detach the entity - it will not be saved to the database
-					 */
-					entityManager.detach(initialTopic);
-					/* render the html view */
 					renderedXML = renderXML(entityManager, initialTopic);
 				}
-
-				/*
-				 * And now get the state of the topic after it has been
-				 * rendered. Rendering can be time consuming, so we will only
-				 * update the TopicRendered field (and leave the others alone)
-				 * with what we have just rendered to lessen the impact of
-				 * database race conditions (such as when the topic has been
-				 * edited since when we started the rendering process and when
-				 * we finished).
-				 */
-				if (renderedXML != null)
-				{
-					final Topic updateTopic = entityManager.find(Topic.class, this.topicId);
-					updateTopic.setRerenderRelatedTopics(false);
-					updateTopic.setTopicRendered(renderedXML);
-					entityManager.persist(updateTopic);
-					entityManager.flush();
-				}
-
-				transactionManager.commit();
 			}
-			catch (final Exception ex)
+
+			/*
+			 * And now get the state of the topic after it has been rendered.
+			 * Rendering can be time consuming, so we will only update the
+			 * TopicRendered field (and leave the others alone) with what we
+			 * have just rendered to lessen the impact of database race
+			 * conditions (such as when the topic has been edited since when we
+			 * started the rendering process and when we finished).
+			 */
+			if (renderedXML != null)
 			{
-				SkynetExceptionUtilities.handleException(ex, false, "Probably a problem updating a Topic entity");
+				final Topic updateTopic = entityManager.find(Topic.class, this.topicId);
+				updateTopic.setRerenderRelatedTopics(false);
+				updateTopic.setTopicRendered(renderedXML);
+				updateTopic.setTopicXMLErrors(xmlErrors);
+				entityManager.persist(updateTopic);
+				entityManager.flush();
+			}
 
-				try
-				{
-					transactionManager.rollback();
-				}
-				catch (final Exception ex2)
-				{
-					SkynetExceptionUtilities.handleException(ex2, false, "An error rolling back a transaction");
-				}
-			}
-			finally
+			transactionManager.commit();
+		}
+		catch (final Exception ex)
+		{
+			SkynetExceptionUtilities.handleException(ex, false, "Probably a problem updating a Topic entity");
+
+			try
 			{
-				if (entityManager != null)
-					entityManager.close();
+				transactionManager.rollback();
 			}
+			catch (final Exception ex2)
+			{
+				SkynetExceptionUtilities.handleException(ex2, false, "An error rolling back a transaction");
+			}
+		}
+		finally
+		{
+			if (entityManager != null)
+				entityManager.close();
 		}
 	}
 }
