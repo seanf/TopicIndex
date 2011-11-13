@@ -220,11 +220,22 @@ public class Filter implements java.io.Serializable
 	{
 		final ArrayList<Category> categories = new ArrayList<Category>();
 
-		for (final FilterTag tag : this.filterTags)
+		for (final FilterTag filterTag : this.filterTags)
 		{
-			for (final TagToCategory category : tag.getTag().getTagToCategories())
-				if (!categories.contains(category.getCategory()))
-					categories.add(category.getCategory());
+			final int filterTagState = filterTag.getTagState();
+
+			if (filterTagState == Constants.MATCH_TAG_STATE || filterTagState == Constants.NOT_MATCH_TAG_STATE)
+			{
+				final Tag tag = filterTag.getTag();
+
+				for (final TagToCategory category : tag.getTagToCategories())
+				{
+					if (!categories.contains(category.getCategory()))
+					{
+						categories.add(category.getCategory());
+					}
+				}
+			}
 		}
 
 		return categories;
@@ -315,32 +326,11 @@ public class Filter implements java.io.Serializable
 				}
 			}
 
-
-				
-
 			if (desc.length() != 0)
 				desc += " ";
 
 			desc += categoryDesc + tagDesc;
 		}
-		
-		String groupBy = "";
-		
-		for (final FilterTag tag : this.filterTags)
-		{
-			final int tagState = tag.getTagState();
-			
-			if (tagState == Constants.GROUP_TAG_STATE)
-			{
-				if (groupBy.length() != 0)
-					groupBy += " ";
-
-				groupBy += tag.getTag().getTagName();
-			}
-		}
-		
-		if (groupBy.length() != 0)
-			groupBy = " [Group By] " + groupBy;
 
 		if (this.getFilterFields().size() != 0)
 		{
@@ -356,8 +346,26 @@ public class Filter implements java.io.Serializable
 			if (desc.length() != 0)
 				desc += " ";
 
-			desc += "[Search Filters]" + searchFilters + groupBy;
+			desc += "[Search Filters]" + searchFilters;
 		}
+
+		String groupBy = "";
+
+		for (final FilterTag tag : this.filterTags)
+		{
+			final int tagState = tag.getTagState();
+
+			if (tagState == Constants.GROUP_TAG_STATE)
+			{
+				if (groupBy.length() != 0)
+					groupBy += " ";
+
+				groupBy += tag.getTag().getTagName();
+			}
+		}
+
+		if (groupBy.length() != 0)
+			desc += " [Group By] " + groupBy;
 
 		return desc;
 	}
