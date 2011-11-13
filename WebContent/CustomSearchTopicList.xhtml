@@ -252,6 +252,8 @@
 					<a4j:actionparam name="actionTopicID"
 						assignTo="#{temporaryTopicList.actionTopicID}"
 						value="{actionTopicID}" />
+					<a4j:actionparam name="tab" assignTo="#{groupedTopicTagsList.tab}"
+						value="{tab}" />
 					<c:forEach items="#{groupedTopicTagsList.filterVars}"
 						var="filtervar">
 						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
@@ -267,6 +269,7 @@
 						assignTo="#{ajaxHelper.baseUrl}" value="/Topic.xhtml" />
 					<a4j:actionparam name="revisionNumber"
 						assignTo="#{ajaxHelper.otherVars}" value="#{null}" />
+					
 					<c:forEach items="#{groupedTopicTagsList.filterVars}"
 						var="filtervar">
 						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
@@ -279,6 +282,7 @@
 						assignTo="#{ajaxHelper.topicId}" value="{actionTopicID}" />
 					<a4j:actionparam name="actionBaseUrl"
 						assignTo="#{ajaxHelper.baseUrl}" value="/TopicEdit.xhtml" />
+					
 					<c:forEach items="#{groupedTopicTagsList.filterVars}"
 						var="filtervar">
 						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
@@ -294,6 +298,7 @@
 					<a4j:actionparam name="actionBaseUrl"
 						assignTo="#{ajaxHelper.baseUrl}"
 						value="/CustomRelatedTopicList.xhtml" />
+					
 					<c:forEach items="#{groupedTopicTagsList.filterVars}"
 						var="filtervar">
 						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
@@ -310,6 +315,7 @@
 						assignTo="#{ajaxHelper.baseUrl}" value="/Topic.xhtml" />
 					<a4j:actionparam name="revisionNumber"
 						assignTo="#{ajaxHelper.otherVars}" value="#{null}" />
+					
 					<c:forEach items="#{groupedTopicTagsList.filterVars}"
 						var="filtervar">
 						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
@@ -323,6 +329,7 @@
 						assignTo="#{ajaxHelper.topicId}" value="{actionTopicID}" />
 					<a4j:actionparam name="actionBaseUrl"
 						assignTo="#{ajaxHelper.baseUrl}" value="/TopicEdit.xhtml" />
+					
 					<c:forEach items="#{groupedTopicTagsList.filterVars}"
 						var="filtervar">
 						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
@@ -351,6 +358,8 @@
 					<a4j:actionparam name="actionTopicID"
 						assignTo="#{groupedTopicTagsList.actionTopicID}"
 						value="{actionTopicID}" />
+					<a4j:actionparam name="tab" assignTo="#{groupedTopicTagsList.tab}"
+						value="{tab}" />
 					<c:forEach items="#{groupedTopicTagsList.filterVars}"
 						var="filtervar">
 						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
@@ -363,6 +372,8 @@
 					<a4j:actionparam name="actionTopicID"
 						assignTo="#{groupedTopicTagsList.actionTopicID}"
 						value="{actionTopicID}" />
+					<a4j:actionparam name="tab" assignTo="#{groupedTopicTagsList.tab}"
+						value="{tab}" />
 					<c:forEach items="#{groupedTopicTagsList.filterVars}"
 						var="filtervar">
 						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
@@ -375,6 +386,8 @@
 					<a4j:actionparam name="actionTopicID"
 						assignTo="#{groupedTopicTagsList.actionTopicID}"
 						value="{actionTopicID}" />
+					<a4j:actionparam name="tab" assignTo="#{groupedTopicTagsList.tab}"
+						value="{tab}" />
 					<c:forEach items="#{groupedTopicTagsList.filterVars}"
 						var="filtervar">
 						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
@@ -598,6 +611,7 @@
 											operation="show">
 											<f:param value="#{_topic.topicId}" name="actionTopicID" />
 											<f:param value="#{groupedTopicTagsList.urlVars}&amp;tab=#{groupedTopicList.detachedTag.tagId}" name="otherVars" />
+											<f:param value="#{groupedTopicList.detachedTag.tagId}" name="tab" />
 										</rich:componentControl>
 									</h:commandButton>
 								</rich:column>
