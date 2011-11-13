@@ -41,6 +41,12 @@
 		<h:outputText
 			value="#{topic.topicAddedBy}" />
 	</s:decorate>
+	
+	<s:decorate id="topicViewAddedByField" template="/layout/display.xhtml">
+		<ui:define name="label">Topic XML Errors</ui:define>
+		<h:outputText
+			value="#{topic.topicSecondOrderData.topicXMLErrors}" />
+	</s:decorate>
 
 	<s:decorate id="topicViewSourceMaterialUrls"
 		template="/layout/display.xhtml">
