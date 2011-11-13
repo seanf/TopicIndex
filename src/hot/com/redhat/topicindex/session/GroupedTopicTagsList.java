@@ -195,10 +195,10 @@ public class GroupedTopicTagsList
 		return 0;
 	}
 
-	public int previousFirstResult()
+	public int getPreviousFirstResult()
 	{
 		if (pagingEntityQuery != null)
-			return pagingEntityQuery.getNextFirstResult();
+			return pagingEntityQuery.getPreviousFirstResult();
 		return 0;
 	}
 
