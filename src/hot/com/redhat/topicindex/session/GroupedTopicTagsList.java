@@ -299,7 +299,7 @@ public class GroupedTopicTagsList
 					final Integer state = Integer.parseInt(urlParameters.get(urlParam));
 					if (state == Constants.GROUP_TAG_STATE)
 					{
-						final Tag tag = EntityUtilities.getTagFromId(tagID, true);
+						final Tag tag = EntityUtilities.getTagFromId(tagID);
 						if (tag != null)
 						{
 							/*

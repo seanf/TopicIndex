@@ -310,6 +310,19 @@ public class Filter implements java.io.Serializable
 				}
 			}
 
+			for (final FilterTag tag : this.filterTags)
+			{
+				if (tag.getTagState() == Constants.GROUP_TAG_STATE)
+				{
+					if (tagDesc.length() != 0)
+						tagDesc += " " + internalLogic + " ";
+
+					tagDesc += "Group By ";
+
+					tagDesc += tag.getTag().getTagName();
+				}
+			}
+
 			if (desc.length() != 0)
 				desc += " ";
 
@@ -810,7 +823,7 @@ public class Filter implements java.io.Serializable
 						{
 							final int tagState = filterTag.getTagState();
 							final Tag filterTagTag = filterTag.getTag();
-							
+
 							if (filterTagTag.getTagId().equals(tag.getId()) && (tagState == Constants.NOT_MATCH_TAG_STATE || tagState == Constants.MATCH_TAG_STATE))
 							{
 								filterTag.setTagState(state);
@@ -841,7 +854,7 @@ public class Filter implements java.io.Serializable
 						{
 							final int tagState = filterTag.getTagState();
 							final Tag filterTagTag = filterTag.getTag();
-							
+
 							if (filterTagTag.getTagId().equals(tag.getId()) && tagState == Constants.GROUP_TAG_STATE)
 							{
 								found = true;
