@@ -1195,7 +1195,7 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 			catgeoriesByID.add(category.getCategoryId());
 		return getTagsInCategoriesByID(catgeoriesByID);
 	}
-
+	
 	/**
 	 * This function forces this topic to be rerendered, without updating any
 	 * related topics.

@@ -10,7 +10,9 @@ import org.hibernate.search.Search;
 import org.jboss.seam.Component;
 import org.jboss.seam.annotations.Name;
 
+import com.redhat.ecs.commonthread.WorkQueue;
 import com.redhat.topicindex.utils.SkynetExceptionUtilities;
+import com.redhat.topicindex.utils.topicrenderer.TopicRenderer;
 import com.redhat.topicindex.entity.Topic;
 
 @Name("globalDatabaseUtilities")
@@ -47,7 +49,7 @@ public class GlobalDatabaseUtilities
 				final int progress = (int)((float)current / (float)total * 100.0f);
 				System.out.println("Rerender progress: Topic " + current + " of " + total + " (" + progress + "%)");
 				
-				topic.reRenderTopic();
+				WorkQueue.runAndWait(TopicRenderer.createNewInstance(topic.getTopicId()));
 			}
 		}
 		catch (final Exception ex)

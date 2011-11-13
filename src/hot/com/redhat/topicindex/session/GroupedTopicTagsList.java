@@ -4,49 +4,87 @@ import static ch.lambdaj.Lambda.filter;
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
 import static ch.lambdaj.collection.LambdaCollections.with;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 
-import com.redhat.topicindex.utils.SkynetExceptionUtilities;
+import org.drools.WorkingMemory;
+import org.jboss.seam.Component;
+import org.jboss.seam.annotations.Create;
+import org.jboss.seam.annotations.In;
+import org.jboss.seam.annotations.Name;
+import org.jboss.seam.framework.EntityQuery;
+import org.jboss.seam.security.Identity;
+
 import com.redhat.ecs.commonutils.HTTPUtilities;
 import com.redhat.ecs.commonutils.MIMEUtilities;
 import com.redhat.ecs.commonutils.ZipUtilities;
+import com.redhat.topicindex.entity.Filter;
 import com.redhat.topicindex.entity.Tag;
 import com.redhat.topicindex.entity.TagToCategory;
 import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.entity.TopicToTag;
 import com.redhat.topicindex.entity.TopicToTopic;
 import com.redhat.topicindex.entity.TopicToTopicSourceUrl;
-import com.redhat.topicindex.filter.TopicFilter;
+import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.EntityUtilities;
+import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.topicindex.utils.structures.DroolsEvent;
+import com.redhat.topicindex.utils.structures.GroupedTopicList;
 import com.redhat.topicindex.utils.structures.tags.UICategoryData;
 import com.redhat.topicindex.utils.structures.tags.UIProjectCategoriesData;
+import com.redhat.topicindex.utils.structures.tags.UIProjectData;
 import com.redhat.topicindex.utils.structures.tags.UITagData;
 
-import org.drools.WorkingMemory;
-import org.jboss.seam.Component;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.security.Identity;
-
-@Name("topicTagsList")
-public class TopicTagsList extends ExtendedTopicList
+@Name("groupedTopicTagsList")
+public class GroupedTopicTagsList
 {
-	/** Serializable version identifier */
-	private static final long serialVersionUID = -5679673449323266908L;
-
-	// A list of quick tag ids, which will be populated by a drools rule
-	protected ArrayList<UITagData> quickTags = new ArrayList<UITagData>();
-
 	@In
-	protected Identity identity;
+	private Identity identity;
 	@In
-	protected WorkingMemory businessRulesWorkingMemory;
+	private WorkingMemory businessRulesWorkingMemory;
+	private List<GroupedTopicList> groupedTopicLists = new ArrayList<GroupedTopicList>();
+	private EntityQuery<Topic> pagingEntityQuery;
+	private String getAllQuery;
+	/** holds the url variables that define a filters options */
+	private String urlVars;
+	/** A list of quick tag ids, which will be populated by a drools rule */
+	private ArrayList<UITagData> quickTags = new ArrayList<UITagData>();
+	/**
+	 * a mapping of category details to tag details with sorting and selection
+	 * information
+	 */
+	protected UIProjectData selectedTags;
+	/**
+	 * The query used to find the entities in the list is set in the constructor
+	 * using setEjbql. Because we modify this query based on the tags in the
+	 * url, the url needs to have all the variables for the tags and categories.
+	 * To ensure that the url always has these variables, we parse them out and
+	 * save them in the filterVars collection, which is then read with a jstl
+	 * foreach tag to place the required params into any link (like next,
+	 * previous, first page, last page) that may require a new instance of this
+	 * object to be constructed.
+	 */
+	private HashMap<String, String> filterVars;
+	/** Provides the heading that identifies the currently selected filter tags */
+	protected String searchTagHeading;
+	
+	public String getSearchTagHeading()
+	{
+		return searchTagHeading;
+	}
+
+	public void setSearchTagHeading(final String value)
+	{
+		searchTagHeading = value;
+	}
 
 	// used by the action links
 	private Integer actionTopicID;
@@ -79,6 +117,27 @@ public class TopicTagsList extends ExtendedTopicList
 		return quickTags;
 	}
 
+	public void setUrlVars(final String urlVars)
+	{
+		this.urlVars = urlVars;
+	}
+
+	public String getUrlVars()
+	{
+		return urlVars;
+	}
+	
+
+	public HashMap<String, String> getFilterVars()
+	{
+		return filterVars;
+	}
+
+	public void setFilterVars(final HashMap<String, String> filterVars)
+	{
+		this.filterVars = filterVars;
+	}
+
 	public void setActionTopicID(final Integer actionTopicID)
 	{
 		this.actionTopicID = actionTopicID;
@@ -89,40 +148,242 @@ public class TopicTagsList extends ExtendedTopicList
 		return actionTopicID;
 	}
 
-	public TopicTagsList()
+	public void setSelectedTags(final UIProjectData selectedTags)
 	{
-		super();
+		this.selectedTags = selectedTags;
 	}
 
-	public TopicTagsList(final int limit)
+	public UIProjectData getSelectedTags()
 	{
-		super(limit);
+		return selectedTags;
 	}
 
-	public TopicTagsList(final int limit, final String constructedEJBQL)
+	public List<GroupedTopicList> getGroupedTopicLists()
 	{
-		super(limit, constructedEJBQL);
+		return groupedTopicLists;
 	}
 
-	public TopicTagsList(final int limit, final String constructedEJBQL, final TopicFilter topic)
+	public void setGroupedTopicLists(List<GroupedTopicList> groupedTopicLists)
 	{
-		super(limit, constructedEJBQL, topic);
+		this.groupedTopicLists = groupedTopicLists;
 	}
 
-	/**
-	 * construct provides common initialization for the overloaded constructors.
-	 * We have the ability to supply the Topic object through which the filters
-	 * work as well as the HQL query in order to overcome the limitation of the
-	 * EntityQuery class whereby you can not unset the setMaxResults function.
-	 * These two properties allow us to construct a new TopicTagsList without
-	 * paging that has all the elements included in a paged version. This is
-	 * used in bulk tagging where you view a paged list of results, but apply
-	 * tags to all elements.
-	 */
-	@Override
-	protected void construct(final int limit, final String constructedEJBQL, final TopicFilter topic)
+	public boolean isNextExists()
 	{
-		super.construct(limit, constructedEJBQL, topic, "topicTagsList");
+		if (pagingEntityQuery != null)
+			return pagingEntityQuery.isNextExists();
+		return false;
+	}
+	
+	public boolean isPreviousExists()
+	{
+		if (pagingEntityQuery != null)
+			return pagingEntityQuery.isPreviousExists();
+		return false;
+	}
+
+	public Long getLastFirstResult()
+	{
+		if (pagingEntityQuery != null)
+			return pagingEntityQuery.getLastFirstResult();
+		return 0l;
+	}
+
+	public int getNextFirstResult()
+	{
+		if (pagingEntityQuery != null)
+			return pagingEntityQuery.getNextFirstResult();
+		return 0;
+	}
+
+	public int previousFirstResult()
+	{
+		if (pagingEntityQuery != null)
+			return pagingEntityQuery.getNextFirstResult();
+		return 0;
+	}
+
+	public Integer getFirstResult()
+	{
+		if (pagingEntityQuery != null)
+			return pagingEntityQuery.getFirstResult();
+		return 0;
+	}
+
+	public void setFirstResult(final Integer firstResult)
+	{
+		if (pagingEntityQuery != null)
+			pagingEntityQuery.setFirstResult(firstResult);
+	}
+
+	public List<Topic> getResultList()
+	{
+		if (pagingEntityQuery != null)
+			return pagingEntityQuery.getResultList();
+		return null;
+	}
+
+	public boolean isPaginated()
+	{
+		if (pagingEntityQuery != null)
+			return pagingEntityQuery.isPaginated();
+		return false;
+	}
+
+	public Long getResultCount()
+	{
+		if (pagingEntityQuery != null)
+			return pagingEntityQuery.getResultCount();
+		return 0l;
+	}
+
+	public void setOrderColumn(final String orderColumn)
+	{
+		if (pagingEntityQuery != null)
+			pagingEntityQuery.setOrderColumn(orderColumn);
+	}
+
+	public String getOrderColumn()
+	{
+		if (pagingEntityQuery != null)
+			return pagingEntityQuery.getOrderColumn();
+		return null;
+	}
+
+	public void setOrderDirection(final String orderDirection)
+	{
+		if (pagingEntityQuery != null)
+			pagingEntityQuery.setOrderDirection(orderDirection);
+	}
+
+	public String getOrderDirection()
+	{
+		if (pagingEntityQuery != null)
+			return pagingEntityQuery.getOrderDirection();
+		return null;
+	}
+
+	@Create
+	public void create()
+	{
+		loadQuickTags();
+		
+		
+
+		// populate the bulk tag database
+		selectedTags = new UIProjectData();
+		selectedTags.populateTopicTags();
+
+		final Map<String, String> urlParameters = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
+		final Filter filter = EntityUtilities.populateFilter(urlParameters, Constants.FILTER_ID, Constants.MATCH_TAG, Constants.CATEORY_INTERNAL_LOGIC, Constants.CATEORY_EXTERNAL_LOGIC);
+		getAllQuery = filter.buildQuery();
+		
+		// get a map of variable names to variable values
+		filterVars = filter.getUrlVariables();
+		
+		// get the heading to display over the list of topics
+		searchTagHeading = filter.getFilterTitle();
+
+		/*
+		 * get a string that can be appended to a url that contains the url
+		 * variables
+		 */
+		urlVars = filter.buildFilterUrlVars();
+
+		final List<Integer> groupedTags = new ArrayList<Integer>();
+
+		for (final String urlParam : urlParameters.keySet())
+		{
+			if (urlParam.equals(Constants.GROUP_TAG))
+			{
+				try
+				{
+					final String urlParamValue = urlParameters.get(urlParam);
+					final Integer tagID = Integer.parseInt(urlParamValue);
+					final Tag tag = EntityUtilities.getTagFromId(tagID, true);
+					if (tag != null)
+					{
+						/*
+						 * build the query, and add a new restriction that
+						 * forces the group tag to be present
+						 */
+						final String query = getAllQuery + " AND exists (select 1 from TopicToTag topicToTag where topicToTag.topic = topic and topicToTag.tag.tagId = " + tagID + ") ";
+						final ExtendedTopicList topics = new ExtendedTopicList(Constants.DEFAULT_PAGING_SIZE, query);
+						if (topics.getResultCount() != 0)
+						{
+							final GroupedTopicList groupedTopicList = new GroupedTopicList();
+							groupedTopicList.setDetachedTag(tag);
+							groupedTopicList.setTopicList(topics);
+
+							groupedTopicLists.add(groupedTopicList);
+
+							if (pagingEntityQuery == null || pagingEntityQuery.getMaxResults() < topics.getMaxResults())
+								pagingEntityQuery = topics;
+							
+							groupedTags.add(tagID);
+						}
+					}
+				}
+				catch (final Exception ex)
+				{
+					SkynetExceptionUtilities.handleException(ex, true, "Probably a bad url parameter passed as a grouping tag");
+				}
+			}
+		}
+
+		/*
+		 * we didn't have any groups, so just find all the matching topics and
+		 * dump them in the default group
+		 */
+		if (groupedTags.size() == 0)
+		{
+			final ExtendedTopicList topics = new ExtendedTopicList(Constants.DEFAULT_PAGING_SIZE, getAllQuery);
+
+			final Tag dummyTag = new Tag();
+			dummyTag.setTagName("Ungrouped Results");
+
+			final GroupedTopicList groupedTopicList = new GroupedTopicList();
+			groupedTopicList.setDetachedTag(dummyTag);
+			groupedTopicList.setTopicList(topics);
+
+			groupedTopicLists.add(groupedTopicList);
+			pagingEntityQuery = topics;
+		}
+		/*
+		 * Find that topics that are part of the query, but couldn't be matched
+		 * in any group
+		 */
+		else
+		{
+			String notQuery = "";
+			for (final Integer tagID : groupedTags)
+			{
+				notQuery += " AND not exists (select 1 from TopicToTag topicToTag where topicToTag.topic = topic and topicToTag.tag.tagId = " + tagID + ")";
+			}
+
+			final ExtendedTopicList topics = new ExtendedTopicList(Constants.DEFAULT_PAGING_SIZE, getAllQuery + notQuery);
+
+			final Tag dummyTag = new Tag();
+			dummyTag.setTagName("Ungrouped Results");
+
+			final GroupedTopicList groupedTopicList = new GroupedTopicList();
+			groupedTopicList.setDetachedTag(dummyTag);
+			groupedTopicList.setTopicList(topics);
+
+			groupedTopicLists.add(groupedTopicList);
+			pagingEntityQuery = topics;
+		}
+	}
+
+	/********************************************************************************/
+
+	private void loadQuickTags()
+	{
+		// Use drools to populate the quick tags
+		businessRulesWorkingMemory.setGlobal("quickTags", quickTags);
+		EntityUtilities.injectSecurity(businessRulesWorkingMemory, identity);
+		businessRulesWorkingMemory.insert(new DroolsEvent("PopulateQuickTags"));
+		businessRulesWorkingMemory.fireAllRules();
 	}
 
 	/**
@@ -130,9 +391,8 @@ public class TopicTagsList extends ExtendedTopicList
 	 */
 	public void applyBulkTags()
 	{
-		final TopicTagsList cloneList = new TopicTagsList(-1, this.constructedEJBQL, this.topic);
-
-		final List<Topic> bulkTagList = cloneList.getResultList();
+		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+		final List<Topic> bulkTagList = entityManager.createQuery(getAllQuery).getResultList();
 
 		/*
 		 * Loop through once, and remove all the tags. then loop through again
@@ -195,8 +455,8 @@ public class TopicTagsList extends ExtendedTopicList
 	{
 		String csv = Topic.getCSVHeaderRow();
 
-		final TopicTagsList cloneList = new TopicTagsList(-1, this.constructedEJBQL, this.topic);
-		final List<Topic> bulkTagList = cloneList.getResultList();
+		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+		final List<Topic> bulkTagList = entityManager.createQuery(getAllQuery).getResultList();
 		{
 			// loop through each topic
 			for (final Topic topic : bulkTagList)
@@ -208,13 +468,13 @@ public class TopicTagsList extends ExtendedTopicList
 
 	public void downloadXML()
 	{
-		final TopicTagsList cloneList = new TopicTagsList(-1, this.constructedEJBQL, this.topic);
-		final List<Topic> topicList = cloneList.getResultList();
+		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+		final List<Topic> bulkTagList = entityManager.createQuery(getAllQuery).getResultList();
 
 		// build up the files that will make up the zip file
 		final HashMap<String, byte[]> files = new HashMap<String, byte[]>();
 
-		for (final Topic topic : topicList)
+		for (final Topic topic : bulkTagList)
 			files.put(topic.getTopicId() + ".xml", topic.getTopicXML() == null ? "".getBytes() : topic.getTopicXML().getBytes());
 
 		byte[] zipFile = null;
@@ -289,27 +549,8 @@ public class TopicTagsList extends ExtendedTopicList
 		 * we might have added a tag that excludes this topic from the previous
 		 * search, so we have to refresh the list
 		 */
-		this.refresh();
-	}
-
-	/**
-	 * Override the validate method to get the @Create function
-	 */
-	@Override
-	public void validate()
-	{
-		super.validate();
-		loadQuickTags();
-
-	}
-
-	private void loadQuickTags()
-	{
-		// Use drools to populate the quick tags
-		businessRulesWorkingMemory.setGlobal("quickTags", quickTags);
-		EntityUtilities.injectSecurity(businessRulesWorkingMemory, identity);
-		businessRulesWorkingMemory.insert(new DroolsEvent("PopulateQuickTags"));
-		businessRulesWorkingMemory.fireAllRules();
+		for (final GroupedTopicList groupedTopicList : groupedTopicLists)
+			groupedTopicList.getTopicList().refresh();
 	}
 
 	protected void removeRelationship(final boolean to)

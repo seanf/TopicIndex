@@ -229,8 +229,15 @@ public class EntityUtilities
 
 	public static Tag getTagFromId(final Integer tagId)
 	{
+		return getTagFromId(tagId, false);
+	}
+	
+	public static Tag getTagFromId(final Integer tagId, final boolean detach)
+	{
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 		final Tag tag = entityManager.find(Tag.class, tagId);
+		if (detach && tag != null)
+			entityManager.detach(tag);
 		return tag;
 	}
 

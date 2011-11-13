@@ -32,6 +32,8 @@ public class Constants
 	
 	public static final String BASE_REST_PATH = "/seam/resource/rest";
 	
+	public static final int DEFAULT_PAGING_SIZE = 25;
+	
 
 
 	/** The format of the date to be displayed by any date widget */
@@ -74,6 +76,8 @@ public class Constants
 	public static final String MATCH_TAG = "tag";
 	/** The URL variable prefix to indicate that a tag needs to be excluded */
 	public static final String NOT_MATCH_TAG = "nottag";
+	/** The URL variable prefix to indicate that a tag is to be used to group results */
+	public static final String GROUP_TAG = "grouptag";
 	/**
 	 * The URL variable prefix to indicate the internal logic of a category (and
 	 * optionally also specify a project)

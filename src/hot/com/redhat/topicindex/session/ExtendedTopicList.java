@@ -20,59 +20,7 @@ public class ExtendedTopicList extends TopicList
 	/** Serializable version identifier */
 	private static final long serialVersionUID = -4553573868560054166L;
 
-	/** Provides the heading that identifies the currently selected filter tags */
-	protected String searchTagHeading;
-	/**
-	 * a mapping of category details to tag details with sorting and selection
-	 * information
-	 */
-	protected UIProjectData selectedTags;
 	protected String constructedEJBQL;
-	/** holds the url variables that define a filters options */
-	protected String urlVars;
-	/**
-	 * The query used to find the entities in the list is set in the constructor
-	 * using setEjbql. Because we modify this query based on the tags in the
-	 * url, the url needs to have all the variables for the tags and categories.
-	 * To ensure that the url always has these variables, we parse them out and
-	 * save them in the filterVars collection, which is then read with a jstl
-	 * foreach tag to place the required params into any link (like next,
-	 * previous, first page, last page) that may require a new instance of this
-	 * object to be constructed.
-	 */
-	private HashMap<String, String> filterVars;
-
-
-
-	public void setSelectedTags(final UIProjectData selectedTags)
-	{
-		this.selectedTags = selectedTags;
-	}
-
-	public UIProjectData getSelectedTags()
-	{
-		return selectedTags;
-	}
-
-	public String getSearchTagHeading()
-	{
-		return searchTagHeading;
-	}
-
-	public void setSearchTagHeading(final String value)
-	{
-		searchTagHeading = value;
-	}
-
-	public void setUrlVars(final String urlVars)
-	{
-		this.urlVars = urlVars;
-	}
-
-	public String getUrlVars()
-	{
-		return urlVars;
-	}
 
 	public ExtendedTopicList(final int limit)
 	{
@@ -91,7 +39,7 @@ public class ExtendedTopicList extends TopicList
 
 	public ExtendedTopicList()
 	{
-		super(25);
+		super(Constants.DEFAULT_PAGING_SIZE);
 	}
 
 	/**
@@ -108,10 +56,6 @@ public class ExtendedTopicList extends TopicList
 	{
 		super.construct(limit, constructedEJBQL, topic);
 
-		// populate the bulk tag database
-		selectedTags = new UIProjectData();
-		selectedTags.populateTopicTags();
-
 		// if a query is not supplied, work it out from the url
 		if (constructedEJBQL == null)
 		{
@@ -122,23 +66,12 @@ public class ExtendedTopicList extends TopicList
 			/* the filter may be null if an invalid varibale was passed in the URL */
 			if (filter != null)
 			{
-				// get the heading to display over the list of topics
-				searchTagHeading = filter.getFilterTitle();
-	
-				// get a string that can be appended to a url that contains the url
-				// variables
-				urlVars = filter.buildFilterUrlVars();
-	
-				// get a map of variable names to variable values
-				filterVars = filter.getUrlVariables();
-	
 				// add the and and or categories clause to the default statement
 				final String query = filter.buildQuery();
 				this.constructedEJBQL = query;
 			}
 			else
 			{
-				searchTagHeading = "Invalid URL variables. Showing all topics.";
 				this.constructedEJBQL = Topic.SELECT_ALL_QUERY;
 			}
 		}
@@ -161,13 +94,4 @@ public class ExtendedTopicList extends TopicList
 			this.topic = topic;
 	}
 
-	public HashMap<String, String> getFilterVars()
-	{
-		return filterVars;
-	}
-
-	public void setFilterVars(HashMap<String, String> filterVars)
-	{
-		this.filterVars = filterVars;
-	}
 }
