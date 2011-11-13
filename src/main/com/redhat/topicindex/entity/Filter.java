@@ -300,7 +300,7 @@ public class Filter implements java.io.Serializable
 			{
 				final int tagState = tag.getTagState();
 
-				if (tagState != Constants.GROUP_TAG_STATE)
+				if (tagState == Constants.MATCH_TAG_STATE || tagState == Constants.NOT_MATCH_TAG_STATE)
 				{
 					if (tag.getTag().isInCategory(category.getCategoryId()))
 					{
@@ -317,7 +317,9 @@ public class Filter implements java.io.Serializable
 
 			for (final FilterTag tag : this.filterTags)
 			{
-				if (tag.getTagState() == Constants.GROUP_TAG_STATE)
+				final int tagState = tag.getTagState();
+				
+				if (tagState == Constants.GROUP_TAG_STATE)
 				{
 					if (tagDesc.length() != 0)
 						tagDesc += " " + internalLogic + " ";
