@@ -6,7 +6,7 @@ public class Constants
 	 * The Skynet build number, displayed on the top bar of all Skynet pages. Is
 	 * in the format yyyymmdd-hhmm
 	 */
-	public static final String BUILD = "20111113-0947";
+	public static final String BUILD = "20111113-2104";
 	
 	/**
 	 * The system property that determines if topics should be rendered into
