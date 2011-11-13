@@ -547,7 +547,8 @@
 				<rich:tabPanel switchType="client">
 					<c:forEach items="#{groupedTopicTagsList.groupedTopicLists}"
 						var="groupedTopicList">
-						<rich:tab label="#{groupedTopicList.detachedTag.tagName} (#{groupedTopicList.topicList.resultCount})">
+						<rich:tab label="#{groupedTopicList.detachedTag.tagName} (#{groupedTopicList.topicList.resultCount})"
+						name="#{groupedTopicList.detachedTag.tagId}">
 
 							<rich:dataTable var="_topic"
 								value="#{groupedTopicList.topicList.resultList}"
@@ -571,7 +572,7 @@
 										<rich:componentControl event="onclick" for="topicContextMenu"
 											operation="show">
 											<f:param value="#{_topic.topicId}" name="actionTopicID" />
-											<f:param value="#{groupedTopicTagsList.urlVars}" name="otherVars" />
+											<f:param value="#{groupedTopicTagsList.urlVars}&amp;tab=#{groupedTopicList.detachedTag.tagId}" name="otherVars" />
 										</rich:componentControl>
 									</h:commandButton>
 								</rich:column>
@@ -615,6 +616,7 @@
 													var="filtervar">
 													<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 												</c:forEach>
+												<f:param name="tab" value="#{groupedTopicList.detachedTag.tagId}"/>
 											</h:commandLink>
 											<br />
 										</c:forEach>
