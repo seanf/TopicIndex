@@ -268,7 +268,7 @@ public class Filter implements java.io.Serializable
 		/* Loop over all the categories that the filter tags belong to */
 		for (final Category category : this.getFilterTagCategories())
 		{
-			String categoryDesc = category.getCategoryName() + ": ";
+			String categoryDesc = "[" + category.getCategoryName() + "] ";
 			String tagDesc = "";
 
 			/* This will be shown in the topic list results title */
@@ -315,30 +315,32 @@ public class Filter implements java.io.Serializable
 				}
 			}
 
-			String groupBy = "";
-			
-			for (final FilterTag tag : this.filterTags)
-			{
-				final int tagState = tag.getTagState();
-				
-				if (tagState == Constants.GROUP_TAG_STATE)
-				{
-					if (groupBy.length() != 0)
-						groupBy += " ";
 
-					groupBy += tag.getTag().getTagName();
-				}
-			}
-			
-			if (groupBy.length() != 0)
-				groupBy = " Group By: " + groupBy;
 				
 
 			if (desc.length() != 0)
 				desc += " ";
 
-			desc += categoryDesc + tagDesc + groupBy;
+			desc += categoryDesc + tagDesc;
 		}
+		
+		String groupBy = "";
+		
+		for (final FilterTag tag : this.filterTags)
+		{
+			final int tagState = tag.getTagState();
+			
+			if (tagState == Constants.GROUP_TAG_STATE)
+			{
+				if (groupBy.length() != 0)
+					groupBy += " ";
+
+				groupBy += tag.getTag().getTagName();
+			}
+		}
+		
+		if (groupBy.length() != 0)
+			groupBy = " [Group By] " + groupBy;
 
 		if (this.getFilterFields().size() != 0)
 		{
@@ -354,10 +356,10 @@ public class Filter implements java.io.Serializable
 			if (desc.length() != 0)
 				desc += " ";
 
-			desc += "Search Filters:" + searchFilters;
+			desc += "[Search Filters]" + searchFilters + groupBy;
 		}
 
-		return "[ " + desc + " ]";
+		return desc;
 	}
 
 	/**
