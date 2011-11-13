@@ -190,7 +190,7 @@
 				<h:outputText value="The topic search returned no results."
 					rendered="#{empty relatedTopicTagsList.resultList}" />
 				<rich:tabPanel switchType="client"
-					selectedTab="#{groupedTopicList.selectedTab}">
+					selectedTab="#{relatedTopicTagsList.tab}">
 					<c:forEach items="#{relatedTopicTagsList.groupedTopicLists}"
 						var="groupedTopicList">
 						<rich:tab
