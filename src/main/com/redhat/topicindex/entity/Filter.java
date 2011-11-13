@@ -843,14 +843,18 @@ public class Filter implements java.io.Serializable
 						for (final FilterTag filterTag : this.getFilterTags())
 						{
 							final int tagState = filterTag.getTagState();
-							final Tag filterTagTag = filterTag.getTag();
 
-							if (filterTagTag.getTagId().equals(tag.getId()) && (tagState == Constants.NOT_MATCH_TAG_STATE || tagState == Constants.MATCH_TAG_STATE))
+							if (tagState == Constants.NOT_MATCH_TAG_STATE || tagState == Constants.MATCH_TAG_STATE)
 							{
-								filterTag.setTagState(state);
-								selectedFilterTags.add(filterTag);
-								found = true;
-								break;
+								final Tag filterTagTag = filterTag.getTag();
+
+								if (filterTagTag.getTagId().equals(tag.getId()))
+								{
+									filterTag.setTagState(state);
+									selectedFilterTags.add(filterTag);
+									found = true;
+									break;
+								}
 							}
 						}
 
@@ -874,12 +878,15 @@ public class Filter implements java.io.Serializable
 						for (final FilterTag filterTag : this.getFilterTags())
 						{
 							final int tagState = filterTag.getTagState();
-							final Tag filterTagTag = filterTag.getTag();
-
-							if (filterTagTag.getTagId().equals(tag.getId()) && tagState == Constants.GROUP_TAG_STATE)
+							if (tagState == Constants.GROUP_TAG_STATE)
 							{
-								found = true;
-								break;
+								final Tag filterTagTag = filterTag.getTag();
+
+								if (filterTagTag.getTagId().equals(tag.getId()))
+								{
+									found = true;
+									break;
+								}
 							}
 						}
 
