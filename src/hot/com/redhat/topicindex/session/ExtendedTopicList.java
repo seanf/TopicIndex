@@ -61,7 +61,7 @@ public class ExtendedTopicList extends TopicList
 		{
 			// initialize filter home
 			final Filter filter = EntityUtilities.populateFilter(FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap(), Constants.FILTER_ID, Constants.MATCH_TAG,
-					Constants.CATEORY_INTERNAL_LOGIC, Constants.CATEORY_EXTERNAL_LOGIC);
+					Constants.GROUP_TAG, Constants.CATEORY_INTERNAL_LOGIC, Constants.CATEORY_EXTERNAL_LOGIC);
 
 			/* the filter may be null if an invalid varibale was passed in the URL */
 			if (filter != null)

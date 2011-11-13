@@ -396,7 +396,7 @@ public class Filter implements java.io.Serializable
 			}
 			else if (tagState == Constants.GROUP_TAG_STATE)
 			{
-				vars.put(Constants.MATCH_TAG + tag.getTagId(), Constants.GROUP_TAG_STATE + "");
+				vars.put(Constants.GROUP_TAG + tag.getTagId(), Constants.GROUP_TAG_STATE + "");
 			}
 		}
 
@@ -925,16 +925,23 @@ public class Filter implements java.io.Serializable
 				boolean found = false;
 				for (final UIProjectCategoriesData project : selectedTags.getProjectCategories())
 				{
-
 					for (final UICategoryData category : project.getCategories())
 					{
 						for (final UITagData tag : category.getTags())
 						{
-							final boolean tagSelected = tag.isSelected();
-							if (!tagSelected && tag.getId().equals(filterTag.getTag().getTagId()))
+							/* are we looking at the same ui tag and filter tag? */
+							if (tag.getId().equals(filterTag.getTag().getTagId()))
 							{
-								found = true;
-								break;
+								final boolean tagSelected = tag.isSelected();
+								final boolean isSelectedTag = filterTag.getTagState() == Constants.MATCH_TAG_STATE || filterTag.getTagState() == Constants.NOT_MATCH_TAG_STATE;
+								final boolean groupBy = tag.isGroupBy();
+								final boolean isGroupByTag = filterTag.getTagState() == Constants.GROUP_TAG_STATE;
+								
+								if ((isSelectedTag && !tagSelected) || (isGroupByTag && !groupBy))
+								{
+									found = true;
+									break;
+								}
 							}
 						}
 					}

@@ -144,7 +144,7 @@ public class CustomTagSearch implements DisplayMessageInterface
 		{
 			// build up a Filter object from the URL variables
 			final FacesContext context = FacesContext.getCurrentInstance();
-			filter = EntityUtilities.populateFilter(context.getExternalContext().getRequestParameterMap(), Constants.FILTER_ID, Constants.MATCH_TAG, Constants.CATEORY_INTERNAL_LOGIC, Constants.CATEORY_EXTERNAL_LOGIC);
+			filter = EntityUtilities.populateFilter(context.getExternalContext().getRequestParameterMap(), Constants.FILTER_ID, Constants.MATCH_TAG, Constants.GROUP_TAG, Constants.CATEORY_INTERNAL_LOGIC, Constants.CATEORY_EXTERNAL_LOGIC);
 		}
 		// otherwise load the filter using the filter id
 		else

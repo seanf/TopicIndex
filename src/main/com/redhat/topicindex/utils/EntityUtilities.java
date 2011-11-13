@@ -386,12 +386,12 @@ public class EntityUtilities
 		}
 	}
 
-	public static Filter populateFilter(final MultivaluedMap<String, String> paramMap, final String filterName, final String tagPrefix, final String categoryInternalPrefix, final String categoryExternalPrefix)
+	public static Filter populateFilter(final MultivaluedMap<String, String> paramMap, final String filterName, final String tagPrefix, final String groupTagPrefix, final String categoryInternalPrefix, final String categoryExternalPrefix)
 	{
 		final Map<String, String> newParamMap = new HashMap<String, String>();
 		for (final String key : paramMap.keySet())
 			newParamMap.put(key, paramMap.getFirst(key));
-		return populateFilter(newParamMap, filterName, tagPrefix, categoryInternalPrefix, categoryExternalPrefix);
+		return populateFilter(newParamMap, filterName, tagPrefix, groupTagPrefix, categoryInternalPrefix, categoryExternalPrefix);
 
 	}
 
@@ -399,7 +399,7 @@ public class EntityUtilities
 	 * This function takes the url parameters and uses them to populate a Filter
 	 * object
 	 */
-	public static Filter populateFilter(final Map<String, String> paramMap, final String filterName, final String tagPrefix, final String categoryInternalPrefix, final String categoryExternalPrefix)
+	public static Filter populateFilter(final Map<String, String> paramMap, final String filterName, final String tagPrefix, final String groupTagPrefix, final String categoryInternalPrefix, final String categoryExternalPrefix)
 	{
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 
@@ -435,6 +435,7 @@ public class EntityUtilities
 			for (final String key : paramMap.keySet())
 			{
 				final boolean tagVar = key.startsWith(tagPrefix);
+				final boolean groupTagVar = key.startsWith(groupTagPrefix);
 				final boolean catIntVar = key.startsWith(categoryInternalPrefix);
 				final boolean catExtVar = key.startsWith(categoryExternalPrefix);
 				final String state = paramMap.get(key);
@@ -528,6 +529,25 @@ public class EntityUtilities
 						filter.getFilterTags().add(filterTag);
 					}
 				}
+				
+				else if (groupTagVar)
+				{
+					final Integer tagId = Integer.parseInt(key.replaceFirst(groupTagPrefix, ""));
+					//final Integer intState = Integer.parseInt(state);
+
+					// get the Tag object that the tag id represents
+					final Tag tag = entityManager.getReference(Tag.class, tagId);
+
+					if (tag != null)
+					{
+						final FilterTag filterTag = new FilterTag();
+						filterTag.setTag(tag);
+						filterTag.setTagState(Constants.GROUP_TAG_STATE);
+						filterTag.setFilter(filter);
+						filter.getFilterTags().add(filterTag);
+					}
+				}
+				
 				// add the filter field states
 				else
 				{

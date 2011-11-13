@@ -74,6 +74,8 @@ public class Constants
 	public static final String DEFAULT_EXTERNAL_LOGIC = AND_LOGIC;
 	/** The url variable prefix to indicate that a tag needs to be matched */
 	public static final String MATCH_TAG = "tag";
+	/** The url variable prefix to indicate that a tag will be used for grouping */
+	public static final String GROUP_TAG = "grouptab";
 	/**
 	 * The URL variable prefix to indicate the internal logic of a category (and
 	 * optionally also specify a project)
