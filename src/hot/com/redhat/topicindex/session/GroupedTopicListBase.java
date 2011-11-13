@@ -1,6 +1,7 @@
 package com.redhat.topicindex.session;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import org.jboss.seam.framework.EntityQuery;
 import com.redhat.topicindex.entity.Filter;
 import com.redhat.topicindex.entity.Tag;
 import com.redhat.topicindex.entity.Topic;
+import com.redhat.topicindex.sort.GroupedTopicListNameComparator;
 import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.EntityUtilities;
 import com.redhat.topicindex.utils.SkynetExceptionUtilities;
@@ -263,6 +265,9 @@ public class GroupedTopicListBase
 				}
 			}
 		}
+		
+		/* sort by tag name, and then add the unsorted topics on the end */
+		Collections.sort(groupedTopicLists, new GroupedTopicListNameComparator());
 
 		/*
 		 * we didn't have any groups, so just find all the matching topics and
