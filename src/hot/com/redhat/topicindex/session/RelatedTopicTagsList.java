@@ -49,7 +49,7 @@ public class RelatedTopicTagsList extends ExtendedTopicList
 	
 	protected void construct(final int limit, final String constructedEJBQL, final TopicFilter topic)
 	{
-		super.construct(limit, constructedEJBQL, topic, "relatedTopicTagsList");
+		super.construct(limit, constructedEJBQL, topic);
 	}
 	
 	public void oneWayToAll()
