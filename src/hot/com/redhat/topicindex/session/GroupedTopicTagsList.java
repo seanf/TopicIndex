@@ -291,32 +291,36 @@ public class GroupedTopicTagsList
 
 		for (final String urlParam : urlParameters.keySet())
 		{
-			if (urlParam.startsWith(Constants.GROUP_TAG))
+			if (urlParam.startsWith(Constants.MATCH_TAG))
 			{
 				try
 				{
-					final Integer tagID = Integer.parseInt(urlParam.replace(Constants.GROUP_TAG, ""));
-					final Tag tag = EntityUtilities.getTagFromId(tagID, true);
-					if (tag != null)
+					final Integer tagID = Integer.parseInt(urlParam.replace(Constants.MATCH_TAG, ""));
+					final Integer state = Integer.parseInt(urlParameters.get(urlParam));
+					if (state == Constants.GROUP_TAG_STATE)
 					{
-						/*
-						 * build the query, and add a new restriction that
-						 * forces the group tag to be present
-						 */
-						final String query = getAllQuery + " AND exists (select 1 from TopicToTag topicToTag where topicToTag.topic = topic and topicToTag.tag.tagId = " + tagID + ") ";
-						final ExtendedTopicList topics = new ExtendedTopicList(Constants.DEFAULT_PAGING_SIZE, query);
-						if (topics.getResultCount() != 0)
+						final Tag tag = EntityUtilities.getTagFromId(tagID, true);
+						if (tag != null)
 						{
-							final GroupedTopicList groupedTopicList = new GroupedTopicList();
-							groupedTopicList.setDetachedTag(tag);
-							groupedTopicList.setTopicList(topics);
+							/*
+							 * build the query, and add a new restriction that
+							 * forces the group tag to be present
+							 */
+							final String query = getAllQuery + " AND exists (select 1 from TopicToTag topicToTag where topicToTag.topic = topic and topicToTag.tag.tagId = " + tagID + ") ";
+							final ExtendedTopicList topics = new ExtendedTopicList(Constants.DEFAULT_PAGING_SIZE, query);
+							if (topics.getResultCount() != 0)
+							{
+								final GroupedTopicList groupedTopicList = new GroupedTopicList();
+								groupedTopicList.setDetachedTag(tag);
+								groupedTopicList.setTopicList(topics);
 
-							groupedTopicLists.add(groupedTopicList);
+								groupedTopicLists.add(groupedTopicList);
 
-							if (pagingEntityQuery == null || pagingEntityQuery.getResultCount() < topics.getResultCount())
-								pagingEntityQuery = topics;
+								if (pagingEntityQuery == null || pagingEntityQuery.getResultCount() < topics.getResultCount())
+									pagingEntityQuery = topics;
 
-							groupedTags.add(tagID);
+								groupedTags.add(tagID);
+							}
 						}
 					}
 				}
@@ -343,7 +347,7 @@ public class GroupedTopicTagsList
 			groupedTopicList.setTopicList(topics);
 
 			groupedTopicLists.add(groupedTopicList);
-			pagingEntityQuery = topics;	
+			pagingEntityQuery = topics;
 		}
 		/*
 		 * Find that topics that are part of the query, but couldn't be matched
@@ -369,7 +373,7 @@ public class GroupedTopicTagsList
 				groupedTopicList.setTopicList(topics);
 
 				groupedTopicLists.add(groupedTopicList);
-				
+
 				if (pagingEntityQuery == null || pagingEntityQuery.getMaxResults() < topics.getMaxResults())
 					pagingEntityQuery = topics;
 			}

@@ -511,7 +511,7 @@ public class EntityUtilities
 				}
 
 				// add the filter tag states
-				if (tagVar)
+				else if (tagVar)
 				{
 					final Integer tagId = Integer.parseInt(key.replaceFirst(tagPrefix, ""));
 					final Integer intState = Integer.parseInt(state);

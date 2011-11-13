@@ -362,7 +362,7 @@ public class Filter implements java.io.Serializable
 			}
 			else if (tagState == Constants.GROUP_TAG_STATE)
 			{
-				vars.put(Constants.GROUP_TAG + tag.getTagId(), Constants.MATCH_TAG_STATE + "");
+				vars.put(Constants.MATCH_TAG + tag.getTagId(), Constants.GROUP_TAG_STATE + "");
 			}
 		}
 
