@@ -6,6 +6,7 @@ import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
 
 import org.jboss.seam.Component;
+import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Name;
 
 import com.redhat.topicindex.utils.SkynetExceptionUtilities;
@@ -17,105 +18,100 @@ import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.EntityUtilities;
 
 @Name("relatedTopicTagsList")
-public class RelatedTopicTagsList extends ExtendedTopicList
+public class RelatedTopicTagsList extends GroupedTopicListBase
 {
 	/** Serializable version identifier */
 	private static final long serialVersionUID = -2877706994939648373L;
-	
-	/** The id of the main topic */ 
+
+	/** The id of the main topic */
 	private Integer topicTopicId;
 	/** The actual Topic object found with the topicTopicId */
 	private Topic instance;
-	
+	/** The object that holds the filter field values */
+	private TopicFilter topic = new TopicFilter();
+
 	public RelatedTopicTagsList()
 	{
-		super();
-	}
-	
-	public RelatedTopicTagsList(final int limit) 
-	{
-		super(limit);
-	}
-	
-	public RelatedTopicTagsList(final int limit, final String constructedEJBQL) 
-	{
-		super(limit, constructedEJBQL);
+
 	}
 
-	public RelatedTopicTagsList(final int limit, final String constructedEJBQL, final TopicFilter topic) 
+	@Create
+	public void create()
 	{
-		super(limit, constructedEJBQL, topic);
+		super.create();
+
+		// build up a Filter object from the URL variables
+		final Filter filter = EntityUtilities.populateFilter(FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap(), Constants.FILTER_ID, Constants.MATCH_TAG, Constants.CATEORY_INTERNAL_LOGIC, Constants.CATEORY_EXTERNAL_LOGIC);
+
+		// preselect the tags on the web page that relate to the tags selected
+		// by the filter
+		selectedTags.populateTopicTags(filter, false);
+
+		// sync up the filter field values
+		for (final FilterField field : filter.getFilterFields())
+			this.topic.setFieldValue(field.getField(), field.getValue());
 	}
-	
-	protected void construct(final int limit, final String constructedEJBQL, final TopicFilter topic)
-	{
-		super.construct(limit, constructedEJBQL, topic);
-	}
-	
+
 	public void oneWayToAll()
 	{
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 		final Topic mainTopic = entityManager.find(Topic.class, topicTopicId);
-		final RelatedTopicTagsList fullList = new RelatedTopicTagsList(-1, this.constructedEJBQL, this.topic);
-		final List<Topic> topics = fullList.getResultList();
+		final List<Topic> topics = entityManager.createQuery(getAllQuery).getResultList();
 		for (final Topic topic : topics)
 		{
 			final boolean isChild = mainTopic.isRelatedTo(topic);
-			
+
 			if (!isChild && !mainTopic.equals(topic))
-				mainTopic.addRelationshipTo(topic);			
+				mainTopic.addRelationshipTo(topic);
 		}
 		entityManager.persist(mainTopic);
 	}
-	
+
 	public void oneWayFromAll()
 	{
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 		final Topic mainTopic = entityManager.find(Topic.class, topicTopicId);
-		final RelatedTopicTagsList fullList = new RelatedTopicTagsList(-1, this.constructedEJBQL, this.topic);
-		final List<Topic> topics = fullList.getResultList();
+		final List<Topic> topics = entityManager.createQuery(getAllQuery).getResultList();
 		for (final Topic topic : topics)
 		{
 			final boolean isChild = topic.isRelatedTo(mainTopic);
-			
+
 			if (!isChild && !mainTopic.equals(topic))
 			{
-				topic.addRelationshipTo(mainTopic);	
+				topic.addRelationshipTo(mainTopic);
 				entityManager.persist(topic);
 			}
-		}		
+		}
 	}
-	
+
 	public void twoWayWithAll()
 	{
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 		final Topic mainTopic = entityManager.find(Topic.class, topicTopicId);
-		final RelatedTopicTagsList fullList = new RelatedTopicTagsList(-1, this.constructedEJBQL, this.topic);
-		final List<Topic> topics = fullList.getResultList();
+		final List<Topic> topics = entityManager.createQuery(getAllQuery).getResultList();
 		for (final Topic topic : topics)
 		{
 			final boolean isMainTopicChild = topic.isRelatedTo(mainTopic);
-			
+
 			if (!isMainTopicChild && !mainTopic.equals(topic))
 			{
 				topic.addRelationshipTo(mainTopic);
 				entityManager.persist(topic);
 			}
-			
+
 			final boolean isTopicChild = mainTopic.isRelatedTo(topic);
-			
+
 			if (!isTopicChild && !mainTopic.equals(topic))
-				mainTopic.addRelationshipTo(topic);	
+				mainTopic.addRelationshipTo(topic);
 		}
 		entityManager.persist(mainTopic);
 	}
-	
+
 	public void removeToAll()
 	{
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 		final Topic mainTopic = entityManager.find(Topic.class, topicTopicId);
-		final RelatedTopicTagsList fullList = new RelatedTopicTagsList(-1, this.constructedEJBQL, this.topic);
-		final List<Topic> topics = fullList.getResultList();
+		final List<Topic> topics = entityManager.createQuery(getAllQuery).getResultList();
 		for (final Topic topic : topics)
 		{
 			mainTopic.removeRelationshipTo(topic);
@@ -127,63 +123,41 @@ public class RelatedTopicTagsList extends ExtendedTopicList
 	{
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 		final Topic mainTopic = entityManager.find(Topic.class, topicTopicId);
-		final RelatedTopicTagsList fullList = new RelatedTopicTagsList(-1, this.constructedEJBQL, this.topic);
-		final List<Topic> topics = fullList.getResultList();
+		final List<Topic> topics = entityManager.createQuery(getAllQuery).getResultList();
 		for (final Topic topic : topics)
 		{
 			if (topic.removeRelationshipTo(mainTopic))
 				entityManager.persist(topic);
-		}	
+		}
 	}
 
 	public void removeBetweenAll()
 	{
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 		final Topic mainTopic = entityManager.find(Topic.class, topicTopicId);
-		final RelatedTopicTagsList fullList = new RelatedTopicTagsList(-1, this.constructedEJBQL, this.topic);
-		final List<Topic> topics = fullList.getResultList();
+		final List<Topic> topics = entityManager.createQuery(getAllQuery).getResultList();
 		for (final Topic topic : topics)
 		{
 			if (topic.removeRelationshipTo(mainTopic))
 			{
 				entityManager.persist(topic);
 			}
-			
-			mainTopic.removeRelationshipTo(topic);		
+
+			mainTopic.removeRelationshipTo(topic);
 		}
 		entityManager.persist(mainTopic);
-	}
-	
-	public void validate()
-	{		
-		super.validate();
-		
-		// build up a Filter object from the URL variables
-		final Filter filter = EntityUtilities.populateFilter(
-				FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap(), 
-				Constants.FILTER_ID, 
-				Constants.MATCH_TAG, 
-				Constants.CATEORY_INTERNAL_LOGIC, 
-				Constants.CATEORY_EXTERNAL_LOGIC);		
-		
-		// preselect the tags on the web page that relate to the tags selected by the filter
-		selectedTags.populateTopicTags(filter, false);
-		
-		// sync up the filter field values
-		for (final FilterField field : filter.getFilterFields())
-			this.topic.setFieldValue(field.getField(), field.getValue());
 	}
 
 	public String doSearch()
 	{
 		return "/CustomRelatedTopicList.seam?" + getSearchUrlVars();
 	}
-	
+
 	protected String getSearchUrlVars()
 	{
 		return getSearchUrlVars(null);
 	}
-	
+
 	protected String getSearchUrlVars(final String startRecord)
 	{
 		final Filter filter = new Filter();
@@ -194,7 +168,7 @@ public class RelatedTopicTagsList extends ExtendedTopicList
 		final String params = filter.buildFilterUrlVars();
 		return "topicTopicId=" + topicTopicId + "&" + params;
 	}
-	
+
 	public boolean isRelatedTo(final Integer otherTopicId)
 	{
 		try
@@ -208,10 +182,10 @@ public class RelatedTopicTagsList extends ExtendedTopicList
 		{
 			SkynetExceptionUtilities.handleException(ex, false, "Probably an error retrieving Topics from the database");
 		}
-		
+
 		return false;
 	}
-	
+
 	public boolean isRelatedFrom(final Integer otherTopicId)
 	{
 		try
@@ -225,25 +199,25 @@ public class RelatedTopicTagsList extends ExtendedTopicList
 		{
 			SkynetExceptionUtilities.handleException(ex, false, "Probably an error retrieving Topics from the database");
 		}
-		
+
 		return false;
 	}
-	
+
 	public boolean isRelatedBothWays(final Integer otherTopicId)
 	{
 		return isRelatedFrom(otherTopicId) && isRelatedTo(otherTopicId);
 	}
-	
+
 	public boolean isNotRelated(final Integer otherTopicId)
 	{
 		return !isRelatedFrom(otherTopicId) && !isRelatedTo(otherTopicId);
 	}
-	
+
 	public boolean isRelatedOneWay(final Integer otherTopicId)
 	{
 		return isRelatedFrom(otherTopicId) != isRelatedTo(otherTopicId);
 	}
-	
+
 	public String removeRelationship(final Integer otherTopicId, final boolean to, final boolean from, final boolean returnToSearch)
 	{
 		try
@@ -251,7 +225,7 @@ public class RelatedTopicTagsList extends ExtendedTopicList
 			final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 			final Topic thisTopic = entityManager.find(Topic.class, topicTopicId);
 			final Topic otherTopic = entityManager.find(Topic.class, otherTopicId);
-			
+
 			if (from)
 			{
 				if (thisTopic.removeRelationshipTo(otherTopic))
@@ -260,7 +234,7 @@ public class RelatedTopicTagsList extends ExtendedTopicList
 					instance = thisTopic;
 				}
 			}
-			
+
 			if (to)
 			{
 				if (otherTopic.removeRelationshipTo(thisTopic))
@@ -268,19 +242,19 @@ public class RelatedTopicTagsList extends ExtendedTopicList
 					entityManager.persist(otherTopic);
 				}
 			}
-			
+
 			entityManager.flush();
 		}
 		catch (final Exception ex)
 		{
 			SkynetExceptionUtilities.handleException(ex, false, "Probably an error retrieving or persiting Topics in the database");
 		}
-		
+
 		final String retValue = returnToSearch ? "/CustomSearchTopicList.xhtml" : null;
-				
+
 		return retValue;
 	}
-	
+
 	public String createRelationship(final Integer otherTopicId, final boolean to, final boolean from, final boolean returnToSearch)
 	{
 		try
@@ -288,18 +262,18 @@ public class RelatedTopicTagsList extends ExtendedTopicList
 			final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 			final Topic thisTopic = entityManager.find(Topic.class, topicTopicId);
 			final Topic otherTopic = entityManager.find(Topic.class, otherTopicId);
-			
+
 			if (from)
 			{
 				if (!thisTopic.isRelatedTo(otherTopic) && !thisTopic.equals(otherTopic))
 				{
 					if (thisTopic.addRelationshipTo(otherTopic))
 					{
-						entityManager.persist(thisTopic);						
+						entityManager.persist(thisTopic);
 					}
 				}
 			}
-			
+
 			if (to)
 			{
 				if (!otherTopic.isRelatedTo(thisTopic) && !thisTopic.equals(otherTopic))
@@ -311,26 +285,25 @@ public class RelatedTopicTagsList extends ExtendedTopicList
 					}
 				}
 			}
-			
+
 			instance = thisTopic;
 			entityManager.flush();
-			
+
 		}
 		catch (final Exception ex)
 		{
 			SkynetExceptionUtilities.handleException(ex, false, "Probably an error retrieving or perssting Topics in the database");
 		}
-		
-		final String retValue = returnToSearch ?
-				"/CustomSearchTopicList.xhtml": null;
-		
+
+		final String retValue = returnToSearch ? "/CustomSearchTopicList.xhtml" : null;
+
 		return retValue;
 	}
 
-	public void setTopicTopicId(final Integer topicTopicId) 
+	public void setTopicTopicId(final Integer topicTopicId)
 	{
 		this.topicTopicId = topicTopicId;
-		
+
 		try
 		{
 			final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
@@ -338,20 +311,22 @@ public class RelatedTopicTagsList extends ExtendedTopicList
 		}
 		catch (final Exception ex)
 		{
-			SkynetExceptionUtilities.handleException(ex, false, "Probably an error retrieving a Topic from the database" );
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error retrieving a Topic from the database");
 		}
 	}
 
-	public Integer getTopicTopicId() {
+	public Integer getTopicTopicId()
+	{
 		return topicTopicId;
 	}
 
-	public void setInstance(final Topic instance) 
+	public void setInstance(final Topic instance)
 	{
 		this.instance = instance;
 	}
 
-	public Topic getInstance() {
+	public Topic getInstance()
+	{
 		return instance;
 	}
 }

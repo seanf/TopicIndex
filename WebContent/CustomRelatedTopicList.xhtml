@@ -16,7 +16,7 @@
 
 		<br />
 		<br />
-		
+
 		<h:outputText
 			value="Topic ID: #{relatedTopicTagsList.topicTopicId} Title: #{relatedTopicTagsList.instance.topicTitle}" />
 
@@ -130,7 +130,7 @@
 		<br />
 
 		<rich:panel>
-			<f:facet name="header">Topic Search Results (#{empty relatedTopicTagsList.resultList ? 0 : (relatedTopicTagsList.paginated ? relatedTopicTagsList.resultCount : relatedTopicTagsList.resultList.size)}) #{relatedTopicTagsList.searchTagHeading}</f:facet>
+			<f:facet name="header">#{relatedTopicTagsList.searchTagHeading}</f:facet>
 
 			<ui:include src="/WEB-INF/templates/BulkRelationshipActions.xhtml" />
 
@@ -189,306 +189,310 @@
 
 				<h:outputText value="The topic search returned no results."
 					rendered="#{empty relatedTopicTagsList.resultList}" />
+				<rich:tabPanel switchType="client">
+					<c:forEach items="#{relatedTopicTagsList.groupedTopicLists}"
+						var="groupedTopicList">
+						<rich:tab
+							label="#{relatedTopicTagsList.detachedTag.tagName} (#{relatedTopicTagsList.topicList.resultCount})">
+							<rich:dataTable var="_topic"
+								value="#{groupedTopicList.topicList.resultList}"
+								rendered="#{not empty relatedTopicTagsList.resultList}"
+								styleClass="listTable"
+								columnsWidth="200px, 50px, 150px, 75px, 150px, 150px"
+								columnClasses=" , , , longText, , , ">
 
-				<rich:dataTable id="relatedTopicTagsList" var="_topic"
-					value="#{relatedTopicTagsList.resultList}"
-					rendered="#{not empty relatedTopicTagsList.resultList}"
-					styleClass="listTable"
-					columnsWidth="200px, 50px, 150px, 75px, 150px, 150px"
-					columnClasses=" , , , longText, , , ">
 
+								<h:column>
+									<f:facet name="header">
+										<h:outputText>Actions</h:outputText>
+									</f:facet>
 
-					<h:column>
-						<f:facet name="header">
-							<h:outputText>Actions</h:outputText>
-						</f:facet>
-
-						<h:form>
-							<!-- 2 way link exists -->
-							<h:commandLink id="twowaylinkremovetoreturn"
-								title="Create a relationship from #{relatedTopicTagsList.topicTopicId} to #{_topic.topicId}, and return to the search screen"
-								value="Convert To 1 Way To Here"
-								action="#{relatedTopicTagsList.removeRelationship(_topic.topicId, true, false, true)}"
-								rendered="#{relatedTopicTagsList.isRelatedBothWays(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
-								class="relatedTopicLink">
-								<c:forEach items="#{relatedTopicTagsList.filterVars}"
-									var="filtervar">
-									<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
-								</c:forEach>
-							</h:commandLink>
+									<h:form>
+										<!-- 2 way link exists -->
+										<h:commandLink id="twowaylinkremovetoreturn"
+											title="Create a relationship from #{relatedTopicTagsList.topicTopicId} to #{_topic.topicId}, and return to the search screen"
+											value="Convert To 1 Way To Here"
+											action="#{relatedTopicTagsList.removeRelationship(_topic.topicId, true, false, true)}"
+											rendered="#{relatedTopicTagsList.isRelatedBothWays(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
+											class="relatedTopicLink">
+											<c:forEach items="#{relatedTopicTagsList.filterVars}"
+												var="filtervar">
+												<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
+											</c:forEach>
+										</h:commandLink>
 				            #{" "}
 				            <h:commandLink id="twowaylinkremovetocontinue"
-								title="Create a relationship from #{relatedTopicTagsList.topicTopicId} to #{_topic.topicId}, and return to this screen"
-								value="&amp; Continue"
-								action="#{relatedTopicTagsList.removeRelationship(_topic.topicId, true, false, false)}"
-								rendered="#{relatedTopicTagsList.isRelatedBothWays(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
-								class="relatedTopicLink">
-								<c:forEach items="#{relatedTopicTagsList.filterVars}"
-									var="filtervar">
-									<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
-								</c:forEach>
-							</h:commandLink>
+											title="Create a relationship from #{relatedTopicTagsList.topicTopicId} to #{_topic.topicId}, and return to this screen"
+											value="&amp; Continue"
+											action="#{relatedTopicTagsList.removeRelationship(_topic.topicId, true, false, false)}"
+											rendered="#{relatedTopicTagsList.isRelatedBothWays(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
+											class="relatedTopicLink">
+											<c:forEach items="#{relatedTopicTagsList.filterVars}"
+												var="filtervar">
+												<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
+											</c:forEach>
+										</h:commandLink>
 
-							<!--  no link exists -->
-							<h:commandLink id="nolinkcreatetoreturn"
-								title="Add a relationship from #{_topic.topicId} to #{relatedTopicTagsList.topicTopicId}, and return to the search screen"
-								value="Create 1 Way From Here"
-								action="#{relatedTopicTagsList.createRelationship(_topic.topicId, true, false, true)}"
-								rendered="#{relatedTopicTagsList.isNotRelated(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
-								class="relatedTopicLink">
-								<c:forEach items="#{relatedTopicTagsList.filterVars}"
-									var="filtervar">
-									<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
-								</c:forEach>
-							</h:commandLink>
+										<!--  no link exists -->
+										<h:commandLink id="nolinkcreatetoreturn"
+											title="Add a relationship from #{_topic.topicId} to #{relatedTopicTagsList.topicTopicId}, and return to the search screen"
+											value="Create 1 Way From Here"
+											action="#{relatedTopicTagsList.createRelationship(_topic.topicId, true, false, true)}"
+											rendered="#{relatedTopicTagsList.isNotRelated(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
+											class="relatedTopicLink">
+											<c:forEach items="#{relatedTopicTagsList.filterVars}"
+												var="filtervar">
+												<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
+											</c:forEach>
+										</h:commandLink>
 				            #{" "}
 				            <h:commandLink id="nolinkcreatetocontinue"
-								title="Add a relationship from #{_topic.topicId} to #{relatedTopicTagsList.topicTopicId}, and return to this screen"
-								value="&amp; Continue"
-								action="#{relatedTopicTagsList.createRelationship(_topic.topicId, true, false, false)}"
-								rendered="#{relatedTopicTagsList.isNotRelated(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
-								class="relatedTopicLink">
-								<c:forEach items="#{relatedTopicTagsList.filterVars}"
-									var="filtervar">
-									<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
-								</c:forEach>
-							</h:commandLink>
+											title="Add a relationship from #{_topic.topicId} to #{relatedTopicTagsList.topicTopicId}, and return to this screen"
+											value="&amp; Continue"
+											action="#{relatedTopicTagsList.createRelationship(_topic.topicId, true, false, false)}"
+											rendered="#{relatedTopicTagsList.isNotRelated(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
+											class="relatedTopicLink">
+											<c:forEach items="#{relatedTopicTagsList.filterVars}"
+												var="filtervar">
+												<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
+											</c:forEach>
+										</h:commandLink>
 
-							<!-- relationship exists to xor from this topic -->
-							<h:commandLink id="onewaylinkcreatetwowayreturn"
-								title="Make the relationship between #{_topic.topicId} and #{relatedTopicTagsList.topicTopicId} two way, and return to the search screen"
-								value="Create 2 Way Relationship"
-								action="#{relatedTopicTagsList.createRelationship(_topic.topicId, true, true, true)}"
-								rendered="#{relatedTopicTagsList.isRelatedOneWay(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
-								class="relatedTopicLink">
-								<c:forEach items="#{relatedTopicTagsList.filterVars}"
-									var="filtervar">
-									<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
-								</c:forEach>
-							</h:commandLink>
+										<!-- relationship exists to xor from this topic -->
+										<h:commandLink id="onewaylinkcreatetwowayreturn"
+											title="Make the relationship between #{_topic.topicId} and #{relatedTopicTagsList.topicTopicId} two way, and return to the search screen"
+											value="Create 2 Way Relationship"
+											action="#{relatedTopicTagsList.createRelationship(_topic.topicId, true, true, true)}"
+											rendered="#{relatedTopicTagsList.isRelatedOneWay(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
+											class="relatedTopicLink">
+											<c:forEach items="#{relatedTopicTagsList.filterVars}"
+												var="filtervar">
+												<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
+											</c:forEach>
+										</h:commandLink>
 				            #{" "}
 				            <h:commandLink id="onewaylinkcreatetwowaycontinue"
-								title="Make the relationship between #{_topic.topicId} and #{relatedTopicTagsList.topicTopicId} two way, and return to this screen"
-								value="&amp; Continue"
-								action="#{relatedTopicTagsList.createRelationship(_topic.topicId, true, true, false)}"
-								rendered="#{relatedTopicTagsList.isRelatedOneWay(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
-								class="relatedTopicLink">
-								<c:forEach items="#{relatedTopicTagsList.filterVars}"
-									var="filtervar">
-									<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
-								</c:forEach>
-							</h:commandLink>
+											title="Make the relationship between #{_topic.topicId} and #{relatedTopicTagsList.topicTopicId} two way, and return to this screen"
+											value="&amp; Continue"
+											action="#{relatedTopicTagsList.createRelationship(_topic.topicId, true, true, false)}"
+											rendered="#{relatedTopicTagsList.isRelatedOneWay(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
+											class="relatedTopicLink">
+											<c:forEach items="#{relatedTopicTagsList.filterVars}"
+												var="filtervar">
+												<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
+											</c:forEach>
+										</h:commandLink>
 
-							<br />
+										<br />
 
-							<!-- 2 way link exists -->
-							<h:commandLink id="twowaylinkremovefromreturn"
-								title="Convert to a relationship from #{_topic.topicId} to #{relatedTopicTagsList.topicTopicId}, and return to the search screen"
-								value="Convert To 1 Way From Here"
-								action="#{relatedTopicTagsList.removeRelationship(_topic.topicId, false, true, true)}"
-								rendered="#{relatedTopicTagsList.isRelatedBothWays(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
-								class="relatedTopicLink">
-								<c:forEach items="#{relatedTopicTagsList.filterVars}"
-									var="filtervar">
-									<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
-								</c:forEach>
-							</h:commandLink>
+										<!-- 2 way link exists -->
+										<h:commandLink id="twowaylinkremovefromreturn"
+											title="Convert to a relationship from #{_topic.topicId} to #{relatedTopicTagsList.topicTopicId}, and return to the search screen"
+											value="Convert To 1 Way From Here"
+											action="#{relatedTopicTagsList.removeRelationship(_topic.topicId, false, true, true)}"
+											rendered="#{relatedTopicTagsList.isRelatedBothWays(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
+											class="relatedTopicLink">
+											<c:forEach items="#{relatedTopicTagsList.filterVars}"
+												var="filtervar">
+												<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
+											</c:forEach>
+										</h:commandLink>
 				            #{" "}
 				            <h:commandLink id="twowaylinkremovefromcontinue"
-								title="Convert to a relationship from #{_topic.topicId} to #{relatedTopicTagsList.topicTopicId}, and return to this screen"
-								value="&amp; Continue"
-								action="#{relatedTopicTagsList.removeRelationship(_topic.topicId, false, true, false)}"
-								rendered="#{relatedTopicTagsList.isRelatedBothWays(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
-								class="relatedTopicLink">
-								<c:forEach items="#{relatedTopicTagsList.filterVars}"
-									var="filtervar">
-									<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
-								</c:forEach>
-							</h:commandLink>
+											title="Convert to a relationship from #{_topic.topicId} to #{relatedTopicTagsList.topicTopicId}, and return to this screen"
+											value="&amp; Continue"
+											action="#{relatedTopicTagsList.removeRelationship(_topic.topicId, false, true, false)}"
+											rendered="#{relatedTopicTagsList.isRelatedBothWays(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
+											class="relatedTopicLink">
+											<c:forEach items="#{relatedTopicTagsList.filterVars}"
+												var="filtervar">
+												<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
+											</c:forEach>
+										</h:commandLink>
 
-							<!--  no link exists -->
-							<h:commandLink id="nolinkcreatefromreturn"
-								title="Create a relationship from #{relatedTopicTagsList.topicTopicId} to #{_topic.topicId}, and return to the search screen"
-								value="Create 1 Way To Here"
-								action="#{relatedTopicTagsList.createRelationship(_topic.topicId, false, true, true)}"
-								rendered="#{relatedTopicTagsList.isNotRelated(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
-								class="relatedTopicLink">
-								<c:forEach items="#{relatedTopicTagsList.filterVars}"
-									var="filtervar">
-									<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
-								</c:forEach>
-							</h:commandLink>
+										<!--  no link exists -->
+										<h:commandLink id="nolinkcreatefromreturn"
+											title="Create a relationship from #{relatedTopicTagsList.topicTopicId} to #{_topic.topicId}, and return to the search screen"
+											value="Create 1 Way To Here"
+											action="#{relatedTopicTagsList.createRelationship(_topic.topicId, false, true, true)}"
+											rendered="#{relatedTopicTagsList.isNotRelated(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
+											class="relatedTopicLink">
+											<c:forEach items="#{relatedTopicTagsList.filterVars}"
+												var="filtervar">
+												<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
+											</c:forEach>
+										</h:commandLink>
 				            #{" "}
 				            <h:commandLink id="nolinkcreatefromcontinue"
-								title="Create a relationship from #{relatedTopicTagsList.topicTopicId} to #{_topic.topicId}, and return to this screen"
-								value="&amp; Continue"
-								action="#{relatedTopicTagsList.createRelationship(_topic.topicId, false, true, false)}"
-								rendered="#{relatedTopicTagsList.isNotRelated(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
-								class="relatedTopicLink">
-								<c:forEach items="#{relatedTopicTagsList.filterVars}"
-									var="filtervar">
-									<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
-								</c:forEach>
-							</h:commandLink>
+											title="Create a relationship from #{relatedTopicTagsList.topicTopicId} to #{_topic.topicId}, and return to this screen"
+											value="&amp; Continue"
+											action="#{relatedTopicTagsList.createRelationship(_topic.topicId, false, true, false)}"
+											rendered="#{relatedTopicTagsList.isNotRelated(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
+											class="relatedTopicLink">
+											<c:forEach items="#{relatedTopicTagsList.filterVars}"
+												var="filtervar">
+												<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
+											</c:forEach>
+										</h:commandLink>
 
-							<!-- relationship exists to this topic -->
-							<h:commandLink id="fromlinkremovereturn"
-								title="Remove the relationship from #{relatedTopicTagsList.topicTopicId} to #{_topic.topicId}, and return to this screen"
-								value="Remove Relationship To Here"
-								action="#{relatedTopicTagsList.removeRelationship(_topic.topicId, true, true, true)}"
-								rendered="#{relatedTopicTagsList.isRelatedOneWay(_topic.topicId) and relatedTopicTagsList.isRelatedTo(_topic.topicId)  and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
-								class="relatedTopicLink">
-								<c:forEach items="#{relatedTopicTagsList.filterVars}"
-									var="filtervar">
-									<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
-								</c:forEach>
-							</h:commandLink>			            
+										<!-- relationship exists to this topic -->
+										<h:commandLink id="fromlinkremovereturn"
+											title="Remove the relationship from #{relatedTopicTagsList.topicTopicId} to #{_topic.topicId}, and return to this screen"
+											value="Remove Relationship To Here"
+											action="#{relatedTopicTagsList.removeRelationship(_topic.topicId, true, true, true)}"
+											rendered="#{relatedTopicTagsList.isRelatedOneWay(_topic.topicId) and relatedTopicTagsList.isRelatedTo(_topic.topicId)  and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
+											class="relatedTopicLink">
+											<c:forEach items="#{relatedTopicTagsList.filterVars}"
+												var="filtervar">
+												<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
+											</c:forEach>
+										</h:commandLink>			            
 				            #{" "}
 				            <h:commandLink id="fromlinkremovecontinue"
-								title="Remove the relationship from #{relatedTopicTagsList.topicTopicId} to #{_topic.topicId}, and return to this screen"
-								value="&amp; Continue"
-								action="#{relatedTopicTagsList.removeRelationship(_topic.topicId, true, true, false)}"
-								rendered="#{relatedTopicTagsList.isRelatedOneWay(_topic.topicId) and relatedTopicTagsList.isRelatedTo(_topic.topicId)  and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
-								class="relatedTopicLink">
-								<c:forEach items="#{relatedTopicTagsList.filterVars}"
-									var="filtervar">
-									<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
-								</c:forEach>
-							</h:commandLink>
+											title="Remove the relationship from #{relatedTopicTagsList.topicTopicId} to #{_topic.topicId}, and return to this screen"
+											value="&amp; Continue"
+											action="#{relatedTopicTagsList.removeRelationship(_topic.topicId, true, true, false)}"
+											rendered="#{relatedTopicTagsList.isRelatedOneWay(_topic.topicId) and relatedTopicTagsList.isRelatedTo(_topic.topicId)  and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
+											class="relatedTopicLink">
+											<c:forEach items="#{relatedTopicTagsList.filterVars}"
+												var="filtervar">
+												<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
+											</c:forEach>
+										</h:commandLink>
 
-							<h:commandLink id="tolinkremovereturn"
-								title="Remove the relationship from #{_topic.topicId} to #{relatedTopicTagsList.topicTopicId}, and return to this screen"
-								value="Remove Relationship From Here"
-								action="#{relatedTopicTagsList.removeRelationship(_topic.topicId, true, true, true)}"
-								rendered="#{relatedTopicTagsList.isRelatedOneWay(_topic.topicId) and relatedTopicTagsList.isRelatedFrom(_topic.topicId)  and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
-								class="relatedTopicLink">
-								<c:forEach items="#{relatedTopicTagsList.filterVars}"
-									var="filtervar">
-									<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
-								</c:forEach>
-							</h:commandLink>			            
+										<h:commandLink id="tolinkremovereturn"
+											title="Remove the relationship from #{_topic.topicId} to #{relatedTopicTagsList.topicTopicId}, and return to this screen"
+											value="Remove Relationship From Here"
+											action="#{relatedTopicTagsList.removeRelationship(_topic.topicId, true, true, true)}"
+											rendered="#{relatedTopicTagsList.isRelatedOneWay(_topic.topicId) and relatedTopicTagsList.isRelatedFrom(_topic.topicId)  and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
+											class="relatedTopicLink">
+											<c:forEach items="#{relatedTopicTagsList.filterVars}"
+												var="filtervar">
+												<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
+											</c:forEach>
+										</h:commandLink>			            
 				            #{" "}
 				            <h:commandLink id="tolinkremovecontinue"
-								title="Remove the relationship from #{_topic.topicId} to #{relatedTopicTagsList.topicTopicId}, and return to this screen"
-								value="&amp; Continue"
-								action="#{relatedTopicTagsList.removeRelationship(_topic.topicId, true, true, false)}"
-								rendered="#{relatedTopicTagsList.isRelatedOneWay(_topic.topicId) and relatedTopicTagsList.isRelatedFrom(_topic.topicId)  and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
-								class="relatedTopicLink">
-								<c:forEach items="#{relatedTopicTagsList.filterVars}"
-									var="filtervar">
-									<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
-								</c:forEach>
-							</h:commandLink>
+											title="Remove the relationship from #{_topic.topicId} to #{relatedTopicTagsList.topicTopicId}, and return to this screen"
+											value="&amp; Continue"
+											action="#{relatedTopicTagsList.removeRelationship(_topic.topicId, true, true, false)}"
+											rendered="#{relatedTopicTagsList.isRelatedOneWay(_topic.topicId) and relatedTopicTagsList.isRelatedFrom(_topic.topicId)  and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
+											class="relatedTopicLink">
+											<c:forEach items="#{relatedTopicTagsList.filterVars}"
+												var="filtervar">
+												<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
+											</c:forEach>
+										</h:commandLink>
 
-							<br />
+										<br />
 
-							<!-- 2 way link exists -->
-							<h:commandLink id="twowaylinkremoveallreturn"
-								title="Remove all relationships between #{relatedTopicTagsList.topicTopicId} and #{_topic.topicId}, and return to the search screen"
-								value="Remove All Relationships"
-								action="#{relatedTopicTagsList.removeRelationship(_topic.topicId, true, true, true)}"
-								rendered="#{relatedTopicTagsList.isRelatedBothWays(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
-								class="relatedTopicLink">
-								<c:forEach items="#{relatedTopicTagsList.filterVars}"
-									var="filtervar">
-									<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
-								</c:forEach>
-							</h:commandLink>
+										<!-- 2 way link exists -->
+										<h:commandLink id="twowaylinkremoveallreturn"
+											title="Remove all relationships between #{relatedTopicTagsList.topicTopicId} and #{_topic.topicId}, and return to the search screen"
+											value="Remove All Relationships"
+											action="#{relatedTopicTagsList.removeRelationship(_topic.topicId, true, true, true)}"
+											rendered="#{relatedTopicTagsList.isRelatedBothWays(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
+											class="relatedTopicLink">
+											<c:forEach items="#{relatedTopicTagsList.filterVars}"
+												var="filtervar">
+												<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
+											</c:forEach>
+										</h:commandLink>
 				            #{" "}
 				            <h:commandLink id="twowaylinkremoveallcontinue"
-								title="Remove all relationships between #{relatedTopicTagsList.topicTopicId} and #{_topic.topicId}, and return to this screen"
-								value="&amp; Continue"
-								action="#{relatedTopicTagsList.removeRelationship(_topic.topicId, true, true, false)}"
-								rendered="#{relatedTopicTagsList.isRelatedBothWays(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
-								class="relatedTopicLink">
-								<c:forEach items="#{relatedTopicTagsList.filterVars}"
-									var="filtervar">
-									<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
-								</c:forEach>
-							</h:commandLink>
+											title="Remove all relationships between #{relatedTopicTagsList.topicTopicId} and #{_topic.topicId}, and return to this screen"
+											value="&amp; Continue"
+											action="#{relatedTopicTagsList.removeRelationship(_topic.topicId, true, true, false)}"
+											rendered="#{relatedTopicTagsList.isRelatedBothWays(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
+											class="relatedTopicLink">
+											<c:forEach items="#{relatedTopicTagsList.filterVars}"
+												var="filtervar">
+												<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
+											</c:forEach>
+										</h:commandLink>
 
-							<!--  no link exists -->
-							<h:commandLink id="nolinktwowayreturn"
-								title="Add a two way relationship between #{relatedTopicTagsList.topicTopicId} and #{_topic.topicId}, and return to the search screen"
-								value="Create a Two Way Relationship"
-								action="#{relatedTopicTagsList.createRelationship(_topic.topicId, true, true, true)}"
-								rendered="#{relatedTopicTagsList.isNotRelated(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
-								class="relatedTopicLink">
-								<c:forEach items="#{relatedTopicTagsList.filterVars}"
-									var="filtervar">
-									<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
-								</c:forEach>
-							</h:commandLink>
+										<!--  no link exists -->
+										<h:commandLink id="nolinktwowayreturn"
+											title="Add a two way relationship between #{relatedTopicTagsList.topicTopicId} and #{_topic.topicId}, and return to the search screen"
+											value="Create a Two Way Relationship"
+											action="#{relatedTopicTagsList.createRelationship(_topic.topicId, true, true, true)}"
+											rendered="#{relatedTopicTagsList.isNotRelated(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
+											class="relatedTopicLink">
+											<c:forEach items="#{relatedTopicTagsList.filterVars}"
+												var="filtervar">
+												<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
+											</c:forEach>
+										</h:commandLink>
 				            #{" "}
 				            <h:commandLink id="nolinktwowaycontinue"
-								title="Add a two way relationship between #{relatedTopicTagsList.topicTopicId} and #{_topic.topicId}, and return to this screen"
-								value="&amp; Continue"
-								action="#{relatedTopicTagsList.createRelationship(_topic.topicId, true, true, false)}"
-								rendered="#{relatedTopicTagsList.isNotRelated(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
-								class="relatedTopicLink">
-								<c:forEach items="#{relatedTopicTagsList.filterVars}"
-									var="filtervar">
-									<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
-								</c:forEach>
-							</h:commandLink>
-						</h:form>
+											title="Add a two way relationship between #{relatedTopicTagsList.topicTopicId} and #{_topic.topicId}, and return to this screen"
+											value="&amp; Continue"
+											action="#{relatedTopicTagsList.createRelationship(_topic.topicId, true, true, false)}"
+											rendered="#{relatedTopicTagsList.isNotRelated(_topic.topicId) and relatedTopicTagsList.topicTopicId ne _topic.topicId}"
+											class="relatedTopicLink">
+											<c:forEach items="#{relatedTopicTagsList.filterVars}"
+												var="filtervar">
+												<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
+											</c:forEach>
+										</h:commandLink>
+									</h:form>
 
-					</h:column>
-
-
-					<h:column>
-						<f:facet name="header">
-							<ui:include src="layout/sort.xhtml">
-								<ui:param name="entityList" value="#{relatedTopicTagsList}" />
-								<ui:param name="propertyLabel" value="ID" />
-								<ui:param name="propertyPath" value="topic.topicId" />
-							</ui:include>
-						</f:facet>
-						<h:outputText value="#{_topic.topicId}" />
-					</h:column>
-
-					<h:column
-						rendered="#{s:hasPermission('RelatedTopicTagsListTitleColumn', 'Rendered', null)}">
-						<f:facet name="header">
-							<ui:include src="layout/sort.xhtml">
-								<ui:param name="entityList" value="#{relatedTopicTagsList}" />
-								<ui:param name="propertyLabel" value="Topic Title" />
-								<ui:param name="propertyPath" value="topic.topicTitle" />
-							</ui:include>
-						</f:facet>
-						<h:outputText value="#{_topic.topicTitle}"
-							title="#{_topic.topicText}" />
-					</h:column>
-
-					<h:column
-						rendered="#{s:hasPermission('RelatedTopicTagsListAddedByColumn', 'Rendered', null)}">
-						<f:facet name="header">
-							<ui:include src="layout/sort.xhtml">
-								<ui:param name="entityList" value="#{relatedTopicTagsList}" />
-								<ui:param name="propertyLabel" value="Added By" />
-								<ui:param name="propertyPath" value="topic.topicAddedBy" />
-							</ui:include>
-						</f:facet>
-						<h:outputText value="#{_topic.topicAddedBy}" />
-					</h:column>
-
-					<h:column
-						rendered="#{s:hasPermission('RelatedTopicTagsListRelatedTopicsColumn', 'Rendered', null)}">
-						<f:facet name="header">Related Topics</f:facet>
-						<h:outputText value="#{_topic.relatedTopicsList}" escape="false" />
-					</h:column>
-
-					<h:column
-						rendered="#{s:hasPermission('RelatedTopicTagsListTagsColumn', 'Rendered', null)}">
-						<f:facet name="header">
-		                Topic Tags
-		            </f:facet>
-						<h:outputText value="#{_topic.tagsList}" escape="false" />
-					</h:column>
+								</h:column>
 
 
-				</rich:dataTable>
+								<h:column>
+									<f:facet name="header">
+										<ui:include src="layout/sort.xhtml">
+											<ui:param name="entityList" value="#{relatedTopicTagsList}" />
+											<ui:param name="propertyLabel" value="ID" />
+											<ui:param name="propertyPath" value="topic.topicId" />
+										</ui:include>
+									</f:facet>
+									<h:outputText value="#{_topic.topicId}" />
+								</h:column>
 
+								<h:column
+									rendered="#{s:hasPermission('RelatedTopicTagsListTitleColumn', 'Rendered', null)}">
+									<f:facet name="header">
+										<ui:include src="layout/sort.xhtml">
+											<ui:param name="entityList" value="#{relatedTopicTagsList}" />
+											<ui:param name="propertyLabel" value="Topic Title" />
+											<ui:param name="propertyPath" value="topic.topicTitle" />
+										</ui:include>
+									</f:facet>
+									<h:outputText value="#{_topic.topicTitle}"
+										title="#{_topic.topicText}" />
+								</h:column>
+
+								<h:column
+									rendered="#{s:hasPermission('RelatedTopicTagsListAddedByColumn', 'Rendered', null)}">
+									<f:facet name="header">
+										<ui:include src="layout/sort.xhtml">
+											<ui:param name="entityList" value="#{relatedTopicTagsList}" />
+											<ui:param name="propertyLabel" value="Added By" />
+											<ui:param name="propertyPath" value="topic.topicAddedBy" />
+										</ui:include>
+									</f:facet>
+									<h:outputText value="#{_topic.topicAddedBy}" />
+								</h:column>
+
+								<h:column
+									rendered="#{s:hasPermission('RelatedTopicTagsListRelatedTopicsColumn', 'Rendered', null)}">
+									<f:facet name="header">Related Topics</f:facet>
+									<h:outputText value="#{_topic.relatedTopicsList}"
+										escape="false" />
+								</h:column>
+
+								<h:column
+									rendered="#{s:hasPermission('RelatedTopicTagsListTagsColumn', 'Rendered', null)}">
+									<f:facet name="header">Topic Tags</f:facet>
+									<h:outputText value="#{_topic.tagsList}" escape="false" />
+								</h:column>
+
+							</rich:dataTable>
+						</rich:tab>
+					</c:forEach>
+				</rich:tabPanel>
 			</div>
 
 			<ui:include src="/WEB-INF/templates/BulkRelationshipActions.xhtml">
