@@ -75,7 +75,7 @@ public class GroupedTopicTagsList
 	private HashMap<String, String> filterVars;
 	/** Provides the heading that identifies the currently selected filter tags */
 	protected String searchTagHeading;
-	
+
 	public String getSearchTagHeading()
 	{
 		return searchTagHeading;
@@ -126,7 +126,6 @@ public class GroupedTopicTagsList
 	{
 		return urlVars;
 	}
-	
 
 	public HashMap<String, String> getFilterVars()
 	{
@@ -174,7 +173,7 @@ public class GroupedTopicTagsList
 			return pagingEntityQuery.isNextExists();
 		return false;
 	}
-	
+
 	public boolean isPreviousExists()
 	{
 		if (pagingEntityQuery != null)
@@ -275,10 +274,10 @@ public class GroupedTopicTagsList
 		final Map<String, String> urlParameters = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
 		final Filter filter = EntityUtilities.populateFilter(urlParameters, Constants.FILTER_ID, Constants.MATCH_TAG, Constants.CATEORY_INTERNAL_LOGIC, Constants.CATEORY_EXTERNAL_LOGIC);
 		getAllQuery = filter.buildQuery();
-		
+
 		// get a map of variable names to variable values
 		filterVars = filter.getUrlVariables();
-		
+
 		// get the heading to display over the list of topics
 		searchTagHeading = filter.getFilterTitle();
 
@@ -316,7 +315,7 @@ public class GroupedTopicTagsList
 
 							if (pagingEntityQuery == null || pagingEntityQuery.getMaxResults() < topics.getMaxResults())
 								pagingEntityQuery = topics;
-							
+
 							groupedTags.add(tagID);
 						}
 					}
@@ -344,7 +343,7 @@ public class GroupedTopicTagsList
 			groupedTopicList.setTopicList(topics);
 
 			groupedTopicLists.add(groupedTopicList);
-			pagingEntityQuery = topics;
+			pagingEntityQuery = topics;	
 		}
 		/*
 		 * Find that topics that are part of the query, but couldn't be matched
@@ -360,15 +359,20 @@ public class GroupedTopicTagsList
 
 			final ExtendedTopicList topics = new ExtendedTopicList(Constants.DEFAULT_PAGING_SIZE, getAllQuery + notQuery);
 
-			final Tag dummyTag = new Tag();
-			dummyTag.setTagName("Ungrouped Results");
+			if (topics.getResultCount() != 0)
+			{
+				final Tag dummyTag = new Tag();
+				dummyTag.setTagName("Ungrouped Results");
 
-			final GroupedTopicList groupedTopicList = new GroupedTopicList();
-			groupedTopicList.setDetachedTag(dummyTag);
-			groupedTopicList.setTopicList(topics);
+				final GroupedTopicList groupedTopicList = new GroupedTopicList();
+				groupedTopicList.setDetachedTag(dummyTag);
+				groupedTopicList.setTopicList(topics);
 
-			groupedTopicLists.add(groupedTopicList);
-			pagingEntityQuery = topics;
+				groupedTopicLists.add(groupedTopicList);
+				
+				if (pagingEntityQuery == null || pagingEntityQuery.getMaxResults() < topics.getMaxResults())
+					pagingEntityQuery = topics;
+			}
 		}
 	}
 
