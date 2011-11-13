@@ -576,8 +576,22 @@ public class UIProjectData
 					{
 						if (tag.getId().equals(filterTag.getTag().getTagId()))
 						{
-							tag.setSelected(true);
-							tag.setNotSelected(filterTag.getTagState() == Constants.NOT_MATCH_TAG_STATE);
+							final int tagState = filterTag.getTagState();
+							
+							if (tagState == Constants.MATCH_TAG_STATE)		
+							{
+								tag.setSelected(true);
+							}
+							else if (tagState == Constants.NOT_MATCH_TAG_STATE)
+							{
+								tag.setSelected(true);
+								tag.setNotSelected(true);
+							}
+							else if (tagState == Constants.GROUP_TAG_STATE)
+							{
+								tag.isGroupBy(true);
+							}
+							
 							found = true;
 							break;
 						}
