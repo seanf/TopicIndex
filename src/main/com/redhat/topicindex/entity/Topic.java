@@ -1246,10 +1246,10 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 	 * @PrimaryKeyJoinColumn
 	 */
 
-	@OneToOne(optional = true, cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToOne(fetch = FetchType.EAGER, optional = true, cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinTable(name = "TopicToTopicSecondOrderData", joinColumns =
-	{ @JoinColumn(name = "topicId", unique = true) }, inverseJoinColumns =
-	{ @JoinColumn(name = "topicSecondOrderDataId") })
+	{ @JoinColumn(name = "TopicID", unique = true) }, inverseJoinColumns =
+	{ @JoinColumn(name = "TopicSecondOrderDataID") })
 	@NotAudited
 	public TopicSecondOrderData getTopicSecondOrderData()
 	{

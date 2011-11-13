@@ -33,7 +33,7 @@ public class TopicSecondOrderData implements java.io.Serializable
 	
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
-	@Column(name = "TopicID")
+	@Column(name = "TopicSecondOrderDataID")
     public Integer getTopicSecondOrderDataId()
 	{
 		return this.topicSecondOrderDataId;
