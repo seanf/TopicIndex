@@ -315,6 +315,8 @@ public class Filter implements java.io.Serializable
 				}
 			}
 
+			String groupBy = "";
+			
 			for (final FilterTag tag : this.filterTags)
 			{
 				final int tagState = tag.getTagState();
@@ -322,18 +324,20 @@ public class Filter implements java.io.Serializable
 				if (tagState == Constants.GROUP_TAG_STATE)
 				{
 					if (tagDesc.length() != 0)
-						tagDesc += " " + internalLogic + " ";
+						groupBy += " " + internalLogic + " ";
 
-					tagDesc += "Group By ";
-
-					tagDesc += tag.getTag().getTagName();
+					groupBy += tag.getTag().getTagName();
 				}
 			}
+			
+			if (groupBy.length() != 0)
+				groupBy = " Group By: " + groupBy;
+				
 
 			if (desc.length() != 0)
 				desc += " ";
 
-			desc += categoryDesc + tagDesc;
+			desc += categoryDesc + tagDesc + groupBy;
 		}
 
 		if (this.getFilterFields().size() != 0)
