@@ -212,8 +212,8 @@ public class GroupedTopicTagsList
 
 	public void setFirstResult(final Integer firstResult)
 	{
-		if (pagingEntityQuery != null)
-			pagingEntityQuery.setFirstResult(firstResult);
+		for (final GroupedTopicList groupedTopicList : groupedTopicLists)
+			groupedTopicList.getTopicList().setFirstResult(firstResult);
 	}
 
 	public List<Topic> getResultList()
