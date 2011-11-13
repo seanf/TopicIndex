@@ -363,7 +363,7 @@
 		<rich:panel>
 			<f:facet name="header">
 				<h:outputText
-					value="Topic Search Results (#{empty groupedTopicTagsList.resultList ? 0 : (groupedTopicTagsList.paginated ? groupedTopicTagsList.resultCount : groupedTopicTagsList.resultList.size)}) #{groupedTopicTagsList.searchTagHeading}" />
+					value="Topic Search Results #{groupedTopicTagsList.searchTagHeading}" />
 			</f:facet>
 
 
@@ -547,7 +547,7 @@
 				<rich:tabPanel switchType="client">
 					<c:forEach items="#{groupedTopicTagsList.groupedTopicLists}"
 						var="groupedTopicList">
-						<rich:tab label="#{groupedTopicList.detachedTag.tagName}">
+						<rich:tab label="#{groupedTopicList.detachedTag.tagName} (groupedTopicList.topicList.size)">
 
 							<rich:dataTable var="_topic"
 								value="#{groupedTopicList.topicList.resultList}"
