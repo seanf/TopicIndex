@@ -52,7 +52,7 @@ public class ExtendedTopicList extends TopicList
 	 * used in bulk tagging where you view a paged list of results, but apply
 	 * tags to all elements.
 	 */
-	protected void construct(final int limit, final String constructedEJBQL, final TopicFilter topic, final String beanName)
+	protected void construct(final int limit, final String constructedEJBQL, final TopicFilter topic)
 	{
 		super.construct(limit, constructedEJBQL, topic);
 

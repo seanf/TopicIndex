@@ -267,8 +267,6 @@ public class GroupedTopicTagsList
 	public void create()
 	{
 		loadQuickTags();
-		
-		
 
 		// populate the bulk tag database
 		selectedTags = new UIProjectData();
