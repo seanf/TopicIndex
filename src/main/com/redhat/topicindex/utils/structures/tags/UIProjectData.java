@@ -589,7 +589,7 @@ public class UIProjectData
 							}
 							else if (tagState == Constants.GROUP_TAG_STATE)
 							{
-								tag.isGroupBy(true);
+								tag.setGroupBy(true);
 							}
 							
 							found = true;
