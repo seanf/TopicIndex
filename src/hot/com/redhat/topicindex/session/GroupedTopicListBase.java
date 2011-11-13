@@ -279,6 +279,7 @@ public class GroupedTopicListBase
 
 			final Tag dummyTag = new Tag();
 			dummyTag.setTagName("Ungrouped Results");
+			dummyTag.setTagId(-1);
 
 			final GroupedTopicList groupedTopicList = new GroupedTopicList();
 			groupedTopicList.setDetachedTag(dummyTag);
@@ -305,6 +306,7 @@ public class GroupedTopicListBase
 			{
 				final Tag dummyTag = new Tag();
 				dummyTag.setTagName("Ungrouped Results");
+				dummyTag.setTagId(-1);
 
 				final GroupedTopicList groupedTopicList = new GroupedTopicList();
 				groupedTopicList.setDetachedTag(dummyTag);

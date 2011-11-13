@@ -27,6 +27,8 @@
 					<a4j:actionparam name="otherTopicId"
 						assignTo="#{groupedTopicTagsList.otherTopicId}"
 						value="{otherTopicId}" />
+					<a4j:actionparam name="tab" assignTo="#{groupedTopicTagsList.tab}"
+						value="{tab}" />
 					<c:forEach items="#{groupedTopicTagsList.filterVars}"
 						var="filtervar">
 						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
@@ -41,6 +43,8 @@
 					<a4j:actionparam name="otherTopicId"
 						assignTo="#{groupedTopicTagsList.otherTopicId}"
 						value="{otherTopicId}" />
+					<a4j:actionparam name="tab" assignTo="#{groupedTopicTagsList.tab}"
+						value="{tab}" />
 					<c:forEach items="#{groupedTopicTagsList.filterVars}"
 						var="filtervar">
 						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
@@ -55,6 +59,8 @@
 					<a4j:actionparam name="otherTopicId"
 						assignTo="#{groupedTopicTagsList.otherTopicId}"
 						value="{otherTopicId}" />
+					<a4j:actionparam name="tab" assignTo="#{groupedTopicTagsList.tab}"
+						value="{tab}" />
 					<c:forEach items="#{groupedTopicTagsList.filterVars}"
 						var="filtervar">
 						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
@@ -69,6 +75,8 @@
 					<a4j:actionparam name="otherTopicId"
 						assignTo="#{groupedTopicTagsList.otherTopicId}"
 						value="{otherTopicId}" />
+					<a4j:actionparam name="tab" assignTo="#{groupedTopicTagsList.tab}"
+						value="{tab}" />
 					<c:forEach items="#{groupedTopicTagsList.filterVars}"
 						var="filtervar">
 						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
@@ -89,6 +97,8 @@
 					<a4j:actionparam name="otherTopicId"
 						assignTo="#{groupedTopicTagsList.otherTopicId}"
 						value="{otherTopicId}" />
+					<a4j:actionparam name="tab" assignTo="#{groupedTopicTagsList.tab}"
+						value="{tab}" />
 					<c:forEach items="#{groupedTopicTagsList.filterVars}"
 						var="filtervar">
 						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
@@ -103,6 +113,8 @@
 					<a4j:actionparam name="otherTopicId"
 						assignTo="#{groupedTopicTagsList.otherTopicId}"
 						value="{otherTopicId}" />
+					<a4j:actionparam name="tab" assignTo="#{groupedTopicTagsList.tab}"
+						value="{tab}" />
 					<c:forEach items="#{groupedTopicTagsList.filterVars}"
 						var="filtervar">
 						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
@@ -117,6 +129,8 @@
 					<a4j:actionparam name="otherTopicId"
 						assignTo="#{groupedTopicTagsList.otherTopicId}"
 						value="{otherTopicId}" />
+					<a4j:actionparam name="tab" assignTo="#{groupedTopicTagsList.tab}"
+						value="{tab}" />
 					<c:forEach items="#{groupedTopicTagsList.filterVars}"
 						var="filtervar">
 						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
@@ -131,6 +145,8 @@
 					<a4j:actionparam name="otherTopicId"
 						assignTo="#{groupedTopicTagsList.otherTopicId}"
 						value="{otherTopicId}" />
+					<a4j:actionparam name="tab" assignTo="#{groupedTopicTagsList.tab}"
+						value="{tab}" />
 					<c:forEach items="#{groupedTopicTagsList.filterVars}"
 						var="filtervar">
 						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
@@ -153,6 +169,8 @@
 					<a4j:actionparam name="otherTopicId"
 						assignTo="#{groupedTopicTagsList.otherTopicId}"
 						value="{otherTopicId}" />
+					<a4j:actionparam name="tab" assignTo="#{groupedTopicTagsList.tab}"
+						value="{tab}" />
 					<c:forEach items="#{groupedTopicTagsList.filterVars}"
 						var="filtervar">
 						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
@@ -164,6 +182,7 @@
 					<a4j:actionparam name="actionTopicID"
 						assignTo="#{groupedTopicTagsList.actionTopicID}"
 						value="{actionTopicID}" />
+					
 					<a4j:actionparam name="otherTopicId"
 						assignTo="#{groupedTopicTagsList.otherTopicId}"
 						value="{otherTopicId}" />
@@ -181,6 +200,8 @@
 					<a4j:actionparam name="otherTopicId"
 						assignTo="#{groupedTopicTagsList.otherTopicId}"
 						value="{otherTopicId}" />
+					<a4j:actionparam name="tab" assignTo="#{groupedTopicTagsList.tab}"
+						value="{tab}" />
 					<c:forEach items="#{groupedTopicTagsList.filterVars}"
 						var="filtervar">
 						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
@@ -195,6 +216,8 @@
 					<a4j:actionparam name="otherTopicId"
 						assignTo="#{groupedTopicTagsList.otherTopicId}"
 						value="{otherTopicId}" />
+					<a4j:actionparam name="tab" assignTo="#{groupedTopicTagsList.tab}"
+						value="{tab}" />
 					<c:forEach items="#{groupedTopicTagsList.filterVars}"
 						var="filtervar">
 						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
@@ -209,6 +232,8 @@
 					<a4j:actionparam name="otherTopicId"
 						assignTo="#{groupedTopicTagsList.otherTopicId}"
 						value="{otherTopicId}" />
+					<a4j:actionparam name="tab" assignTo="#{groupedTopicTagsList.tab}"
+						value="{tab}" />
 					<c:forEach items="#{groupedTopicTagsList.filterVars}"
 						var="filtervar">
 						<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
@@ -544,11 +569,11 @@
 				<h:outputText value="The topic search returned no results."
 					rendered="#{empty groupedTopicTagsList.resultList}" />
 
-				<rich:tabPanel switchType="client" selectedTab="#{groupedTopicList.tab}">
+				<rich:tabPanel switchType="client" selectedTab="Tab#{groupedTopicTagsList.tab}">
 					<c:forEach items="#{groupedTopicTagsList.groupedTopicLists}"
 						var="groupedTopicList">
 						<rich:tab label="#{groupedTopicList.detachedTag.tagName} (#{groupedTopicList.topicList.resultCount})"
-						name="#{groupedTopicList.detachedTag.tagId}">
+						name="Tab#{groupedTopicList.detachedTag.tagId}">
 
 							<rich:dataTable var="_topic"
 								value="#{groupedTopicList.topicList.resultList}"
@@ -657,6 +682,7 @@
 												for="oneWayRelatedContentMenu" operation="show">
 												<f:param value="#{_topic.topicId}" name="actionTopicID" />
 												<f:param value="#{relatedTopic.topicId}" name="otherTopicId" />
+												<f:param value="#{groupedTopicList.detachedTag.tagId}" name="tab" />
 											</rich:componentControl>
 										</h:commandButton>
 									</a4j:repeat>
@@ -677,6 +703,7 @@
 												for="twoWayRelatedContentMenu" operation="show">
 												<f:param value="#{_topic.topicId}" name="actionTopicID" />
 												<f:param value="#{relatedTopic.topicId}" name="otherTopicId" />
+												<f:param value="#{groupedTopicList.detachedTag.tagId}" name="tab" />
 											</rich:componentControl>
 										</h:commandButton>
 									</a4j:repeat>
@@ -699,6 +726,7 @@
 												for="incomingWayRelatedContentMenu" operation="show">
 												<f:param value="#{_topic.topicId}" name="actionTopicID" />
 												<f:param value="#{relatedTopic.topicId}" name="otherTopicId" />
+												<f:param value="#{groupedTopicList.detachedTag.tagId}" name="tab" />
 											</rich:componentControl>
 										</h:commandButton>
 
