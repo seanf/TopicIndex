@@ -549,7 +549,7 @@
 						var="groupedTopicList">
 						<rich:tab label="#{groupedTopicList.detachedTag.tagName}">
 
-							<rich:dataTable id="groupedTopicList" var="_topic"
+							<rich:dataTable var="_topic"
 								value="#{groupedTopicList.topicList.resultList}"
 								rendered="#{not empty groupedTopicTagsList.resultList}"
 								styleClass="listTable"
