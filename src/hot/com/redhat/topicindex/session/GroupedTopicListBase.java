@@ -44,6 +44,8 @@ public class GroupedTopicListBase
 	protected HashMap<String, String> filterVars;
 	/** Provides the heading that identifies the currently selected filter tags */
 	protected String searchTagHeading;
+	/** The selected tab */
+	private String tab;
 
 	public String getSearchTagHeading()
 	{
@@ -53,6 +55,16 @@ public class GroupedTopicListBase
 	public void setSearchTagHeading(final String value)
 	{
 		searchTagHeading = value;
+	}
+	
+	public String getTab()
+	{
+		return tab;
+	}
+
+	public void setTab(final String tab)
+	{
+		this.tab = tab;
 	}
 
 	public void setUrlVars(final String urlVars)
