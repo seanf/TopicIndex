@@ -8,5 +8,6 @@
 
 	<param name="from" />
 	<param name="topicTopicId" value="#{relatedTopicTagsList.topicTopicId}" />
+	<param name="tab" value="#{relatedTopicTagsList.tab}" />
 
 </page>

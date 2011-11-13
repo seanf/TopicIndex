@@ -30,6 +30,8 @@ public class RelatedTopicTagsList extends GroupedTopicListBase
 	private Topic instance;
 	/** The object that holds the filter field values */
 	private TopicFilter topic = new TopicFilter();
+	/** The selected tab */
+	private String tab;
 
 	public RelatedTopicTagsList()
 	{
@@ -382,5 +384,15 @@ public class RelatedTopicTagsList extends GroupedTopicListBase
 	public void setTopic(final TopicFilter topic)
 	{
 		this.topic = topic;
+	}
+
+	public String getTab()
+	{
+		return tab;
+	}
+
+	public void setTab(final String tab)
+	{
+		this.tab = tab;
 	}
 }
