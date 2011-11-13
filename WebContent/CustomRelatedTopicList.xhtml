@@ -193,7 +193,7 @@
 					<c:forEach items="#{relatedTopicTagsList.groupedTopicLists}"
 						var="groupedTopicList">
 						<rich:tab
-							label="#{relatedTopicTagsList.detachedTag.tagName} (#{relatedTopicTagsList.topicList.resultCount})">
+							label="#{groupedTopicList.detachedTag.tagName} (#{groupedTopicList.topicList.resultCount})">
 							<rich:dataTable var="_topic"
 								value="#{groupedTopicList.topicList.resultList}"
 								rendered="#{not empty relatedTopicTagsList.resultList}"
