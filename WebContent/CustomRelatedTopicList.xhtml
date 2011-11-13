@@ -190,12 +190,12 @@
 				<h:outputText value="The topic search returned no results."
 					rendered="#{empty relatedTopicTagsList.resultList}" />
 				<rich:tabPanel switchType="client"
-					selectedTab="#{relatedTopicTagsList.tab}">
+					selectedTab="Tab#{relatedTopicTagsList.tab}">
 					<c:forEach items="#{relatedTopicTagsList.groupedTopicLists}"
 						var="groupedTopicList">
 						<rich:tab
 							label="#{groupedTopicList.detachedTag.tagName} (#{groupedTopicList.topicList.resultCount})"
-							name="#{groupedTopicList.detachedTag.tagId}">
+							name="Tab#{groupedTopicList.detachedTag.tagId}">
 							<rich:dataTable var="_topic"
 								value="#{groupedTopicList.topicList.resultList}"
 								rendered="#{not empty relatedTopicTagsList.resultList}"
