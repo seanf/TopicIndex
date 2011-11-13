@@ -323,8 +323,8 @@ public class Filter implements java.io.Serializable
 				
 				if (tagState == Constants.GROUP_TAG_STATE)
 				{
-					if (tagDesc.length() != 0)
-						groupBy += " " + internalLogic + " ";
+					if (groupBy.length() != 0)
+						groupBy += " ";
 
 					groupBy += tag.getTag().getTagName();
 				}
