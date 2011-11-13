@@ -57,15 +57,29 @@ public class TopicRenderer implements Runnable
 	}
 
 	public static String validateXML(final Topic topic)
-	{
-		final XMLValidator validator = new XMLValidator();
-		final boolean valid = validator.validateTopicXML(topic.getTopicXML(), true) != null;
-		return valid ? null : validator.getErrorText();
+	{		
+		try
+		{
+			System.out.println("START TopicRenderer.validateXML() ID: " + topic.getTopicId());
+			final XMLValidator validator = new XMLValidator();
+			final boolean valid = validator.validateTopicXML(topic.getTopicXML(), true) != null;
+			return valid ? null : validator.getErrorText();
+		}
+		catch (final Exception ex)
+		{
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error with one of the steps used to preprocess the Topic's XML");
+		}
+		finally
+		{
+			System.out.println("FINISH TopicRenderer.validateXML() ID: " + topic.getTopicId());
+		}
+		
+		return null;
 	}
 
 	public static String renderXML(final EntityManager entityManager, final Topic topic)
 	{
-		System.out.println("START Topic.renderXML() ID: " + topic.getTopicId());
+		System.out.println("START TopicRenderer.renderXML() ID: " + topic.getTopicId());
 
 		try
 		{
@@ -103,7 +117,7 @@ public class TopicRenderer implements Runnable
 		}
 		finally
 		{
-			System.out.println("FINISH Topic.renderXML() ID: " + topic.getTopicId());
+			System.out.println("FINISH TopicRenderer.renderXML() ID: " + topic.getTopicId());
 		}
 
 		return Constants.XSL_ERROR_TEMPLATE;
