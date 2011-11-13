@@ -298,15 +298,20 @@ public class Filter implements java.io.Serializable
 
 			for (final FilterTag tag : this.filterTags)
 			{
-				if (tag.getTag().isInCategory(category.getCategoryId()))
+				final int tagState = tag.getTagState();
+
+				if (tagState != Constants.GROUP_TAG_STATE)
 				{
-					if (tagDesc.length() != 0)
-						tagDesc += " " + internalLogic + " ";
+					if (tag.getTag().isInCategory(category.getCategoryId()))
+					{
+						if (tagDesc.length() != 0)
+							tagDesc += " " + internalLogic + " ";
 
-					if (tag.getTagState() == Constants.NOT_MATCH_TAG_STATE)
-						tagDesc += "Not ";
+						if (tagState == Constants.NOT_MATCH_TAG_STATE)
+							tagDesc += "Not ";
 
-					tagDesc += tag.getTag().getTagName();
+						tagDesc += tag.getTag().getTagName();
+					}
 				}
 			}
 
