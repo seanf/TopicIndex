@@ -373,4 +373,14 @@ public class RelatedTopicTagsList extends GroupedTopicListBase
 	{
 		return instance;
 	}
+
+	public TopicFilter getTopic()
+	{
+		return topic;
+	}
+
+	public void setTopic(final TopicFilter topic)
+	{
+		this.topic = topic;
+	}
 }
