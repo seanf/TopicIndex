@@ -571,7 +571,7 @@
 										<rich:componentControl event="onclick" for="topicContextMenu"
 											operation="show">
 											<f:param value="#{_topic.topicId}" name="actionTopicID" />
-											<f:param value="#{topicTagsList.urlVars}" name="otherVars" />
+											<f:param value="#{groupedTopicTagsList.urlVars}" name="otherVars" />
 										</rich:componentControl>
 									</h:commandButton>
 								</rich:column>
@@ -608,10 +608,10 @@
 											title="Use these links to toggle the tags applied to a topic" />
 									</f:facet>
 									<h:form>
-										<c:forEach items="#{topicTagsList.quickTags}" var="tagID">
+										<c:forEach items="#{groupedTopicTagsList.quickTags}" var="tagID">
 											<h:commandLink value="#{tagID.name}"
-												action="#{topicTagsList.addTagById(_topic.topicId, tagID.id)}">
-												<c:forEach items="#{topicTagsList.filterVars}"
+												action="#{groupedTopicTagsList.addTagById(_topic.topicId, tagID.id)}">
+												<c:forEach items="#{groupedTopicTagsList.filterVars}"
 													var="filtervar">
 													<f:param name="#{filtervar.key}" value="#{filtervar.value}" />
 												</c:forEach>
@@ -712,7 +712,7 @@
 								</rich:column>
 
 								<a4j:support reRender="selectiontable"
-									action="#{topicTagsList.takeSelection}"
+									action="#{groupedTopicTagsList.takeSelection}"
 									event="onselectionchange" />
 
 							</rich:dataTable>

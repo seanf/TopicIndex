@@ -9,9 +9,7 @@ import static org.hamcrest.Matchers.equalTo;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 
@@ -20,20 +18,17 @@ import org.jboss.seam.Component;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
-import org.jboss.seam.framework.EntityQuery;
 import org.jboss.seam.security.Identity;
 
 import com.redhat.ecs.commonutils.HTTPUtilities;
 import com.redhat.ecs.commonutils.MIMEUtilities;
 import com.redhat.ecs.commonutils.ZipUtilities;
-import com.redhat.topicindex.entity.Filter;
 import com.redhat.topicindex.entity.Tag;
 import com.redhat.topicindex.entity.TagToCategory;
 import com.redhat.topicindex.entity.Topic;
 import com.redhat.topicindex.entity.TopicToTag;
 import com.redhat.topicindex.entity.TopicToTopic;
 import com.redhat.topicindex.entity.TopicToTopicSourceUrl;
-import com.redhat.topicindex.utils.Constants;
 import com.redhat.topicindex.utils.EntityUtilities;
 import com.redhat.topicindex.utils.SkynetExceptionUtilities;
 import com.redhat.topicindex.utils.structures.DroolsEvent;
