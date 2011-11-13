@@ -111,7 +111,7 @@ public class UITagDataBase
 		}
 	}
 
-	public UITagDataBase(final String name, final String description, final Integer id, final Integer sort, final boolean selected, final boolean notSelected)
+	public UITagDataBase(final String name, final String description, final Integer id, final Integer sort, final boolean selected, final boolean notSelected, final boolean groupBy)
 	{
 		this.name = name;
 		this.id = id;
@@ -119,6 +119,7 @@ public class UITagDataBase
 		this.sort = sort;
 		this.selected = selected;
 		this.notSelected = notSelected;
+		this.groupBy = groupBy;
 	}
 
 	public Integer getNewSort()

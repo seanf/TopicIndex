@@ -220,7 +220,7 @@ public class UIProjectData
 
 		return removeTags;
 	}
-	
+
 	public void populateTopicTags(final Topic topic)
 	{
 		populateTags(topic.getTags(), null, true);
@@ -525,6 +525,7 @@ public class UIProjectData
 		 */
 		boolean selected = false;
 		boolean selectedNot = false;
+		boolean groupBy = false;
 
 		if (checkedTags != null)
 		{
@@ -535,11 +536,17 @@ public class UIProjectData
 		{
 			if (filter != null)
 			{
-				final int tagState = filter.hasTag(tagId);
-				if (tagState == Constants.NOT_MATCH_TAG_STATE)
-					selected = selectedNot = true;
-				else if (tagState == Constants.MATCH_TAG_STATE)
-					selected = true;
+				final List<Integer> tagStates = filter.hasTag(tagId);
+
+				for (final Integer tagState : tagStates)
+				{
+					if (tagState == Constants.NOT_MATCH_TAG_STATE)
+						selected = selectedNot = true;
+					else if (tagState == Constants.MATCH_TAG_STATE)
+						selected = true;
+					else if (tagState == Constants.GROUP_TAG_STATE)
+						groupBy = true;
+				}
 			}
 		}
 
@@ -551,10 +558,10 @@ public class UIProjectData
 				sorting = tagToCategory.getSorting();
 		}
 
-		final UITagData retValue = new UITagData(tagName, tagDescription, tagId, sorting == null ? 0 : sorting, selected, selectedNot, tagParentList, tagChildrenList);
+		final UITagData retValue = new UITagData(tagName, tagDescription, tagId, sorting == null ? 0 : sorting, selected, selectedNot, groupBy, tagParentList, tagChildrenList);
 		return retValue;
 	}
-	
+
 	public void loadTagCheckboxes(final Filter filter)
 	{
 		// sync the Filter with the gui checkboxes
@@ -585,7 +592,7 @@ public class UIProjectData
 			}
 		}
 	}
-	
+
 	public void loadCategoryLogic(final Filter filter)
 	{
 		// sync the category logic states

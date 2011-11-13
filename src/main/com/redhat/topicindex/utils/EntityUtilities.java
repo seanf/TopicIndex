@@ -231,7 +231,7 @@ public class EntityUtilities
 	{
 		return getTagFromId(tagId, false);
 	}
-	
+
 	public static Tag getTagFromId(final Integer tagId, final boolean detach)
 	{
 		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
@@ -336,11 +336,12 @@ public class EntityUtilities
 				}
 			}
 
-			// in this case the sort value in the TopicTagCategoryData
-			// represents the tags sorting position within
-			// the category, not the category's sorting position amongst other
-			// categories
-			categories.add(new UICategoryData(catName, catDesc, catID, sorting == null ? 0 : sorting, selected, false, false));
+			/*
+			 * in this case the sort value in the TopicTagCategoryData
+			 * represents the tags sorting position within the category, not the
+			 * category's sorting position amongst other categories
+			 */
+			categories.add(new UICategoryData(catName, catDesc, catID, sorting == null ? 0 : sorting, selected, false, false, false));
 		}
 
 		// sort the categories by name
@@ -529,11 +530,11 @@ public class EntityUtilities
 						filter.getFilterTags().add(filterTag);
 					}
 				}
-				
+
 				else if (groupTagVar)
 				{
 					final Integer tagId = Integer.parseInt(key.replaceFirst(groupTagPrefix, ""));
-					//final Integer intState = Integer.parseInt(state);
+					// final Integer intState = Integer.parseInt(state);
 
 					// get the Tag object that the tag id represents
 					final Tag tag = entityManager.getReference(Tag.class, tagId);
@@ -547,7 +548,7 @@ public class EntityUtilities
 						filter.getFilterTags().add(filterTag);
 					}
 				}
-				
+
 				// add the filter field states
 				else
 				{

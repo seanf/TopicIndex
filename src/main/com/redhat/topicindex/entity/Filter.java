@@ -177,15 +177,17 @@ public class Filter implements java.io.Serializable
 	 *            The id of the tag to get the state of
 	 * @return -1 if the tag was not found, otherwise the state of the tag
 	 */
-	public int hasTag(final Integer tagID)
+	public List<Integer> hasTag(final Integer tagID)
 	{
+		final List<Integer> retValue = new ArrayList<Integer>();
+		
 		for (final FilterTag tag : this.getFilterTags())
 		{
 			if (tag.getTag().getTagId().equals(tagID))
-				return tag.getTagState();
+				retValue.add(tag.getTagState());
 		}
 
-		return -1;
+		return retValue;
 	}
 
 	public ArrayList<Integer> hasCategory(final Integer categoryId)

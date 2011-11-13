@@ -224,11 +224,11 @@ public class GroupedTopicListBase
 
 		for (final String urlParam : urlParameters.keySet())
 		{
-			if (urlParam.startsWith(Constants.MATCH_TAG))
+			if (urlParam.startsWith(Constants.GROUP_TAG))
 			{
 				try
 				{
-					final Integer tagID = Integer.parseInt(urlParam.replace(Constants.MATCH_TAG, ""));
+					final Integer tagID = Integer.parseInt(urlParam.replace(Constants.GROUP_TAG, ""));
 					final Integer state = Integer.parseInt(urlParameters.get(urlParam));
 					if (state == Constants.GROUP_TAG_STATE)
 					{

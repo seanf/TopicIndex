@@ -58,9 +58,10 @@ public class UICategoryData extends UITagDataBase implements Comparable<UICatego
 		final Integer sort,
 		final boolean selected, 
 		final boolean notSelected,
+		final boolean groupBy,
 		final boolean mutuallyExclusive)
 	{
-		super(name, description, id, sort, selected, notSelected);
+		super(name, description, id, sort, selected, notSelected, groupBy);
 		this.mutuallyExclusive = mutuallyExclusive;
 	}
 	
@@ -71,7 +72,7 @@ public class UICategoryData extends UITagDataBase implements Comparable<UICatego
 			final Integer sort,
 			final boolean mutuallyExclusive)
 		{
-			super(name, description, id, sort, false, false);
+			super(name, description, id, sort, false, false, false);
 			this.mutuallyExclusive = mutuallyExclusive;
 			this.internalLogic = Constants.OR_LOGIC;
 			this.externalLogic = Constants.AND_LOGIC;

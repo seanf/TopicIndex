@@ -29,7 +29,7 @@ public class UIProjectCategoriesData extends UITagDataBase implements Comparable
 
 	public UIProjectCategoriesData(final String name, final String description, final Integer id)
 	{
-		super(name, description, id, 0, false, false);
+		super(name, description, id, 0, false, false, false);
 	}
 
 	public void clear()

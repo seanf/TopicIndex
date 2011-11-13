@@ -39,10 +39,11 @@ public class UITagData extends UITagDataBase implements Comparable<UITagData>
 		final Integer sort, 
 		final boolean selected, 
 		final boolean notSelected,
+		final boolean groupBy,
 		final String parentList,
 		final String childrenList)
 	{
-		super(name, description, id, sort, selected, notSelected);
+		super(name, description, id, sort, selected, notSelected, groupBy);
 		this.childrenList = childrenList;
 		this.parentList = parentList;
 	}
@@ -55,7 +56,7 @@ public class UITagData extends UITagDataBase implements Comparable<UITagData>
 		final String parentList,
 		final String childrenList)
 	{
-		super(name, description, id, sort, false, false);
+		super(name, description, id, sort, false, false, false);
 		this.childrenList = childrenList;
 		this.parentList = parentList;
 	}
@@ -64,7 +65,7 @@ public class UITagData extends UITagDataBase implements Comparable<UITagData>
 		final String name, 
 		final Integer id)
 	{
-		super(name, "", id, 0, false, false);
+		super(name, "", id, 0, false, false, false);
 		this.childrenList = "";
 		this.parentList = "";
 	}
