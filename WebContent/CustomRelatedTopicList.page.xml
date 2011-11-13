@@ -5,27 +5,8 @@
 	<param name="firstResult" value="#{relatedTopicTagsList.firstResult}" />
 	<param name="sort" value="#{relatedTopicTagsList.orderColumn}" />
 	<param name="dir" value="#{relatedTopicTagsList.orderDirection}" />
-	<param name="logic" value="#{relatedTopicTagsList.restrictionLogicOperator}" />
 
 	<param name="from" />
 	<param name="topicTopicId" value="#{relatedTopicTagsList.topicTopicId}" />
-	
-	
-	<param name="startDate" value="#{relatedTopicTagsList.topic.startCreateDateString}" />
-	<param name="endDate" value="#{relatedTopicTagsList.topic.endCreateDateString}" />
-	<param name="topicIds" value="#{relatedTopicTagsList.topic.topicIdsString}" />
-	<param name="topicTitle" value="#{relatedTopicTagsList.topic.topicTitle}" />
-	<param name="topicText" value="#{relatedTopicTagsList.topic.topicText}" />
-	<param name="topicAddedBy" value="#{relatedTopicTagsList.topic.topicAddedBy}" />
-	<param name="topicProduct" value="#{relatedTopicTagsList.topic.topicProduct}" />
-	<param name="topicHasRelationships" value="#{relatedTopicTagsList.topic.hasRelationships}" />
-	<param name="topicRelatedTo" value="#{relatedTopicTagsList.topic.topicRelatedTo}" />
-	<param name="topicRelatedFrom" value="#{relatedTopicTagsList.topic.topicRelatedFrom}" />
-	<param name="topicXml" value="#{relatedTopicTagsList.topic.topicXML}" />
-	<param name="topicTextSearch" value="#{relatedTopicTagsList.topic.topicTextSearch}" />
-	<param name="topicHasXMLErrors" value="#{relatedTopicTagsList.topic.hasXMLErrors}" />
-	<param name="endEditDate" value="#{relatedTopicTagsList.topic.endEditDateString}" />
-	<param name="startEditDate" value="#{relatedTopicTagsList.topic.startEditDateString}" />
-	<param name="topicEditedInLastDays" value="#{relatedTopicTagsList.topic.editedInLastDaysString}"/>
 
 </page>

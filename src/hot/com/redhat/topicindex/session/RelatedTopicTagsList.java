@@ -54,98 +54,140 @@ public class RelatedTopicTagsList extends GroupedTopicListBase
 
 	public void oneWayToAll()
 	{
-		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
-		final Topic mainTopic = entityManager.find(Topic.class, topicTopicId);
-		final List<Topic> topics = entityManager.createQuery(getAllQuery).getResultList();
-		for (final Topic topic : topics)
+		try
 		{
-			final boolean isChild = mainTopic.isRelatedTo(topic);
+			final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+			final Topic mainTopic = entityManager.find(Topic.class, topicTopicId);
+			final List<Topic> topics = entityManager.createQuery(getAllQuery).getResultList();
+			for (final Topic topic : topics)
+			{
+				final boolean isChild = mainTopic.isRelatedTo(topic);
 
-			if (!isChild && !mainTopic.equals(topic))
-				mainTopic.addRelationshipTo(topic);
+				if (!isChild && !mainTopic.equals(topic))
+					mainTopic.addRelationshipTo(topic);
+			}
+			entityManager.persist(mainTopic);
 		}
-		entityManager.persist(mainTopic);
+		catch (final Exception ex)
+		{
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an issue with the topic with id" + topicTopicId);
+		}
 	}
 
 	public void oneWayFromAll()
 	{
-		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
-		final Topic mainTopic = entityManager.find(Topic.class, topicTopicId);
-		final List<Topic> topics = entityManager.createQuery(getAllQuery).getResultList();
-		for (final Topic topic : topics)
+		try
 		{
-			final boolean isChild = topic.isRelatedTo(mainTopic);
-
-			if (!isChild && !mainTopic.equals(topic))
+			final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+			final Topic mainTopic = entityManager.find(Topic.class, topicTopicId);
+			final List<Topic> topics = entityManager.createQuery(getAllQuery).getResultList();
+			for (final Topic topic : topics)
 			{
-				topic.addRelationshipTo(mainTopic);
-				entityManager.persist(topic);
+				final boolean isChild = topic.isRelatedTo(mainTopic);
+
+				if (!isChild && !mainTopic.equals(topic))
+				{
+					topic.addRelationshipTo(mainTopic);
+					entityManager.persist(topic);
+				}
 			}
+		}
+		catch (final Exception ex)
+		{
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an issue with the topic with id" + topicTopicId);
 		}
 	}
 
 	public void twoWayWithAll()
 	{
-		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
-		final Topic mainTopic = entityManager.find(Topic.class, topicTopicId);
-		final List<Topic> topics = entityManager.createQuery(getAllQuery).getResultList();
-		for (final Topic topic : topics)
+		try
 		{
-			final boolean isMainTopicChild = topic.isRelatedTo(mainTopic);
-
-			if (!isMainTopicChild && !mainTopic.equals(topic))
+			final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+			final Topic mainTopic = entityManager.find(Topic.class, topicTopicId);
+			final List<Topic> topics = entityManager.createQuery(getAllQuery).getResultList();
+			for (final Topic topic : topics)
 			{
-				topic.addRelationshipTo(mainTopic);
-				entityManager.persist(topic);
+				final boolean isMainTopicChild = topic.isRelatedTo(mainTopic);
+
+				if (!isMainTopicChild && !mainTopic.equals(topic))
+				{
+					topic.addRelationshipTo(mainTopic);
+					entityManager.persist(topic);
+				}
+
+				final boolean isTopicChild = mainTopic.isRelatedTo(topic);
+
+				if (!isTopicChild && !mainTopic.equals(topic))
+					mainTopic.addRelationshipTo(topic);
 			}
-
-			final boolean isTopicChild = mainTopic.isRelatedTo(topic);
-
-			if (!isTopicChild && !mainTopic.equals(topic))
-				mainTopic.addRelationshipTo(topic);
+			entityManager.persist(mainTopic);
 		}
-		entityManager.persist(mainTopic);
+		catch (final Exception ex)
+		{
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an issue with the topic with id" + topicTopicId);
+		}
 	}
 
 	public void removeToAll()
 	{
-		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
-		final Topic mainTopic = entityManager.find(Topic.class, topicTopicId);
-		final List<Topic> topics = entityManager.createQuery(getAllQuery).getResultList();
-		for (final Topic topic : topics)
+		try
 		{
-			mainTopic.removeRelationshipTo(topic);
+			final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+			final Topic mainTopic = entityManager.find(Topic.class, topicTopicId);
+			final List<Topic> topics = entityManager.createQuery(getAllQuery).getResultList();
+			for (final Topic topic : topics)
+			{
+				mainTopic.removeRelationshipTo(topic);
+			}
+			entityManager.persist(mainTopic);
 		}
-		entityManager.persist(mainTopic);
+		catch (final Exception ex)
+		{
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an issue with the topic with id" + topicTopicId);
+		}
 	}
 
 	public void removeFromAll()
 	{
-		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
-		final Topic mainTopic = entityManager.find(Topic.class, topicTopicId);
-		final List<Topic> topics = entityManager.createQuery(getAllQuery).getResultList();
-		for (final Topic topic : topics)
+		try
 		{
-			if (topic.removeRelationshipTo(mainTopic))
-				entityManager.persist(topic);
+			final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+			final Topic mainTopic = entityManager.find(Topic.class, topicTopicId);
+			final List<Topic> topics = entityManager.createQuery(getAllQuery).getResultList();
+			for (final Topic topic : topics)
+			{
+				if (topic.removeRelationshipTo(mainTopic))
+					entityManager.persist(topic);
+			}
+		}
+		catch (final Exception ex)
+		{
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an issue with the topic with id" + topicTopicId);
 		}
 	}
 
 	public void removeBetweenAll()
 	{
-		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
-		final Topic mainTopic = entityManager.find(Topic.class, topicTopicId);
-		final List<Topic> topics = entityManager.createQuery(getAllQuery).getResultList();
-		for (final Topic topic : topics)
+		try
 		{
-			if (topic.removeRelationshipTo(mainTopic))
+			final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+			final Topic mainTopic = entityManager.find(Topic.class, topicTopicId);
+			final List<Topic> topics = entityManager.createQuery(getAllQuery).getResultList();
+			for (final Topic topic : topics)
 			{
-				entityManager.persist(topic);
-			}
+				if (topic.removeRelationshipTo(mainTopic))
+				{
+					entityManager.persist(topic);
+				}
 
-			mainTopic.removeRelationshipTo(topic);
+				mainTopic.removeRelationshipTo(topic);
+			}
+			entityManager.persist(mainTopic);
 		}
-		entityManager.persist(mainTopic);
+		catch (final Exception ex)
+		{
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an issue with the topic with id" + topicTopicId);
+		}
 	}
 
 	public String doSearch()
