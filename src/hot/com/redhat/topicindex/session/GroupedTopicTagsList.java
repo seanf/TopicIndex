@@ -292,12 +292,12 @@ public class GroupedTopicTagsList
 
 		for (final String urlParam : urlParameters.keySet())
 		{
-			if (urlParam.equals(Constants.GROUP_TAG))
+			if (urlParam.startsWith(Constants.GROUP_TAG))
 			{
 				try
 				{
 					final String urlParamValue = urlParameters.get(urlParam);
-					final Integer tagID = Integer.parseInt(urlParamValue);
+					final Integer tagID = Integer.parseInt(urlParamValue.replace(Constants.GROUP_TAG, ""));
 					final Tag tag = EntityUtilities.getTagFromId(tagID, true);
 					if (tag != null)
 					{
