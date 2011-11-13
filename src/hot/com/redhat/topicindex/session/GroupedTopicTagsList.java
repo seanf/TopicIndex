@@ -313,7 +313,7 @@ public class GroupedTopicTagsList
 
 							groupedTopicLists.add(groupedTopicList);
 
-							if (pagingEntityQuery == null || pagingEntityQuery.getMaxResults() < topics.getMaxResults())
+							if (pagingEntityQuery == null || pagingEntityQuery.getResultCount() < topics.getResultCount())
 								pagingEntityQuery = topics;
 
 							groupedTags.add(tagID);
