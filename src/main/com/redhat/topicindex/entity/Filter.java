@@ -350,14 +350,19 @@ public class Filter implements java.io.Serializable
 		for (final FilterTag filterTag : this.filterTags)
 		{
 			final Tag tag = filterTag.getTag();
+			final Integer tagState = filterTag.getTagState();
 
-			if (filterTag.getTagState() == Constants.MATCH_TAG_STATE)
+			if (tagState == Constants.MATCH_TAG_STATE)
 			{
 				vars.put(Constants.MATCH_TAG + tag.getTagId(), Constants.MATCH_TAG_STATE + "");
 			}
-			else if (filterTag.getTagState() == Constants.NOT_MATCH_TAG_STATE)
+			else if (tagState == Constants.NOT_MATCH_TAG_STATE)
 			{
 				vars.put(Constants.MATCH_TAG + tag.getTagId(), Constants.NOT_MATCH_TAG_STATE + "");
+			}
+			else if (tagState == Constants.GROUP_TAG_STATE)
+			{
+				vars.put(Constants.GROUP_TAG + tag.getTagId(), Constants.MATCH_TAG_STATE + "");
 			}
 		}
 
@@ -658,14 +663,13 @@ public class Filter implements java.io.Serializable
 			else if (fieldName.equals(Constants.TOPIC_STARTDATE_FILTER_VAR))
 			{
 
-					startCreateDate = fieldValue;
-
+				startCreateDate = fieldValue;
 
 			}
 			else if (fieldName.equals(Constants.TOPIC_ENDDATE_FILTER_VAR))
 			{
 
-					endCreateDate = fieldValue;
+				endCreateDate = fieldValue;
 
 			}
 
@@ -707,7 +711,7 @@ public class Filter implements java.io.Serializable
 
 			if (startCreateDate != null)
 			{
-				thisRestriction = "topic.topicTimeStamp >= '"  + startCreateDate + "'";
+				thisRestriction = "topic.topicTimeStamp >= '" + startCreateDate + "'";
 			}
 
 			if (endCreateDate != null)
@@ -765,9 +769,9 @@ public class Filter implements java.io.Serializable
 		 */
 		if (query.length() != 0)
 			query = " where " + query;
-		
+
 		return Topic.SELECT_ALL_QUERY + query;
-		
+
 	}
 
 	public void syncFilterWithTags(final UIProjectData selectedTags)
@@ -796,6 +800,7 @@ public class Filter implements java.io.Serializable
 				{
 					final boolean tagSelected = tag.isSelected();
 					final boolean notTagSelected = tag.isNotSelected();
+					final boolean groupBy = tag.isGroupBy();
 					final int state = notTagSelected ? Constants.NOT_MATCH_TAG_STATE : Constants.MATCH_TAG_STATE;
 
 					if (tagSelected)
@@ -803,7 +808,10 @@ public class Filter implements java.io.Serializable
 						boolean found = false;
 						for (final FilterTag filterTag : this.getFilterTags())
 						{
-							if (filterTag.getTag().getTagId().equals(tag.getId()))
+							final int tagState = filterTag.getTagState();
+							final Tag filterTagTag = filterTag.getTag();
+							
+							if (filterTagTag.getTagId().equals(tag.getId()) && (tagState == Constants.NOT_MATCH_TAG_STATE || tagState == Constants.MATCH_TAG_STATE))
 							{
 								filterTag.setTagState(state);
 								selectedFilterTags.add(filterTag);
@@ -821,6 +829,35 @@ public class Filter implements java.io.Serializable
 							filterTag.setFilter(this);
 							filterTag.setTag(dbTag);
 							filterTag.setTagState(state);
+
+							this.getFilterTags().add(filterTag);
+						}
+					}
+
+					if (groupBy)
+					{
+						boolean found = false;
+						for (final FilterTag filterTag : this.getFilterTags())
+						{
+							final int tagState = filterTag.getTagState();
+							final Tag filterTagTag = filterTag.getTag();
+							
+							if (filterTagTag.getTagId().equals(tag.getId()) && tagState == Constants.GROUP_TAG_STATE)
+							{
+								found = true;
+								break;
+							}
+						}
+
+						if (!found)
+						{
+							final Tag dbTag = entityManager.getReference(Tag.class, tag.getId());
+
+							final FilterTag filterTag = new FilterTag();
+							selectedFilterTags.add(filterTag);
+							filterTag.setFilter(this);
+							filterTag.setTag(dbTag);
+							filterTag.setTagState(Constants.GROUP_TAG_STATE);
 
 							this.getFilterTags().add(filterTag);
 						}
@@ -862,9 +899,10 @@ public class Filter implements java.io.Serializable
 					}
 				}
 
-				// add to a temporary container so we don't modify the
-				// collection we
-				// are looping over
+				/*
+				 * add to a temporary container so we don't modify the
+				 * collection we are looping over
+				 */
 				if (found)
 					removeTags.add(filterTag);
 			}

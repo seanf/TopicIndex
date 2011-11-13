@@ -21,6 +21,8 @@ public class UITagDataBase
 	protected boolean selected = false;
 	/** Whether or not this object has been "not selected" */
 	protected boolean notSelected = false;
+	/** Whether or not to use this tag as a group */
+	private boolean groupBy = false;
 
 	public boolean isSelected()
 	{
@@ -127,5 +129,15 @@ public class UITagDataBase
 	public void setNewSort(final Integer newSort)
 	{
 		this.newSort = newSort;
+	}
+
+	public boolean isGroupBy()
+	{
+		return groupBy;
+	}
+
+	public void setGroupBy(boolean groupBy)
+	{
+		this.groupBy = groupBy;
 	}
 }

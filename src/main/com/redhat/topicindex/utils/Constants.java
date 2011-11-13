@@ -101,6 +101,11 @@ public class Constants
 	 */
 	public static final int NOT_MATCH_TAG_STATE = 0;
 	/**
+	 * The value (as used in the FilterTag database TagState field) the
+	 * indicates that a tag should be excluded
+	 */
+	public static final int GROUP_TAG_STATE = 2;
+	/**
 	 * The value (as used in the FilterCategory database CategoryState field)
 	 * the indicates that a category has an internal "and" state
 	 */

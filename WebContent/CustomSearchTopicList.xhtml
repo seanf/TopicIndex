@@ -547,7 +547,7 @@
 				<rich:tabPanel switchType="client">
 					<c:forEach items="#{groupedTopicTagsList.groupedTopicLists}"
 						var="groupedTopicList">
-						<rich:tab label="#{groupedTopicList.detachedTag.tagName} (groupedTopicList.topicList.size)">
+						<rich:tab label="#{groupedTopicList.detachedTag.tagName} (#{groupedTopicList.topicList.resultCount})">
 
 							<rich:dataTable var="_topic"
 								value="#{groupedTopicList.topicList.resultList}"

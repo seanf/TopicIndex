@@ -87,11 +87,12 @@
 									onclick="toggleNotTags('#{project.id}', '#{category.id}')" />
 							</h:panelGroup>
 
-							<h:panelGrid columns="3">
+							<h:panelGrid columns="4">
 
 								<h:outputText value="" />
 								<h:outputText value="" />
 								<h:outputText value="Not" />
+								<h:outputText value="Grp" />
 
 								<c:forEach
 									items="#{category.tags}"
@@ -109,6 +110,10 @@
 										id="tagnot-#{project.id}-#{category.id}-#{categoryTag.id}"
 										value="#{categoryTag.notSelected}"
 										title="Select this box along with the box to the left to exclude this tag from the search" />
+									<h:selectBooleanCheckbox
+										id="taggroup-#{project.id}-#{category.id}-#{categoryTag.id}"
+										value="#{categoryTag.groupBy}"
+										title="Select this box to group the resulting search by this tag" />
 								</c:forEach>
 
 							</h:panelGrid>
