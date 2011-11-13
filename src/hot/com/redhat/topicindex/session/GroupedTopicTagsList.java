@@ -296,8 +296,7 @@ public class GroupedTopicTagsList
 			{
 				try
 				{
-					final String urlParamValue = urlParameters.get(urlParam);
-					final Integer tagID = Integer.parseInt(urlParamValue.replace(Constants.GROUP_TAG, ""));
+					final Integer tagID = Integer.parseInt(urlParam.replace(Constants.GROUP_TAG, ""));
 					final Tag tag = EntityUtilities.getTagFromId(tagID, true);
 					if (tag != null)
 					{
