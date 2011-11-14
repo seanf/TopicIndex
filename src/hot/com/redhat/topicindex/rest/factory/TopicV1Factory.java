@@ -93,7 +93,6 @@ public class TopicV1Factory implements RESTDataObjectFactory<TopicV1, Topic>
 
 		if (dataObject.isParameterSet(TopicV1.INCOMING_NAME))
 		{
-
 			for (final TopicV1 topic : dataObject.getIncomingRelationships().getItems())
 			{
 				final Topic otherTopic = entityManager.find(Topic.class, topic.getId());
