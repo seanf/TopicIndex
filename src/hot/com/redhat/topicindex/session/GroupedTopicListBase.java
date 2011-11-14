@@ -318,5 +318,8 @@ public class GroupedTopicListBase
 					pagingEntityQuery = topics;
 			}
 		}
+		
+		if (groupedTopicLists.size() != 0)
+			this.tab = groupedTopicLists.get(0).getDetachedTag().getTagId().toString();
 	}
 }

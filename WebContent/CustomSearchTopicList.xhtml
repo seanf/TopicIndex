@@ -610,7 +610,7 @@
 										<rich:componentControl event="onclick" for="topicContextMenu"
 											operation="show">
 											<f:param value="#{_topic.topicId}" name="actionTopicID" />
-											<f:param value="#{groupedTopicTagsList.urlVars}&amp;tab=#{groupedTopicList.detachedTag.tagId}" name="otherVars" />
+											<f:param value="#{groupedTopicTagsList.urlVars}#{empty groupedTopicTagsList.urlVars ? '?' : '&amp;'}tab=#{groupedTopicList.detachedTag.tagId}" name="otherVars" />
 											<f:param value="#{groupedTopicList.detachedTag.tagId}" name="tab" />
 										</rich:componentControl>
 									</h:commandButton>
