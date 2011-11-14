@@ -855,7 +855,7 @@ public class DocbookBuilder
 		landingPage.setTopicTitle(title);
 
 		for (final Tag tag : templateTags)
-			landingPage.addTag(tag.getTagId());
+			landingPage.addTag(tag);
 
 		/*
 		 * Apply the xml from the template topic, or a generic template if not

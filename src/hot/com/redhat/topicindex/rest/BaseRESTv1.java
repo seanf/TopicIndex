@@ -243,7 +243,7 @@ public class BaseRESTv1
 
 			assert entity != null : "entity should not be null";
 
-			factory.sync(entity, dataObject);
+			factory.sync(entityManager, entity, dataObject);
 			entityManager.persist(entity);
 			entityManager.flush();
 			transactionManager.commit();

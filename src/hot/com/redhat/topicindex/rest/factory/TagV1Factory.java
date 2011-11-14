@@ -1,5 +1,7 @@
 package com.redhat.topicindex.rest.factory;
 
+import javax.persistence.EntityManager;
+
 import com.redhat.topicindex.entity.Category;
 import com.redhat.topicindex.entity.Tag;
 import com.redhat.topicindex.rest.ExpandData;
@@ -47,7 +49,7 @@ public class TagV1Factory implements RESTDataObjectFactory<TagV1, Tag>
 	}
 
 	@Override
-	public void sync(Tag entity, TagV1 dataObject)
+	public void sync(final EntityManager entityManager, final Tag entity, final TagV1 dataObject)
 	{
 		// TODO Auto-generated method stub
 		

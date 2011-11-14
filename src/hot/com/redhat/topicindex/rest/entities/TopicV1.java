@@ -19,7 +19,7 @@ import com.redhat.topicindex.rest.collections.BaseRestCollectionV1;
  * A representation of the Topic resource to be sent via the REST interface.
  */
 @XmlRootElement(name = "topic")
-public class TopicV1 extends BaseRestV1 {
+public class TopicV1 extends BaseRESTEntityV1 {
 	public static final String ID_NAME = "id";
 	public static final String TITLE_NAME = "title";
 	public static final String DESCRIPTION_NAME = "description";

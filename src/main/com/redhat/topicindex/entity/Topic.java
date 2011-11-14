@@ -175,13 +175,31 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		this.topicToTags = topicToTags;
 	}
 
-	public void addTag(final int tagID)
+	public void addTag(final Tag tag)
 	{
-		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
-		if (filter(having(on(TopicToTag.class).getTag().getTagId(), equalTo(tagID)), this.getTopicToTags()).size() == 0)
-		{
-			final Tag tag = entityManager.find(Tag.class, tagID);
+		if (filter(having(on(TopicToTag.class).getTag(), equalTo(tag)), this.getTopicToTags()).size() == 0)
+		{			
 			this.topicToTags.add(new TopicToTag(this, tag));
+		}
+	}
+		
+	public void addTag(final EntityManager entityManager, final int tagID)
+	{
+		final Tag tag = entityManager.getReference(Tag.class, tagID);
+		addTag(tag);
+	}
+	
+	public void removeTag(final Tag tag)
+	{
+		removeTag(tag.getTagId());
+	}
+	
+	public void removeTag(final int tagID)
+	{
+		final List<TopicToTag> topicToTags = filter(having(on(TopicToTag.class).getTag().getTagId(), equalTo(tagID)), this.getTopicToTags());
+		if (topicToTags.size() != 0)
+		{
+			this.topicToTags.remove(topicToTags.get(0));
 		}
 	}
 
@@ -635,9 +653,21 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		return false;
 	}
 
+	public boolean removeRelationshipTo(final EntityManager entityManager, final Integer topicId)
+	{
+		final Topic topic = entityManager.getReference(Topic.class, topicId);
+		return removeRelationshipTo(topic);
+	}
+	
 	public boolean removeRelationshipTo(final Topic relatedTopic)
 	{
 		return removeRelationshipTo(relatedTopic.getTopicId());
+	}
+	
+	public boolean addRelationshipTo(final EntityManager entityManager, final Integer topicId)
+	{
+		final Topic topic = entityManager.getReference(Topic.class, topicId);
+		return addRelationshipTo(topic);
 	}
 
 	public boolean addRelationshipTo(final Topic relatedTopic)

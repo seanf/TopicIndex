@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 
-public abstract class BaseRestV1
+public abstract class BaseRESTEntityV1
 {
 	/**
 	 * Maintains a list of the database fields that have been specifically set
@@ -18,6 +18,8 @@ public abstract class BaseRestV1
 	private String deleteLink = null;
 	private String addLink = null;
 	private String[] expand = null;
+	private Boolean addItem = null;
+	private Boolean removeItem = null;
 
 	protected void setParamaterToConfigured(final String paramater)
 	{
@@ -93,5 +95,25 @@ public abstract class BaseRestV1
 	public void setExpand(final String[] expand)
 	{
 		this.expand = expand;
+	}
+
+	public Boolean getAddItem()
+	{
+		return addItem;
+	}
+
+	public void setAddItem(Boolean addItem)
+	{
+		this.addItem = addItem;
+	}
+
+	public Boolean getRemoveItem()
+	{
+		return removeItem;
+	}
+
+	public void setRemoveItem(Boolean removeItem)
+	{
+		this.removeItem = removeItem;
 	}
 }

@@ -2,7 +2,7 @@ package com.redhat.topicindex.rest.entities;
 
 import com.redhat.topicindex.rest.collections.BaseRestCollectionV1;
 
-public class TagV1 extends BaseRestV1
+public class TagV1 extends BaseRESTEntityV1
 {
 	private Integer id = null;
 	private String name = null;

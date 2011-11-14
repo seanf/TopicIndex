@@ -326,6 +326,7 @@ public class TopicHome extends VersionedEntityHome<Topic> implements DisplayMess
 
 	public void triggerCreateEvent()
 	{
+		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
 		final Topic topic = this.getInstance();
 
 		if (!this.isManaged())
@@ -341,7 +342,7 @@ public class TopicHome extends VersionedEntityHome<Topic> implements DisplayMess
 					if (key.startsWith(Constants.MATCH_TAG) && Integer.parseInt(paramMap.get(key)) == Constants.MATCH_TAG_STATE)
 					{
 						final Integer tagID = Integer.parseInt(key.replace(Constants.MATCH_TAG, ""));
-						topic.addTag(tagID);
+						topic.addTag(entityManager, tagID);
 					}
 				}
 				catch (final NumberFormatException ex)
@@ -467,9 +468,10 @@ public class TopicHome extends VersionedEntityHome<Topic> implements DisplayMess
 				{
 					boolean hasPermission = true;
 
-					// check to see if we have authority to modify this flag
-					// thanks to the
-					// category(s) it belongs to
+					/*
+					 * check to see if we have authority to modify this flag
+					 * thanks to the category(s) it belongs to
+					 */
 					for (TagToCategory category : existingTag.getTagToCategories())
 					{
 						try
@@ -534,23 +536,16 @@ public class TopicHome extends VersionedEntityHome<Topic> implements DisplayMess
 			// only proceed if there are some changes to make
 			if (removeTags.size() != 0 || addTags.size() != 0)
 			{
-				// remove the tags
+				// remove the deleted tags
 				for (final Tag removeTag : removeTags)
 				{
-					// clean the tag relationship from both collections
-					for (final Set<TopicToTag> collection : new ArrayList<Set<TopicToTag>>()
-					{
-						{
-							add(topicToTags);
-							add(removeTag.getTopicToTags());
-						}
-					})
-						with(collection).remove(having(on(TopicToTag.class).getTag(), equalTo(removeTag)));
+					topic.removeTag(removeTag);
 				}
 
+				// add the created tags
 				for (final Tag addTag : addTags)
 				{
-					topicToTags.add(new TopicToTag(topic, addTag));
+					topic.addTag(addTag);
 				}
 			}
 		}
