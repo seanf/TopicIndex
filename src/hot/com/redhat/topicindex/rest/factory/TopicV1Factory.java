@@ -128,8 +128,7 @@ public class TopicV1Factory implements RESTDataObjectFactory<TopicV1, Topic>
 				{
 					entity.removeRelationshipTo(entityManager, topic.getId());
 					otherTopic.removeRelationshipTo(entityManager, entity.getTopicId());
-				}
-				
+				}				
 			}
 		}
 		
