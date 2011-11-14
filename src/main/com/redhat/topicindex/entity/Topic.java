@@ -189,6 +189,13 @@ public class Topic implements java.io.Serializable, Comparable<Topic>
 		addTag(tag);
 	}
 	
+	public void addTag(final int tagID)
+	{
+		final EntityManager entityManager = (EntityManager) Component.getInstance("entityManager");
+		final Tag tag = entityManager.getReference(Tag.class, tagID);
+		addTag(tag);
+	}
+	
 	public void removeTag(final Tag tag)
 	{
 		removeTag(tag.getTagId());
