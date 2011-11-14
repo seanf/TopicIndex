@@ -205,6 +205,71 @@ public class BaseRESTv1
 		}
 
 	}
+	
+	protected <T, U> void createEntity(final Class<U> type, final T dataObject, final RESTDataObjectFactory<T, U> factory)
+	{
+		TransactionManager transactionManager = null;
+		EntityManager entityManager = null;
+
+		try
+		{
+			final InitialContext initCtx = new InitialContext();
+
+			final EntityManagerFactory entityManagerFactory = (EntityManagerFactory) initCtx.lookup("java:jboss/EntityManagerFactory");
+			if (entityManagerFactory == null)
+				throw new InternalServerErrorException("Could not find the EntityManagerFactory");
+
+			transactionManager = (TransactionManager) initCtx.lookup("java:jboss/TransactionManager");
+			if (transactionManager == null)
+				throw new InternalServerErrorException("Could not find the TransactionManager");
+
+			assert transactionManager != null : "transactionManager should not be null";
+			assert entityManagerFactory != null : "entityManagerFactory should not be null";
+
+			transactionManager.begin();
+
+			entityManager = entityManagerFactory.createEntityManager();
+			if (entityManager == null)
+				throw new InternalServerErrorException("Could not create an EntityManager");
+
+			assert entityManager != null : "entityManager should not be null";
+
+			final U entity = factory.create(entityManager, dataObject);
+			if (entity == null)
+				throw new BadRequestException("The entity could not be created");
+
+			assert entity != null : "entity should not be null";
+
+			entityManager.persist(entity);
+			entityManager.flush();
+			transactionManager.commit();
+		}
+		catch (final Failure ex)
+		{
+			SkynetExceptionUtilities.handleException(ex, false, "There was an error looking up the required manager objects");
+			throw ex;
+		}
+		catch (final Exception ex)
+		{
+			SkynetExceptionUtilities.handleException(ex, false, "Probably an error saving the entity");
+
+			try
+			{
+				transactionManager.rollback();
+			}
+			catch (final Exception ex2)
+			{
+				SkynetExceptionUtilities.handleException(ex2, false, "There was an error rolling back the transaction");
+			}
+
+			throw new InternalServerErrorException("There was an error saving the entity");
+		}
+		finally
+		{
+			if (entityManager != null)
+				entityManager.close();
+		}
+	}
 
 	protected <T, U> void updateEntity(final Class<U> type, final T dataObject, final RESTDataObjectFactory<T, U> factory, final Object id)
 	{

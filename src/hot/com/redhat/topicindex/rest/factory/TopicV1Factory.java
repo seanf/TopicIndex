@@ -147,4 +147,12 @@ public class TopicV1Factory implements RESTDataObjectFactory<TopicV1, Topic>
 			}
 		}
 	}
+
+	@Override
+	public Topic create(final EntityManager entityManager, final TopicV1 dataObject)
+	{
+		final Topic entity = new Topic();
+		this.sync(entityManager, entity, dataObject);
+		return entity;		
+	}
 }

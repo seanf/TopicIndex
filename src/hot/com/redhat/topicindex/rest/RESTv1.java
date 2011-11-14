@@ -2,6 +2,7 @@ package com.redhat.topicindex.rest;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -163,6 +164,15 @@ public class RESTv1 extends BaseRESTv1 implements RESTInterfaceV1
 	{
 		updateEntity(Topic.class, dataObject, new TopicV1Factory(), id);
 	}
+	
+	@POST
+	@Path("/topic/post/json")
+	@Consumes(
+	{ MediaType.APPLICATION_JSON })
+	public void creatTopic(final TopicV1 dataObject)
+	{
+		createEntity(Topic.class, dataObject, new TopicV1Factory());
+	}
 
 	/* TAG FUNCTIONS */
 	@GET
@@ -216,6 +226,7 @@ public class RESTv1 extends BaseRESTv1 implements RESTInterfaceV1
 	{
 		updateEntity(Tag.class, dataObject, new TagV1Factory(), id);
 	}
+	
 
 	/* CATEGORY FUNCTIONS */
 	@GET

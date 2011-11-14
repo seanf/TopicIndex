@@ -55,4 +55,11 @@ public class ProjectV1Factory implements RESTDataObjectFactory<ProjectV1, Projec
 		
 	}
 
+	@Override
+	public Project create(EntityManager entityManager, ProjectV1 dataObject)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

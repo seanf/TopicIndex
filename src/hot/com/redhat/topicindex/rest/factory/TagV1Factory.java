@@ -55,4 +55,11 @@ public class TagV1Factory implements RESTDataObjectFactory<TagV1, Tag>
 		
 	}
 
+	@Override
+	public Tag create(EntityManager entityManager, TagV1 dataObject)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

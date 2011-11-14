@@ -57,4 +57,11 @@ public class CategoryV1Factory implements RESTDataObjectFactory<CategoryV1, Cate
 		
 	}
 
+	@Override
+	public Category create(EntityManager entityManager, CategoryV1 dataObject)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
