@@ -149,29 +149,38 @@ public class RESTv1 extends BaseRESTv1 implements RESTInterfaceV1
 
 	@PUT
 	@Path("/topic/put/json/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(
 	{ MediaType.APPLICATION_JSON })
-	public void updateJSONTopic(@PathParam("id") final Integer id, final TopicV1 dataObject)
+	public TopicV1 updateJSONTopic(@PathParam("id") final Integer id, @QueryParam("expand") final String expand, final TopicV1 dataObject)
 	{
-		updateEntity(Topic.class, dataObject, new TopicV1Factory(), id);
+		final TopicV1Factory factory = new TopicV1Factory();
+		final Topic topic = updateEntity(Topic.class, dataObject, factory, id);
+		return factory.create(topic, this.getBaseUrl(), JSON_URL, expand);
 	}
 
 	@PUT
 	@Path("/topic/put/xml/{id}")
+	@Produces(MediaType.APPLICATION_XML)
 	@Consumes(
 	{ MediaType.TEXT_XML })
-	public void updateXMLTopic(@PathParam("id") final Integer id, final TopicV1 dataObject)
+	public TopicV1 updateXMLTopic(@PathParam("id") final Integer id, @QueryParam("expand") final String expand, final TopicV1 dataObject)
 	{
-		updateEntity(Topic.class, dataObject, new TopicV1Factory(), id);
+		final TopicV1Factory factory = new TopicV1Factory();
+		final Topic topic = updateEntity(Topic.class, dataObject, factory, id);
+		return factory.create(topic, this.getBaseUrl(), XML_URL, expand);
 	}
 	
 	@POST
 	@Path("/topic/post/json")
+	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(
 	{ MediaType.APPLICATION_JSON })
-	public void creatTopic(final TopicV1 dataObject)
+	public TopicV1 creatTopic(@QueryParam("expand") final String expand, final TopicV1 dataObject)
 	{
-		createEntity(Topic.class, dataObject, new TopicV1Factory());
+		final TopicV1Factory factory = new TopicV1Factory();
+		final Topic topic = createEntity(Topic.class, dataObject, factory);
+		return factory.create(topic, this.getBaseUrl(), JSON_URL, expand);
 	}
 
 	/* TAG FUNCTIONS */

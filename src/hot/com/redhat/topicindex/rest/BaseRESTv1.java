@@ -205,18 +205,18 @@ public class BaseRESTv1
 		}
 
 	}
-	
-	protected <T, U> void createEntity(final Class<U> type, final T dataObject, final RESTDataObjectFactory<T, U> factory)
+
+	protected <T, U> U createEntity(final Class<U> type, final T dataObject, final RESTDataObjectFactory<T, U> factory)
 	{
-		createOrUdpateEntity(type, dataObject, factory, null, false);
-	}
-	
-	protected <T, U> void updateEntity(final Class<U> type, final T dataObject, final RESTDataObjectFactory<T, U> factory, final Object id)
-	{
-		createOrUdpateEntity(type, dataObject, factory, id, true);
+		return createOrUdpateEntity(type, dataObject, factory, null, false);
 	}
 
-	private <T, U> void createOrUdpateEntity(final Class<U> type, final T dataObject, final RESTDataObjectFactory<T, U> factory, final Object id, final boolean update)
+	protected <T, U> U updateEntity(final Class<U> type, final T dataObject, final RESTDataObjectFactory<T, U> factory, final Object id)
+	{
+		return createOrUdpateEntity(type, dataObject, factory, id, true);
+	}
+
+	private <T, U> U createOrUdpateEntity(final Class<U> type, final T dataObject, final RESTDataObjectFactory<T, U> factory, final Object id, final boolean update)
 	{
 		TransactionManager transactionManager = null;
 		EntityManager entityManager = null;
@@ -244,6 +244,10 @@ public class BaseRESTv1
 
 			assert entityManager != null : "entityManager should not be null";
 
+			/*
+			 * The difference between creating or updating an entity is that we
+			 * create a new instance of U, or find an existing instance of U.
+			 */
 			U entity = null;
 			if (update)
 			{
@@ -262,9 +266,14 @@ public class BaseRESTv1
 
 			assert entity != null : "entity should not be null";
 
+			/* sync the entity with the data object */
+			factory.sync(entityManager, entity, dataObject);
+
 			entityManager.persist(entity);
 			entityManager.flush();
 			transactionManager.commit();
+			
+			return entity;
 		}
 		catch (final Failure ex)
 		{

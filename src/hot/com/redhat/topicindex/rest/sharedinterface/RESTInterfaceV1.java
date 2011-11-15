@@ -88,13 +88,15 @@ public interface RESTInterfaceV1
 	
 	@PUT
 	@Path("/topic/put/json/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes({MediaType.APPLICATION_JSON})
-	public void updateJSONTopic(@PathParam("id") final Integer id, final TopicV1 dataObject);
+	public TopicV1 updateJSONTopic(@PathParam("id") final Integer id, @QueryParam("expand") final String expand, final TopicV1 dataObject);
 	
 	@PUT
 	@Path("/topic/put/xml/{id}")
+	@Produces(MediaType.APPLICATION_XML)
 	@Consumes({MediaType.APPLICATION_XML})
-	public void updateXMLTopic(@PathParam("id") final Integer id, final TopicV1 dataObject);
+	public TopicV1 updateXMLTopic(@PathParam("id") final Integer id, @QueryParam("expand") final String expand, final TopicV1 dataObject);
 	
 	/* TAG FUNCTIONS */
 	@GET
